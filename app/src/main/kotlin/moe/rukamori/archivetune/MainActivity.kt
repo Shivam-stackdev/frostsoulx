@@ -458,6 +458,10 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
+        if (!isMusicServiceBound || playerConnection?.aodModeEnabled?.value == true) {
+            super.onStop()
+            return
+        }
         safeUnbindMusicService()
         super.onStop()
     }
@@ -1036,12 +1040,32 @@ class MainActivity : ComponentActivity() {
                             controller.systemBarsBehavior =
                                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                             controller.hide(WindowInsetsCompat.Type.systemBars())
-                            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                            @Suppress("DEPRECATION")
+                            window.addFlags(
+                                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON or
+                                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                            )
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                                setShowWhenLocked(true)
+                                setTurnScreenOn(true)
+                            }
                         } else {
                             controller.show(WindowInsetsCompat.Type.systemBars())
                             controller.systemBarsBehavior =
                                 WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
-                            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                            @Suppress("DEPRECATION")
+                            window.clearFlags(
+                                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON or
+                                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                            )
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                                setShowWhenLocked(false)
+                                setTurnScreenOn(false)
+                            }
                         }
                     }
 
