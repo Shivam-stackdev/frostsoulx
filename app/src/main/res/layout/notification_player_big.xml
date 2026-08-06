@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/transparent">
+
+    <!--
+        Media3 will inject its own media controls above this.
+        This layout is used as the custom big content view.
+        The lyrics text sits at the bottom of the expanded notification.
+    -->
+
+    <TextView
+        android:id="@+id/notification_lyrics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="12dp"
+        android:textSize="13sp"
+        android:textColor="#E0E0E0"
+        android:maxLines="1"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:text="..."
+        android:gravity="center"
+        android:fontFamily="sans-serif-medium"
+        android:background="@android:color/transparent" />
+
+</LinearLayout>

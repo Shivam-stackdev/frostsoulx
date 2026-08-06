@@ -40,6 +40,7 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
@@ -219,6 +220,10 @@ import moe.rukamori.archivetune.innertube.models.response.PlayerResponse
 import moe.rukamori.archivetune.lastfm.LastFM
 import moe.rukamori.archivetune.lyrics.LyricsHelper
 import moe.rukamori.archivetune.lyrics.LyricsPreloadManager
+import moe.rukamori.archivetune.lyrics.LyricsUtils.isLineSyncedLrc
+import moe.rukamori.archivetune.lyrics.LyricsUtils.isTtml
+import moe.rukamori.archivetune.lyrics.LyricsUtils.parseLyrics
+import moe.rukamori.archivetune.lyrics.LyricsUtils.parseTtml
 import moe.rukamori.archivetune.models.MediaMetadata
 import moe.rukamori.archivetune.models.PersistPlayerState
 import moe.rukamori.archivetune.models.PersistQueue
@@ -521,6 +526,10 @@ class MusicService :
     private var crossfadeProgress = 0f
     private var crossfadePlaybackRequested = false
     private var lyricsPreloadManager: LyricsPreloadManager? = null
+    private lateinit var lyricsNotificationProvider: ArchiveTuneMediaNotificationProvider
+    private val lyricsHandler = Handler(Looper.getMainLooper())
+    private var lyricsUpdateRunnable: Runnable? = null
+    private var currentSongLyrics: List<moe.rukamori.archivetune.lyrics.LyricsEntry>? = null
 
     private val secondaryCrossfadeListener =
         object : Player.Listener {
@@ -1187,12 +1196,12 @@ class MusicService :
                     ),
                 ).setBitmapLoader(CoilBitmapLoader(this, scope))
                 .build()
-        setMediaNotificationProvider(
+        lyricsNotificationProvider =
             ArchiveTuneMediaNotificationProvider(
                 context = this,
                 smallIconResId = R.drawable.small_icon,
-            ),
-        )
+            )
+        setMediaNotificationProvider(lyricsNotificationProvider)
 
         updateNotification()
         player.repeatMode = REPEAT_MODE_OFF
@@ -6478,6 +6487,8 @@ class MusicService :
                 }
             }
         }
+        currentSongLyrics = null
+        if (mediaItem != null) loadLyricsForCurrentSong()
         if (playWhenReady && !isCrossfading) {
             scheduleCrossfade()
         } else if (!playWhenReady && !isCrossfading) {
@@ -6504,6 +6515,7 @@ class MusicService :
                 }
             }
         }
+        if (isPlaying) startLyricsSync() else stopLyricsSync()
         if (isPlaying && !isCrossfading) {
             scheduleCrossfade()
         }
@@ -8141,7 +8153,40 @@ class MusicService :
         }
     }
 
+    private fun startLyricsSync() {
+        stopLyricsSync()
+        lyricsUpdateRunnable = object : Runnable {
+            override fun run() {
+                if (!player.isPlaying) return
+                if (currentSongLyrics == null) loadLyricsForCurrentSong()
+                if (lyricsNotificationProvider.updateLyricsPosition(currentSongLyrics, player.currentPosition)) {
+                    refreshPlaybackNotification()
+                }
+                lyricsHandler.postDelayed(this, 400L)
+            }
+        }
+        lyricsHandler.post(lyricsUpdateRunnable!!)
+    }
+
+    private fun stopLyricsSync() {
+        lyricsUpdateRunnable?.let(lyricsHandler::removeCallbacks)
+        lyricsUpdateRunnable = null
+    }
+
+    private fun loadLyricsForCurrentSong() {
+        val mediaId = player.currentMediaItem?.mediaId ?: return
+        scope.launch {
+            val rawLyrics = database.lyrics(mediaId).first()?.lyrics ?: return@launch
+            currentSongLyrics = when {
+                isTtml(rawLyrics) -> parseTtml(rawLyrics)
+                isLineSyncedLrc(rawLyrics) -> parseLyrics(rawLyrics)
+                else -> emptyList()
+            }
+        }
+    }
+
     override fun onDestroy() {
+        stopLyricsSync()
         equalizerPlaybackController.detach(this)
         discordServiceStopping = true
         requestDiscordSync(
