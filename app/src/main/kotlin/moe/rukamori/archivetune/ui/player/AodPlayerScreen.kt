@@ -721,16 +721,14 @@ private fun AodSliderSection(
             if (seekEnabled) makeTimeString(duration) else ""
         }
     val sliderColors =
-        remember(accentColor) {
-            SliderDefaults.colors(
-                thumbColor = accentColor,
-                activeTrackColor = accentColor,
-                inactiveTrackColor = White30,
-                disabledThumbColor = White30,
-                disabledActiveTrackColor = White30,
-                disabledInactiveTrackColor = White15,
-            )
-        }
+        SliderDefaults.colors(
+            thumbColor = accentColor,
+            activeTrackColor = accentColor,
+            inactiveTrackColor = White30,
+            disabledThumbColor = White30,
+            disabledActiveTrackColor = White30,
+            disabledInactiveTrackColor = White15,
+        )
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Slider(
