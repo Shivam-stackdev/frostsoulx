@@ -6488,7 +6488,7 @@ class MusicService :
             }
         }
         currentSongLyrics = null
-        if (mediaItem != null) loadLyricsForCurrentSong()
+        if (player.currentMediaItem != null) loadLyricsForCurrentSong()
         if (playWhenReady && !isCrossfading) {
             scheduleCrossfade()
         } else if (!playWhenReady && !isCrossfading) {

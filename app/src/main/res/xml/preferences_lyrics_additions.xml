@@ -3,8 +3,7 @@
     Example: res/xml/preferences_lyrics.xml or wherever your settings are defined.
 -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Existing preferences... -->
 
@@ -13,13 +12,13 @@
         android:title="Notification Lyrics"
         android:summary="Show time-synced lyrics in the notification shade"
         android:defaultValue="true"
-        app:iconSpaceReserved="false" />
+        />
 
     <SwitchPreferenceCompat
         android:key="lyrics_dark_cyan_highlight"
         android:title="Dark Cyan Highlight"
         android:summary="Highlight the active lyric line with a dark cyan overlay"
         android:defaultValue="false"
-        app:iconSpaceReserved="false" />
+        />
 
 </PreferenceScreen>

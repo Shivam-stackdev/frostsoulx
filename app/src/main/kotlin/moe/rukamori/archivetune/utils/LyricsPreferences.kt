@@ -2,7 +2,6 @@ package moe.rukamori.archivetune.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 
 /**
  * Preferences for lyrics display options.
@@ -13,7 +12,7 @@ object LyricsPreferences {
     private const val NOTIFICATION_LYRICS_ENABLED = "notification_lyrics_enabled"
 
     private fun prefs(context: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(context)
+        return context.getSharedPreferences("lyrics_preferences", Context.MODE_PRIVATE)
     }
 
     /**
