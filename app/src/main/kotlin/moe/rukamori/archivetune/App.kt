@@ -37,10 +37,7 @@ import moe.rukamori.archivetune.ads.SupportAdsInitializer
 import moe.rukamori.archivetune.canvas.ArchiveTuneCanvas
 import moe.rukamori.archivetune.constants.*
 import moe.rukamori.archivetune.extensions.*
-import moe.rukamori.archivetune.gatekeeper.GatekeeperResult
-import moe.rukamori.archivetune.gatekeeper.RunGatekeeperCheckUseCase
 import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.NetworkGatekeeper
 import moe.rukamori.archivetune.innertube.models.YouTubeLocale
 import moe.rukamori.archivetune.kugou.KuGou
 import moe.rukamori.archivetune.lastfm.LastFM
