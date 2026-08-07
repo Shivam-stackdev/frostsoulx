@@ -40,6 +40,7 @@ import moe.rukamori.archivetune.extensions.*
 import moe.rukamori.archivetune.gatekeeper.GatekeeperResult
 import moe.rukamori.archivetune.gatekeeper.RunGatekeeperCheckUseCase
 import moe.rukamori.archivetune.innertube.YouTube
+import moe.rukamori.archivetune.innertube.NetworkGatekeeper
 import moe.rukamori.archivetune.innertube.models.YouTubeLocale
 import moe.rukamori.archivetune.kugou.KuGou
 import moe.rukamori.archivetune.lastfm.LastFM
@@ -124,15 +125,12 @@ class App :
         initializeDeferredAsync()
     }
 
-    private fun initializeGatekeeper() {
-        applicationScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                val result = runGatekeeperCheckUseCase()
-                if (result !is GatekeeperResult.Blocked || !result.retryable) return@launch
-                delay(GATEKEEPER_RETRY_INTERVAL_MILLIS)
-            }
+        private fun initializeGatekeeper() {
+        // BYPASSED: Gatekeeper disabled for fork
+        // Prevents "Connection blocked by ArchiveTune Remote" toast
+        NetworkGatekeeper.setConnectionBlocked(false)
         }
-    }
+        
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
