@@ -555,12 +555,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val gatekeeperViewModel: GatekeeperViewModel = hiltViewModel()
-            LaunchedEffect(Unit) {
-                gatekeeperViewModel.blockedMessages.collect { message ->
-                    Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
-                }
-            }
+
 
             val updateChannel by rememberEnumPreference(UpdateChannelKey, defaultValue = defaultUpdateChannel)
 
