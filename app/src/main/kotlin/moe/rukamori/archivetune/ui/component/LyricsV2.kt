@@ -11,6 +11,7 @@ package moe.rukamori.archivetune.ui.component
 
 import android.view.WindowManager
 import android.widget.Toast
+import moe.rukamori.archivetune.constants.LyricsDarkCyanHighlightKey
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
