@@ -769,14 +769,16 @@ fun LyricsV2(
                             Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    color =
-                                        if (isSelected && isSelectionModeActive) {
-                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                                        } else {
-                                            Color.Transparent
-                                        },
-                                    shape = RoundedCornerShape(8.dp),
-                                ).padding(
+    color =
+        if (isSelected && isSelectionModeActive) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+        } else if (isActive && lyricsDarkCyanHighlight) {
+            Color(0xFF008B8B).copy(alpha = 0.2f)
+        } else {
+            Color.Transparent
+        },
+    shape = RoundedCornerShape(8.dp),
+).padding(
                                     start = if (isAllBackground) 24.dp else 12.dp,
                                     end = 12.dp,
                                     top =
