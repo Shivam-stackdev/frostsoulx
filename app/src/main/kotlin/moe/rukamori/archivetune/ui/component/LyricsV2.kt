@@ -20,7 +20,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import moe.rukamori.archivetune.constants.LyricsDarkCyanHighlightKey
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -882,6 +881,7 @@ fun LyricsV2(
                                 isPast = isPast,
                                 currentPositionMs = currentPositionMs,
                                 textColor = textColor,
+                                fillColor = if (lyricsDarkCyanHighlight) Color(0xFF008B8B) else textColor,
                                 inactiveAlpha = inactiveAlpha,
                                 baseFontSize = lyricsTextSize,
                                 isLineAllBackground = isAllBackground,
