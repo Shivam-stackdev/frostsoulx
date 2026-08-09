@@ -10,6 +10,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.widget.RemoteViews
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
@@ -41,8 +44,9 @@ class ArchiveTuneMediaNotificationProvider(
     private val bigRemoteViews by lazy {
         RemoteViews(context.packageName, R.layout.notification_player_big)
     }
-    private var lastLyricLine = ""
+    private var lastLyricLine: CharSequence = ""
     private var lastActiveIndex = -1
+    private var lastActiveWordCount = -1
 
     override fun createNotification(
         mediaSession: MediaSession,
@@ -79,24 +83,59 @@ class ArchiveTuneMediaNotificationProvider(
         return MediaNotification(mediaNotification.notificationId, notification)
     }
 
-    /** Updates the expanded notification's current lyric line. */
-    fun updateLyricsPosition(lyrics: List<LyricsEntry>?, positionMs: Long): Boolean {
-        val newLine = findCurrentLine(lyrics, positionMs)
+    /**
+     * Updates the expanded notification's current lyric line.
+     *
+     * When [highlightEnabled] and the entry has word-level timing, already-sung words are
+     * painted dark cyan. RemoteViews can't animate a live sweep like the in-app player does,
+     * so this is a stepped approximation: each word snaps to cyan once playback reaches it,
+     * re-rendered on the same ~400ms tick that drives this call.
+     */
+    fun updateLyricsPosition(
+        lyrics: List<LyricsEntry>?,
+        positionMs: Long,
+        highlightEnabled: Boolean,
+    ): Boolean {
         val newIndex = findCurrentIndex(lyrics, positionMs)
-        if (newLine == lastLyricLine && newIndex == lastActiveIndex) return false
-        lastLyricLine = newLine
+        val entry = lyrics?.getOrNull(newIndex)
+        val wordCount = if (highlightEnabled) countHighlightedWords(entry, positionMs) else -1
+        if (newIndex == lastActiveIndex && wordCount == lastActiveWordCount) return false
         lastActiveIndex = newIndex
-        bigRemoteViews.setTextViewText(R.id.notification_lyrics, newLine)
+        lastActiveWordCount = wordCount
+        lastLyricLine = buildLyricLine(entry, positionMs, highlightEnabled)
+        bigRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricLine)
         return true
     }
 
-    private fun findCurrentLine(lyrics: List<LyricsEntry>?, positionMs: Long): String {
-        if (lyrics.isNullOrEmpty()) return ""
-        var current = ""
-        for (entry in lyrics) {
-            if (entry.time <= positionMs) current = entry.text else break
+    private fun countHighlightedWords(entry: LyricsEntry?, positionMs: Long): Int {
+        val words = entry?.words ?: return -1
+        return words.count { positionMs >= (it.startTime * 1000).toLong() }
+    }
+
+    private fun buildLyricLine(
+        entry: LyricsEntry?,
+        positionMs: Long,
+        highlightEnabled: Boolean,
+    ): CharSequence {
+        if (entry == null) return ""
+        val words = entry.words
+        if (!highlightEnabled || words.isNullOrEmpty()) return entry.text
+
+        val builder = SpannableStringBuilder()
+        for (word in words) {
+            val start = builder.length
+            builder.append(word.text)
+            val wordStartMs = (word.startTime * 1000).toLong()
+            if (positionMs >= wordStartMs) {
+                builder.setSpan(
+                    ForegroundColorSpan(0xFF008B8B.toInt()),
+                    start,
+                    builder.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
         }
-        return current
+        return builder
     }
 
     private fun findCurrentIndex(lyrics: List<LyricsEntry>?, positionMs: Long): Int {
