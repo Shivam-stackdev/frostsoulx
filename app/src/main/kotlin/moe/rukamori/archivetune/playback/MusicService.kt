@@ -184,6 +184,7 @@ import moe.rukamori.archivetune.constants.ScrobbleDelayPercentKey
 import moe.rukamori.archivetune.constants.ScrobbleDelaySecondsKey
 import moe.rukamori.archivetune.constants.ScrobbleMinSongDurationKey
 import moe.rukamori.archivetune.constants.ShowLyricsKey
+import moe.rukamori.archivetune.constants.LyricsDarkCyanHighlightKey
 import moe.rukamori.archivetune.constants.SkipSilenceKey
 import moe.rukamori.archivetune.constants.SmartTrimmerKey
 import moe.rukamori.archivetune.constants.StopMusicOnTaskClearKey
@@ -529,6 +530,8 @@ class MusicService :
     private lateinit var lyricsNotificationProvider: ArchiveTuneMediaNotificationProvider
     private val lyricsHandler = Handler(Looper.getMainLooper())
     private var lyricsUpdateRunnable: Runnable? = null
+        @Volatile
+private var lyricsNotificationHighlightEnabled = false
     private var currentSongLyrics: List<moe.rukamori.archivetune.lyrics.LyricsEntry>? = null
 
     private val secondaryCrossfadeListener =
@@ -1045,6 +1048,12 @@ class MusicService :
         super.onCreate()
         equalizerPlaybackController.attach(this)
         ensureScopesActive()
+        ioScope.launch {
+    dataStore.data
+        .map { it[LyricsDarkCyanHighlightKey] ?: false }
+        .distinctUntilChanged()
+        .collectLatest { lyricsNotificationHighlightEnabled = it }
+        }
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -8159,7 +8168,12 @@ class MusicService :
             override fun run() {
                 if (!player.isPlaying) return
                 if (currentSongLyrics == null) loadLyricsForCurrentSong()
-                if (lyricsNotificationProvider.updateLyricsPosition(currentSongLyrics, player.currentPosition)) {
+                if (lyricsNotificationProvider.updateLyricsPosition(
+        currentSongLyrics,
+        player.currentPosition,
+        lyricsNotificationHighlightEnabled,
+    )
+) {
                     refreshPlaybackNotification()
                 }
                 lyricsHandler.postDelayed(this, 400L)
