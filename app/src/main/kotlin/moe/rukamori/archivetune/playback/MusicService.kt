@@ -1045,8 +1045,8 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     override fun onCreate() {
-        equalizerPlaybackController.attach(this)
         super.onCreate()
+        equalizerPlaybackController.attach(this)
         ensureScopesActive()
 
         dataStore.data
