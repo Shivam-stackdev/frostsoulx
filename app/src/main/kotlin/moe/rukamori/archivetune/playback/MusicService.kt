@@ -1045,22 +1045,13 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     override fun onCreate() {
-        super.onCreate()
         equalizerPlaybackController.attach(this)
         ensureScopesActive()
-        1050  equalizerPlaybackController.attach(this)
-1051  ensureScopesActive()
-1052
-1053  dataStore.data
-1054      .map { it[LyricsDarkCyanHighlightKey] ?: false }
-1055      .distinctUntilChanged()
-1056      .collectLatest(ioScope) { lyricsNotificationHighlightEnabled = it }
-        ioScope.launch {
-    dataStore.data
-        .map { it[LyricsDarkCyanHighlightKey] ?: false }
-        .distinctUntilChanged()
-        .collectLatest { lyricsNotificationHighlightEnabled = it }
-        }
+
+        dataStore.data
+            .map { it[LyricsDarkCyanHighlightKey] ?: false }
+            .distinctUntilChanged()
+            .collectLatest(ioScope) { lyricsNotificationHighlightEnabled = it }
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
