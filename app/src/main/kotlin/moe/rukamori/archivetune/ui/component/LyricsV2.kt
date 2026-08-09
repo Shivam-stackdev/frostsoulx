@@ -1412,7 +1412,7 @@ private fun AnimatedWordV2(
                         shadow =
                             if (glowAlpha > 0f) {
                                 Shadow(
-                                    color = textColor.copy(alpha = glowAlpha),
+                                    color = fillColor.copy(alpha = glowAlpha)
                                     offset = Offset.Zero,
                                     blurRadius = glowRadius.coerceAtLeast(1f),
                                 )
@@ -1421,9 +1421,9 @@ private fun AnimatedWordV2(
                             },
                     ),
                 color =
-                    textColor.copy(
-                        alpha = if (isBackground) 0.75f else 1f,
-                    ),
+    fillColor.copy(
+        alpha = if (isBackground) 0.75f else 1f,
+    ),
                 modifier =
                     if (isWordActive && !isWordComplete) {
                         Modifier
