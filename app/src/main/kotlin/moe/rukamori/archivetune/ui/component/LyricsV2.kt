@@ -1402,7 +1402,7 @@ private fun AnimatedWordV2(
         if (isWordComplete || isWordActive || isLinePast) {
             Text(
                 text = word.text,
-                style =
+              style =
                     MaterialTheme.typography.headlineMedium.copy(
                         fontSize = actualFontSize.sp,
                         fontWeight = fontWeight,
@@ -1412,7 +1412,7 @@ private fun AnimatedWordV2(
                         shadow =
                             if (glowAlpha > 0f) {
                                 Shadow(
-                                    color = fillColor.copy(alpha = glowAlpha)
+                                    color = fillColor.copy(alpha = glowAlpha),
                                     offset = Offset.Zero,
                                     blurRadius = glowRadius.coerceAtLeast(1f),
                                 )
@@ -1421,9 +1421,9 @@ private fun AnimatedWordV2(
                             },
                     ),
                 color =
-    fillColor.copy(
-        alpha = if (isBackground) 0.75f else 1f,
-    ),
+                    fillColor.copy(
+                        alpha = if (isBackground) 0.75f else 1f,
+                    ),
                 modifier =
                     if (isWordActive && !isWordComplete) {
                         Modifier
