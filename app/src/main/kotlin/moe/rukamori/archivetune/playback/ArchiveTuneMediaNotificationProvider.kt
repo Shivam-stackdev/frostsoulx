@@ -68,7 +68,7 @@ class ArchiveTuneMediaNotificationProvider(
         val notification =
             NotificationCompat.Builder(context, original)
                 .setContentText(lastLyricLine)
-                .setStyle(NotificationCompat.DecoratedMediaCustomViewStyle())
+                .setStyle(androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle())
                 .setCustomContentView(bigRemoteViews.apply {
                     setTextViewText(R.id.notification_lyrics, lastLyricLine)
                 })
