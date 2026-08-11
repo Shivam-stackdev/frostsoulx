@@ -6496,6 +6496,9 @@ private var lyricsNotificationHighlightEnabled = false
             }
         }
         currentSongLyrics = null
+        if (lyricsNotificationProvider.updateLyricsPosition(null, 0L, lyricsNotificationHighlightEnabled)) {
+            refreshPlaybackNotification()
+        }
         if (player.currentMediaItem != null) loadLyricsForCurrentSong()
         if (playWhenReady && !isCrossfading) {
             scheduleCrossfade()
@@ -8175,7 +8178,7 @@ private var lyricsNotificationHighlightEnabled = false
 ) {
                     refreshPlaybackNotification()
                 }
-                lyricsHandler.postDelayed(this, 400L)
+                lyricsHandler.postDelayed(this, 350L)
             }
         }
         lyricsHandler.post(lyricsUpdateRunnable!!)
@@ -8190,10 +8193,19 @@ private var lyricsNotificationHighlightEnabled = false
         val mediaId = player.currentMediaItem?.mediaId ?: return
         scope.launch {
             val rawLyrics = database.lyrics(mediaId).first()?.lyrics ?: return@launch
+            if (player.currentMediaItem?.mediaId != mediaId) return@launch
             currentSongLyrics = when {
                 isTtml(rawLyrics) -> parseTtml(rawLyrics)
                 isLineSyncedLrc(rawLyrics) -> parseLyrics(rawLyrics)
                 else -> emptyList()
+            }
+            if (lyricsNotificationProvider.updateLyricsPosition(
+                    currentSongLyrics,
+                    player.currentPosition,
+                    lyricsNotificationHighlightEnabled,
+                )
+            ) {
+                refreshPlaybackNotification()
             }
         }
     }

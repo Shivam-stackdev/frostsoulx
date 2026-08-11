@@ -45,6 +45,7 @@ class ArchiveTuneMediaNotificationProvider(
         RemoteViews(context.packageName, R.layout.notification_player_big)
     }
     private var lastLyricLine: CharSequence = ""
+    private var lastLyricsHash: Int? = null
     private var lastActiveIndex = -1
     private var lastActiveWordCount = -1
 
@@ -96,10 +97,18 @@ class ArchiveTuneMediaNotificationProvider(
         positionMs: Long,
         highlightEnabled: Boolean,
     ): Boolean {
+        val lyricsHash = lyrics?.hashCode()
         val newIndex = findCurrentIndex(lyrics, positionMs)
         val entry = lyrics?.getOrNull(newIndex)
         val wordCount = if (highlightEnabled) countHighlightedWords(entry, positionMs) else -1
-        if (newIndex == lastActiveIndex && wordCount == lastActiveWordCount) return false
+        if (
+            lyricsHash == lastLyricsHash &&
+            newIndex == lastActiveIndex &&
+            wordCount == lastActiveWordCount
+        ) {
+            return false
+        }
+        lastLyricsHash = lyricsHash
         lastActiveIndex = newIndex
         lastActiveWordCount = wordCount
         lastLyricLine = buildLyricLine(entry, positionMs, highlightEnabled)

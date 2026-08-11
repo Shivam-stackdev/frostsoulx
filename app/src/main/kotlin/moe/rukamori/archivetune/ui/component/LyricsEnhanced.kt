@@ -144,6 +144,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
+private const val KARAOKE_DARK_CYAN = 0xFF008B8B
 private const val LRC_LEAD_MS = 300L
 private const val TTML_LEAD_MS = 0L
 private const val LYRIC_VISUAL_TUNING_OFFSET_MS = 150L
@@ -160,6 +161,37 @@ private const val SMOOTH_PLAYBACK_MAX_BACKWARD_DRIFT_MS = 180L
 private const val SMOOTH_PLAYBACK_DRIFT_CORRECTION = 0.55f
 private const val LYRIC_FOCUS_SCROLL_DURATION_MS = 520
 private const val MIN_KARAOKE_SYLLABLE_DURATION_MS = 1
+
+private fun buildProgressiveKaraokeText(
+    words: List<WordTimestamp>,
+    positionMs: Long,
+    textColor: Color,
+): AnnotatedString = buildAnnotatedString {
+    val darkCyan = Color(KARAOKE_DARK_CYAN.toInt())
+    words.forEach { word ->
+        val start = word.startTime * 1000.0
+        val end = (word.endTime * 1000.0).coerceAtLeast(start + 1.0)
+        val progress = ((positionMs - start) / (end - start)).toFloat().coerceIn(0f, 1f)
+        val style = when {
+            positionMs >= end -> SpanStyle(color = darkCyan)
+            positionMs <= start -> SpanStyle(color = textColor)
+            else -> {
+                val edge = (progress + 0.02f).coerceAtMost(1f)
+                SpanStyle(
+                    brush = Brush.horizontalGradient(
+                        colorStops = arrayOf(
+                            0f to darkCyan,
+                            progress to darkCyan,
+                            edge to textColor,
+                            1f to textColor,
+                        ),
+                    ),
+                )
+            }
+        }
+        withStyle(style) { append(word.text) }
+    }
+}
 
 @Composable
 fun LyricsEnhanced(
@@ -739,6 +771,32 @@ fun LyricsEnhanced(
                             keepAliveZone = 72.dp,
                             modifier = Modifier.fillMaxSize(),
                         )
+                    }
+
+                    // The library renderer remains responsible for layout, scrolling, and timing.
+                    // This transparent overlay only paints the focused line with the fork's QQ-style
+                    // progressive Dark Cyan word sweep, using the same playback position and words.
+                    val overlayPositionMs = playbackSyncPosition().toLong()
+                    val overlayEntry = lyricsEntries.lastOrNull { it.time <= overlayPositionMs }
+                    val overlayWords = overlayEntry?.words
+                    if (overlayWords != null && overlayWords.isNotEmpty()) {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(top = lyricsViewportOffset),
+                            contentAlignment = Alignment.TopCenter,
+                        ) {
+                            Text(
+                                text = buildProgressiveKaraokeText(
+                                    words = overlayWords,
+                                    positionMs = overlayPositionMs,
+                                    textColor = textColor,
+                                ),
+                                style = normalTextStyle,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                     }
                 }
             }
