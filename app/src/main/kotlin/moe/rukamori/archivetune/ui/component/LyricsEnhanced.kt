@@ -79,11 +79,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -117,6 +121,7 @@ import moe.rukamori.archivetune.LocalPlayerConnection
 import moe.rukamori.archivetune.R
 import moe.rukamori.archivetune.constants.LyricsClickKey
 import moe.rukamori.archivetune.constants.LyricsLineBlurKey
+import moe.rukamori.archivetune.constants.LyricsDarkCyanHighlightKey
 import moe.rukamori.archivetune.constants.LyricsRomanizeChineseKey
 import moe.rukamori.archivetune.constants.LyricsRomanizeHindiKey
 import moe.rukamori.archivetune.constants.LyricsRomanizeJapaneseKey
@@ -211,6 +216,7 @@ fun LyricsEnhanced(
     val playerConnection = LocalPlayerConnection.current ?: return
     val player = playerConnection.player
     val context = LocalContext.current
+    val density = LocalDensity.current
     val animationsDisabled = LocalAnimationsDisabled.current
 
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
@@ -219,6 +225,7 @@ fun LyricsEnhanced(
     val (lyricsClick) = rememberPreference(LyricsClickKey, defaultValue = true)
     val (lyricsTextSize) = rememberPreference(LyricsTextSizeKey, defaultValue = 26f)
     val (lyricsLineBlurPreference) = rememberPreference(LyricsLineBlurKey, defaultValue = true)
+    val (lyricsDarkCyanHighlight) = rememberPreference(LyricsDarkCyanHighlightKey, defaultValue = false)
     val (romanizeChinese) = rememberPreference(LyricsRomanizeChineseKey, defaultValue = true)
     val (romanizeHindi) = rememberPreference(LyricsRomanizeHindiKey, defaultValue = true)
     val (romanizeJapanese) = rememberPreference(LyricsRomanizeJapaneseKey, defaultValue = true)
@@ -780,30 +787,55 @@ fun LyricsEnhanced(
                         )
                     }
 
-                    // Keep the library renderer responsible for layout, scrolling, and timing.
-                    // This layer is transparent except for the word-level Dark Cyan progress, and is
-                    // positioned over the same active LazyColumn item instead of duplicating the line
-                    // at the top of the viewport.
-                    val overlayPositionMs = playbackSyncPosition().toLong()
-                    val overlayIndex = lyricsEntries.indexOfLast { it.time <= overlayPositionMs }
-                    val overlayEntry = lyricsEntries.getOrNull(overlayIndex)
-                    val overlayWords = overlayEntry?.words
-                    val activeItem = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == overlayIndex }
-                    if (overlayWords != null && overlayWords.isNotEmpty() && activeItem != null) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Text(
-                                text = buildProgressiveKaraokeText(
-                                    words = overlayWords,
-                                    positionMs = overlayPositionMs,
-                                    textColor = textColor,
-                                ),
+                    if (lyricsDarkCyanHighlight) {
+                        // KaraokeLyricsView owns timing, scrolling, and row layout. Match its
+                        // actual line index and row bounds rather than drawing a second line at
+                        // the viewport origin. This keeps the sweep attached to the active row.
+                        val overlayPositionMs = playbackSyncPosition().toLong()
+                        val overlayLineIndex = syncedLyrics.findLastStartedLineIndex(overlayPositionMs.toInt())
+                        val activeItem =
+                            listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == overlayLineIndex }
+                        val overlayLine = syncedLyrics.lines.getOrNull(overlayLineIndex)
+                        val overlayStartMs = overlayLine?.start?.toLong()
+                        val overlayEntry =
+                            lyricsEntries.firstOrNull { entry ->
+                                val mainStartMs =
+                                    entry.words
+                                        ?.firstOrNull { !it.isBackground }
+                                        ?.let { (it.startTime * 1000.0).roundToLong() }
+                                mainStartMs != null && mainStartMs == overlayStartMs
+                            }
+                        val overlayWords = overlayEntry?.words?.filterNot(WordTimestamp::isBackground)
+                        if (overlayWords != null && overlayWords.isNotEmpty() && activeItem != null) {
+                            Box(
+                                contentAlignment = Alignment.Center,
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
+                                        .height(with(density) { activeItem.size.toDp() })
                                         .offset { IntOffset(0, activeItem.offset) },
-                                style = normalTextStyle.copy(color = Color.Transparent),
-                                textAlign = TextAlign.Center,
-                            )
+                            ) {
+                                Text(
+                                    text = buildProgressiveKaraokeText(
+                                        words = overlayWords,
+                                        positionMs = overlayPositionMs,
+                                        textColor = textColor,
+                                    ),
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .graphicsLayer {
+                                                compositingStrategy = CompositingStrategy.Offscreen
+                                            }
+                                            .drawWithContent {
+                                                // Keep the overlay in the row’s own drawing layer;
+                                                // the gradient span supplies the smooth word sweep.
+                                                drawContent()
+                                            },
+                                    style = normalTextStyle.copy(color = Color.Transparent),
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
                         }
                     }
                 }

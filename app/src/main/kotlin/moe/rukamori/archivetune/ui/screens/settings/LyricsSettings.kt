@@ -82,6 +82,7 @@ import moe.rukamori.archivetune.constants.LyricsClickKey
 import moe.rukamori.archivetune.constants.LyricsLineBlurKey
 import moe.rukamori.archivetune.constants.LyricsDarkCyanHighlightKey
 import moe.rukamori.archivetune.constants.LyricsLineSpacingKey
+import moe.rukamori.archivetune.constants.NotificationLyricsEnabledKey
 import moe.rukamori.archivetune.constants.LyricsMode
 import moe.rukamori.archivetune.constants.LyricsModeKey
 import moe.rukamori.archivetune.constants.LyricsProviderOrderKey
@@ -201,7 +202,9 @@ fun LyricsSettings(
         }
     val (lyricsLineBlur, onLyricsLineBlurChange) = rememberPreference(LyricsLineBlurKey, defaultValue = true)
     val (lyricsDarkCyanHighlight, onLyricsDarkCyanHighlightChange) =
-    rememberPreference(LyricsDarkCyanHighlightKey, defaultValue = false)
+        rememberPreference(LyricsDarkCyanHighlightKey, defaultValue = false)
+    val (notificationLyricsEnabled, onNotificationLyricsEnabledChange) =
+        rememberPreference(NotificationLyricsEnabledKey, defaultValue = true)
     val (lyricsRomanizeJapanese, onLyricsRomanizeJapaneseChange) = rememberPreference(LyricsRomanizeJapaneseKey, defaultValue = true)
     val (lyricsRomanizeKorean, onLyricsRomanizeKoreanChange) = rememberPreference(LyricsRomanizeKoreanKey, defaultValue = true)
     val (lyricsRomanizeChinese, onLyricsRomanizeChineseChange) = rememberPreference(LyricsRomanizeChineseKey, defaultValue = true)
@@ -400,12 +403,21 @@ fun LyricsSettings(
             }
            
             item {
-    SwitchPreference(
-        title = { Text(stringResource(R.string.lyrics_dark_cyan_highlight)) },
-        icon = { Icon(painterResource(R.drawable.lyrics), null) },
-        checked = lyricsDarkCyanHighlight,
-        onCheckedChange = onLyricsDarkCyanHighlightChange,
-    )
+                SwitchPreference(
+                    title = { Text(stringResource(R.string.lyrics_dark_cyan_highlight)) },
+                    icon = { Icon(painterResource(R.drawable.lyrics), null) },
+                    checked = lyricsDarkCyanHighlight,
+                    onCheckedChange = onLyricsDarkCyanHighlightChange,
+                )
+            }
+
+            item {
+                SwitchPreference(
+                    title = { Text(stringResource(R.string.notification_lyrics)) },
+                    icon = { Icon(painterResource(R.drawable.lyrics), null) },
+                    checked = notificationLyricsEnabled,
+                    onCheckedChange = onNotificationLyricsEnabledChange,
+                )
             }
 
             item {

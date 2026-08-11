@@ -48,6 +48,7 @@ class ArchiveTuneMediaNotificationProvider(
     private var lastLyricsHash: Int? = null
     private var lastActiveIndex = -1
     private var lastActiveWordCount = -1
+    private var lastLyricsEnabled = true
 
     override fun createNotification(
         mediaSession: MediaSession,
@@ -67,9 +68,12 @@ class ArchiveTuneMediaNotificationProvider(
         val notification =
             NotificationCompat.Builder(context, original)
                 .setContentText(lastLyricLine)
-                .setCustomBigContentView(bigRemoteViews.apply {
+                .setStyle(NotificationCompat.DecoratedMediaCustomViewStyle())
+                .setCustomContentView(bigRemoteViews.apply {
                     setTextViewText(R.id.notification_lyrics, lastLyricLine)
                 })
+                .setCustomBigContentView(bigRemoteViews)
+                .setOnlyAlertOnce(true)
                 .build()
         if (originalDeleteIntent != null) {
             notification.deleteIntent = PendingIntent.getService(
@@ -86,32 +90,32 @@ class ArchiveTuneMediaNotificationProvider(
     }
 
     /**
-     * Updates the expanded notification's current lyric line.
-     *
-     * When [highlightEnabled] and the entry has word-level timing, already-sung words are
-     * painted dark cyan. RemoteViews can't animate a live sweep like the in-app player does,
-     * so this is a stepped approximation: each word snaps to cyan once playback reaches it,
-     * re-rendered on the same ~400ms tick that drives this call.
+     * Updates the notification lyric line using the same playback position as the player.
+     * RemoteViews cannot render the in-app sweep animation, so it displays completed words
+     * in Dark Cyan and is rebuilt only when the line or completed-word boundary changes.
      */
     fun updateLyricsPosition(
         lyrics: List<LyricsEntry>?,
         positionMs: Long,
         highlightEnabled: Boolean,
+        lyricsEnabled: Boolean = true,
     ): Boolean {
         val lyricsHash = lyrics?.hashCode()
-        val newIndex = findCurrentIndex(lyrics, positionMs)
-        val entry = lyrics?.getOrNull(newIndex)
-        val wordCount = if (highlightEnabled) countHighlightedWords(entry, positionMs) else -1
+        val newIndex = if (lyricsEnabled) findCurrentIndex(lyrics, positionMs) else -1
+        val entry = if (lyricsEnabled) lyrics?.getOrNull(newIndex) else null
+        val wordCount = if (highlightEnabled && lyricsEnabled) countHighlightedWords(entry, positionMs) else -1
         if (
             lyricsHash == lastLyricsHash &&
             newIndex == lastActiveIndex &&
-            wordCount == lastActiveWordCount
+            wordCount == lastActiveWordCount &&
+            lyricsEnabled == lastLyricsEnabled
         ) {
             return false
         }
         lastLyricsHash = lyricsHash
         lastActiveIndex = newIndex
         lastActiveWordCount = wordCount
+        lastLyricsEnabled = lyricsEnabled
         lastLyricLine = buildLyricLine(entry, positionMs, highlightEnabled)
         bigRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricLine)
         return true

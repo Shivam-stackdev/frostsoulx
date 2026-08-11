@@ -185,6 +185,7 @@ import moe.rukamori.archivetune.constants.ScrobbleDelaySecondsKey
 import moe.rukamori.archivetune.constants.ScrobbleMinSongDurationKey
 import moe.rukamori.archivetune.constants.ShowLyricsKey
 import moe.rukamori.archivetune.constants.LyricsDarkCyanHighlightKey
+import moe.rukamori.archivetune.constants.NotificationLyricsEnabledKey
 import moe.rukamori.archivetune.constants.SkipSilenceKey
 import moe.rukamori.archivetune.constants.SmartTrimmerKey
 import moe.rukamori.archivetune.constants.StopMusicOnTaskClearKey
@@ -531,7 +532,9 @@ class MusicService :
     private val lyricsHandler = Handler(Looper.getMainLooper())
     private var lyricsUpdateRunnable: Runnable? = null
         @Volatile
-private var lyricsNotificationHighlightEnabled = false
+    private var lyricsNotificationHighlightEnabled = false
+    @Volatile
+    private var lyricsNotificationEnabled = true
     private var currentSongLyrics: List<moe.rukamori.archivetune.lyrics.LyricsEntry>? = null
 
     private val secondaryCrossfadeListener =
@@ -1053,6 +1056,24 @@ private var lyricsNotificationHighlightEnabled = false
             .map { it[LyricsDarkCyanHighlightKey] ?: false }
             .distinctUntilChanged()
             .collectLatest(ioScope) { lyricsNotificationHighlightEnabled = it }
+        dataStore.data
+            .map { it[NotificationLyricsEnabledKey] ?: true }
+            .distinctUntilChanged()
+            .collectLatest(ioScope) {
+                lyricsNotificationEnabled = it
+                withContext(Dispatchers.Main.immediate) {
+                    if (::lyricsNotificationProvider.isInitialized &&
+                        lyricsNotificationProvider.updateLyricsPosition(
+                            currentSongLyrics,
+                            player.currentPosition,
+                            lyricsNotificationHighlightEnabled,
+                            lyricsNotificationEnabled,
+                        )
+                    ) {
+                        refreshPlaybackNotification()
+                    }
+                }
+            }
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -6496,7 +6517,12 @@ private var lyricsNotificationHighlightEnabled = false
             }
         }
         currentSongLyrics = null
-        if (lyricsNotificationProvider.updateLyricsPosition(null, 0L, lyricsNotificationHighlightEnabled)) {
+        if (lyricsNotificationProvider.updateLyricsPosition(
+                null,
+                0L,
+                lyricsNotificationHighlightEnabled,
+                lyricsNotificationEnabled,
+            )) {
             refreshPlaybackNotification()
         }
         if (player.currentMediaItem != null) loadLyricsForCurrentSong()
@@ -8174,6 +8200,7 @@ private var lyricsNotificationHighlightEnabled = false
         currentSongLyrics,
         player.currentPosition,
         lyricsNotificationHighlightEnabled,
+        lyricsNotificationEnabled,
     )
 ) {
                     refreshPlaybackNotification()
@@ -8203,6 +8230,7 @@ private var lyricsNotificationHighlightEnabled = false
                     currentSongLyrics,
                     player.currentPosition,
                     lyricsNotificationHighlightEnabled,
+                    lyricsNotificationEnabled,
                 )
             ) {
                 refreshPlaybackNotification()
