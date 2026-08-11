@@ -66,6 +66,7 @@ class ArchiveTuneMediaNotificationProvider(
         val originalDeleteIntent = original.deleteIntent
         val notification =
             NotificationCompat.Builder(context, original)
+                .setContentText(lastLyricLine)
                 .setCustomBigContentView(bigRemoteViews.apply {
                     setTextViewText(R.id.notification_lyrics, lastLyricLine)
                 })

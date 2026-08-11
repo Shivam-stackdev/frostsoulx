@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -93,6 +94,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -179,7 +181,7 @@ private fun buildProgressiveKaraokeText(
         val progress = ((positionMs - start) / (end - start)).toFloat().coerceIn(0f, 1f)
         val style = when {
             positionMs >= end -> SpanStyle(color = darkCyan)
-            positionMs <= start -> SpanStyle(color = textColor)
+            positionMs <= start -> SpanStyle(color = Color.Transparent)
             else -> {
                 val edge = (progress + 0.02f).coerceAtMost(1f)
                 SpanStyle(
@@ -187,8 +189,8 @@ private fun buildProgressiveKaraokeText(
                         colorStops = arrayOf(
                             0f to darkCyan,
                             progress to darkCyan,
-                            edge to textColor,
-                            1f to textColor,
+                            edge to Color.Transparent,
+                            1f to Color.Transparent,
                         ),
                     ),
                 )
@@ -778,27 +780,28 @@ fun LyricsEnhanced(
                         )
                     }
 
-                    // The library renderer remains responsible for layout, scrolling, and timing.
-                    // This transparent overlay only paints the focused line with the fork's QQ-style
-                    // progressive Dark Cyan word sweep, using the same playback position and words.
+                    // Keep the library renderer responsible for layout, scrolling, and timing.
+                    // This layer is transparent except for the word-level Dark Cyan progress, and is
+                    // positioned over the same active LazyColumn item instead of duplicating the line
+                    // at the top of the viewport.
                     val overlayPositionMs = playbackSyncPosition().toLong()
-                    val overlayEntry = lyricsEntries.lastOrNull { it.time <= overlayPositionMs }
+                    val overlayIndex = lyricsEntries.indexOfLast { it.time <= overlayPositionMs }
+                    val overlayEntry = lyricsEntries.getOrNull(overlayIndex)
                     val overlayWords = overlayEntry?.words
-                    if (overlayWords != null && overlayWords.isNotEmpty()) {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(top = lyricsViewportOffset),
-                            contentAlignment = Alignment.TopCenter,
-                        ) {
+                    val activeItem = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == overlayIndex }
+                    if (overlayWords != null && overlayWords.isNotEmpty() && activeItem != null) {
+                        Box(modifier = Modifier.fillMaxSize()) {
                             Text(
                                 text = buildProgressiveKaraokeText(
                                     words = overlayWords,
                                     positionMs = overlayPositionMs,
                                     textColor = textColor,
                                 ),
-                                style = normalTextStyle,
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .offset { IntOffset(0, activeItem.offset) },
+                                style = normalTextStyle.copy(color = Color.Transparent),
                                 textAlign = TextAlign.Center,
                             )
                         }
