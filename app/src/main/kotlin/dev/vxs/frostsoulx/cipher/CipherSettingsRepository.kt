@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import dev.vxs.frostsoulx.constants.MoriCipherManualRefreshHistoryKey
-import dev.vxs.frostsoulx.morideobfuscator.CipherRefreshResult
-import dev.vxs.frostsoulx.morideobfuscator.CipherSnapshot
-import dev.vxs.frostsoulx.morideobfuscator.MoriCipherRuntime
+import moe.rukamori.archivetune.morideobfuscator.CipherRefreshResult
+import moe.rukamori.archivetune.morideobfuscator.CipherSnapshot
+import moe.rukamori.archivetune.morideobfuscator.MoriCipherRuntime
 import dev.vxs.frostsoulx.utils.dataStore
 import javax.inject.Inject
 import javax.inject.Singleton

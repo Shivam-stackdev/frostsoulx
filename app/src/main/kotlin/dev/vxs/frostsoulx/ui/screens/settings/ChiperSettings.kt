@@ -71,7 +71,7 @@ import androidx.navigation.NavController
 import dev.vxs.frostsoulx.LocalAnimationsDisabled
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
 import dev.vxs.frostsoulx.R
-import dev.vxs.frostsoulx.morideobfuscator.CipherRuntimeStatus
+import moe.rukamori.archivetune.morideobfuscator.CipherRuntimeStatus
 import dev.vxs.frostsoulx.ui.component.IconButton
 import dev.vxs.frostsoulx.ui.component.PreferenceEntry
 import dev.vxs.frostsoulx.ui.component.PreferenceGroup

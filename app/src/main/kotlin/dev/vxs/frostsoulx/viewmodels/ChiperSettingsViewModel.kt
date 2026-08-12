@@ -26,8 +26,8 @@ import dev.vxs.frostsoulx.cipher.CipherSettingsDomainState
 import dev.vxs.frostsoulx.cipher.ManualCipherRefreshResult
 import dev.vxs.frostsoulx.cipher.ObserveCipherSettingsUseCase
 import dev.vxs.frostsoulx.cipher.RefreshCipherUseCase
-import dev.vxs.frostsoulx.morideobfuscator.CipherRuntimeStatus
-import dev.vxs.frostsoulx.morideobfuscator.MORI_CIPHER_REFRESH_INTERVAL_MILLIS
+import moe.rukamori.archivetune.morideobfuscator.CipherRuntimeStatus
+import moe.rukamori.archivetune.morideobfuscator.MORI_CIPHER_REFRESH_INTERVAL_MILLIS
 import dev.vxs.frostsoulx.utils.reportException
 import java.util.Locale
 import javax.inject.Inject

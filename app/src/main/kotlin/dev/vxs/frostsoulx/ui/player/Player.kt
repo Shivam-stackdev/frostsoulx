@@ -1232,9 +1232,31 @@ fun BottomSheetPlayer(
             )
         }
 
-// distance
-
-        when (LocalConfiguration.current.orientation) {
+if (!aodModeEnabled) {
+            enrichedMetadata?.let { metadata ->
+                FrostSoulPlayerAdapter(
+                    mediaMetadata = metadata,
+                    positionMs = sliderPosition ?: position,
+                    durationMs = duration,
+                    isPlaying = isPlaying,
+                    isLoading = isLoading,
+                    canSkipPrevious = canSkipPrevious,
+                    canSkipNext = canSkipNext,
+                    isLiked = currentSongLiked,
+                    queueTitle = queueTitle,
+                    queueWindows = queueWindows,
+                    currentQueueIndex = currentWindowIndex,
+                    lyrics = currentLyricsEntity?.lyrics,
+                    playerConnection = playerConnection,
+                    onCollapse = state::collapseSoft,
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .nestedScroll(state.preUpPostDownNestedScrollConnection),
+                )
+            }
+        } else {
+            when (LocalConfiguration.current.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> {
                 if (playerDesignStyle == PlayerDesignStyle.V5) {
                     val littleBackground = MaterialTheme.colorScheme.primaryContainer
@@ -1775,6 +1797,7 @@ fun BottomSheetPlayer(
                 }
             }
         }
+        }
 
         val queueOnBackgroundColor = if (useBlackBackground) Color.White else MaterialTheme.colorScheme.onSurface
         val queueSurfaceColor = if (useBlackBackground) Color.Black else MaterialTheme.colorScheme.surface
@@ -1793,35 +1816,37 @@ fun BottomSheetPlayer(
                 }
             }
 
-        Queue(
-            state = queueSheetState,
-            playerBottomSheetState = state,
-            navController = navController,
-            backgroundColor =
-                if (useBlackBackground) {
-                    Color.Black
-                } else {
-                    MaterialTheme.colorScheme.surfaceContainer
-                },
-            onBackgroundColor = queueOnBackgroundColor,
-            TextBackgroundColor = TextBackgroundColor,
-            textButtonColor = textButtonColor,
-            iconButtonColor = iconButtonColor,
-            onShowLyrics = { isLyricsScreenVisible = true },
-            pureBlack = pureBlack,
-        )
-
-        mediaMetadata?.let { metadata ->
-            MikoLyricsTransition(
-                visible = isLyricsScreenVisible,
-                backHandlerEnabled = isLyricsScreenVisible && state.isExpandedOrExpanding,
-                mediaMetadata = metadata,
+        if (aodModeEnabled) {
+            Queue(
+                state = queueSheetState,
+                playerBottomSheetState = state,
                 navController = navController,
-                lyricsSyncOffset = lyricsSyncOffset,
-                onLyricsSyncOffsetChange = { lyricsSyncOffset = it },
-                onDismiss = { isLyricsScreenVisible = false },
-                onQueueClick = openQueue,
+                backgroundColor =
+                    if (useBlackBackground) {
+                        Color.Black
+                    } else {
+                        MaterialTheme.colorScheme.surfaceContainer
+                    },
+                onBackgroundColor = queueOnBackgroundColor,
+                TextBackgroundColor = TextBackgroundColor,
+                textButtonColor = textButtonColor,
+                iconButtonColor = iconButtonColor,
+                onShowLyrics = { isLyricsScreenVisible = true },
+                pureBlack = pureBlack,
             )
+
+            mediaMetadata?.let { metadata ->
+                MikoLyricsTransition(
+                    visible = isLyricsScreenVisible,
+                    backHandlerEnabled = isLyricsScreenVisible && state.isExpandedOrExpanding,
+                    mediaMetadata = metadata,
+                    navController = navController,
+                    lyricsSyncOffset = lyricsSyncOffset,
+                    onLyricsSyncOffsetChange = { lyricsSyncOffset = it },
+                    onDismiss = { isLyricsScreenVisible = false },
+                    onQueueClick = openQueue,
+                )
+            }
         }
 
         AnimatedVisibility(
