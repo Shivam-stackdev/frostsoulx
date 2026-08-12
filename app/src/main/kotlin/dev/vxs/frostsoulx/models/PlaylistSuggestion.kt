@@ -5,9 +5,9 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.models
+package dev.vxs.frostsoulx.models
 
-import moe.rukamori.archivetune.innertube.models.YTItem
+import dev.vxs.frostsoulx.innertube.models.YTItem
 
 data class PlaylistSuggestion(
     val items: List<YTItem>,

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
@@ -23,20 +23,20 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.statToPeriod
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.Album
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.EventWithSong
-import moe.rukamori.archivetune.db.entities.ListeningBySlot
-import moe.rukamori.archivetune.db.entities.ListeningSummary
-import moe.rukamori.archivetune.db.entities.ListeningTotals
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.db.entities.SongWithStats
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.ui.screens.OptionStats
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.statToPeriod
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.Album
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.EventWithSong
+import dev.vxs.frostsoulx.db.entities.ListeningBySlot
+import dev.vxs.frostsoulx.db.entities.ListeningSummary
+import dev.vxs.frostsoulx.db.entities.ListeningTotals
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.db.entities.SongWithStats
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.ui.screens.OptionStats
+import dev.vxs.frostsoulx.utils.reportException
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset

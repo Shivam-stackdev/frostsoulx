@@ -5,9 +5,9 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
-import moe.rukamori.archivetune.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.YouTube
 import java.net.InetSocketAddress
 import java.net.Proxy
 

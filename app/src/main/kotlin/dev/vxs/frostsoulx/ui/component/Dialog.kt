@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.delay
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 
 @Composable
 fun DefaultDialog(

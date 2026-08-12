@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.horizontalScroll
@@ -54,22 +54,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.LastFmProvider
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.InfoLabel
-import moe.rukamori.archivetune.ui.component.PreferenceEntry
-import moe.rukamori.archivetune.ui.component.PreferenceGroup
-import moe.rukamori.archivetune.ui.component.SwitchPreference
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.LastFmLoginDialogUiModel
-import moe.rukamori.archivetune.viewmodels.LastFmServiceEditorUiModel
-import moe.rukamori.archivetune.viewmodels.LastFmSettingsScreenState
-import moe.rukamori.archivetune.viewmodels.LastFmSettingsUiModel
-import moe.rukamori.archivetune.viewmodels.LastFmSettingsViewModel
-import moe.rukamori.archivetune.viewmodels.LastFmTimingEditorUiModel
-import moe.rukamori.archivetune.viewmodels.LastFmTimingSetting
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.LastFmProvider
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.InfoLabel
+import dev.vxs.frostsoulx.ui.component.PreferenceEntry
+import dev.vxs.frostsoulx.ui.component.PreferenceGroup
+import dev.vxs.frostsoulx.ui.component.SwitchPreference
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.LastFmLoginDialogUiModel
+import dev.vxs.frostsoulx.viewmodels.LastFmServiceEditorUiModel
+import dev.vxs.frostsoulx.viewmodels.LastFmSettingsScreenState
+import dev.vxs.frostsoulx.viewmodels.LastFmSettingsUiModel
+import dev.vxs.frostsoulx.viewmodels.LastFmSettingsViewModel
+import dev.vxs.frostsoulx.viewmodels.LastFmTimingEditorUiModel
+import dev.vxs.frostsoulx.viewmodels.LastFmTimingSetting
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)

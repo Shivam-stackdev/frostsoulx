@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.content.Context
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.ui.utils.getMusicVideoYTThumbnail
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.ui.utils.getMusicVideoYTThumbnail
 import timber.log.Timber
 
 data class ResolvedDiscordImages(

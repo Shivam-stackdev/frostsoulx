@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.extensions
+package dev.vxs.frostsoulx.extensions
 
 import androidx.media3.exoplayer.ExoPlayer
 import timber.log.Timber

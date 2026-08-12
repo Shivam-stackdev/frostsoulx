@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.content.res.Configuration
 import android.view.HapticFeedbackConstants
@@ -95,34 +95,34 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.BlurRadiusKey
-import moe.rukamori.archivetune.constants.DisableBlurKey
-import moe.rukamori.archivetune.constants.EnableHapticFeedbackKey
-import moe.rukamori.archivetune.constants.LyricsBackgroundStyle
-import moe.rukamori.archivetune.constants.LyricsBackgroundStyleKey
-import moe.rukamori.archivetune.constants.LyricsMode
-import moe.rukamori.archivetune.constants.LyricsModeKey
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyle
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyleKey
-import moe.rukamori.archivetune.constants.PlayerCustomBlurKey
-import moe.rukamori.archivetune.constants.PlayerCustomBrightnessKey
-import moe.rukamori.archivetune.constants.PlayerCustomContrastKey
-import moe.rukamori.archivetune.constants.PlayerCustomImageUriKey
-import moe.rukamori.archivetune.constants.ShowLyricsPlayerControlsKey
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.LyricsEnhanced
-import moe.rukamori.archivetune.ui.component.LyricsV2
-import moe.rukamori.archivetune.ui.component.PlayerSliderTrack
-import moe.rukamori.archivetune.ui.menu.LyricsMenu
-import moe.rukamori.archivetune.ui.theme.PlayerColorExtractor
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.BlurRadiusKey
+import dev.vxs.frostsoulx.constants.DisableBlurKey
+import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.constants.LyricsBackgroundStyle
+import dev.vxs.frostsoulx.constants.LyricsBackgroundStyleKey
+import dev.vxs.frostsoulx.constants.LyricsMode
+import dev.vxs.frostsoulx.constants.LyricsModeKey
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyleKey
+import dev.vxs.frostsoulx.constants.PlayerCustomBlurKey
+import dev.vxs.frostsoulx.constants.PlayerCustomBrightnessKey
+import dev.vxs.frostsoulx.constants.PlayerCustomContrastKey
+import dev.vxs.frostsoulx.constants.PlayerCustomImageUriKey
+import dev.vxs.frostsoulx.constants.ShowLyricsPlayerControlsKey
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.LyricsEnhanced
+import dev.vxs.frostsoulx.ui.component.LyricsV2
+import dev.vxs.frostsoulx.ui.component.PlayerSliderTrack
+import dev.vxs.frostsoulx.ui.menu.LyricsMenu
+import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
 import kotlin.coroutines.cancellation.CancellationException
 
 private val AppleMusicFallbackGradient =
@@ -205,7 +205,7 @@ fun LyricsScreen(
             EntryPointAccessors
                 .fromApplication(
                     context.applicationContext,
-                    moe.rukamori.archivetune.di.LyricsHelperEntryPoint::class.java,
+                    dev.vxs.frostsoulx.di.LyricsHelperEntryPoint::class.java,
                 ).lyricsHelper()
         }
 

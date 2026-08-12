@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,12 +18,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.Album
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.LocalItem
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.db.entities.Song
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.Album
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.LocalItem
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.db.entities.Song
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)

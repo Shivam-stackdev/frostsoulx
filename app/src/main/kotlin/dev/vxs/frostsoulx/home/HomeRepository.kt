@@ -5,19 +5,19 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.home
+package dev.vxs.frostsoulx.home
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.constants.DisableBlurKey
-import moe.rukamori.archivetune.constants.QuickPicksDisplayMode
-import moe.rukamori.archivetune.constants.QuickPicksDisplayModeKey
-import moe.rukamori.archivetune.constants.ShowHomeCategoryChipsKey
-import moe.rukamori.archivetune.extensions.toEnum
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.constants.DisableBlurKey
+import dev.vxs.frostsoulx.constants.QuickPicksDisplayMode
+import dev.vxs.frostsoulx.constants.QuickPicksDisplayModeKey
+import dev.vxs.frostsoulx.constants.ShowHomeCategoryChipsKey
+import dev.vxs.frostsoulx.extensions.toEnum
+import dev.vxs.frostsoulx.utils.dataStore
 import javax.inject.Inject
 
 class HomeRepository

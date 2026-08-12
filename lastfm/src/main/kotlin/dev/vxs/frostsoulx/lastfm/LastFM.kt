@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lastfm
+package dev.vxs.frostsoulx.lastfm
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -20,9 +20,9 @@ import io.ktor.http.Parameters
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.lastfm.models.Authentication
-import moe.rukamori.archivetune.lastfm.models.LastFmError
-import moe.rukamori.archivetune.lastfm.models.TokenResponse
+import dev.vxs.frostsoulx.lastfm.models.Authentication
+import dev.vxs.frostsoulx.lastfm.models.LastFmError
+import dev.vxs.frostsoulx.lastfm.models.TokenResponse
 import java.net.URI
 import java.security.MessageDigest
 

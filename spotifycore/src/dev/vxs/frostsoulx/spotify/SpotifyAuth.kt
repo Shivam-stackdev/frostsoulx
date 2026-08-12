@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.spotify
+package dev.vxs.frostsoulx.spotify
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +14,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.spotify.models.SpotifyInternalToken
+import dev.vxs.frostsoulx.spotify.models.SpotifyInternalToken
 import java.net.HttpURLConnection
 import java.net.URI
 import javax.crypto.Mac

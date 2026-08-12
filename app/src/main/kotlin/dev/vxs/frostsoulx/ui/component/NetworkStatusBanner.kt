@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import moe.rukamori.archivetune.network.NetworkBannerUiState
+import dev.vxs.frostsoulx.network.NetworkBannerUiState
 
 private data class NetworkBannerVisuals(
     val message: String,

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
@@ -13,8 +13,8 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import moe.rukamori.archivetune.models.ActiveOutputDevice
-import moe.rukamori.archivetune.models.PlayerOutputDevice
+import dev.vxs.frostsoulx.models.ActiveOutputDevice
+import dev.vxs.frostsoulx.models.PlayerOutputDevice
 
 class AudioOutputResolver(
     private val audioManager: AudioManager,

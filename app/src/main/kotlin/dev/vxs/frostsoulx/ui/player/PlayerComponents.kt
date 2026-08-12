@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.content.Context
 import android.content.Intent
@@ -102,31 +102,31 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import me.saket.squiggles.SquigglySlider
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.EnableHapticFeedbackKey
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyle
-import moe.rukamori.archivetune.constants.PlayerDesignStyle
-import moe.rukamori.archivetune.constants.PlayerHorizontalPadding
-import moe.rukamori.archivetune.constants.SliderStyle
-import moe.rukamori.archivetune.db.entities.FormatEntity
-import moe.rukamori.archivetune.db.entities.codecLabel
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.extensions.toggleRepeatMode
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.playback.PlayerConnection
-import moe.rukamori.archivetune.ui.component.BottomSheetPageState
-import moe.rukamori.archivetune.ui.component.BottomSheetState
-import moe.rukamori.archivetune.ui.component.MenuState
-import moe.rukamori.archivetune.ui.component.PlayerSliderTrack
-import moe.rukamori.archivetune.ui.component.ResizableIconButton
-import moe.rukamori.archivetune.ui.menu.PlayerMenu
-import moe.rukamori.archivetune.ui.theme.PlayerBackgroundColorUtils
-import moe.rukamori.archivetune.ui.theme.PlayerSliderColors
-import moe.rukamori.archivetune.ui.utils.ShowMediaInfo
-import moe.rukamori.archivetune.ui.utils.highRes
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.utils.rememberLowDataModeActive
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
+import dev.vxs.frostsoulx.constants.PlayerDesignStyle
+import dev.vxs.frostsoulx.constants.PlayerHorizontalPadding
+import dev.vxs.frostsoulx.constants.SliderStyle
+import dev.vxs.frostsoulx.db.entities.FormatEntity
+import dev.vxs.frostsoulx.db.entities.codecLabel
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.extensions.toggleRepeatMode
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.playback.PlayerConnection
+import dev.vxs.frostsoulx.ui.component.BottomSheetPageState
+import dev.vxs.frostsoulx.ui.component.BottomSheetState
+import dev.vxs.frostsoulx.ui.component.MenuState
+import dev.vxs.frostsoulx.ui.component.PlayerSliderTrack
+import dev.vxs.frostsoulx.ui.component.ResizableIconButton
+import dev.vxs.frostsoulx.ui.menu.PlayerMenu
+import dev.vxs.frostsoulx.ui.theme.PlayerBackgroundColorUtils
+import dev.vxs.frostsoulx.ui.theme.PlayerSliderColors
+import dev.vxs.frostsoulx.ui.utils.ShowMediaInfo
+import dev.vxs.frostsoulx.ui.utils.highRes
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.utils.rememberLowDataModeActive
+import dev.vxs.frostsoulx.utils.rememberPreference
 
 private const val PlayerBackgroundMaxBlurRadius = 64f
 private const val ExplicitBadgeInlineId = "explicitBadge"

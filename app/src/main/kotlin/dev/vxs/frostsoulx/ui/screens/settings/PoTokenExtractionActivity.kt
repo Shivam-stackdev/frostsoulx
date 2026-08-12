@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -51,10 +51,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.utils.potoken.BotGuardTokenGenerator
-import moe.rukamori.archivetune.utils.resetAuthWebViewSession
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.utils.potoken.BotGuardTokenGenerator
+import dev.vxs.frostsoulx.utils.resetAuthWebViewSession
 
 class PoTokenExtractionActivity : ComponentActivity() {
     companion object {

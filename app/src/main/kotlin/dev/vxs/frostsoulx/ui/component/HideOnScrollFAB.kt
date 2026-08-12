@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
@@ -31,11 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import moe.rukamori.archivetune.LocalAnimationsDisabled
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.constants.EnableHapticFeedbackKey
-import moe.rukamori.archivetune.ui.utils.isScrollingUp
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalAnimationsDisabled
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.ui.utils.isScrollingUp
+import dev.vxs.frostsoulx.utils.rememberPreference
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

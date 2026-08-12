@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens
+package dev.vxs.frostsoulx.ui.screens
 
 import android.content.Intent
 import android.view.View
@@ -94,22 +94,22 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.DisableBlurKey
-import moe.rukamori.archivetune.db.entities.Album
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.db.entities.SongWithStats
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.menu.ArtistMenu
-import moe.rukamori.archivetune.ui.menu.SongMenu
-import moe.rukamori.archivetune.utils.ComposeToImage
-import moe.rukamori.archivetune.utils.joinByBullet
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.YearInMusicUiState
-import moe.rukamori.archivetune.viewmodels.YearInMusicViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.DisableBlurKey
+import dev.vxs.frostsoulx.db.entities.Album
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.db.entities.SongWithStats
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.menu.ArtistMenu
+import dev.vxs.frostsoulx.ui.menu.SongMenu
+import dev.vxs.frostsoulx.utils.ComposeToImage
+import dev.vxs.frostsoulx.utils.joinByBullet
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.YearInMusicUiState
+import dev.vxs.frostsoulx.viewmodels.YearInMusicViewModel
 import java.text.NumberFormat
 import kotlin.coroutines.resume
 

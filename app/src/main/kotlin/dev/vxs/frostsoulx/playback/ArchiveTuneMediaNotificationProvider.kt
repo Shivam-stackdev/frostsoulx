@@ -4,7 +4,7 @@
  * GPL-3.0 License | Contributors: see git history
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import android.app.PendingIntent
 import android.content.Context
@@ -22,8 +22,8 @@ import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import com.google.common.collect.ImmutableList
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.lyrics.LyricsEntry
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.lyrics.LyricsEntry
 
 /** Media3 notification provider with an expanded, time-synced lyrics line. */
 @UnstableApi

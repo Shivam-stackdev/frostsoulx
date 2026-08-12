@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -32,20 +32,20 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import moe.rukamori.archivetune.constants.AudioQuality
-import moe.rukamori.archivetune.constants.AudioQualityKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.FormatEntity
-import moe.rukamori.archivetune.db.entities.SongEntity
-import moe.rukamori.archivetune.di.DownloadCache
-import moe.rukamori.archivetune.di.PlayerCache
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.utils.AuthScopedCacheValue
-import moe.rukamori.archivetune.utils.StreamClientUtils
-import moe.rukamori.archivetune.utils.YTPlayerUtils
-import moe.rukamori.archivetune.utils.enumPreference
-import moe.rukamori.archivetune.utils.isLowDataModeActive
-import moe.rukamori.archivetune.utils.retryWithoutPlaybackLoginContext
+import dev.vxs.frostsoulx.constants.AudioQuality
+import dev.vxs.frostsoulx.constants.AudioQualityKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.FormatEntity
+import dev.vxs.frostsoulx.db.entities.SongEntity
+import dev.vxs.frostsoulx.di.DownloadCache
+import dev.vxs.frostsoulx.di.PlayerCache
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.utils.AuthScopedCacheValue
+import dev.vxs.frostsoulx.utils.StreamClientUtils
+import dev.vxs.frostsoulx.utils.YTPlayerUtils
+import dev.vxs.frostsoulx.utils.enumPreference
+import dev.vxs.frostsoulx.utils.isLowDataModeActive
+import dev.vxs.frostsoulx.utils.retryWithoutPlaybackLoginContext
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import java.time.LocalDateTime

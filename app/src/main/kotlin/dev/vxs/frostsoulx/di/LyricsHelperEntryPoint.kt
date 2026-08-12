@@ -5,13 +5,13 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.di
+package dev.vxs.frostsoulx.di
 
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import moe.rukamori.archivetune.lyrics.LyricsHelper
-import moe.rukamori.archivetune.lyrics.LyricsPreloadManager
+import dev.vxs.frostsoulx.lyrics.LyricsHelper
+import dev.vxs.frostsoulx.lyrics.LyricsPreloadManager
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)

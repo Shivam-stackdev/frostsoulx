@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,8 +19,8 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.request.allowHardware
-import moe.rukamori.archivetune.ui.utils.YTThumbQuality
-import moe.rukamori.archivetune.ui.utils.buildYTThumbnailUrl
+import dev.vxs.frostsoulx.ui.utils.YTThumbQuality
+import dev.vxs.frostsoulx.ui.utils.buildYTThumbnailUrl
 import timber.log.Timber
 
 data class ThumbnailSwapState(

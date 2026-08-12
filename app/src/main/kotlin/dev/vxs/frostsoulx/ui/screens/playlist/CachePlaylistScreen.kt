@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.playlist
+package dev.vxs.frostsoulx.ui.screens.playlist
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -64,31 +64,31 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.AppBarHeight
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.SongSortDescendingKey
-import moe.rukamori.archivetune.constants.SongSortType
-import moe.rukamori.archivetune.constants.SongSortTypeKey
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.DraggableScrollbar
-import moe.rukamori.archivetune.ui.component.EmptyPlaceholder
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.MediaDetailHero
-import moe.rukamori.archivetune.ui.component.SongListItem
-import moe.rukamori.archivetune.ui.component.SortHeader
-import moe.rukamori.archivetune.ui.menu.SelectionSongMenu
-import moe.rukamori.archivetune.ui.menu.SongMenu
-import moe.rukamori.archivetune.ui.utils.ItemWrapper
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.CachePlaylistViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.AppBarHeight
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.SongSortDescendingKey
+import dev.vxs.frostsoulx.constants.SongSortType
+import dev.vxs.frostsoulx.constants.SongSortTypeKey
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.DraggableScrollbar
+import dev.vxs.frostsoulx.ui.component.EmptyPlaceholder
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.MediaDetailHero
+import dev.vxs.frostsoulx.ui.component.SongListItem
+import dev.vxs.frostsoulx.ui.component.SortHeader
+import dev.vxs.frostsoulx.ui.menu.SelectionSongMenu
+import dev.vxs.frostsoulx.ui.menu.SongMenu
+import dev.vxs.frostsoulx.ui.utils.ItemWrapper
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.CachePlaylistViewModel
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)

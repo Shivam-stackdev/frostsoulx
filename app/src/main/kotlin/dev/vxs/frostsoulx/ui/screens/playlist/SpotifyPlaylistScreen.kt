@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.playlist
+package dev.vxs.frostsoulx.ui.screens.playlist
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -71,37 +71,37 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.LocalDownloadUtil
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.AppBarHeight
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.spotify.SpotifyMapper
-import moe.rukamori.archivetune.spotify.SpotifyDownloadItem
-import moe.rukamori.archivetune.spotify.SpotifyPlaybackResolver
-import moe.rukamori.archivetune.spotify.SpotifyPlaylistEvent
-import moe.rukamori.archivetune.spotify.SpotifyPlaylistQueue
-import moe.rukamori.archivetune.spotify.SpotifyPlaylistViewModel
-import moe.rukamori.archivetune.spotify.models.SpotifyTrack
-import moe.rukamori.archivetune.ui.component.DraggableScrollbar
-import moe.rukamori.archivetune.ui.component.EmptyPlaceholder
-import moe.rukamori.archivetune.ui.component.ExpressivePullToRefreshBox
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.MediaDetailAction
-import moe.rukamori.archivetune.ui.component.MediaDetailHero
-import moe.rukamori.archivetune.ui.component.MediaDetailIconAction
-import moe.rukamori.archivetune.ui.component.SpotifyTrackListItem
-import moe.rukamori.archivetune.ui.utils.HeaderDownloadItem
-import moe.rukamori.archivetune.ui.utils.HeaderDownloadProgressIndicator
-import moe.rukamori.archivetune.ui.utils.HeaderDownloadState
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.ui.utils.headerDownloadState
-import moe.rukamori.archivetune.ui.utils.resize
-import moe.rukamori.archivetune.ui.utils.sendAddMissingDownloads
-import moe.rukamori.archivetune.ui.utils.sendRemoveDownloads
-import moe.rukamori.archivetune.utils.makeTimeString
+import dev.vxs.frostsoulx.LocalDownloadUtil
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.AppBarHeight
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.spotify.SpotifyMapper
+import dev.vxs.frostsoulx.spotify.SpotifyDownloadItem
+import dev.vxs.frostsoulx.spotify.SpotifyPlaybackResolver
+import dev.vxs.frostsoulx.spotify.SpotifyPlaylistEvent
+import dev.vxs.frostsoulx.spotify.SpotifyPlaylistQueue
+import dev.vxs.frostsoulx.spotify.SpotifyPlaylistViewModel
+import dev.vxs.frostsoulx.spotify.models.SpotifyTrack
+import dev.vxs.frostsoulx.ui.component.DraggableScrollbar
+import dev.vxs.frostsoulx.ui.component.EmptyPlaceholder
+import dev.vxs.frostsoulx.ui.component.ExpressivePullToRefreshBox
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.MediaDetailAction
+import dev.vxs.frostsoulx.ui.component.MediaDetailHero
+import dev.vxs.frostsoulx.ui.component.MediaDetailIconAction
+import dev.vxs.frostsoulx.ui.component.SpotifyTrackListItem
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadItem
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadProgressIndicator
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadState
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.ui.utils.headerDownloadState
+import dev.vxs.frostsoulx.ui.utils.resize
+import dev.vxs.frostsoulx.ui.utils.sendAddMissingDownloads
+import dev.vxs.frostsoulx.ui.utils.sendRemoveDownloads
+import dev.vxs.frostsoulx.utils.makeTimeString
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)

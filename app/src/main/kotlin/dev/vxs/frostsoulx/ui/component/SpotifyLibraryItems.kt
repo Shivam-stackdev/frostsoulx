@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -23,17 +23,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.ListThumbnailSize
-import moe.rukamori.archivetune.constants.ThumbnailCornerRadius
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.db.entities.PlaylistEntity
-import moe.rukamori.archivetune.spotify.SpotifyMapper
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylist
-import moe.rukamori.archivetune.spotify.models.SpotifyTrack
-import moe.rukamori.archivetune.ui.utils.resize
-import moe.rukamori.archivetune.utils.joinByBullet
-import moe.rukamori.archivetune.utils.makeTimeString
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.ListThumbnailSize
+import dev.vxs.frostsoulx.constants.ThumbnailCornerRadius
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.db.entities.PlaylistEntity
+import dev.vxs.frostsoulx.spotify.SpotifyMapper
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylist
+import dev.vxs.frostsoulx.spotify.models.SpotifyTrack
+import dev.vxs.frostsoulx.ui.utils.resize
+import dev.vxs.frostsoulx.utils.joinByBullet
+import dev.vxs.frostsoulx.utils.makeTimeString
 
 @Composable
 fun SpotifyLibraryPlaylistListItem(

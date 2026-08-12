@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils.oem
+package dev.vxs.frostsoulx.utils.oem
 
 import android.annotation.SuppressLint
 import android.content.Context

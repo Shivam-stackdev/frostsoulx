@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.models
+package dev.vxs.frostsoulx.innertube.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -158,7 +158,7 @@ data class YouTubeDataPage(
                                     @Serializable
                                     data class Thumbnail(
                                         @SerialName("thumbnails")
-                                        val thumbnails: List<moe.rukamori.archivetune.innertube.models.Thumbnail>? = null,
+                                        val thumbnails: List<dev.vxs.frostsoulx.innertube.models.Thumbnail>? = null,
                                     )
 
                                     @Serializable

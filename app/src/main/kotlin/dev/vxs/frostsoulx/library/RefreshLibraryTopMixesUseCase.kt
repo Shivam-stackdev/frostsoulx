@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.library
+package dev.vxs.frostsoulx.library
 
 import android.content.Context
 import com.google.common.collect.ImmutableList
@@ -13,24 +13,24 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.first
-import moe.rukamori.archivetune.ai.AiServiceConfig
-import moe.rukamori.archivetune.ai.AiTextService
-import moe.rukamori.archivetune.constants.AiApiKeyKey
-import moe.rukamori.archivetune.constants.AiApiValidationStatus
-import moe.rukamori.archivetune.constants.AiApiValidationStatusKey
-import moe.rukamori.archivetune.constants.AiCustomEndpointKey
-import moe.rukamori.archivetune.constants.AiCustomModelKey
-import moe.rukamori.archivetune.constants.AiProvider
-import moe.rukamori.archivetune.constants.AiProviderKey
-import moe.rukamori.archivetune.constants.AiSelectedModelKey
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.extensions.toEnum
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.repository.LibraryTopMixRepository
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.ai.AiServiceConfig
+import dev.vxs.frostsoulx.ai.AiTextService
+import dev.vxs.frostsoulx.constants.AiApiKeyKey
+import dev.vxs.frostsoulx.constants.AiApiValidationStatus
+import dev.vxs.frostsoulx.constants.AiApiValidationStatusKey
+import dev.vxs.frostsoulx.constants.AiCustomEndpointKey
+import dev.vxs.frostsoulx.constants.AiCustomModelKey
+import dev.vxs.frostsoulx.constants.AiProvider
+import dev.vxs.frostsoulx.constants.AiProviderKey
+import dev.vxs.frostsoulx.constants.AiSelectedModelKey
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.extensions.toEnum
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.repository.LibraryTopMixRepository
+import dev.vxs.frostsoulx.utils.dataStore
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
@@ -334,7 +334,7 @@ private fun String.matchesComparableTitle(other: String): Boolean {
         (self == target || (self.length > 3 && target.contains(self)) || (target.length > 3 && self.contains(target)))
 }
 
-private fun List<moe.rukamori.archivetune.innertube.models.Artist>.matchesAnyLocalArtist(song: Song): Boolean {
+private fun List<dev.vxs.frostsoulx.innertube.models.Artist>.matchesAnyLocalArtist(song: Song): Boolean {
     val remoteArtists = map { it.name.normalizedForMixMatch() }.filter { it.isNotBlank() }
     val localArtists = song.artists.map { it.name.normalizedForMixMatch() }.filter { it.isNotBlank() }
     if (remoteArtists.isEmpty() || localArtists.isEmpty()) return false

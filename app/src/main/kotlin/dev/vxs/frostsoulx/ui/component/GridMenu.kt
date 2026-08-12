@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -42,8 +42,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.media3.exoplayer.offline.Download
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.utils.makeTimeString
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.utils.makeTimeString
 
 val GridMenuItemHeight = 108.dp
 

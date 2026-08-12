@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -18,11 +18,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.auth.CompleteYouTubeLoginUseCase
-import moe.rukamori.archivetune.auth.MissingYouTubeDataSyncIdException
-import moe.rukamori.archivetune.auth.SaveYouTubePoTokenUseCase
-import moe.rukamori.archivetune.auth.UpdateYouTubeLoginContextUseCase
-import moe.rukamori.archivetune.innertube.PlaybackAuthState
+import dev.vxs.frostsoulx.auth.CompleteYouTubeLoginUseCase
+import dev.vxs.frostsoulx.auth.MissingYouTubeDataSyncIdException
+import dev.vxs.frostsoulx.auth.SaveYouTubePoTokenUseCase
+import dev.vxs.frostsoulx.auth.UpdateYouTubeLoginContextUseCase
+import dev.vxs.frostsoulx.innertube.PlaybackAuthState
 import timber.log.Timber
 import javax.inject.Inject
 

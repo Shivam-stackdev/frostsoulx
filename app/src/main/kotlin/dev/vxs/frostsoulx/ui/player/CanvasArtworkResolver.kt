@@ -5,13 +5,13 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.canvas.ArchiveTuneCanvas
-import moe.rukamori.archivetune.canvas.models.CanvasArtwork
-import moe.rukamori.archivetune.canvas.models.matchesSongIdentity
+import dev.vxs.frostsoulx.canvas.ArchiveTuneCanvas
+import dev.vxs.frostsoulx.canvas.models.CanvasArtwork
+import dev.vxs.frostsoulx.canvas.models.matchesSongIdentity
 import timber.log.Timber
 
 internal suspend fun resolveCanvasArtworkForPlayback(

@@ -5,9 +5,9 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
-import moe.rukamori.archivetune.db.entities.Song
+import dev.vxs.frostsoulx.db.entities.Song
 
 internal fun Song.discordAlbumMusicUrl(): String? =
     if (song.isLocal || song.id.isLocalMediaId()) {

@@ -5,16 +5,16 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.extensions
+package dev.vxs.frostsoulx.extensions
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import moe.rukamori.archivetune.constants.InnerTubeCookieKey
-import moe.rukamori.archivetune.constants.YtmSyncKey
-import moe.rukamori.archivetune.innertube.utils.hasYouTubeLoginCookie
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
+import dev.vxs.frostsoulx.constants.InnerTubeCookieKey
+import dev.vxs.frostsoulx.constants.YtmSyncKey
+import dev.vxs.frostsoulx.innertube.utils.hasYouTubeLoginCookie
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
 
 fun Context.isSyncEnabled(): Boolean = dataStore.get(YtmSyncKey, true) && isUserLoggedIn()
 

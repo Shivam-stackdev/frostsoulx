@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,23 +27,23 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.constants.InnerTubeCookieKey
-import moe.rukamori.archivetune.constants.SelectedYtmPlaylistsKey
-import moe.rukamori.archivetune.constants.YtmSyncKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.ArtistEntity
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.db.entities.PlaylistEntity
-import moe.rukamori.archivetune.db.entities.PlaylistSongMap
-import moe.rukamori.archivetune.db.entities.SongEntity
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.utils.completed
-import moe.rukamori.archivetune.innertube.utils.hasYouTubeLoginCookie
-import moe.rukamori.archivetune.models.toMediaMetadata
+import dev.vxs.frostsoulx.constants.InnerTubeCookieKey
+import dev.vxs.frostsoulx.constants.SelectedYtmPlaylistsKey
+import dev.vxs.frostsoulx.constants.YtmSyncKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.ArtistEntity
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.db.entities.PlaylistEntity
+import dev.vxs.frostsoulx.db.entities.PlaylistSongMap
+import dev.vxs.frostsoulx.db.entities.SongEntity
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.utils.completed
+import dev.vxs.frostsoulx.innertube.utils.hasYouTubeLoginCookie
+import dev.vxs.frostsoulx.models.toMediaMetadata
 import timber.log.Timber
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicLong

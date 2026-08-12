@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.backup
+package dev.vxs.frostsoulx.backup
 
 import android.content.Context
 import android.net.Uri
@@ -17,8 +17,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellationException
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.utils.reportException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

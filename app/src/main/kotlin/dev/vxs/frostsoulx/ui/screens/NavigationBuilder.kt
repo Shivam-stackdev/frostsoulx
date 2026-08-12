@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens
+package dev.vxs.frostsoulx.ui.screens
 
 import android.net.Uri
 import androidx.compose.animation.core.tween
@@ -23,62 +23,62 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.constants.UpdateChannel
-import moe.rukamori.archivetune.defaultUpdateChannel
-import moe.rukamori.archivetune.musicrecognition.MusicRecognitionRoute
-import moe.rukamori.archivetune.musicrecognition.MusicRecognitionDetailsRoute
-import moe.rukamori.archivetune.ui.screens.BrowseScreen
-import moe.rukamori.archivetune.ui.screens.artist.ArtistAlbumsScreen
-import moe.rukamori.archivetune.ui.screens.artist.ArtistItemsScreen
-import moe.rukamori.archivetune.ui.screens.artist.ArtistScreen
-import moe.rukamori.archivetune.ui.screens.artist.ArtistSongsScreen
-import moe.rukamori.archivetune.ui.screens.library.LibraryScreen
-import moe.rukamori.archivetune.ui.screens.library.LocalSongScreen
-import moe.rukamori.archivetune.ui.screens.musicrecognition.MusicRecognitionScreen
-import moe.rukamori.archivetune.ui.screens.musicrecognition.MusicRecognitionDetailsScreen
-import moe.rukamori.archivetune.ui.screens.playlist.AutoPlaylistScreen
-import moe.rukamori.archivetune.ui.screens.playlist.CachePlaylistScreen
-import moe.rukamori.archivetune.ui.screens.playlist.LocalPlaylistScreen
-import moe.rukamori.archivetune.ui.screens.playlist.OnlinePlaylistScreen
-import moe.rukamori.archivetune.ui.screens.playlist.SpotifyPlaylistScreen
-import moe.rukamori.archivetune.ui.screens.playlist.TopPlaylistScreen
-import moe.rukamori.archivetune.ui.screens.search.OnlineSearchResult
-import moe.rukamori.archivetune.ui.screens.search.OnlineSearchResultArgument
-import moe.rukamori.archivetune.ui.screens.search.OnlineSearchResultRoute
-import moe.rukamori.archivetune.ui.screens.search.OnlineSearchResultRoutePrefix
-import moe.rukamori.archivetune.ui.screens.search.SearchScreen
-import moe.rukamori.archivetune.ui.screens.settings.AboutScreen
-import moe.rukamori.archivetune.ui.screens.settings.AccountSettings
-import moe.rukamori.archivetune.ui.screens.settings.AiIntegrationSettings
-import moe.rukamori.archivetune.ui.screens.settings.AodCustomizedScreen
-import moe.rukamori.archivetune.ui.screens.settings.AppearanceSettings
-import moe.rukamori.archivetune.ui.screens.settings.BackupAndRestore
-import moe.rukamori.archivetune.ui.screens.settings.ChangelogScreen
-import moe.rukamori.archivetune.ui.screens.settings.ChiperSettings
-import moe.rukamori.archivetune.ui.screens.settings.ContentSettings
-import moe.rukamori.archivetune.ui.screens.settings.CustomizeBackground
-import moe.rukamori.archivetune.ui.screens.settings.DebugSettings
-import moe.rukamori.archivetune.ui.screens.settings.DiscordSettings
-import moe.rukamori.archivetune.ui.screens.settings.HiddenPlaylistsScreen
-import moe.rukamori.archivetune.ui.screens.settings.IconScreen
-import moe.rukamori.archivetune.ui.screens.settings.IntegrationScreen
-import moe.rukamori.archivetune.ui.screens.settings.InternetSettings
-import moe.rukamori.archivetune.ui.screens.settings.LastFMSettings
-import moe.rukamori.archivetune.ui.screens.settings.LogcatScreen
-import moe.rukamori.archivetune.ui.screens.settings.LyricsAnimationSettings
-import moe.rukamori.archivetune.ui.screens.settings.LyricsSettings
-import moe.rukamori.archivetune.ui.screens.settings.MusicTogetherScreen
-import moe.rukamori.archivetune.ui.screens.settings.PO_TOKEN_ROUTE
-import moe.rukamori.archivetune.ui.screens.settings.PalettePickerScreen
-import moe.rukamori.archivetune.ui.screens.settings.PlayerSettings
-import moe.rukamori.archivetune.ui.screens.settings.PoTokenScreen
-import moe.rukamori.archivetune.ui.screens.settings.PrivacySettings
-import moe.rukamori.archivetune.ui.screens.settings.SettingsScreen
-import moe.rukamori.archivetune.ui.screens.settings.StorageSettings
-import moe.rukamori.archivetune.ui.screens.settings.ThemeCreatorScreen
-import moe.rukamori.archivetune.ui.screens.settings.UpdateScreen
-import moe.rukamori.archivetune.viewmodels.OnlineSearchSort
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.constants.UpdateChannel
+import dev.vxs.frostsoulx.defaultUpdateChannel
+import dev.vxs.frostsoulx.musicrecognition.MusicRecognitionRoute
+import dev.vxs.frostsoulx.musicrecognition.MusicRecognitionDetailsRoute
+import dev.vxs.frostsoulx.ui.screens.BrowseScreen
+import dev.vxs.frostsoulx.ui.screens.artist.ArtistAlbumsScreen
+import dev.vxs.frostsoulx.ui.screens.artist.ArtistItemsScreen
+import dev.vxs.frostsoulx.ui.screens.artist.ArtistScreen
+import dev.vxs.frostsoulx.ui.screens.artist.ArtistSongsScreen
+import dev.vxs.frostsoulx.ui.screens.library.LibraryScreen
+import dev.vxs.frostsoulx.ui.screens.library.LocalSongScreen
+import dev.vxs.frostsoulx.ui.screens.musicrecognition.MusicRecognitionScreen
+import dev.vxs.frostsoulx.ui.screens.musicrecognition.MusicRecognitionDetailsScreen
+import dev.vxs.frostsoulx.ui.screens.playlist.AutoPlaylistScreen
+import dev.vxs.frostsoulx.ui.screens.playlist.CachePlaylistScreen
+import dev.vxs.frostsoulx.ui.screens.playlist.LocalPlaylistScreen
+import dev.vxs.frostsoulx.ui.screens.playlist.OnlinePlaylistScreen
+import dev.vxs.frostsoulx.ui.screens.playlist.SpotifyPlaylistScreen
+import dev.vxs.frostsoulx.ui.screens.playlist.TopPlaylistScreen
+import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResult
+import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResultArgument
+import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResultRoute
+import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResultRoutePrefix
+import dev.vxs.frostsoulx.ui.screens.search.SearchScreen
+import dev.vxs.frostsoulx.ui.screens.settings.AboutScreen
+import dev.vxs.frostsoulx.ui.screens.settings.AccountSettings
+import dev.vxs.frostsoulx.ui.screens.settings.AiIntegrationSettings
+import dev.vxs.frostsoulx.ui.screens.settings.AodCustomizedScreen
+import dev.vxs.frostsoulx.ui.screens.settings.AppearanceSettings
+import dev.vxs.frostsoulx.ui.screens.settings.BackupAndRestore
+import dev.vxs.frostsoulx.ui.screens.settings.ChangelogScreen
+import dev.vxs.frostsoulx.ui.screens.settings.ChiperSettings
+import dev.vxs.frostsoulx.ui.screens.settings.ContentSettings
+import dev.vxs.frostsoulx.ui.screens.settings.CustomizeBackground
+import dev.vxs.frostsoulx.ui.screens.settings.DebugSettings
+import dev.vxs.frostsoulx.ui.screens.settings.DiscordSettings
+import dev.vxs.frostsoulx.ui.screens.settings.HiddenPlaylistsScreen
+import dev.vxs.frostsoulx.ui.screens.settings.IconScreen
+import dev.vxs.frostsoulx.ui.screens.settings.IntegrationScreen
+import dev.vxs.frostsoulx.ui.screens.settings.InternetSettings
+import dev.vxs.frostsoulx.ui.screens.settings.LastFMSettings
+import dev.vxs.frostsoulx.ui.screens.settings.LogcatScreen
+import dev.vxs.frostsoulx.ui.screens.settings.LyricsAnimationSettings
+import dev.vxs.frostsoulx.ui.screens.settings.LyricsSettings
+import dev.vxs.frostsoulx.ui.screens.settings.MusicTogetherScreen
+import dev.vxs.frostsoulx.ui.screens.settings.PO_TOKEN_ROUTE
+import dev.vxs.frostsoulx.ui.screens.settings.PalettePickerScreen
+import dev.vxs.frostsoulx.ui.screens.settings.PlayerSettings
+import dev.vxs.frostsoulx.ui.screens.settings.PoTokenScreen
+import dev.vxs.frostsoulx.ui.screens.settings.PrivacySettings
+import dev.vxs.frostsoulx.ui.screens.settings.SettingsScreen
+import dev.vxs.frostsoulx.ui.screens.settings.StorageSettings
+import dev.vxs.frostsoulx.ui.screens.settings.ThemeCreatorScreen
+import dev.vxs.frostsoulx.ui.screens.settings.UpdateScreen
+import dev.vxs.frostsoulx.viewmodels.OnlineSearchSort
 
 @OptIn(ExperimentalMaterial3Api::class)
 fun NavGraphBuilder.navigationBuilder(
@@ -443,7 +443,7 @@ fun NavGraphBuilder.navigationBuilder(
         LastFMSettings(navController)
     }
     composable("settings/discord/experimental") {
-        moe.rukamori.archivetune.ui.screens.settings
+        dev.vxs.frostsoulx.ui.screens.settings
             .DiscordExperimental(navController)
     }
     composable("settings/misc") {

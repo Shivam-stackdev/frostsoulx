@@ -5,15 +5,15 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.onboarding
+package dev.vxs.frostsoulx.onboarding
 
 import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.R
 import javax.inject.Inject
 
 class ObserveOnboardingDataUseCase

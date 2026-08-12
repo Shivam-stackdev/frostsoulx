@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
@@ -33,9 +33,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.PlaylistSongSortType
-import moe.rukamori.archivetune.constants.PlaylistSortType
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.PlaylistSongSortType
+import dev.vxs.frostsoulx.constants.PlaylistSortType
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

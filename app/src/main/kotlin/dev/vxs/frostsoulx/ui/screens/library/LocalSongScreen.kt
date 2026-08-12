@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.library
+package dev.vxs.frostsoulx.ui.screens.library
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -95,28 +95,28 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.CONTENT_TYPE_HEADER
-import moe.rukamori.archivetune.constants.CONTENT_TYPE_SONG
-import moe.rukamori.archivetune.constants.LocalSongsExcludedFoldersKey
-import moe.rukamori.archivetune.constants.LocalSongsIncludedFoldersKey
-import moe.rukamori.archivetune.constants.LocalSongsMinDurationSecondsKey
-import moe.rukamori.archivetune.constants.LocalSongsSortDescendingKey
-import moe.rukamori.archivetune.constants.LocalSongsSortTypeKey
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.localmedia.LocalSongScanConfig
-import moe.rukamori.archivetune.localmedia.SupportedLocalAudio
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.SongListItem
-import moe.rukamori.archivetune.ui.component.SortHeader
-import moe.rukamori.archivetune.ui.menu.SongMenu
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.LocalSongsScanState
-import moe.rukamori.archivetune.viewmodels.LocalSongsViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.CONTENT_TYPE_HEADER
+import dev.vxs.frostsoulx.constants.CONTENT_TYPE_SONG
+import dev.vxs.frostsoulx.constants.LocalSongsExcludedFoldersKey
+import dev.vxs.frostsoulx.constants.LocalSongsIncludedFoldersKey
+import dev.vxs.frostsoulx.constants.LocalSongsMinDurationSecondsKey
+import dev.vxs.frostsoulx.constants.LocalSongsSortDescendingKey
+import dev.vxs.frostsoulx.constants.LocalSongsSortTypeKey
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.localmedia.LocalSongScanConfig
+import dev.vxs.frostsoulx.localmedia.SupportedLocalAudio
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.SongListItem
+import dev.vxs.frostsoulx.ui.component.SortHeader
+import dev.vxs.frostsoulx.ui.menu.SongMenu
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.LocalSongsScanState
+import dev.vxs.frostsoulx.viewmodels.LocalSongsViewModel
 import java.text.Collator
 import java.time.LocalDateTime
 import java.util.Locale

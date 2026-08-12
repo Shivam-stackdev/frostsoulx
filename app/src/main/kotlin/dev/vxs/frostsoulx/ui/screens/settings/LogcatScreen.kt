@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -78,17 +78,17 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.logcat.LogcatLevel
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.LogcatEffect
-import moe.rukamori.archivetune.viewmodels.LogcatScreenState
-import moe.rukamori.archivetune.viewmodels.LogcatUiEntries
-import moe.rukamori.archivetune.viewmodels.LogcatUiEntry
-import moe.rukamori.archivetune.viewmodels.LogcatUiModel
-import moe.rukamori.archivetune.viewmodels.LogcatViewModel
-import moe.rukamori.archivetune.ui.component.IconButton as ArchiveTuneIconButton
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.logcat.LogcatLevel
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.LogcatEffect
+import dev.vxs.frostsoulx.viewmodels.LogcatScreenState
+import dev.vxs.frostsoulx.viewmodels.LogcatUiEntries
+import dev.vxs.frostsoulx.viewmodels.LogcatUiEntry
+import dev.vxs.frostsoulx.viewmodels.LogcatUiModel
+import dev.vxs.frostsoulx.viewmodels.LogcatViewModel
+import dev.vxs.frostsoulx.ui.component.IconButton as ArchiveTuneIconButton
 
 @Composable
 fun LogcatScreen(

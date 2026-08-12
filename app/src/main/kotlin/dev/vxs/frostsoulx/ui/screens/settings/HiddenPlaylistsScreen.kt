@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,13 +46,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.PlaylistSortType
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.utils.backToMain
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.PlaylistSortType
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.utils.backToMain
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

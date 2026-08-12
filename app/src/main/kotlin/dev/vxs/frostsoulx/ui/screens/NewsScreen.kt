@@ -10,7 +10,7 @@
     ExperimentalMaterial3ExpressiveApi::class,
 )
 
-package moe.rukamori.archivetune.ui.screens
+package dev.vxs.frostsoulx.ui.screens
 
 import android.net.Uri
 import androidx.compose.animation.AnimatedContent
@@ -97,17 +97,17 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.models.NewsItem
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.NewsUiState
-import moe.rukamori.archivetune.viewmodels.NewsViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.models.NewsItem
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.NewsUiState
+import dev.vxs.frostsoulx.viewmodels.NewsViewModel
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import moe.rukamori.archivetune.ui.component.IconButton as AppIconButton
+import dev.vxs.frostsoulx.ui.component.IconButton as AppIconButton
 
 @Composable
 fun NewsScreen(

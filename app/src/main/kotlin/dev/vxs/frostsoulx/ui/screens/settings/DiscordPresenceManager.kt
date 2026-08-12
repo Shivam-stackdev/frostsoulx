@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.content.Context
 import android.os.Handler
@@ -25,11 +25,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.discord.DiscordOAuthRepository
-import moe.rukamori.archivetune.discord.DiscordSocialPresenceClient
-import moe.rukamori.archivetune.utils.DiscordImageResolver
-import moe.rukamori.archivetune.utils.DiscordRPC
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.discord.DiscordOAuthRepository
+import dev.vxs.frostsoulx.discord.DiscordSocialPresenceClient
+import dev.vxs.frostsoulx.utils.DiscordImageResolver
+import dev.vxs.frostsoulx.utils.DiscordRPC
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong

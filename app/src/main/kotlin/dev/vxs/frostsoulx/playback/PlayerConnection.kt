@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import android.content.Context
 import androidx.media3.common.MediaItem
@@ -38,17 +38,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.canvas.models.CanvasArtwork
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.extensions.currentMetadata
-import moe.rukamori.archivetune.extensions.getCurrentQueueIndex
-import moe.rukamori.archivetune.extensions.getQueueWindows
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.playback.MusicService.MusicBinder
-import moe.rukamori.archivetune.playback.queues.Queue
-import moe.rukamori.archivetune.ui.player.refetchCanvasArtworkForPlayback
-import moe.rukamori.archivetune.utils.isLocalMediaId
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.canvas.models.CanvasArtwork
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.extensions.currentMetadata
+import dev.vxs.frostsoulx.extensions.getCurrentQueueIndex
+import dev.vxs.frostsoulx.extensions.getQueueWindows
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.playback.MusicService.MusicBinder
+import dev.vxs.frostsoulx.playback.queues.Queue
+import dev.vxs.frostsoulx.ui.player.refetchCanvasArtworkForPlayback
+import dev.vxs.frostsoulx.utils.isLocalMediaId
+import dev.vxs.frostsoulx.utils.reportException
 import java.util.Locale
 
 internal data class CanvasArtworkUpdate(
@@ -319,9 +319,9 @@ class PlayerConnection(
     }
 
     fun seekToNext() {
-        val state = service.togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (state?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
-            service.requestTogetherControl(moe.rukamori.archivetune.together.ControlAction.SkipNext)
+        val state = service.togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (state?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
+            service.requestTogetherControl(dev.vxs.frostsoulx.together.ControlAction.SkipNext)
             return
         }
         player.seekToNext()
@@ -330,9 +330,9 @@ class PlayerConnection(
     }
 
     fun seekToPrevious() {
-        val state = service.togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (state?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
-            service.requestTogetherControl(moe.rukamori.archivetune.together.ControlAction.SkipPrevious)
+        val state = service.togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (state?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
+            service.requestTogetherControl(dev.vxs.frostsoulx.together.ControlAction.SkipPrevious)
             return
         }
         player.seekToPrevious()

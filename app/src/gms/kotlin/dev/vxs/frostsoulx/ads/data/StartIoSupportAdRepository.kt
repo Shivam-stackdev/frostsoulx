@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ads.data
+package dev.vxs.frostsoulx.ads.data
 
 import android.app.Activity
 import android.app.Application
@@ -30,12 +30,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.MainActivity
-import moe.rukamori.archivetune.ads.domain.SupportAdAvailability
-import moe.rukamori.archivetune.ads.domain.SupportAdEvent
-import moe.rukamori.archivetune.ads.domain.SupportAdRepository
-import moe.rukamori.archivetune.ads.domain.SupportAdRequestResult
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.MainActivity
+import dev.vxs.frostsoulx.ads.domain.SupportAdAvailability
+import dev.vxs.frostsoulx.ads.domain.SupportAdEvent
+import dev.vxs.frostsoulx.ads.domain.SupportAdRepository
+import dev.vxs.frostsoulx.ads.domain.SupportAdRequestResult
 import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject

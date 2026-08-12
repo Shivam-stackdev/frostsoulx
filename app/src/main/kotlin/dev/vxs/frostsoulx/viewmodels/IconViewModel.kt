@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -21,10 +21,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.appicon.AppIconCatalog
-import moe.rukamori.archivetune.appicon.LoadAppIconsUseCase
-import moe.rukamori.archivetune.appicon.SelectAppIconUseCase
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.appicon.AppIconCatalog
+import dev.vxs.frostsoulx.appicon.LoadAppIconsUseCase
+import dev.vxs.frostsoulx.appicon.SelectAppIconUseCase
 import javax.inject.Inject
 
 sealed interface IconScreenState {

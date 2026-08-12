@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -20,7 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.getSystemService
-import moe.rukamori.archivetune.constants.LowDataModeKey
+import dev.vxs.frostsoulx.constants.LowDataModeKey
 
 fun Context.isLowDataModeActive(): Boolean = isLowDataModeActive(dataStore.get(LowDataModeKey, true))
 

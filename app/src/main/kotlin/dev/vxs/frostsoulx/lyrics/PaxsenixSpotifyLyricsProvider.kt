@@ -5,13 +5,13 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lyrics
+package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
-import moe.rukamori.archivetune.constants.EnablePaxsenixSpotifyLyricsKey
-import moe.rukamori.archivetune.paxsenix.PaxsenixLyrics
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
+import dev.vxs.frostsoulx.constants.EnablePaxsenixSpotifyLyricsKey
+import dev.vxs.frostsoulx.paxsenix.PaxsenixLyrics
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
 
 object PaxsenixSpotifyLyricsProvider : LyricsProvider {
     override val name = "Paxsenix: Spotify"

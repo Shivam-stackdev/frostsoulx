@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.musicrecognition
+package dev.vxs.frostsoulx.musicrecognition
 
 import android.app.Activity
 import android.app.Service
@@ -32,7 +32,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import android.util.Base64
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.MainActivity
+import dev.vxs.frostsoulx.MainActivity
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -269,11 +269,11 @@ class BackgroundMusicRecognitionService : Service() {
 
     companion object {
         private const val ActionRecognizePlayback =
-            "moe.rukamori.archivetune.action.RECOGNIZE_DEVICE_PLAYBACK"
+            "dev.vxs.frostsoulx.action.RECOGNIZE_DEVICE_PLAYBACK"
         private const val ActionRecognizeMicrophone =
-            "moe.rukamori.archivetune.action.RECOGNIZE_MICROPHONE"
+            "dev.vxs.frostsoulx.action.RECOGNIZE_MICROPHONE"
         private const val ActionCancel =
-            "moe.rukamori.archivetune.action.CANCEL_BACKGROUND_RECOGNITION"
+            "dev.vxs.frostsoulx.action.CANCEL_BACKGROUND_RECOGNITION"
         private const val ExtraResultCode = "media_projection_result_code"
         private const val ExtraResultData = "media_projection_result_data"
 

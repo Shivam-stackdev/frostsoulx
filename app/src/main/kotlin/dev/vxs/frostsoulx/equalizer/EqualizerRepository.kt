@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.equalizer
+package dev.vxs.frostsoulx.equalizer
 
 import android.content.Context
 import android.net.Uri
@@ -17,25 +17,25 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.constants.EqualizerAutoHeadroomEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerBandLevelsMbKey
-import moe.rukamori.archivetune.constants.EqualizerBassBoostEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerBassBoostStrengthKey
-import moe.rukamori.archivetune.constants.EqualizerControlModeKey
-import moe.rukamori.archivetune.constants.EqualizerCustomProfilesJsonKey
-import moe.rukamori.archivetune.constants.EqualizerEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerOutputGainEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerOutputGainMbKey
-import moe.rukamori.archivetune.constants.EqualizerSelectedProfileIdKey
-import moe.rukamori.archivetune.constants.EqualizerVirtualizerEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerVirtualizerStrengthKey
-import moe.rukamori.archivetune.playback.EqCapabilities
-import moe.rukamori.archivetune.playback.EqProfile
-import moe.rukamori.archivetune.playback.EqProfilesPayload
-import moe.rukamori.archivetune.playback.EqSettings
-import moe.rukamori.archivetune.playback.EqualizerJson
-import moe.rukamori.archivetune.playback.EqualizerPlaybackController
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.constants.EqualizerAutoHeadroomEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerBandLevelsMbKey
+import dev.vxs.frostsoulx.constants.EqualizerBassBoostEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerBassBoostStrengthKey
+import dev.vxs.frostsoulx.constants.EqualizerControlModeKey
+import dev.vxs.frostsoulx.constants.EqualizerCustomProfilesJsonKey
+import dev.vxs.frostsoulx.constants.EqualizerEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerOutputGainEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerOutputGainMbKey
+import dev.vxs.frostsoulx.constants.EqualizerSelectedProfileIdKey
+import dev.vxs.frostsoulx.constants.EqualizerVirtualizerEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerVirtualizerStrengthKey
+import dev.vxs.frostsoulx.playback.EqCapabilities
+import dev.vxs.frostsoulx.playback.EqProfile
+import dev.vxs.frostsoulx.playback.EqProfilesPayload
+import dev.vxs.frostsoulx.playback.EqSettings
+import dev.vxs.frostsoulx.playback.EqualizerJson
+import dev.vxs.frostsoulx.playback.EqualizerPlaybackController
+import dev.vxs.frostsoulx.utils.dataStore
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton

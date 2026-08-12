@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.net.ConnectivityManager
 import androidx.media3.common.PlaybackException
@@ -14,28 +14,28 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import moe.rukamori.archivetune.constants.AudioQuality
-import moe.rukamori.archivetune.constants.PlayerStreamClient
-import moe.rukamori.archivetune.innertube.NewPipeUtils
-import moe.rukamori.archivetune.innertube.PlaybackAuthState
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.YouTubeClient
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.ANDROID_CREATOR
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.ANDROID_MUSIC
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.ANDROID_TESTSUITE
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.ANDROID_UNPLUGGED
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.IOS
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.IOS_MUSIC
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.IPADOS
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.MOBILE
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.TVHTML5
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.TVHTML5_SIMPLY_EMBEDDED_PLAYER
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.VISIONOS
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.WEB
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.WEB_CREATOR
-import moe.rukamori.archivetune.innertube.models.YouTubeClient.Companion.WEB_REMIX
-import moe.rukamori.archivetune.innertube.models.response.PlayerResponse
-import moe.rukamori.archivetune.utils.potoken.BotGuardTokenGenerator
+import dev.vxs.frostsoulx.constants.AudioQuality
+import dev.vxs.frostsoulx.constants.PlayerStreamClient
+import dev.vxs.frostsoulx.innertube.NewPipeUtils
+import dev.vxs.frostsoulx.innertube.PlaybackAuthState
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.ANDROID_CREATOR
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.ANDROID_MUSIC
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.ANDROID_TESTSUITE
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.ANDROID_UNPLUGGED
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.IOS
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.IOS_MUSIC
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.IPADOS
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.MOBILE
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.TVHTML5
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.TVHTML5_SIMPLY_EMBEDDED_PLAYER
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.VISIONOS
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.WEB
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.WEB_CREATOR
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient.Companion.WEB_REMIX
+import dev.vxs.frostsoulx.innertube.models.response.PlayerResponse
+import dev.vxs.frostsoulx.utils.potoken.BotGuardTokenGenerator
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.util.Locale
@@ -113,7 +113,7 @@ object YTPlayerUtils {
      * Do not use other clients for this because it can result in inconsistent metadata.
      * For example other clients can have different normalization targets (loudnessDb).
      *
-     * [moe.rukamori.archivetune.innertube.models.YouTubeClient.WEB_REMIX] should be preferred here because currently it is the only client which provides:
+     * [dev.vxs.frostsoulx.innertube.models.YouTubeClient.WEB_REMIX] should be preferred here because currently it is the only client which provides:
      * - the correct metadata (like loudnessDb)
      * - premium formats
      */

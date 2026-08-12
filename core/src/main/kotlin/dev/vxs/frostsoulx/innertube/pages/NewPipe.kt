@@ -5,14 +5,14 @@
 * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
 */
 
-package moe.rukamori.archivetune.innertube
+package dev.vxs.frostsoulx.innertube
 
 import io.ktor.http.URLBuilder
 import io.ktor.http.parseQueryString
 import kotlinx.coroutines.CancellationException
-import moe.rukamori.archivetune.innertube.models.YouTubeClient
-import moe.rukamori.archivetune.innertube.models.response.PlayerResponse
-import moe.rukamori.archivetune.morideobfuscator.MoriCipherRuntime
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient
+import dev.vxs.frostsoulx.innertube.models.response.PlayerResponse
+import dev.vxs.frostsoulx.morideobfuscator.MoriCipherRuntime
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody

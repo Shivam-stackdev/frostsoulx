@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens
+package dev.vxs.frostsoulx.ui.screens
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -89,51 +89,51 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size
 import kotlinx.coroutines.CoroutineScope
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.GridThumbnailHeight
-import moe.rukamori.archivetune.constants.ListItemHeight
-import moe.rukamori.archivetune.constants.ListThumbnailSize
-import moe.rukamori.archivetune.constants.QuickPicksDisplayMode
-import moe.rukamori.archivetune.constants.ThumbnailCornerRadius
-import moe.rukamori.archivetune.db.entities.Album
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.LocalItem
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.innertube.models.YTItem
-import moe.rukamori.archivetune.innertube.pages.HomePage
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.models.SimilarRecommendation
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.playback.PlayerConnection
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.playback.queues.YouTubeQueue
-import moe.rukamori.archivetune.ui.component.AlbumGridItem
-import moe.rukamori.archivetune.ui.component.ArtistGridItem
-import moe.rukamori.archivetune.ui.component.MenuState
-import moe.rukamori.archivetune.ui.component.SongGridItem
-import moe.rukamori.archivetune.ui.component.SongListItem
-import moe.rukamori.archivetune.ui.component.SpeedDialGridItem
-import moe.rukamori.archivetune.ui.component.YouTubeGridItem
-import moe.rukamori.archivetune.ui.menu.AlbumMenu
-import moe.rukamori.archivetune.ui.menu.ArtistMenu
-import moe.rukamori.archivetune.ui.menu.PlaylistMenu
-import moe.rukamori.archivetune.ui.menu.SongMenu
-import moe.rukamori.archivetune.ui.menu.YouTubeAlbumMenu
-import moe.rukamori.archivetune.ui.menu.YouTubeArtistMenu
-import moe.rukamori.archivetune.ui.menu.YouTubePlaylistMenu
-import moe.rukamori.archivetune.ui.menu.YouTubeSongMenu
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.GridThumbnailHeight
+import dev.vxs.frostsoulx.constants.ListItemHeight
+import dev.vxs.frostsoulx.constants.ListThumbnailSize
+import dev.vxs.frostsoulx.constants.QuickPicksDisplayMode
+import dev.vxs.frostsoulx.constants.ThumbnailCornerRadius
+import dev.vxs.frostsoulx.db.entities.Album
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.LocalItem
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.innertube.models.YTItem
+import dev.vxs.frostsoulx.innertube.pages.HomePage
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.models.SimilarRecommendation
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.playback.PlayerConnection
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
+import dev.vxs.frostsoulx.ui.component.AlbumGridItem
+import dev.vxs.frostsoulx.ui.component.ArtistGridItem
+import dev.vxs.frostsoulx.ui.component.MenuState
+import dev.vxs.frostsoulx.ui.component.SongGridItem
+import dev.vxs.frostsoulx.ui.component.SongListItem
+import dev.vxs.frostsoulx.ui.component.SpeedDialGridItem
+import dev.vxs.frostsoulx.ui.component.YouTubeGridItem
+import dev.vxs.frostsoulx.ui.menu.AlbumMenu
+import dev.vxs.frostsoulx.ui.menu.ArtistMenu
+import dev.vxs.frostsoulx.ui.menu.PlaylistMenu
+import dev.vxs.frostsoulx.ui.menu.SongMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubeAlbumMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubeArtistMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubePlaylistMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubeSongMenu
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.random.Random
-import moe.rukamori.archivetune.ui.utils.SnapLayoutInfoProvider as buildSnapLayoutInfoProvider
+import dev.vxs.frostsoulx.ui.utils.SnapLayoutInfoProvider as buildSnapLayoutInfoProvider
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -566,7 +566,7 @@ fun SpeedDialSection(
                                     title = localItem.title,
                                     artists =
                                         localItem.artists.map {
-                                            moe.rukamori.archivetune.innertube.models
+                                            dev.vxs.frostsoulx.innertube.models
                                                 .Artist(name = it.name, id = it.id)
                                         },
                                     thumbnail = localItem.song.thumbnailUrl.orEmpty(),
@@ -581,7 +581,7 @@ fun SpeedDialSection(
                                     title = localItem.title,
                                     artists =
                                         localItem.artists.map {
-                                            moe.rukamori.archivetune.innertube.models
+                                            dev.vxs.frostsoulx.innertube.models
                                                 .Artist(name = it.name, id = it.id)
                                         },
                                     year = localItem.album.year,

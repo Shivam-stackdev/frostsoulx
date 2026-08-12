@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
@@ -23,19 +23,19 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.constants.AutoPlaylistSongSortDescendingKey
-import moe.rukamori.archivetune.constants.AutoPlaylistSongSortType
-import moe.rukamori.archivetune.constants.AutoPlaylistSongSortTypeKey
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.constants.SongSortType
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.extensions.filterExplicit
-import moe.rukamori.archivetune.extensions.toEnum
-import moe.rukamori.archivetune.utils.SyncUtils
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.constants.AutoPlaylistSongSortDescendingKey
+import dev.vxs.frostsoulx.constants.AutoPlaylistSongSortType
+import dev.vxs.frostsoulx.constants.AutoPlaylistSongSortTypeKey
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.constants.SongSortType
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.extensions.filterExplicit
+import dev.vxs.frostsoulx.extensions.toEnum
+import dev.vxs.frostsoulx.utils.SyncUtils
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)

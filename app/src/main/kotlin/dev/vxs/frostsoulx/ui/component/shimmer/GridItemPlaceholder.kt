@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component.shimmer
+package dev.vxs.frostsoulx.ui.component.shimmer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import moe.rukamori.archivetune.constants.GridThumbnailCornerRadius
-import moe.rukamori.archivetune.constants.GridThumbnailHeight
+import dev.vxs.frostsoulx.constants.GridThumbnailCornerRadius
+import dev.vxs.frostsoulx.constants.GridThumbnailHeight
 
 @Composable
 fun GridItemPlaceHolder(

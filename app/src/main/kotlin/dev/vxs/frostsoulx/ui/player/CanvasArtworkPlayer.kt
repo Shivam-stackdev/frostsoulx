@@ -7,7 +7,7 @@
 
 @file:OptIn(androidx.media3.common.util.UnstableApi::class)
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -40,8 +40,8 @@ import androidx.media3.ui.compose.ContentFrame
 import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.utils.StreamClientUtils
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.utils.StreamClientUtils
 import okhttp3.OkHttpClient
 import timber.log.Timber
 import java.util.Locale

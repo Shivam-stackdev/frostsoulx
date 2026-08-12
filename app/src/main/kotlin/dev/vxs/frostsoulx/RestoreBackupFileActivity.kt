@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune
+package dev.vxs.frostsoulx
 
 import android.net.Uri
 import android.os.Bundle
@@ -49,11 +49,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import moe.rukamori.archivetune.ui.component.DefaultDialog
-import moe.rukamori.archivetune.ui.menu.LoadingScreen
-import moe.rukamori.archivetune.ui.theme.ArchiveTuneTheme
-import moe.rukamori.archivetune.viewmodels.BackupCategory
-import moe.rukamori.archivetune.viewmodels.BackupRestoreViewModel
+import dev.vxs.frostsoulx.ui.component.DefaultDialog
+import dev.vxs.frostsoulx.ui.menu.LoadingScreen
+import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
+import dev.vxs.frostsoulx.viewmodels.BackupCategory
+import dev.vxs.frostsoulx.viewmodels.BackupRestoreViewModel
 
 @AndroidEntryPoint
 class RestoreBackupFileActivity : ComponentActivity() {

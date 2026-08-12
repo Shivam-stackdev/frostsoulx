@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -38,9 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.TagEntity
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.TagEntity
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

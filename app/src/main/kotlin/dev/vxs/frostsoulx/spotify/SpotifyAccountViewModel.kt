@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.spotify
+package dev.vxs.frostsoulx.spotify
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 @HiltViewModel

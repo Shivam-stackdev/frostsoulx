@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.playlist
+package dev.vxs.frostsoulx.ui.screens.playlist
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -70,36 +70,36 @@ import androidx.compose.ui.util.fastSumBy
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalDownloadUtil
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.AppBarHeight
-import moe.rukamori.archivetune.constants.MyTopFilter
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.DefaultDialog
-import moe.rukamori.archivetune.ui.component.DraggableScrollbar
-import moe.rukamori.archivetune.ui.component.EmptyPlaceholder
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.MediaDetailAction
-import moe.rukamori.archivetune.ui.component.MediaDetailHero
-import moe.rukamori.archivetune.ui.component.SongListItem
-import moe.rukamori.archivetune.ui.component.SortHeader
-import moe.rukamori.archivetune.ui.menu.SelectionSongMenu
-import moe.rukamori.archivetune.ui.menu.SongMenu
-import moe.rukamori.archivetune.ui.utils.HeaderDownloadItem
-import moe.rukamori.archivetune.ui.utils.HeaderDownloadProgressIndicator
-import moe.rukamori.archivetune.ui.utils.HeaderDownloadState
-import moe.rukamori.archivetune.ui.utils.ItemWrapper
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.ui.utils.headerDownloadState
-import moe.rukamori.archivetune.ui.utils.sendAddMissingDownloads
-import moe.rukamori.archivetune.ui.utils.sendRemoveDownloads
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.viewmodels.TopPlaylistViewModel
+import dev.vxs.frostsoulx.LocalDownloadUtil
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.AppBarHeight
+import dev.vxs.frostsoulx.constants.MyTopFilter
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.DefaultDialog
+import dev.vxs.frostsoulx.ui.component.DraggableScrollbar
+import dev.vxs.frostsoulx.ui.component.EmptyPlaceholder
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.MediaDetailAction
+import dev.vxs.frostsoulx.ui.component.MediaDetailHero
+import dev.vxs.frostsoulx.ui.component.SongListItem
+import dev.vxs.frostsoulx.ui.component.SortHeader
+import dev.vxs.frostsoulx.ui.menu.SelectionSongMenu
+import dev.vxs.frostsoulx.ui.menu.SongMenu
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadItem
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadProgressIndicator
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadState
+import dev.vxs.frostsoulx.ui.utils.ItemWrapper
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.ui.utils.headerDownloadState
+import dev.vxs.frostsoulx.ui.utils.sendAddMissingDownloads
+import dev.vxs.frostsoulx.ui.utils.sendRemoveDownloads
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.viewmodels.TopPlaylistViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable

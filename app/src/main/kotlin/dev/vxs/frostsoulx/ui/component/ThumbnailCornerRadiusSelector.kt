@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,9 +31,9 @@ import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.ThumbnailCornerRadiusKey
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.ThumbnailCornerRadiusKey
+import dev.vxs.frostsoulx.utils.rememberPreference
 import kotlin.math.roundToInt
 
 @Composable

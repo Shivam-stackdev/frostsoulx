@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.musicrecognition
+package dev.vxs.frostsoulx.musicrecognition
 
 import android.content.Context
 import android.media.AudioAttributes
@@ -32,10 +32,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.shazamkit.Shazam
-import moe.rukamori.archivetune.shazamkit.ShazamSignatureGenerator
-import moe.rukamori.archivetune.shazamkit.models.RecognitionResult
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.shazamkit.Shazam
+import dev.vxs.frostsoulx.shazamkit.ShazamSignatureGenerator
+import dev.vxs.frostsoulx.shazamkit.models.RecognitionResult
+import dev.vxs.frostsoulx.utils.dataStore
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton

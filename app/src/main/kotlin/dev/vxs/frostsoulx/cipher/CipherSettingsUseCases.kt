@@ -5,13 +5,13 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.cipher
+package dev.vxs.frostsoulx.cipher
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
-import moe.rukamori.archivetune.morideobfuscator.CipherSnapshot
+import dev.vxs.frostsoulx.morideobfuscator.CipherSnapshot
 import javax.inject.Inject
 
 data class CipherSettingsDomainState(

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.content.Context
 import android.os.Looper
@@ -30,13 +30,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
-import moe.rukamori.archivetune.constants.HISTORY_DURATION_LEGACY_FLOAT_KEY
-import moe.rukamori.archivetune.constants.HISTORY_DURATION_MAX
-import moe.rukamori.archivetune.constants.HISTORY_DURATION_MIN
-import moe.rukamori.archivetune.constants.HistoryDuration
-import moe.rukamori.archivetune.constants.UpdateChannel
-import moe.rukamori.archivetune.constants.UpdateChannelKey
-import moe.rukamori.archivetune.extensions.toEnum
+import dev.vxs.frostsoulx.constants.HISTORY_DURATION_LEGACY_FLOAT_KEY
+import dev.vxs.frostsoulx.constants.HISTORY_DURATION_MAX
+import dev.vxs.frostsoulx.constants.HISTORY_DURATION_MIN
+import dev.vxs.frostsoulx.constants.HistoryDuration
+import dev.vxs.frostsoulx.constants.UpdateChannel
+import dev.vxs.frostsoulx.constants.UpdateChannelKey
+import dev.vxs.frostsoulx.extensions.toEnum
 import kotlin.properties.ReadOnlyProperty
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(

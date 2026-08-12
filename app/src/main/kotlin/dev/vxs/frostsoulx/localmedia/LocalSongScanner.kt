@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.localmedia
+package dev.vxs.frostsoulx.localmedia
 
 import android.content.ContentUris
 import android.content.Context
@@ -18,18 +18,18 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.AlbumArtistMap
-import moe.rukamori.archivetune.db.entities.AlbumEntity
-import moe.rukamori.archivetune.db.entities.ArtistEntity
-import moe.rukamori.archivetune.db.entities.FormatEntity
-import moe.rukamori.archivetune.db.entities.LyricsEntity
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.db.entities.SongAlbumMap
-import moe.rukamori.archivetune.db.entities.SongArtistMap
-import moe.rukamori.archivetune.db.entities.SongEntity
-import moe.rukamori.archivetune.lyrics.LyricsUtils
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.AlbumArtistMap
+import dev.vxs.frostsoulx.db.entities.AlbumEntity
+import dev.vxs.frostsoulx.db.entities.ArtistEntity
+import dev.vxs.frostsoulx.db.entities.FormatEntity
+import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.db.entities.SongAlbumMap
+import dev.vxs.frostsoulx.db.entities.SongArtistMap
+import dev.vxs.frostsoulx.db.entities.SongEntity
+import dev.vxs.frostsoulx.lyrics.LyricsUtils
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream

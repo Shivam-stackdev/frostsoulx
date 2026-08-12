@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.net.Uri
 import androidx.compose.runtime.Immutable
@@ -26,17 +26,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.equalizer.ApplyEqualizerPresetUseCase
-import moe.rukamori.archivetune.equalizer.EqualizerConfiguration
-import moe.rukamori.archivetune.equalizer.EqualizerControlMode
-import moe.rukamori.archivetune.equalizer.EqualizerTone
-import moe.rukamori.archivetune.equalizer.ManageEqualizerProfilesUseCase
-import moe.rukamori.archivetune.equalizer.ObserveEqualizerUseCase
-import moe.rukamori.archivetune.equalizer.UpdateEqualizerUseCase
-import moe.rukamori.archivetune.equalizer.equalizerToneIndices
-import moe.rukamori.archivetune.equalizer.resampleLevels
-import moe.rukamori.archivetune.playback.EqProfile
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.equalizer.ApplyEqualizerPresetUseCase
+import dev.vxs.frostsoulx.equalizer.EqualizerConfiguration
+import dev.vxs.frostsoulx.equalizer.EqualizerControlMode
+import dev.vxs.frostsoulx.equalizer.EqualizerTone
+import dev.vxs.frostsoulx.equalizer.ManageEqualizerProfilesUseCase
+import dev.vxs.frostsoulx.equalizer.ObserveEqualizerUseCase
+import dev.vxs.frostsoulx.equalizer.UpdateEqualizerUseCase
+import dev.vxs.frostsoulx.equalizer.equalizerToneIndices
+import dev.vxs.frostsoulx.equalizer.resampleLevels
+import dev.vxs.frostsoulx.playback.EqProfile
 import javax.inject.Inject
 
 sealed interface EqualizerScreenState {

@@ -5,9 +5,9 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ai
+package dev.vxs.frostsoulx.ai
 
-import moe.rukamori.archivetune.lyrics.LyricsUtils
+import dev.vxs.frostsoulx.lyrics.LyricsUtils
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.xml.sax.InputSource

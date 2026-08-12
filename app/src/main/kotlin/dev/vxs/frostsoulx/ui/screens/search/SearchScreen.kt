@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.search
+package dev.vxs.frostsoulx.ui.screens.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -67,33 +67,33 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.DisableBlurKey
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.playback.queues.YouTubeQueue
-import moe.rukamori.archivetune.search.SearchDiscoveryUiModel
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.NavigationTitle
-import moe.rukamori.archivetune.ui.component.YouTubeGridItem
-import moe.rukamori.archivetune.ui.component.YouTubeListItem
-import moe.rukamori.archivetune.ui.component.shimmer.ShimmerHost
-import moe.rukamori.archivetune.ui.component.shimmer.TextPlaceholder
-import moe.rukamori.archivetune.ui.menu.YouTubeAlbumMenu
-import moe.rukamori.archivetune.ui.menu.YouTubeArtistMenu
-import moe.rukamori.archivetune.ui.menu.YouTubeSongMenu
-import moe.rukamori.archivetune.ui.screens.MoodAndGenresButton
-import moe.rukamori.archivetune.ui.screens.MoodAndGenresButtonHeight
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.SearchDiscoveryScreenState
-import moe.rukamori.archivetune.viewmodels.SearchDiscoveryTab
-import moe.rukamori.archivetune.viewmodels.SearchDiscoveryViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.DisableBlurKey
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
+import dev.vxs.frostsoulx.search.SearchDiscoveryUiModel
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.NavigationTitle
+import dev.vxs.frostsoulx.ui.component.YouTubeGridItem
+import dev.vxs.frostsoulx.ui.component.YouTubeListItem
+import dev.vxs.frostsoulx.ui.component.shimmer.ShimmerHost
+import dev.vxs.frostsoulx.ui.component.shimmer.TextPlaceholder
+import dev.vxs.frostsoulx.ui.menu.YouTubeAlbumMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubeArtistMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubeSongMenu
+import dev.vxs.frostsoulx.ui.screens.MoodAndGenresButton
+import dev.vxs.frostsoulx.ui.screens.MoodAndGenresButtonHeight
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.SearchDiscoveryScreenState
+import dev.vxs.frostsoulx.viewmodels.SearchDiscoveryTab
+import dev.vxs.frostsoulx.viewmodels.SearchDiscoveryViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable

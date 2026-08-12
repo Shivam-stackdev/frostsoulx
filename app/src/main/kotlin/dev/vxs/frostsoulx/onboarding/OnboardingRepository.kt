@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.onboarding
+package dev.vxs.frostsoulx.onboarding
 
 import android.Manifest
 import android.content.Context
@@ -17,10 +17,10 @@ import com.google.common.collect.ImmutableList
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.constants.LaunchCountKey
-import moe.rukamori.archivetune.constants.OnboardingCompletedKey
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.constants.LaunchCountKey
+import dev.vxs.frostsoulx.constants.OnboardingCompletedKey
+import dev.vxs.frostsoulx.utils.dataStore
 import javax.inject.Inject
 
 class OnboardingRepository

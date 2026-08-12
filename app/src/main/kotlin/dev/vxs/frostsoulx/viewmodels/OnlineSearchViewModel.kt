@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.compose.runtime.getValue
@@ -19,28 +19,28 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.aicontentfilter.FilterAiContentUseCase
-import moe.rukamori.archivetune.aicontentfilter.LoadAiContentFilterPolicyUseCase
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.YouTube.SearchFilter.Companion.FILTER_ALBUM
-import moe.rukamori.archivetune.innertube.YouTube.SearchFilter.Companion.FILTER_ARTIST
-import moe.rukamori.archivetune.innertube.YouTube.SearchFilter.Companion.FILTER_COMMUNITY_PLAYLIST
-import moe.rukamori.archivetune.innertube.YouTube.SearchFilter.Companion.FILTER_FEATURED_PLAYLIST
-import moe.rukamori.archivetune.innertube.YouTube.SearchFilter.Companion.FILTER_SONG
-import moe.rukamori.archivetune.innertube.YouTube.SearchFilter.Companion.FILTER_VIDEO
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.YTItem
-import moe.rukamori.archivetune.innertube.models.filterExplicit
-import moe.rukamori.archivetune.innertube.models.filterVideo
-import moe.rukamori.archivetune.innertube.pages.SearchSummaryPage
-import moe.rukamori.archivetune.models.ItemsPage
-import moe.rukamori.archivetune.ui.screens.search.OnlineSearchResultArgument
-import moe.rukamori.archivetune.ui.screens.search.decodeOnlineSearchQuery
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.aicontentfilter.FilterAiContentUseCase
+import dev.vxs.frostsoulx.aicontentfilter.LoadAiContentFilterPolicyUseCase
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.YouTube.SearchFilter.Companion.FILTER_ALBUM
+import dev.vxs.frostsoulx.innertube.YouTube.SearchFilter.Companion.FILTER_ARTIST
+import dev.vxs.frostsoulx.innertube.YouTube.SearchFilter.Companion.FILTER_COMMUNITY_PLAYLIST
+import dev.vxs.frostsoulx.innertube.YouTube.SearchFilter.Companion.FILTER_FEATURED_PLAYLIST
+import dev.vxs.frostsoulx.innertube.YouTube.SearchFilter.Companion.FILTER_SONG
+import dev.vxs.frostsoulx.innertube.YouTube.SearchFilter.Companion.FILTER_VIDEO
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.YTItem
+import dev.vxs.frostsoulx.innertube.models.filterExplicit
+import dev.vxs.frostsoulx.innertube.models.filterVideo
+import dev.vxs.frostsoulx.innertube.pages.SearchSummaryPage
+import dev.vxs.frostsoulx.models.ItemsPage
+import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResultArgument
+import dev.vxs.frostsoulx.ui.screens.search.decodeOnlineSearchQuery
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 enum class OnlineSearchSort {

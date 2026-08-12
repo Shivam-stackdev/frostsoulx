@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.playlist
+package dev.vxs.frostsoulx.ui.screens.playlist
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -44,18 +44,18 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.DefaultDialog
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.NavigationTitle
-import moe.rukamori.archivetune.ui.component.YouTubeListItem
-import moe.rukamori.archivetune.viewmodels.LocalPlaylistViewModel
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.DefaultDialog
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.NavigationTitle
+import dev.vxs.frostsoulx.ui.component.YouTubeListItem
+import dev.vxs.frostsoulx.viewmodels.LocalPlaylistViewModel
 
 @Composable
 fun PlaylistSuggestionsSection(

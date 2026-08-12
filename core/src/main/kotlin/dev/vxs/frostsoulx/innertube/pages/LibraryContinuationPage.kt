@@ -5,9 +5,9 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.YTItem
+import dev.vxs.frostsoulx.innertube.models.YTItem
 
 data class LibraryContinuationPage(
     val items: List<YTItem>,

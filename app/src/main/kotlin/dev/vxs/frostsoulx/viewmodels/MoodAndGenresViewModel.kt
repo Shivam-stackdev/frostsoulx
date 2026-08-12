@@ -5,16 +5,16 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.pages.MoodAndGenres
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.pages.MoodAndGenres
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 @HiltViewModel

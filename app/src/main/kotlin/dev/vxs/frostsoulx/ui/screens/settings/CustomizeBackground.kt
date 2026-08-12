@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.content.Context
 import android.content.Intent
@@ -77,13 +77,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.PlayerCustomBlurKey
-import moe.rukamori.archivetune.constants.PlayerCustomBrightnessKey
-import moe.rukamori.archivetune.constants.PlayerCustomContrastKey
-import moe.rukamori.archivetune.constants.PlayerCustomImageUriKey
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.PlayerCustomBlurKey
+import dev.vxs.frostsoulx.constants.PlayerCustomBrightnessKey
+import dev.vxs.frostsoulx.constants.PlayerCustomContrastKey
+import dev.vxs.frostsoulx.constants.PlayerCustomImageUriKey
+import dev.vxs.frostsoulx.utils.rememberPreference
 import kotlin.math.roundToInt
 
 private const val DEFAULT_BLUR = 0f

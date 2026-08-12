@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.together
+package dev.vxs.frostsoulx.together
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -14,9 +14,9 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import moe.rukamori.archivetune.constants.TogetherOnlineEndpointCacheKey
-import moe.rukamori.archivetune.constants.TogetherOnlineEndpointLastCheckedAtKey
-import moe.rukamori.archivetune.utils.getAsync
+import dev.vxs.frostsoulx.constants.TogetherOnlineEndpointCacheKey
+import dev.vxs.frostsoulx.constants.TogetherOnlineEndpointLastCheckedAtKey
+import dev.vxs.frostsoulx.utils.getAsync
 import java.net.URI
 import java.util.concurrent.TimeUnit
 

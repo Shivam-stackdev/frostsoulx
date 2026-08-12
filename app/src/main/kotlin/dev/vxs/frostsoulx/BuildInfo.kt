@@ -5,9 +5,9 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune
+package dev.vxs.frostsoulx
 
-import moe.rukamori.archivetune.constants.UpdateChannel
+import dev.vxs.frostsoulx.constants.UpdateChannel
 
 private val CanaryVersionRegex = Regex("""^N\d{8}$""")
 

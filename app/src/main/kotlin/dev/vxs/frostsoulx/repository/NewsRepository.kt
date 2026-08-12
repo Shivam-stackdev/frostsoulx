@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.repository
+package dev.vxs.frostsoulx.repository
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -14,7 +14,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.models.NewsItem
+import dev.vxs.frostsoulx.models.NewsItem
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton

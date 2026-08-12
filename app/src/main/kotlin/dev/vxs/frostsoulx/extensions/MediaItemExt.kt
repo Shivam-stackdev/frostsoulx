@@ -5,26 +5,26 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.extensions
+package dev.vxs.frostsoulx.extensions
 
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_OMV
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_UGC
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.ui.utils.YTThumbQuality
-import moe.rukamori.archivetune.ui.utils.YtimgResizePolicy
-import moe.rukamori.archivetune.ui.utils.buildYTThumbnailUrl
-import moe.rukamori.archivetune.ui.utils.resize
-import moe.rukamori.archivetune.utils.NotificationArtworkSizePx
-import moe.rukamori.archivetune.utils.isLocalMediaId
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_OMV
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint.WatchEndpointMusicSupportedConfigs.WatchEndpointMusicConfig.Companion.MUSIC_VIDEO_TYPE_UGC
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.ui.utils.YTThumbQuality
+import dev.vxs.frostsoulx.ui.utils.YtimgResizePolicy
+import dev.vxs.frostsoulx.ui.utils.buildYTThumbnailUrl
+import dev.vxs.frostsoulx.ui.utils.resize
+import dev.vxs.frostsoulx.utils.NotificationArtworkSizePx
+import dev.vxs.frostsoulx.utils.isLocalMediaId
 
-const val ExtraIsMusicVideo = "moe.rukamori.archivetune.extra.IS_MUSIC_VIDEO"
+const val ExtraIsMusicVideo = "dev.vxs.frostsoulx.extra.IS_MUSIC_VIDEO"
 
 val MediaItem.metadata: MediaMetadata?
     get() = localConfiguration?.tag as? MediaMetadata

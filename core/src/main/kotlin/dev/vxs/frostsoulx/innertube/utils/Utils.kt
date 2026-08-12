@@ -5,13 +5,13 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.utils
+package dev.vxs.frostsoulx.innertube.utils
 
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.distinctByPlaylistEntry
-import moe.rukamori.archivetune.innertube.pages.LibraryPage
-import moe.rukamori.archivetune.innertube.pages.PlaylistContinuationPage
-import moe.rukamori.archivetune.innertube.pages.PlaylistPage
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.distinctByPlaylistEntry
+import dev.vxs.frostsoulx.innertube.pages.LibraryPage
+import dev.vxs.frostsoulx.innertube.pages.PlaylistContinuationPage
+import dev.vxs.frostsoulx.innertube.pages.PlaylistPage
 import java.security.MessageDigest
 
 // Cap for LibraryPage.continued() (e.g. FEmusic_liked_playlists / generated mixes)

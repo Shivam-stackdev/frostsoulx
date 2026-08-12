@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -16,8 +16,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.ui.component.BottomSheetState
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.ui.component.BottomSheetState
 
 /**
  * Centralized *behavior* for the title/artist block shared by every player design style.

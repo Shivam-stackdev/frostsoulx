@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -22,16 +22,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.db.entities.Album
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.ui.menu.AlbumMenu
-import moe.rukamori.archivetune.ui.menu.ArtistMenu
-import moe.rukamori.archivetune.ui.menu.PlaylistMenu
-import moe.rukamori.archivetune.ui.menu.YouTubePlaylistMenu
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.db.entities.Album
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.ui.menu.AlbumMenu
+import dev.vxs.frostsoulx.ui.menu.ArtistMenu
+import dev.vxs.frostsoulx.ui.menu.PlaylistMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubePlaylistMenu
 
 @Composable
 fun LibraryArtistListItem(

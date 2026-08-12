@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.net.Uri
 import androidx.compose.runtime.Immutable
@@ -23,14 +23,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.logcat.ClearLogcatUseCase
-import moe.rukamori.archivetune.logcat.ExportLogcatUseCase
-import moe.rukamori.archivetune.logcat.FilterLogcatUseCase
-import moe.rukamori.archivetune.logcat.FormatLogcatUseCase
-import moe.rukamori.archivetune.logcat.LogcatLevel
-import moe.rukamori.archivetune.logcat.LogcatRecord
-import moe.rukamori.archivetune.logcat.ObserveLogcatUseCase
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.logcat.ClearLogcatUseCase
+import dev.vxs.frostsoulx.logcat.ExportLogcatUseCase
+import dev.vxs.frostsoulx.logcat.FilterLogcatUseCase
+import dev.vxs.frostsoulx.logcat.FormatLogcatUseCase
+import dev.vxs.frostsoulx.logcat.LogcatLevel
+import dev.vxs.frostsoulx.logcat.LogcatRecord
+import dev.vxs.frostsoulx.logcat.ObserveLogcatUseCase
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

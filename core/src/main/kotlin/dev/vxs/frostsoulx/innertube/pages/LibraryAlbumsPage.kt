@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.MusicTwoRowItemRenderer
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.MusicTwoRowItemRenderer
 
 data class LibraryAlbumsPage(
     val albums: List<AlbumItem>,

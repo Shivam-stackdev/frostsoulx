@@ -5,17 +5,17 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.library
+package dev.vxs.frostsoulx.ui.screens.library
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import moe.rukamori.archivetune.constants.PlaylistTagsFilterKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.TagEntity
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.constants.PlaylistTagsFilterKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.TagEntity
+import dev.vxs.frostsoulx.utils.rememberPreference
 
 @Composable
 internal fun rememberPlaylistTagFilterState(database: MusicDatabase): Pair<Set<String>, (Set<String>) -> Unit> {

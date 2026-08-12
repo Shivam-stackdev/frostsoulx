@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -18,8 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.R
 
 @Composable
 fun buildSettingsGroups(

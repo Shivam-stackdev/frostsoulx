@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.downloads
+package dev.vxs.frostsoulx.ui.screens.downloads
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -85,22 +85,22 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.downloads.DownloadEntryUiModel
-import moe.rukamori.archivetune.downloads.DownloadMediaType
-import moe.rukamori.archivetune.downloads.DownloadSectionUiModel
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.EmptyPlaceholder
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.ui.utils.formatFileSize
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.viewmodels.DownloadLibraryEvent
-import moe.rukamori.archivetune.viewmodels.DownloadLibraryScreenState
-import moe.rukamori.archivetune.viewmodels.DownloadLibraryTab
-import moe.rukamori.archivetune.viewmodels.DownloadLibraryViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.downloads.DownloadEntryUiModel
+import dev.vxs.frostsoulx.downloads.DownloadMediaType
+import dev.vxs.frostsoulx.downloads.DownloadSectionUiModel
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.EmptyPlaceholder
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.ui.utils.formatFileSize
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.viewmodels.DownloadLibraryEvent
+import dev.vxs.frostsoulx.viewmodels.DownloadLibraryScreenState
+import dev.vxs.frostsoulx.viewmodels.DownloadLibraryTab
+import dev.vxs.frostsoulx.viewmodels.DownloadLibraryViewModel
 
 @Composable
 fun DownloadLibraryScreen(
@@ -261,7 +261,7 @@ private fun DownloadLibraryScreenContent(
                                 )
                             },
                             navigationIcon = {
-                                moe.rukamori.archivetune.ui.component.IconButton(
+                                dev.vxs.frostsoulx.ui.component.IconButton(
                                     onClick = onBack,
                                     onLongClick = onBackToMain,
                                 ) {

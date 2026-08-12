@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune
+package dev.vxs.frostsoulx
 
 import android.annotation.SuppressLint
 import android.content.ComponentName
@@ -185,123 +185,123 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.aod.ACTION_AOD_MODE
-import moe.rukamori.archivetune.constants.AppBarHeight
-import moe.rukamori.archivetune.constants.AppFontPreference
-import moe.rukamori.archivetune.constants.AppLanguageKey
-import moe.rukamori.archivetune.constants.CustomFontUriKey
-import moe.rukamori.archivetune.constants.CustomThemeColorKey
-import moe.rukamori.archivetune.constants.DarkModeKey
-import moe.rukamori.archivetune.constants.DefaultOpenTabKey
-import moe.rukamori.archivetune.constants.DisableAnimationsKey
-import moe.rukamori.archivetune.constants.DisableScreenshotKey
-import moe.rukamori.archivetune.constants.DynamicThemeKey
-import moe.rukamori.archivetune.constants.EnableHapticFeedbackKey
-import moe.rukamori.archivetune.constants.FontPreferenceKey
-import moe.rukamori.archivetune.constants.HasPressedStarKey
-import moe.rukamori.archivetune.constants.LaunchCountKey
-import moe.rukamori.archivetune.constants.MiniPlayerBottomSpacing
-import moe.rukamori.archivetune.constants.MiniPlayerHeight
-import moe.rukamori.archivetune.constants.MiniPlayerLastAnchorKey
-import moe.rukamori.archivetune.constants.NavigationBarAnimationSpec
-import moe.rukamori.archivetune.constants.NavigationBarBottomPadding
-import moe.rukamori.archivetune.constants.NavigationBarHeight
-import moe.rukamori.archivetune.constants.NavigationBarHorizontalPadding
-import moe.rukamori.archivetune.constants.PauseSearchHistoryKey
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyle
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyleKey
-import moe.rukamori.archivetune.constants.PlayerDesignStyle
-import moe.rukamori.archivetune.constants.PlayerDesignStyleKey
-import moe.rukamori.archivetune.constants.PureBlackKey
-import moe.rukamori.archivetune.constants.RemindAfterKey
-import moe.rukamori.archivetune.constants.SYSTEM_DEFAULT
-import moe.rukamori.archivetune.constants.SearchSource
-import moe.rukamori.archivetune.constants.SearchSourceKey
-import moe.rukamori.archivetune.constants.StopMusicOnTaskClearKey
-import moe.rukamori.archivetune.constants.UpdateChannel
-import moe.rukamori.archivetune.constants.UpdateChannelKey
-import moe.rukamori.archivetune.constants.UseSystemFontKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.Album
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.db.entities.SearchHistory
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.musicrecognition.ACTION_MUSIC_RECOGNITION
-import moe.rukamori.archivetune.musicrecognition.MusicRecognitionRoute
-import moe.rukamori.archivetune.musicrecognition.openMusicRecognition
-import moe.rukamori.archivetune.onboarding.OnboardingScreenState
-import moe.rukamori.archivetune.onboarding.OnboardingViewModel
-import moe.rukamori.archivetune.playback.DownloadUtil
-import moe.rukamori.archivetune.playback.MusicService
-import moe.rukamori.archivetune.playback.MusicService.MusicBinder
-import moe.rukamori.archivetune.playback.PlayerConnection
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.playback.queues.LocalAlbumRadio
-import moe.rukamori.archivetune.playback.queues.Queue
-import moe.rukamori.archivetune.playback.queues.YouTubeAlbumRadio
-import moe.rukamori.archivetune.playback.queues.YouTubeQueue
-import moe.rukamori.archivetune.ui.component.BottomSheetMenu
-import moe.rukamori.archivetune.ui.component.BottomSheetPage
-import moe.rukamori.archivetune.ui.component.COLLAPSED_ANCHOR
-import moe.rukamori.archivetune.ui.component.DISMISSED_ANCHOR
-import moe.rukamori.archivetune.ui.component.EXPANDED_ANCHOR
-import moe.rukamori.archivetune.ui.component.FloatingNavigationToolbar
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.LocalBottomSheetPageState
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.MarkdownText
-import moe.rukamori.archivetune.ui.component.NetworkStatusBanner
-import moe.rukamori.archivetune.ui.component.StarDialog
-import moe.rukamori.archivetune.ui.component.TopSearch
-import moe.rukamori.archivetune.ui.component.TvNavigationRail
-import moe.rukamori.archivetune.ui.component.rememberBottomSheetState
-import moe.rukamori.archivetune.ui.component.shimmer.ShimmerTheme
-import moe.rukamori.archivetune.ui.menu.YouTubeSongMenu
-import moe.rukamori.archivetune.ui.player.BottomSheetPlayer
-import moe.rukamori.archivetune.ui.screens.LOGIN_URL_ARGUMENT
-import moe.rukamori.archivetune.ui.screens.Screens
-import moe.rukamori.archivetune.ui.screens.buildLoginRoute
-import moe.rukamori.archivetune.ui.screens.navigationBuilder
-import moe.rukamori.archivetune.ui.screens.onboarding.OnboardingRoute
-import moe.rukamori.archivetune.ui.screens.search.LocalSearchScreen
-import moe.rukamori.archivetune.ui.screens.search.OnlineSearchResultArgument
-import moe.rukamori.archivetune.ui.screens.search.OnlineSearchResultRoutePrefix
-import moe.rukamori.archivetune.ui.screens.search.OnlineSearchScreen
-import moe.rukamori.archivetune.ui.screens.search.decodeOnlineSearchQuery
-import moe.rukamori.archivetune.ui.screens.search.onlineSearchResultRoute
-import moe.rukamori.archivetune.ui.screens.settings.DarkMode
-import moe.rukamori.archivetune.ui.screens.settings.NavigationTab
-import moe.rukamori.archivetune.ui.theme.ArchiveTuneTheme
-import moe.rukamori.archivetune.ui.theme.ColorSaver
-import moe.rukamori.archivetune.ui.theme.DefaultThemeColor
-import moe.rukamori.archivetune.ui.theme.extractThemeColor
-import moe.rukamori.archivetune.ui.utils.appBarScrollBehavior
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.ui.utils.resetHeightOffset
-import moe.rukamori.archivetune.utils.PreferenceStore
-import moe.rukamori.archivetune.utils.SyncUtils
-import moe.rukamori.archivetune.utils.Updater
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
-import moe.rukamori.archivetune.utils.isLowRamDevice
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.utils.reportException
-import moe.rukamori.archivetune.utils.setAppLocale
-import moe.rukamori.archivetune.viewmodels.BackupCategory
-import moe.rukamori.archivetune.viewmodels.BackupRestoreViewModel
-import moe.rukamori.archivetune.viewmodels.HomeViewModel
-import moe.rukamori.archivetune.viewmodels.NetworkBannerViewModel
-import moe.rukamori.archivetune.viewmodels.NewsViewModel
-import moe.rukamori.archivetune.viewmodels.OnlineSearchSort
+import dev.vxs.frostsoulx.aod.ACTION_AOD_MODE
+import dev.vxs.frostsoulx.constants.AppBarHeight
+import dev.vxs.frostsoulx.constants.AppFontPreference
+import dev.vxs.frostsoulx.constants.AppLanguageKey
+import dev.vxs.frostsoulx.constants.CustomFontUriKey
+import dev.vxs.frostsoulx.constants.CustomThemeColorKey
+import dev.vxs.frostsoulx.constants.DarkModeKey
+import dev.vxs.frostsoulx.constants.DefaultOpenTabKey
+import dev.vxs.frostsoulx.constants.DisableAnimationsKey
+import dev.vxs.frostsoulx.constants.DisableScreenshotKey
+import dev.vxs.frostsoulx.constants.DynamicThemeKey
+import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.constants.FontPreferenceKey
+import dev.vxs.frostsoulx.constants.HasPressedStarKey
+import dev.vxs.frostsoulx.constants.LaunchCountKey
+import dev.vxs.frostsoulx.constants.MiniPlayerBottomSpacing
+import dev.vxs.frostsoulx.constants.MiniPlayerHeight
+import dev.vxs.frostsoulx.constants.MiniPlayerLastAnchorKey
+import dev.vxs.frostsoulx.constants.NavigationBarAnimationSpec
+import dev.vxs.frostsoulx.constants.NavigationBarBottomPadding
+import dev.vxs.frostsoulx.constants.NavigationBarHeight
+import dev.vxs.frostsoulx.constants.NavigationBarHorizontalPadding
+import dev.vxs.frostsoulx.constants.PauseSearchHistoryKey
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyleKey
+import dev.vxs.frostsoulx.constants.PlayerDesignStyle
+import dev.vxs.frostsoulx.constants.PlayerDesignStyleKey
+import dev.vxs.frostsoulx.constants.PureBlackKey
+import dev.vxs.frostsoulx.constants.RemindAfterKey
+import dev.vxs.frostsoulx.constants.SYSTEM_DEFAULT
+import dev.vxs.frostsoulx.constants.SearchSource
+import dev.vxs.frostsoulx.constants.SearchSourceKey
+import dev.vxs.frostsoulx.constants.StopMusicOnTaskClearKey
+import dev.vxs.frostsoulx.constants.UpdateChannel
+import dev.vxs.frostsoulx.constants.UpdateChannelKey
+import dev.vxs.frostsoulx.constants.UseSystemFontKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.Album
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.db.entities.SearchHistory
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.musicrecognition.ACTION_MUSIC_RECOGNITION
+import dev.vxs.frostsoulx.musicrecognition.MusicRecognitionRoute
+import dev.vxs.frostsoulx.musicrecognition.openMusicRecognition
+import dev.vxs.frostsoulx.onboarding.OnboardingScreenState
+import dev.vxs.frostsoulx.onboarding.OnboardingViewModel
+import dev.vxs.frostsoulx.playback.DownloadUtil
+import dev.vxs.frostsoulx.playback.MusicService
+import dev.vxs.frostsoulx.playback.MusicService.MusicBinder
+import dev.vxs.frostsoulx.playback.PlayerConnection
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.playback.queues.LocalAlbumRadio
+import dev.vxs.frostsoulx.playback.queues.Queue
+import dev.vxs.frostsoulx.playback.queues.YouTubeAlbumRadio
+import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
+import dev.vxs.frostsoulx.ui.component.BottomSheetMenu
+import dev.vxs.frostsoulx.ui.component.BottomSheetPage
+import dev.vxs.frostsoulx.ui.component.COLLAPSED_ANCHOR
+import dev.vxs.frostsoulx.ui.component.DISMISSED_ANCHOR
+import dev.vxs.frostsoulx.ui.component.EXPANDED_ANCHOR
+import dev.vxs.frostsoulx.ui.component.FloatingNavigationToolbar
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.LocalBottomSheetPageState
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.MarkdownText
+import dev.vxs.frostsoulx.ui.component.NetworkStatusBanner
+import dev.vxs.frostsoulx.ui.component.StarDialog
+import dev.vxs.frostsoulx.ui.component.TopSearch
+import dev.vxs.frostsoulx.ui.component.TvNavigationRail
+import dev.vxs.frostsoulx.ui.component.rememberBottomSheetState
+import dev.vxs.frostsoulx.ui.component.shimmer.ShimmerTheme
+import dev.vxs.frostsoulx.ui.menu.YouTubeSongMenu
+import dev.vxs.frostsoulx.ui.player.BottomSheetPlayer
+import dev.vxs.frostsoulx.ui.screens.LOGIN_URL_ARGUMENT
+import dev.vxs.frostsoulx.ui.screens.Screens
+import dev.vxs.frostsoulx.ui.screens.buildLoginRoute
+import dev.vxs.frostsoulx.ui.screens.navigationBuilder
+import dev.vxs.frostsoulx.ui.screens.onboarding.OnboardingRoute
+import dev.vxs.frostsoulx.ui.screens.search.LocalSearchScreen
+import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResultArgument
+import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResultRoutePrefix
+import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchScreen
+import dev.vxs.frostsoulx.ui.screens.search.decodeOnlineSearchQuery
+import dev.vxs.frostsoulx.ui.screens.search.onlineSearchResultRoute
+import dev.vxs.frostsoulx.ui.screens.settings.DarkMode
+import dev.vxs.frostsoulx.ui.screens.settings.NavigationTab
+import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
+import dev.vxs.frostsoulx.ui.theme.ColorSaver
+import dev.vxs.frostsoulx.ui.theme.DefaultThemeColor
+import dev.vxs.frostsoulx.ui.theme.extractThemeColor
+import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.ui.utils.resetHeightOffset
+import dev.vxs.frostsoulx.utils.PreferenceStore
+import dev.vxs.frostsoulx.utils.SyncUtils
+import dev.vxs.frostsoulx.utils.Updater
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.utils.isLowRamDevice
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.utils.reportException
+import dev.vxs.frostsoulx.utils.setAppLocale
+import dev.vxs.frostsoulx.viewmodels.BackupCategory
+import dev.vxs.frostsoulx.viewmodels.BackupRestoreViewModel
+import dev.vxs.frostsoulx.viewmodels.HomeViewModel
+import dev.vxs.frostsoulx.viewmodels.NetworkBannerViewModel
+import dev.vxs.frostsoulx.viewmodels.NewsViewModel
+import dev.vxs.frostsoulx.viewmodels.OnlineSearchSort
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -402,7 +402,7 @@ class MainActivity : ComponentActivity() {
         pendingTogetherJoinLink = null
         lifecycleScope.launch(Dispatchers.IO) {
             val displayName =
-                runCatching { dataStore.data.first()[moe.rukamori.archivetune.constants.TogetherDisplayNameKey] }
+                runCatching { dataStore.data.first()[dev.vxs.frostsoulx.constants.TogetherDisplayNameKey] }
                     .getOrNull()
                     ?.trim()
                     .orEmpty()
@@ -582,7 +582,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-                moe.rukamori.archivetune.utils.UpdateNotificationManager
+                dev.vxs.frostsoulx.utils.UpdateNotificationManager
                     .checkForUpdates(this@MainActivity)
             }
 
@@ -592,12 +592,12 @@ class MainActivity : ComponentActivity() {
             // bottom sheet to not appear and overlay interactions to be blocked).
             val bottomSheetPageState =
                 remember {
-                    moe.rukamori.archivetune.ui.component
+                    dev.vxs.frostsoulx.ui.component
                         .BottomSheetPageState()
                 }
             val menuState =
                 remember {
-                    moe.rukamori.archivetune.ui.component
+                    dev.vxs.frostsoulx.ui.component
                         .MenuState()
                 }
             val releaseNotesState = remember { mutableStateOf<String?>(null) }
@@ -714,13 +714,13 @@ class MainActivity : ComponentActivity() {
                     if (customThemeColorValue.startsWith("#")) {
                         null
                     } else if (customThemeColorValue.startsWith("seedPalette:")) {
-                        moe.rukamori.archivetune.ui.theme.ThemeSeedPaletteCodec
+                        dev.vxs.frostsoulx.ui.theme.ThemeSeedPaletteCodec
                             .decodeFromPreference(customThemeColorValue)
                     } else {
-                        moe.rukamori.archivetune.ui.screens.settings.ThemePalettes
+                        dev.vxs.frostsoulx.ui.screens.settings.ThemePalettes
                             .findById(customThemeColorValue)
                             ?.let {
-                                moe.rukamori.archivetune.ui.theme.ThemeSeedPalette(
+                                dev.vxs.frostsoulx.ui.theme.ThemeSeedPalette(
                                     primary = it.primary,
                                     secondary = it.secondary,
                                     tertiary = it.tertiary,
@@ -1510,8 +1510,8 @@ class MainActivity : ComponentActivity() {
                         LocalDownloadUtil provides downloadUtil,
                         LocalShimmerTheme provides ShimmerTheme,
                         LocalSyncUtils provides syncUtils,
-                        moe.rukamori.archivetune.ui.component.LocalBottomSheetPageState provides bottomSheetPageState,
-                        moe.rukamori.archivetune.ui.component.LocalMenuState provides menuState,
+                        dev.vxs.frostsoulx.ui.component.LocalBottomSheetPageState provides bottomSheetPageState,
+                        dev.vxs.frostsoulx.ui.component.LocalMenuState provides menuState,
                     ) {
                         Row {
                             AnimatedVisibility(
@@ -2543,7 +2543,7 @@ class MainActivity : ComponentActivity() {
         val mediaId = uri.toString()
         val title = resolveExternalAudioTitle(uri)
         val metadata =
-            moe.rukamori.archivetune.models.MediaMetadata(
+            dev.vxs.frostsoulx.models.MediaMetadata(
                 id = mediaId,
                 title = title,
                 artists = emptyList(),
@@ -2722,7 +2722,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startMusicServiceSafely() {
-        runCatching { startService(Intent(this, moe.rukamori.archivetune.playback.MusicService::class.java)) }
+        runCatching { startService(Intent(this, dev.vxs.frostsoulx.playback.MusicService::class.java)) }
             .onFailure { reportException(it) }
     }
 
@@ -2867,8 +2867,8 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        const val ACTION_SEARCH = "moe.rukamori.archivetune.action.SEARCH"
-        const val ACTION_LIBRARY = "moe.rukamori.archivetune.action.LIBRARY"
+        const val ACTION_SEARCH = "dev.vxs.frostsoulx.action.SEARCH"
+        const val ACTION_LIBRARY = "dev.vxs.frostsoulx.action.LIBRARY"
     }
 }
 

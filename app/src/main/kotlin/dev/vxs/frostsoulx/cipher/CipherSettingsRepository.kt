@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.cipher
+package dev.vxs.frostsoulx.cipher
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -13,11 +13,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.constants.MoriCipherManualRefreshHistoryKey
-import moe.rukamori.archivetune.morideobfuscator.CipherRefreshResult
-import moe.rukamori.archivetune.morideobfuscator.CipherSnapshot
-import moe.rukamori.archivetune.morideobfuscator.MoriCipherRuntime
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.constants.MoriCipherManualRefreshHistoryKey
+import dev.vxs.frostsoulx.morideobfuscator.CipherRefreshResult
+import dev.vxs.frostsoulx.morideobfuscator.CipherSnapshot
+import dev.vxs.frostsoulx.morideobfuscator.MoriCipherRuntime
+import dev.vxs.frostsoulx.utils.dataStore
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.content.Context
 import androidx.work.Constraints
@@ -17,8 +17,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import moe.rukamori.archivetune.morideobfuscator.CipherRuntimeStatus
-import moe.rukamori.archivetune.morideobfuscator.MoriCipherRuntime
+import dev.vxs.frostsoulx.morideobfuscator.CipherRuntimeStatus
+import dev.vxs.frostsoulx.morideobfuscator.MoriCipherRuntime
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 

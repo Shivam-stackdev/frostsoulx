@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.widget
+package dev.vxs.frostsoulx.widget
 
 import android.content.ComponentName
 import android.content.Context
-import moe.rukamori.archivetune.playback.MusicService
+import dev.vxs.frostsoulx.playback.MusicService
 
 internal suspend fun requestPlaybackWidgetUpdate(context: Context) {
     val serviceIntent = android.content.Intent(context, MusicService::class.java)

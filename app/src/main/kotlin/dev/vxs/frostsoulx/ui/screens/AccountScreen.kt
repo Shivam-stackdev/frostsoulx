@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens
+package dev.vxs.frostsoulx.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -34,21 +34,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.GridThumbnailHeight
-import moe.rukamori.archivetune.ui.component.ChipsRow
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.YouTubeGridItem
-import moe.rukamori.archivetune.ui.component.shimmer.GridItemPlaceHolder
-import moe.rukamori.archivetune.ui.component.shimmer.ShimmerHost
-import moe.rukamori.archivetune.ui.menu.YouTubeAlbumMenu
-import moe.rukamori.archivetune.ui.menu.YouTubeArtistMenu
-import moe.rukamori.archivetune.ui.menu.YouTubePlaylistMenu
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.AccountContentType
-import moe.rukamori.archivetune.viewmodels.AccountViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.GridThumbnailHeight
+import dev.vxs.frostsoulx.ui.component.ChipsRow
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.YouTubeGridItem
+import dev.vxs.frostsoulx.ui.component.shimmer.GridItemPlaceHolder
+import dev.vxs.frostsoulx.ui.component.shimmer.ShimmerHost
+import dev.vxs.frostsoulx.ui.menu.YouTubeAlbumMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubeArtistMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubePlaylistMenu
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.AccountContentType
+import dev.vxs.frostsoulx.viewmodels.AccountViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable

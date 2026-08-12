@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -56,7 +56,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.media3.common.PlaybackException
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 
 @Composable
 fun PlaybackErrorDialog(

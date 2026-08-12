@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.appicon
+package dev.vxs.frostsoulx.appicon
 
 import android.content.ComponentName
 import android.content.Context
@@ -18,7 +18,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 import javax.inject.Inject
 import javax.inject.Singleton
 

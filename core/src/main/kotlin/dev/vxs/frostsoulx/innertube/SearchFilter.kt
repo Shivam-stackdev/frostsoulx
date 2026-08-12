@@ -1,4 +1,4 @@
-package moe.rukamori.archivetune.innertube
+package dev.vxs.frostsoulx.innertube
 
 @JvmInline
 value class SearchFilter(

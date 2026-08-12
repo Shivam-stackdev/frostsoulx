@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
@@ -21,14 +21,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.cipher.CipherSettingsDomainState
-import moe.rukamori.archivetune.cipher.ManualCipherRefreshResult
-import moe.rukamori.archivetune.cipher.ObserveCipherSettingsUseCase
-import moe.rukamori.archivetune.cipher.RefreshCipherUseCase
-import moe.rukamori.archivetune.morideobfuscator.CipherRuntimeStatus
-import moe.rukamori.archivetune.morideobfuscator.MORI_CIPHER_REFRESH_INTERVAL_MILLIS
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.cipher.CipherSettingsDomainState
+import dev.vxs.frostsoulx.cipher.ManualCipherRefreshResult
+import dev.vxs.frostsoulx.cipher.ObserveCipherSettingsUseCase
+import dev.vxs.frostsoulx.cipher.RefreshCipherUseCase
+import dev.vxs.frostsoulx.morideobfuscator.CipherRuntimeStatus
+import dev.vxs.frostsoulx.morideobfuscator.MORI_CIPHER_REFRESH_INTERVAL_MILLIS
+import dev.vxs.frostsoulx.utils.reportException
 import java.util.Locale
 import javax.inject.Inject
 

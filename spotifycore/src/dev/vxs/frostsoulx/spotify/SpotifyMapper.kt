@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.spotify
+package dev.vxs.frostsoulx.spotify
 
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylist
-import moe.rukamori.archivetune.spotify.models.SpotifyTrack
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylist
+import dev.vxs.frostsoulx.spotify.models.SpotifyTrack
 
 /**
  * Utility object for creating search queries from Spotify track data.

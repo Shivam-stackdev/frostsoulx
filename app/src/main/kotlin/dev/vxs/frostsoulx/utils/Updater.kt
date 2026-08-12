@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import androidx.datastore.preferences.core.edit
 import io.ktor.client.HttpClient
@@ -15,16 +15,16 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CancellationException
-import moe.rukamori.archivetune.App
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.constants.CanaryReleasesEtagKey
-import moe.rukamori.archivetune.constants.CanaryReleasesFingerprintKey
-import moe.rukamori.archivetune.constants.CanaryReleasesJsonKey
-import moe.rukamori.archivetune.constants.CanaryReleasesLastCheckedAtKey
-import moe.rukamori.archivetune.constants.GitHubReleasesEtagKey
-import moe.rukamori.archivetune.constants.GitHubReleasesFingerprintKey
-import moe.rukamori.archivetune.constants.GitHubReleasesJsonKey
-import moe.rukamori.archivetune.constants.GitHubReleasesLastCheckedAtKey
+import dev.vxs.frostsoulx.App
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.constants.CanaryReleasesEtagKey
+import dev.vxs.frostsoulx.constants.CanaryReleasesFingerprintKey
+import dev.vxs.frostsoulx.constants.CanaryReleasesJsonKey
+import dev.vxs.frostsoulx.constants.CanaryReleasesLastCheckedAtKey
+import dev.vxs.frostsoulx.constants.GitHubReleasesEtagKey
+import dev.vxs.frostsoulx.constants.GitHubReleasesFingerprintKey
+import dev.vxs.frostsoulx.constants.GitHubReleasesJsonKey
+import dev.vxs.frostsoulx.constants.GitHubReleasesLastCheckedAtKey
 import org.json.JSONArray
 import org.json.JSONObject
 

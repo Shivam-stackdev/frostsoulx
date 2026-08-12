@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 
 /**
  * Returns a `Material3SettingsItem` that can be placed inside a `Material3SettingsGroup`.

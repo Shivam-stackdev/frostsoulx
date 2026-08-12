@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.menu
+package dev.vxs.frostsoulx.ui.menu
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -49,19 +49,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.ListThumbnailSize
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.ui.component.CreatePlaylistDialog
-import moe.rukamori.archivetune.ui.component.DefaultDialog
-import moe.rukamori.archivetune.ui.component.ListDialog
-import moe.rukamori.archivetune.ui.component.ListItem
-import moe.rukamori.archivetune.ui.component.PlaylistListItem
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.ListThumbnailSize
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.ui.component.CreatePlaylistDialog
+import dev.vxs.frostsoulx.ui.component.DefaultDialog
+import dev.vxs.frostsoulx.ui.component.ListDialog
+import dev.vxs.frostsoulx.ui.component.ListItem
+import dev.vxs.frostsoulx.ui.component.PlaylistListItem
 import timber.log.Timber
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets

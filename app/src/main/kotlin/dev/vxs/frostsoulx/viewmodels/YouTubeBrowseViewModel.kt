@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
@@ -15,17 +15,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.aicontentfilter.FilterAiContentUseCase
-import moe.rukamori.archivetune.aicontentfilter.LoadAiContentFilterPolicyUseCase
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.extensions.filterBlockedArtists
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.pages.BrowseResult
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.aicontentfilter.FilterAiContentUseCase
+import dev.vxs.frostsoulx.aicontentfilter.LoadAiContentFilterPolicyUseCase
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.extensions.filterBlockedArtists
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.pages.BrowseResult
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 @HiltViewModel

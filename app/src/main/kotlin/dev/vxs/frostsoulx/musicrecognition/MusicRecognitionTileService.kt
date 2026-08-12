@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.musicrecognition
+package dev.vxs.frostsoulx.musicrecognition
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -13,7 +13,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 
 class MusicRecognitionTileService : TileService() {
     override fun onStartListening() {

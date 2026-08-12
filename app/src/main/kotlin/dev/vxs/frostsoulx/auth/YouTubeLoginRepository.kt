@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.auth
+package dev.vxs.frostsoulx.auth
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -14,25 +14,25 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.constants.AccountChannelHandleKey
-import moe.rukamori.archivetune.constants.AccountEmailKey
-import moe.rukamori.archivetune.constants.AccountNameKey
-import moe.rukamori.archivetune.constants.DataSyncIdKey
-import moe.rukamori.archivetune.constants.InnerTubeCookieKey
-import moe.rukamori.archivetune.constants.SavedAccountsKey
-import moe.rukamori.archivetune.constants.SelectedYtmPlaylistsKey
-import moe.rukamori.archivetune.constants.VisitorDataKey
-import moe.rukamori.archivetune.constants.YtmSyncKey
-import moe.rukamori.archivetune.innertube.PlaybackAuthState
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.AccountInfo
-import moe.rukamori.archivetune.innertube.utils.hasYouTubeLoginCookie
-import moe.rukamori.archivetune.utils.SavedAccount
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.decodeSavedAccounts
-import moe.rukamori.archivetune.utils.encodeSavedAccounts
-import moe.rukamori.archivetune.utils.putLegacyPoToken
-import moe.rukamori.archivetune.utils.toPlaybackAuthState
+import dev.vxs.frostsoulx.constants.AccountChannelHandleKey
+import dev.vxs.frostsoulx.constants.AccountEmailKey
+import dev.vxs.frostsoulx.constants.AccountNameKey
+import dev.vxs.frostsoulx.constants.DataSyncIdKey
+import dev.vxs.frostsoulx.constants.InnerTubeCookieKey
+import dev.vxs.frostsoulx.constants.SavedAccountsKey
+import dev.vxs.frostsoulx.constants.SelectedYtmPlaylistsKey
+import dev.vxs.frostsoulx.constants.VisitorDataKey
+import dev.vxs.frostsoulx.constants.YtmSyncKey
+import dev.vxs.frostsoulx.innertube.PlaybackAuthState
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.AccountInfo
+import dev.vxs.frostsoulx.innertube.utils.hasYouTubeLoginCookie
+import dev.vxs.frostsoulx.utils.SavedAccount
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.decodeSavedAccounts
+import dev.vxs.frostsoulx.utils.encodeSavedAccounts
+import dev.vxs.frostsoulx.utils.putLegacyPoToken
+import dev.vxs.frostsoulx.utils.toPlaybackAuthState
 import javax.inject.Inject
 import javax.inject.Singleton
 

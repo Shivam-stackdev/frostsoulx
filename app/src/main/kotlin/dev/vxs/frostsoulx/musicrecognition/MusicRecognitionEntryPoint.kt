@@ -5,14 +5,14 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.musicrecognition
+package dev.vxs.frostsoulx.musicrecognition
 
 import android.util.Base64
 import androidx.navigation.NavHostController
 import kotlinx.serialization.json.Json
 
 const val MusicRecognitionRoute = "music_recognition"
-const val ACTION_MUSIC_RECOGNITION = "moe.rukamori.archivetune.action.MUSIC_RECOGNITION"
+const val ACTION_MUSIC_RECOGNITION = "dev.vxs.frostsoulx.action.MUSIC_RECOGNITION"
 const val MusicRecognitionAutoStartRequestKey = "music_recognition_auto_start_request"
 const val MusicRecognitionDetailsRoute = "music_recognition/details/{encodedTrack}"
 

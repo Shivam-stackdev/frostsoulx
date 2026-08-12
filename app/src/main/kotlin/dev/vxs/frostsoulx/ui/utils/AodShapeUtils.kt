@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.utils
+package dev.vxs.frostsoulx.ui.utils
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import moe.rukamori.archivetune.constants.AodThumbnailShape
+import dev.vxs.frostsoulx.constants.AodThumbnailShape
 
 fun AodThumbnailShape.supportsArtworkGlowShadow(): Boolean =
     when (this) {

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playlisttags
+package dev.vxs.frostsoulx.playlisttags
 
 import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
-import moe.rukamori.archivetune.repository.PlaylistTagsRepository
+import dev.vxs.frostsoulx.repository.PlaylistTagsRepository
 import javax.inject.Inject
 
 @Immutable

@@ -1,4 +1,4 @@
-package moe.rukamori.archivetune.utils.oem
+package dev.vxs.frostsoulx.utils.oem
 
 /**
  * Media Kit

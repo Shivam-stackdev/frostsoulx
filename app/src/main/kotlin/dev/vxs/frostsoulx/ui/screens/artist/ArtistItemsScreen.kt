@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.artist
+package dev.vxs.frostsoulx.ui.screens.artist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -37,40 +37,40 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.CONTENT_TYPE_ALBUM
-import moe.rukamori.archivetune.constants.CONTENT_TYPE_ARTIST
-import moe.rukamori.archivetune.constants.CONTENT_TYPE_LIST
-import moe.rukamori.archivetune.constants.CONTENT_TYPE_PLAYLIST
-import moe.rukamori.archivetune.constants.CONTENT_TYPE_SONG
-import moe.rukamori.archivetune.constants.GridThumbnailHeight
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.innertube.models.YTItem
-import moe.rukamori.archivetune.innertube.pages.ArtistItemsPageLayout
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.playback.queues.YouTubeQueue
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.YouTubeGridItem
-import moe.rukamori.archivetune.ui.component.YouTubeListItem
-import moe.rukamori.archivetune.ui.component.shimmer.GridItemPlaceHolder
-import moe.rukamori.archivetune.ui.component.shimmer.ListItemPlaceHolder
-import moe.rukamori.archivetune.ui.component.shimmer.ShimmerHost
-import moe.rukamori.archivetune.ui.menu.YouTubeAlbumMenu
-import moe.rukamori.archivetune.ui.menu.YouTubeArtistMenu
-import moe.rukamori.archivetune.ui.menu.YouTubePlaylistMenu
-import moe.rukamori.archivetune.ui.menu.YouTubeSongMenu
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.ArtistItemsViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.CONTENT_TYPE_ALBUM
+import dev.vxs.frostsoulx.constants.CONTENT_TYPE_ARTIST
+import dev.vxs.frostsoulx.constants.CONTENT_TYPE_LIST
+import dev.vxs.frostsoulx.constants.CONTENT_TYPE_PLAYLIST
+import dev.vxs.frostsoulx.constants.CONTENT_TYPE_SONG
+import dev.vxs.frostsoulx.constants.GridThumbnailHeight
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.innertube.models.YTItem
+import dev.vxs.frostsoulx.innertube.pages.ArtistItemsPageLayout
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.YouTubeGridItem
+import dev.vxs.frostsoulx.ui.component.YouTubeListItem
+import dev.vxs.frostsoulx.ui.component.shimmer.GridItemPlaceHolder
+import dev.vxs.frostsoulx.ui.component.shimmer.ListItemPlaceHolder
+import dev.vxs.frostsoulx.ui.component.shimmer.ShimmerHost
+import dev.vxs.frostsoulx.ui.menu.YouTubeAlbumMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubeArtistMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubePlaylistMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubeSongMenu
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.ArtistItemsViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable

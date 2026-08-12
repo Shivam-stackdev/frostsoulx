@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playlist
+package dev.vxs.frostsoulx.playlist
 
 import kotlinx.coroutines.CancellationException
-import moe.rukamori.archivetune.repository.PlaylistCreationRepository
+import dev.vxs.frostsoulx.repository.PlaylistCreationRepository
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -5,26 +5,26 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.content.Context
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.first
-import moe.rukamori.archivetune.constants.AccountChannelHandleKey
-import moe.rukamori.archivetune.constants.AccountEmailKey
-import moe.rukamori.archivetune.constants.AccountNameKey
-import moe.rukamori.archivetune.constants.DataSyncIdKey
-import moe.rukamori.archivetune.constants.InnerTubeCookieKey
-import moe.rukamori.archivetune.constants.PoTokenGvsKey
-import moe.rukamori.archivetune.constants.PoTokenKey
-import moe.rukamori.archivetune.constants.PoTokenPlayerKey
-import moe.rukamori.archivetune.constants.PoTokenSourceUrlKey
-import moe.rukamori.archivetune.constants.VisitorDataKey
-import moe.rukamori.archivetune.constants.WebClientPoTokenEnabledKey
-import moe.rukamori.archivetune.innertube.PlaybackAuthState
-import moe.rukamori.archivetune.innertube.YouTube
+import dev.vxs.frostsoulx.constants.AccountChannelHandleKey
+import dev.vxs.frostsoulx.constants.AccountEmailKey
+import dev.vxs.frostsoulx.constants.AccountNameKey
+import dev.vxs.frostsoulx.constants.DataSyncIdKey
+import dev.vxs.frostsoulx.constants.InnerTubeCookieKey
+import dev.vxs.frostsoulx.constants.PoTokenGvsKey
+import dev.vxs.frostsoulx.constants.PoTokenKey
+import dev.vxs.frostsoulx.constants.PoTokenPlayerKey
+import dev.vxs.frostsoulx.constants.PoTokenSourceUrlKey
+import dev.vxs.frostsoulx.constants.VisitorDataKey
+import dev.vxs.frostsoulx.constants.WebClientPoTokenEnabledKey
+import dev.vxs.frostsoulx.innertube.PlaybackAuthState
+import dev.vxs.frostsoulx.innertube.YouTube
 
 fun Preferences.toPlaybackAuthState(): PlaybackAuthState =
     PlaybackAuthState(

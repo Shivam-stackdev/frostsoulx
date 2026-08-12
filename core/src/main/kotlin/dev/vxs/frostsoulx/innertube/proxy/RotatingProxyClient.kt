@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.proxy
+package dev.vxs.frostsoulx.innertube.proxy
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

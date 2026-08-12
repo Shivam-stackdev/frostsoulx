@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.widget
+package dev.vxs.frostsoulx.widget
 
 import android.content.Context
 import android.content.Intent
@@ -44,8 +44,8 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.material3.ColorProviders
 import androidx.glance.unit.ColorProvider
-import moe.rukamori.archivetune.MainActivity
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.MainActivity
+import dev.vxs.frostsoulx.R
 import java.io.File
 
 @Immutable

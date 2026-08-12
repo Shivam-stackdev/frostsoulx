@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -20,10 +20,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.constants.NewsLastReadTimestampKey
-import moe.rukamori.archivetune.models.NewsItem
-import moe.rukamori.archivetune.repository.NewsRepository
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.constants.NewsLastReadTimestampKey
+import dev.vxs.frostsoulx.models.NewsItem
+import dev.vxs.frostsoulx.repository.NewsRepository
+import dev.vxs.frostsoulx.utils.dataStore
 import javax.inject.Inject
 
 sealed interface NewsUiState {

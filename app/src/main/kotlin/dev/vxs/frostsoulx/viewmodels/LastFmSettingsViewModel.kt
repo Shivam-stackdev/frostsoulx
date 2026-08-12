@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -23,16 +23,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.LastFmProvider
-import moe.rukamori.archivetune.lastfm.LastFM
-import moe.rukamori.archivetune.scrobbling.LastFmServiceConfig
-import moe.rukamori.archivetune.scrobbling.LastFmSettingsData
-import moe.rukamori.archivetune.scrobbling.LoginLastFmUseCase
-import moe.rukamori.archivetune.scrobbling.LogoutLastFmUseCase
-import moe.rukamori.archivetune.scrobbling.ObserveLastFmSettingsUseCase
-import moe.rukamori.archivetune.scrobbling.SaveLastFmServiceConfigUseCase
-import moe.rukamori.archivetune.scrobbling.UpdateLastFmScrobblingOptionsUseCase
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.LastFmProvider
+import dev.vxs.frostsoulx.lastfm.LastFM
+import dev.vxs.frostsoulx.scrobbling.LastFmServiceConfig
+import dev.vxs.frostsoulx.scrobbling.LastFmSettingsData
+import dev.vxs.frostsoulx.scrobbling.LoginLastFmUseCase
+import dev.vxs.frostsoulx.scrobbling.LogoutLastFmUseCase
+import dev.vxs.frostsoulx.scrobbling.ObserveLastFmSettingsUseCase
+import dev.vxs.frostsoulx.scrobbling.SaveLastFmServiceConfigUseCase
+import dev.vxs.frostsoulx.scrobbling.UpdateLastFmScrobblingOptionsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 

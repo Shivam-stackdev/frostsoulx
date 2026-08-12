@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.spotify
+package dev.vxs.frostsoulx.spotify
 
 import androidx.media3.common.MediaItem
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +13,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.playback.queues.Queue
-import moe.rukamori.archivetune.spotify.models.SpotifyTrack
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.playback.queues.Queue
+import dev.vxs.frostsoulx.spotify.models.SpotifyTrack
 
 class SpotifyPlaylistQueue(
     private val playlistId: String,

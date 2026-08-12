@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.widget
+package dev.vxs.frostsoulx.widget
 
 import android.content.Context
 import android.os.Build
@@ -40,7 +40,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 
 class AlbumArtWidget : GlanceAppWidget() {
     override val stateDefinition = PreferencesGlanceStateDefinition

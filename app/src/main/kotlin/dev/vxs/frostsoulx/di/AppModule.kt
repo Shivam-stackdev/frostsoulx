@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.di
+package dev.vxs.frostsoulx.di
 
 import android.content.Context
 import androidx.media3.database.DatabaseProvider
@@ -22,13 +22,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import moe.rukamori.archivetune.constants.MaxSongCacheSizeKey
-import moe.rukamori.archivetune.db.InternalDatabase
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.storage.StorageFolderKind
-import moe.rukamori.archivetune.storage.StorageLocationRepository
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
+import dev.vxs.frostsoulx.constants.MaxSongCacheSizeKey
+import dev.vxs.frostsoulx.db.InternalDatabase
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.storage.StorageFolderKind
+import dev.vxs.frostsoulx.storage.StorageLocationRepository
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
 import java.io.File
 import java.util.NavigableSet
 import java.util.TreeSet

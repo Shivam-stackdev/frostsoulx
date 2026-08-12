@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import android.content.ContentResolver
 import android.content.Context
@@ -39,30 +39,30 @@ import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.constants.MediaSessionConstants
-import moe.rukamori.archivetune.constants.PlaylistSongSortType
-import moe.rukamori.archivetune.constants.PlaylistSortType
-import moe.rukamori.archivetune.constants.SongSortType
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.PlaylistEntity
-import moe.rukamori.archivetune.db.entities.PlaylistSong
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.extensions.metadata
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.toggleRepeatMode
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.filterExplicit
-import moe.rukamori.archivetune.innertube.models.filterVideo
-import moe.rukamori.archivetune.models.PersistQueue
-import moe.rukamori.archivetune.playback.MusicService.Companion.PERSISTENT_QUEUE_FILE
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
-import moe.rukamori.archivetune.utils.isLocalMediaId
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.constants.MediaSessionConstants
+import dev.vxs.frostsoulx.constants.PlaylistSongSortType
+import dev.vxs.frostsoulx.constants.PlaylistSortType
+import dev.vxs.frostsoulx.constants.SongSortType
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.PlaylistEntity
+import dev.vxs.frostsoulx.db.entities.PlaylistSong
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.extensions.metadata
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.toggleRepeatMode
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.filterExplicit
+import dev.vxs.frostsoulx.innertube.models.filterVideo
+import dev.vxs.frostsoulx.models.PersistQueue
+import dev.vxs.frostsoulx.playback.MusicService.Companion.PERSISTENT_QUEUE_FILE
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.utils.isLocalMediaId
 import java.io.ObjectInputStream
 import java.text.Collator
 import java.time.LocalDateTime

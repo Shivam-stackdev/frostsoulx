@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.db
+package dev.vxs.frostsoulx.db
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -28,29 +28,29 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
-import moe.rukamori.archivetune.db.entities.AlbumArtistMap
-import moe.rukamori.archivetune.db.entities.AlbumEntity
-import moe.rukamori.archivetune.db.entities.ArtistEntity
-import moe.rukamori.archivetune.db.entities.Event
-import moe.rukamori.archivetune.db.entities.FormatEntity
-import moe.rukamori.archivetune.db.entities.LibraryTopMixEntity
-import moe.rukamori.archivetune.db.entities.LibraryTopMixSongMap
-import moe.rukamori.archivetune.db.entities.LyricsEntity
-import moe.rukamori.archivetune.db.entities.PlayCountEntity
-import moe.rukamori.archivetune.db.entities.PlaylistEntity
-import moe.rukamori.archivetune.db.entities.PlaylistSongMap
-import moe.rukamori.archivetune.db.entities.PlaylistSongMapPreview
-import moe.rukamori.archivetune.db.entities.PlaylistTagMap
-import moe.rukamori.archivetune.db.entities.RelatedSongMap
-import moe.rukamori.archivetune.db.entities.SearchHistory
-import moe.rukamori.archivetune.db.entities.SetVideoIdEntity
-import moe.rukamori.archivetune.db.entities.SongAlbumMap
-import moe.rukamori.archivetune.db.entities.SongArtistMap
-import moe.rukamori.archivetune.db.entities.SongEntity
-import moe.rukamori.archivetune.db.entities.SortedSongAlbumMap
-import moe.rukamori.archivetune.db.entities.SortedSongArtistMap
-import moe.rukamori.archivetune.db.entities.TagEntity
-import moe.rukamori.archivetune.extensions.toSQLiteQuery
+import dev.vxs.frostsoulx.db.entities.AlbumArtistMap
+import dev.vxs.frostsoulx.db.entities.AlbumEntity
+import dev.vxs.frostsoulx.db.entities.ArtistEntity
+import dev.vxs.frostsoulx.db.entities.Event
+import dev.vxs.frostsoulx.db.entities.FormatEntity
+import dev.vxs.frostsoulx.db.entities.LibraryTopMixEntity
+import dev.vxs.frostsoulx.db.entities.LibraryTopMixSongMap
+import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.db.entities.PlayCountEntity
+import dev.vxs.frostsoulx.db.entities.PlaylistEntity
+import dev.vxs.frostsoulx.db.entities.PlaylistSongMap
+import dev.vxs.frostsoulx.db.entities.PlaylistSongMapPreview
+import dev.vxs.frostsoulx.db.entities.PlaylistTagMap
+import dev.vxs.frostsoulx.db.entities.RelatedSongMap
+import dev.vxs.frostsoulx.db.entities.SearchHistory
+import dev.vxs.frostsoulx.db.entities.SetVideoIdEntity
+import dev.vxs.frostsoulx.db.entities.SongAlbumMap
+import dev.vxs.frostsoulx.db.entities.SongArtistMap
+import dev.vxs.frostsoulx.db.entities.SongEntity
+import dev.vxs.frostsoulx.db.entities.SortedSongAlbumMap
+import dev.vxs.frostsoulx.db.entities.SortedSongArtistMap
+import dev.vxs.frostsoulx.db.entities.TagEntity
+import dev.vxs.frostsoulx.extensions.toSQLiteQuery
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset

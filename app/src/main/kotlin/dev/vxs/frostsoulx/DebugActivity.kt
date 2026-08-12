@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune
+package dev.vxs.frostsoulx
 
 import android.content.ClipData
 import android.content.Intent
@@ -64,7 +64,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.ui.theme.ArchiveTuneTheme
+import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date

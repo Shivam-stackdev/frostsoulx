@@ -1,4 +1,4 @@
-package moe.rukamori.archivetune.ui.lyrics
+package dev.vxs.frostsoulx.ui.lyrics
 
 import android.graphics.Typeface
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.lyrics.LyricsEntry
-import moe.rukamori.archivetune.utils.LyricsPreferences
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.lyrics.LyricsEntry
+import dev.vxs.frostsoulx.utils.LyricsPreferences
 
 /**
  * RecyclerView adapter for synced lyrics with optional dark cyan highlight.

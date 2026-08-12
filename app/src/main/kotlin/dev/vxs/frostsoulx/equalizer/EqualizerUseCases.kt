@@ -5,14 +5,14 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.equalizer
+package dev.vxs.frostsoulx.equalizer
 
 import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.playback.EqCapabilities
-import moe.rukamori.archivetune.playback.EqProfile
-import moe.rukamori.archivetune.playback.EqSettings
+import dev.vxs.frostsoulx.playback.EqCapabilities
+import dev.vxs.frostsoulx.playback.EqProfile
+import dev.vxs.frostsoulx.playback.EqSettings
 import javax.inject.Inject
 import kotlin.math.ceil
 import kotlin.math.floor

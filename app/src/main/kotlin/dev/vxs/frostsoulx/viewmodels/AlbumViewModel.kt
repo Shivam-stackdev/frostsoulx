@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
@@ -22,14 +22,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.extensions.filterBlockedArtists
-import moe.rukamori.archivetune.extensions.filterVideo
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.extensions.filterBlockedArtists
+import dev.vxs.frostsoulx.extensions.filterVideo
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 sealed interface AlbumUiState {

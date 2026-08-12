@@ -5,13 +5,13 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lyrics
+package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
-import moe.rukamori.archivetune.constants.EnableKugouKey
-import moe.rukamori.archivetune.kugou.KuGou
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
+import dev.vxs.frostsoulx.constants.EnableKugouKey
+import dev.vxs.frostsoulx.kugou.KuGou
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
 
 object KuGouLyricsProvider : LyricsProvider {
     override val name = "Kugou"

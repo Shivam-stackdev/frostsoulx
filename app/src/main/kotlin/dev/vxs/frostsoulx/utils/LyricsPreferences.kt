@@ -1,4 +1,4 @@
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.content.Context
 import android.content.SharedPreferences

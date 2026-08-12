@@ -5,17 +5,17 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.Album
-import moe.rukamori.archivetune.innertube.models.Artist
-import moe.rukamori.archivetune.innertube.models.BrowseEndpoint
-import moe.rukamori.archivetune.innertube.models.PlaylistPanelVideoRenderer
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.innertube.models.oddElements
-import moe.rukamori.archivetune.innertube.models.splitBySeparator
-import moe.rukamori.archivetune.innertube.utils.parseTime
+import dev.vxs.frostsoulx.innertube.models.Album
+import dev.vxs.frostsoulx.innertube.models.Artist
+import dev.vxs.frostsoulx.innertube.models.BrowseEndpoint
+import dev.vxs.frostsoulx.innertube.models.PlaylistPanelVideoRenderer
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.innertube.models.oddElements
+import dev.vxs.frostsoulx.innertube.models.splitBySeparator
+import dev.vxs.frostsoulx.innertube.utils.parseTime
 
 data class NextResult(
     val title: String? = null,

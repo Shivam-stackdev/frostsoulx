@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -26,20 +26,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.storage.ClearStorageCacheUseCase
-import moe.rukamori.archivetune.storage.ObserveStorageFoldersUseCase
-import moe.rukamori.archivetune.storage.SetStorageFolderUseCase
-import moe.rukamori.archivetune.storage.StorageCacheClearProgress
-import moe.rukamori.archivetune.storage.StorageCacheClearResult
-import moe.rukamori.archivetune.storage.StorageCacheKind
-import moe.rukamori.archivetune.storage.StorageFolderSelection
-import moe.rukamori.archivetune.storage.StorageFolderUpdateResult
-import moe.rukamori.archivetune.storage.StorageLocationKind
-import moe.rukamori.archivetune.storage.StorageLocationOption
-import moe.rukamori.archivetune.storage.StorageLocationOptions
-import moe.rukamori.archivetune.storage.StorageMigrationPhase
-import moe.rukamori.archivetune.storage.StorageMigrationProgress
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.storage.ClearStorageCacheUseCase
+import dev.vxs.frostsoulx.storage.ObserveStorageFoldersUseCase
+import dev.vxs.frostsoulx.storage.SetStorageFolderUseCase
+import dev.vxs.frostsoulx.storage.StorageCacheClearProgress
+import dev.vxs.frostsoulx.storage.StorageCacheClearResult
+import dev.vxs.frostsoulx.storage.StorageCacheKind
+import dev.vxs.frostsoulx.storage.StorageFolderSelection
+import dev.vxs.frostsoulx.storage.StorageFolderUpdateResult
+import dev.vxs.frostsoulx.storage.StorageLocationKind
+import dev.vxs.frostsoulx.storage.StorageLocationOption
+import dev.vxs.frostsoulx.storage.StorageLocationOptions
+import dev.vxs.frostsoulx.storage.StorageMigrationPhase
+import dev.vxs.frostsoulx.storage.StorageMigrationProgress
 import javax.inject.Inject
 
 sealed interface StorageSettingsScreenState {

@@ -5,18 +5,18 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.constants.EnableUpdateNotificationKey
-import moe.rukamori.archivetune.constants.UpdateChannel
-import moe.rukamori.archivetune.constants.UpdateChannelKey
-import moe.rukamori.archivetune.defaultUpdateChannel
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.constants.EnableUpdateNotificationKey
+import dev.vxs.frostsoulx.constants.UpdateChannel
+import dev.vxs.frostsoulx.constants.UpdateChannelKey
+import dev.vxs.frostsoulx.defaultUpdateChannel
 
 class UpdateCheckWorker(
     context: Context,

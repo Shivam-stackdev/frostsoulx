@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
@@ -50,8 +50,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ui.screens.OptionStats
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.screens.OptionStats
 
 @Composable
 fun <E> ChipsRow(

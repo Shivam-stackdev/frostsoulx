@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.localmedia.LocalSongScanConfig
-import moe.rukamori.archivetune.localmedia.LocalSongScanSummary
-import moe.rukamori.archivetune.localmedia.LocalSongScanner
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.localmedia.LocalSongScanConfig
+import dev.vxs.frostsoulx.localmedia.LocalSongScanSummary
+import dev.vxs.frostsoulx.localmedia.LocalSongScanner
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 @HiltViewModel

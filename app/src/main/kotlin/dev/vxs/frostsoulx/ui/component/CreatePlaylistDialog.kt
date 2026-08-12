@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -29,11 +29,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.viewmodels.CreatePlaylistEvent
-import moe.rukamori.archivetune.viewmodels.CreatePlaylistScreenState
-import moe.rukamori.archivetune.viewmodels.CreatePlaylistUiData
-import moe.rukamori.archivetune.viewmodels.CreatePlaylistViewModel
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.viewmodels.CreatePlaylistEvent
+import dev.vxs.frostsoulx.viewmodels.CreatePlaylistScreenState
+import dev.vxs.frostsoulx.viewmodels.CreatePlaylistUiData
+import dev.vxs.frostsoulx.viewmodels.CreatePlaylistViewModel
 
 @Composable
 fun CreatePlaylistDialog(

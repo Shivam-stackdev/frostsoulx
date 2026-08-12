@@ -10,7 +10,7 @@
     androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class,
 )
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -68,18 +68,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalAnimationsDisabled
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.morideobfuscator.CipherRuntimeStatus
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.PreferenceEntry
-import moe.rukamori.archivetune.ui.component.PreferenceGroup
-import moe.rukamori.archivetune.ui.utils.appBarScrollBehavior
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.ChiperSettingsUiData
-import moe.rukamori.archivetune.viewmodels.ChiperSettingsUiState
-import moe.rukamori.archivetune.viewmodels.ChiperSettingsViewModel
+import dev.vxs.frostsoulx.LocalAnimationsDisabled
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.morideobfuscator.CipherRuntimeStatus
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.PreferenceEntry
+import dev.vxs.frostsoulx.ui.component.PreferenceGroup
+import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.ChiperSettingsUiData
+import dev.vxs.frostsoulx.viewmodels.ChiperSettingsUiState
+import dev.vxs.frostsoulx.viewmodels.ChiperSettingsViewModel
 import java.text.DateFormat
 import java.util.Date
 

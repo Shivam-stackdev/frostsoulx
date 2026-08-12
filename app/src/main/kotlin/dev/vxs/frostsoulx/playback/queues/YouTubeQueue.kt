@@ -5,15 +5,15 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback.queues
+package dev.vxs.frostsoulx.playback.queues
 
 import androidx.media3.common.MediaItem
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.models.MediaMetadata
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.models.MediaMetadata
 
 class YouTubeQueue(
     internal var endpoint: WatchEndpoint,

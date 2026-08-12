@@ -5,22 +5,22 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.Album
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.Artist
-import moe.rukamori.archivetune.innertube.models.MusicResponsiveHeaderRenderer
-import moe.rukamori.archivetune.innertube.models.MusicResponsiveListItemRenderer
-import moe.rukamori.archivetune.innertube.models.SectionListRenderer
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.Thumbnail
-import moe.rukamori.archivetune.innertube.models.getContinuation
-import moe.rukamori.archivetune.innertube.models.getItems
-import moe.rukamori.archivetune.innertube.models.oddElements
-import moe.rukamori.archivetune.innertube.models.response.BrowseResponse
-import moe.rukamori.archivetune.innertube.models.splitBySeparator
-import moe.rukamori.archivetune.innertube.utils.parseTime
+import dev.vxs.frostsoulx.innertube.models.Album
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.Artist
+import dev.vxs.frostsoulx.innertube.models.MusicResponsiveHeaderRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicResponsiveListItemRenderer
+import dev.vxs.frostsoulx.innertube.models.SectionListRenderer
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.Thumbnail
+import dev.vxs.frostsoulx.innertube.models.getContinuation
+import dev.vxs.frostsoulx.innertube.models.getItems
+import dev.vxs.frostsoulx.innertube.models.oddElements
+import dev.vxs.frostsoulx.innertube.models.response.BrowseResponse
+import dev.vxs.frostsoulx.innertube.models.splitBySeparator
+import dev.vxs.frostsoulx.innertube.utils.parseTime
 
 data class AlbumPage(
     val album: AlbumItem,

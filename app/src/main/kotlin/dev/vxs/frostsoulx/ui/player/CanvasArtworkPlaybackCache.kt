@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.content.Context
 import android.media.MediaExtractor
@@ -24,11 +24,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.canvas.models.CanvasArtwork
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.storage.StorageFolderKind
-import moe.rukamori.archivetune.storage.StorageLocationRepository
-import moe.rukamori.archivetune.utils.StreamClientUtils
+import dev.vxs.frostsoulx.canvas.models.CanvasArtwork
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.storage.StorageFolderKind
+import dev.vxs.frostsoulx.storage.StorageLocationRepository
+import dev.vxs.frostsoulx.utils.StreamClientUtils
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber

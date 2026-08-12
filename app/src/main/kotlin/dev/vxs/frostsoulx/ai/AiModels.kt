@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ai
+package dev.vxs.frostsoulx.ai
 
 import androidx.compose.runtime.Immutable
-import moe.rukamori.archivetune.constants.AiProvider
+import dev.vxs.frostsoulx.constants.AiProvider
 
 @Immutable
 data class AiModelOption(

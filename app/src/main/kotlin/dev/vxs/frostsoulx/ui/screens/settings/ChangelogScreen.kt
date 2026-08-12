@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,14 +23,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.UpdateChannel
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.MarkdownText
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.utils.ReleaseInfo
-import moe.rukamori.archivetune.utils.Updater
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.UpdateChannel
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.MarkdownText
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.utils.ReleaseInfo
+import dev.vxs.frostsoulx.utils.Updater
 import java.text.SimpleDateFormat
 import java.util.Locale
 

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
@@ -13,7 +13,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import moe.rukamori.archivetune.LocalAnimationsDisabled
+import dev.vxs.frostsoulx.LocalAnimationsDisabled
 
 object SettingsDimensions {
     val GroupCardCornerRadius = 16.dp

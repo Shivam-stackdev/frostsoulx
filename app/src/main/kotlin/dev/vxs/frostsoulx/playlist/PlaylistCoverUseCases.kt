@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playlist
+package dev.vxs.frostsoulx.playlist
 
 import android.net.Uri
-import moe.rukamori.archivetune.repository.PlaylistCoverRepository
+import dev.vxs.frostsoulx.repository.PlaylistCoverRepository
 import javax.inject.Inject
 
 class UpdatePlaylistCoverUseCase

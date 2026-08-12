@@ -5,15 +5,15 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lyrics
+package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
 import android.util.Log
-import moe.rukamori.archivetune.constants.EnableUnisonLyricsKey
-import moe.rukamori.archivetune.unison.Unison
-import moe.rukamori.archivetune.utils.GlobalLog
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
+import dev.vxs.frostsoulx.constants.EnableUnisonLyricsKey
+import dev.vxs.frostsoulx.unison.Unison
+import dev.vxs.frostsoulx.utils.GlobalLog
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
 
 object UnisonLyricsProvider : LyricsProvider {
     init {

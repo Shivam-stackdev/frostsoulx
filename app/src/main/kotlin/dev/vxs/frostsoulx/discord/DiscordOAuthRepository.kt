@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.discord
+package dev.vxs.frostsoulx.discord
 
 import android.content.Context
 import android.net.Uri
@@ -17,14 +17,14 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.constants.DiscordAvatarUrlKey
-import moe.rukamori.archivetune.constants.DiscordNameKey
-import moe.rukamori.archivetune.constants.DiscordRefreshTokenKey
-import moe.rukamori.archivetune.constants.DiscordTokenExpiresAtKey
-import moe.rukamori.archivetune.constants.DiscordTokenKey
-import moe.rukamori.archivetune.constants.DiscordUsernameKey
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.constants.DiscordAvatarUrlKey
+import dev.vxs.frostsoulx.constants.DiscordNameKey
+import dev.vxs.frostsoulx.constants.DiscordRefreshTokenKey
+import dev.vxs.frostsoulx.constants.DiscordTokenExpiresAtKey
+import dev.vxs.frostsoulx.constants.DiscordTokenKey
+import dev.vxs.frostsoulx.constants.DiscordUsernameKey
+import dev.vxs.frostsoulx.utils.dataStore
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL

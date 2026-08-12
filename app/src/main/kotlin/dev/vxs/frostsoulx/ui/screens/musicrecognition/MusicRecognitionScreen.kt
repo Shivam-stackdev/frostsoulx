@@ -10,7 +10,7 @@
     androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class,
 )
 
-package moe.rukamori.archivetune.ui.screens.musicrecognition
+package dev.vxs.frostsoulx.ui.screens.musicrecognition
 
 import android.Manifest
 import android.content.Intent
@@ -103,21 +103,21 @@ import androidx.window.core.layout.WindowSizeClass
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ui.component.SwitchPreference
-import moe.rukamori.archivetune.ui.screens.search.onlineSearchResultRoute
-import moe.rukamori.archivetune.ui.utils.appBarScrollBehavior
-import moe.rukamori.archivetune.viewmodels.MusicRecognitionErrorUi
-import moe.rukamori.archivetune.viewmodels.MusicRecognitionEvent
-import moe.rukamori.archivetune.viewmodels.MusicRecognitionScreenState
-import moe.rukamori.archivetune.viewmodels.MusicRecognitionSettingsUiState
-import moe.rukamori.archivetune.viewmodels.MusicRecognitionViewModel
-import moe.rukamori.archivetune.viewmodels.RecognitionHistoryItemUiModel
-import moe.rukamori.archivetune.viewmodels.RecognitionHistorySheetUiState
-import moe.rukamori.archivetune.viewmodels.RecognitionHistoryUiModel
-import moe.rukamori.archivetune.viewmodels.RecognitionPhaseUi
-import moe.rukamori.archivetune.viewmodels.RecognizedTrackUiModel
-import moe.rukamori.archivetune.musicrecognition.navigateToMusicRecognitionDetails
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.component.SwitchPreference
+import dev.vxs.frostsoulx.ui.screens.search.onlineSearchResultRoute
+import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
+import dev.vxs.frostsoulx.viewmodels.MusicRecognitionErrorUi
+import dev.vxs.frostsoulx.viewmodels.MusicRecognitionEvent
+import dev.vxs.frostsoulx.viewmodels.MusicRecognitionScreenState
+import dev.vxs.frostsoulx.viewmodels.MusicRecognitionSettingsUiState
+import dev.vxs.frostsoulx.viewmodels.MusicRecognitionViewModel
+import dev.vxs.frostsoulx.viewmodels.RecognitionHistoryItemUiModel
+import dev.vxs.frostsoulx.viewmodels.RecognitionHistorySheetUiState
+import dev.vxs.frostsoulx.viewmodels.RecognitionHistoryUiModel
+import dev.vxs.frostsoulx.viewmodels.RecognitionPhaseUi
+import dev.vxs.frostsoulx.viewmodels.RecognizedTrackUiModel
+import dev.vxs.frostsoulx.musicrecognition.navigateToMusicRecognitionDetails
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

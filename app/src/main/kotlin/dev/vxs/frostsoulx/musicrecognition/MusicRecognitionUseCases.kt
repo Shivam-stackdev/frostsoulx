@@ -5,14 +5,14 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.musicrecognition
+package dev.vxs.frostsoulx.musicrecognition
 
 import android.media.projection.MediaProjection
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.BuildConfig
+import dev.vxs.frostsoulx.BuildConfig
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -7,7 +7,7 @@
 
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.onboarding
+package dev.vxs.frostsoulx.ui.screens.onboarding
 
 import android.content.Intent
 import android.provider.Settings
@@ -71,16 +71,16 @@ import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.common.collect.ImmutableList
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.onboarding.OnboardingCommunityActionUiModel
-import moe.rukamori.archivetune.onboarding.OnboardingEvent
-import moe.rukamori.archivetune.onboarding.OnboardingPageId
-import moe.rukamori.archivetune.onboarding.OnboardingPermissionAction
-import moe.rukamori.archivetune.onboarding.OnboardingPermissionStatus
-import moe.rukamori.archivetune.onboarding.OnboardingPermissionUiModel
-import moe.rukamori.archivetune.onboarding.OnboardingScreenState
-import moe.rukamori.archivetune.onboarding.OnboardingUiState
-import moe.rukamori.archivetune.onboarding.OnboardingViewModel
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.onboarding.OnboardingCommunityActionUiModel
+import dev.vxs.frostsoulx.onboarding.OnboardingEvent
+import dev.vxs.frostsoulx.onboarding.OnboardingPageId
+import dev.vxs.frostsoulx.onboarding.OnboardingPermissionAction
+import dev.vxs.frostsoulx.onboarding.OnboardingPermissionStatus
+import dev.vxs.frostsoulx.onboarding.OnboardingPermissionUiModel
+import dev.vxs.frostsoulx.onboarding.OnboardingScreenState
+import dev.vxs.frostsoulx.onboarding.OnboardingUiState
+import dev.vxs.frostsoulx.onboarding.OnboardingViewModel
 
 @Composable
 fun OnboardingRoute(

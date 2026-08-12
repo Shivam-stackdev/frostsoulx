@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.aicontentfilter
+package dev.vxs.frostsoulx.aicontentfilter
 
 import androidx.compose.runtime.Immutable
 

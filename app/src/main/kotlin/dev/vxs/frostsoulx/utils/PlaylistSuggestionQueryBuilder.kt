@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
-import moe.rukamori.archivetune.constants.PlaylistSuggestionSource
-import moe.rukamori.archivetune.db.entities.PlaylistSong
-import moe.rukamori.archivetune.models.PlaylistSuggestionQuery
+import dev.vxs.frostsoulx.constants.PlaylistSuggestionSource
+import dev.vxs.frostsoulx.db.entities.PlaylistSong
+import dev.vxs.frostsoulx.models.PlaylistSuggestionQuery
 import java.time.LocalDateTime
 import java.time.Year
 

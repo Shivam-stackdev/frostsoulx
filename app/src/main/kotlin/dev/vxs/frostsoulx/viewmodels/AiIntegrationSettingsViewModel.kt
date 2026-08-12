@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -24,20 +24,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ai.AiModelOption
-import moe.rukamori.archivetune.ai.AiServiceConfig
-import moe.rukamori.archivetune.ai.AiTextService
-import moe.rukamori.archivetune.constants.AiApiKeyKey
-import moe.rukamori.archivetune.constants.AiApiValidationStatus
-import moe.rukamori.archivetune.constants.AiApiValidationStatusKey
-import moe.rukamori.archivetune.constants.AiCustomEndpointKey
-import moe.rukamori.archivetune.constants.AiCustomModelKey
-import moe.rukamori.archivetune.constants.AiProvider
-import moe.rukamori.archivetune.constants.AiProviderKey
-import moe.rukamori.archivetune.constants.AiSelectedModelKey
-import moe.rukamori.archivetune.extensions.toEnum
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ai.AiModelOption
+import dev.vxs.frostsoulx.ai.AiServiceConfig
+import dev.vxs.frostsoulx.ai.AiTextService
+import dev.vxs.frostsoulx.constants.AiApiKeyKey
+import dev.vxs.frostsoulx.constants.AiApiValidationStatus
+import dev.vxs.frostsoulx.constants.AiApiValidationStatusKey
+import dev.vxs.frostsoulx.constants.AiCustomEndpointKey
+import dev.vxs.frostsoulx.constants.AiCustomModelKey
+import dev.vxs.frostsoulx.constants.AiProvider
+import dev.vxs.frostsoulx.constants.AiProviderKey
+import dev.vxs.frostsoulx.constants.AiSelectedModelKey
+import dev.vxs.frostsoulx.extensions.toEnum
+import dev.vxs.frostsoulx.utils.dataStore
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 

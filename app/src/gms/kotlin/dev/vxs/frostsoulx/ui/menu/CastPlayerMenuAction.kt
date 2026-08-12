@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.menu
+package dev.vxs.frostsoulx.ui.menu
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,11 +50,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.cast.CastScreenState
-import moe.rukamori.archivetune.cast.CastUiState
-import moe.rukamori.archivetune.cast.CastViewModel
-import moe.rukamori.archivetune.ui.component.NewAction
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.cast.CastScreenState
+import dev.vxs.frostsoulx.cast.CastUiState
+import dev.vxs.frostsoulx.cast.CastViewModel
+import dev.vxs.frostsoulx.ui.component.NewAction
 
 @Composable
 fun rememberCastPlayerMenuAction(): NewAction? {

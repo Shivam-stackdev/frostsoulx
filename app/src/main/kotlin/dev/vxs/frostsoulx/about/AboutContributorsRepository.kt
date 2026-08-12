@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.about
+package dev.vxs.frostsoulx.about
 
 import android.content.Context
 import androidx.compose.runtime.Immutable
@@ -22,8 +22,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.constants.GitHubContributorsJsonKey
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.constants.GitHubContributorsJsonKey
+import dev.vxs.frostsoulx.utils.dataStore
 import org.json.JSONArray
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import androidx.media3.common.Player
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.db.entities.SongEntity
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.db.entities.SongEntity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Test

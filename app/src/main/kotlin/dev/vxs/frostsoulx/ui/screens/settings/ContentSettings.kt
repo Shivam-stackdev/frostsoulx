@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.content.Intent
 import android.os.Build
@@ -39,23 +39,23 @@ import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.*
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.ui.component.EditTextPreference
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.ListPreference
-import moe.rukamori.archivetune.ui.component.PreferenceEntry
-import moe.rukamori.archivetune.ui.component.PreferenceGroup
-import moe.rukamori.archivetune.ui.component.SwitchPreference
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.utils.setAppLocale
-import moe.rukamori.archivetune.viewmodels.AiContentFilterSettingsEffect
-import moe.rukamori.archivetune.viewmodels.AiContentFilterSettingsState
-import moe.rukamori.archivetune.viewmodels.ContentSettingsViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.*
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.ui.component.EditTextPreference
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.ListPreference
+import dev.vxs.frostsoulx.ui.component.PreferenceEntry
+import dev.vxs.frostsoulx.ui.component.PreferenceGroup
+import dev.vxs.frostsoulx.ui.component.SwitchPreference
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.utils.setAppLocale
+import dev.vxs.frostsoulx.viewmodels.AiContentFilterSettingsEffect
+import dev.vxs.frostsoulx.viewmodels.AiContentFilterSettingsState
+import dev.vxs.frostsoulx.viewmodels.ContentSettingsViewModel
 import java.util.Locale
 
 @Composable

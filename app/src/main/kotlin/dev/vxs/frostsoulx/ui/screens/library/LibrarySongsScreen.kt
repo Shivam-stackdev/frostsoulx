@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.library
+package dev.vxs.frostsoulx.ui.screens.library
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -66,29 +66,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.PureBlackKey
-import moe.rukamori.archivetune.constants.SongFilter
-import moe.rukamori.archivetune.constants.SongFilterKey
-import moe.rukamori.archivetune.constants.SongSortDescendingKey
-import moe.rukamori.archivetune.constants.SongSortType
-import moe.rukamori.archivetune.constants.SongSortTypeKey
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.ExpressivePullToRefreshBox
-import moe.rukamori.archivetune.ui.component.ItemThumbnail
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.menu.SongMenu
-import moe.rukamori.archivetune.ui.screens.library.rememberArtworkGradient
-import moe.rukamori.archivetune.ui.utils.ItemWrapper
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.LibrarySongsViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.PureBlackKey
+import dev.vxs.frostsoulx.constants.SongFilter
+import dev.vxs.frostsoulx.constants.SongFilterKey
+import dev.vxs.frostsoulx.constants.SongSortDescendingKey
+import dev.vxs.frostsoulx.constants.SongSortType
+import dev.vxs.frostsoulx.constants.SongSortTypeKey
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.ExpressivePullToRefreshBox
+import dev.vxs.frostsoulx.ui.component.ItemThumbnail
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.menu.SongMenu
+import dev.vxs.frostsoulx.ui.screens.library.rememberArtworkGradient
+import dev.vxs.frostsoulx.ui.utils.ItemWrapper
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.LibrarySongsViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

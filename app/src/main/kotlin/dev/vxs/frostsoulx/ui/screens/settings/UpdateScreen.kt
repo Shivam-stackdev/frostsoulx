@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -100,25 +100,25 @@ import androidx.navigation.NavController
 import androidx.window.core.layout.WindowSizeClass
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.EnableUpdateNotificationKey
-import moe.rukamori.archivetune.constants.UpdateChannel
-import moe.rukamori.archivetune.constants.UpdateChannelKey
-import moe.rukamori.archivetune.defaultUpdateChannel
-import moe.rukamori.archivetune.ui.component.BottomSheetPage
-import moe.rukamori.archivetune.ui.component.BottomSheetPageState
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.MarkdownText
-import moe.rukamori.archivetune.ui.utils.appBarScrollBehavior
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.utils.AppUpdateInstaller
-import moe.rukamori.archivetune.utils.GitCommit
-import moe.rukamori.archivetune.utils.UpdateNotificationManager
-import moe.rukamori.archivetune.utils.Updater
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.EnableUpdateNotificationKey
+import dev.vxs.frostsoulx.constants.UpdateChannel
+import dev.vxs.frostsoulx.constants.UpdateChannelKey
+import dev.vxs.frostsoulx.defaultUpdateChannel
+import dev.vxs.frostsoulx.ui.component.BottomSheetPage
+import dev.vxs.frostsoulx.ui.component.BottomSheetPageState
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.MarkdownText
+import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.utils.AppUpdateInstaller
+import dev.vxs.frostsoulx.utils.GitCommit
+import dev.vxs.frostsoulx.utils.UpdateNotificationManager
+import dev.vxs.frostsoulx.utils.Updater
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
@@ -23,17 +23,17 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.musicrecognition.FilterRecognitionHistoryUseCase
-import moe.rukamori.archivetune.musicrecognition.MusicRecognitionAutoStartRequestKey
-import moe.rukamori.archivetune.musicrecognition.MusicRecognitionException
-import moe.rukamori.archivetune.musicrecognition.MusicRecognitionFailure
-import moe.rukamori.archivetune.musicrecognition.ObserveBackgroundRecognitionSettingUseCase
-import moe.rukamori.archivetune.musicrecognition.ObserveRecognitionHistoryUseCase
-import moe.rukamori.archivetune.musicrecognition.RecognitionHistoryEntry
-import moe.rukamori.archivetune.musicrecognition.RecognitionPhase
-import moe.rukamori.archivetune.musicrecognition.RecognizeMusicUseCase
-import moe.rukamori.archivetune.musicrecognition.RecognizedTrack
-import moe.rukamori.archivetune.musicrecognition.SetBackgroundRecognitionEnabledUseCase
+import dev.vxs.frostsoulx.musicrecognition.FilterRecognitionHistoryUseCase
+import dev.vxs.frostsoulx.musicrecognition.MusicRecognitionAutoStartRequestKey
+import dev.vxs.frostsoulx.musicrecognition.MusicRecognitionException
+import dev.vxs.frostsoulx.musicrecognition.MusicRecognitionFailure
+import dev.vxs.frostsoulx.musicrecognition.ObserveBackgroundRecognitionSettingUseCase
+import dev.vxs.frostsoulx.musicrecognition.ObserveRecognitionHistoryUseCase
+import dev.vxs.frostsoulx.musicrecognition.RecognitionHistoryEntry
+import dev.vxs.frostsoulx.musicrecognition.RecognitionPhase
+import dev.vxs.frostsoulx.musicrecognition.RecognizeMusicUseCase
+import dev.vxs.frostsoulx.musicrecognition.RecognizedTrack
+import dev.vxs.frostsoulx.musicrecognition.SetBackgroundRecognitionEnabledUseCase
 import timber.log.Timber
 import java.text.DateFormat
 import java.util.Date
@@ -139,7 +139,7 @@ sealed interface MusicRecognitionEvent {
     ) : MusicRecognitionEvent
 
     data class NavigateToDetails(
-        val track: moe.rukamori.archivetune.musicrecognition.RecognizedTrack,
+        val track: dev.vxs.frostsoulx.musicrecognition.RecognizedTrack,
     ) : MusicRecognitionEvent
 }
 

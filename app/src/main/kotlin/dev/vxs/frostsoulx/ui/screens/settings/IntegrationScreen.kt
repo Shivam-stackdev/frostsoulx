@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -26,18 +26,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.ListenBrainzEnabledKey
-import moe.rukamori.archivetune.constants.ListenBrainzTokenKey
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.InfoLabel
-import moe.rukamori.archivetune.ui.component.PreferenceEntry
-import moe.rukamori.archivetune.ui.component.PreferenceGroup
-import moe.rukamori.archivetune.ui.component.SwitchPreference
-import moe.rukamori.archivetune.ui.component.TextFieldDialog
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.ListenBrainzEnabledKey
+import dev.vxs.frostsoulx.constants.ListenBrainzTokenKey
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.InfoLabel
+import dev.vxs.frostsoulx.ui.component.PreferenceEntry
+import dev.vxs.frostsoulx.ui.component.PreferenceGroup
+import dev.vxs.frostsoulx.ui.component.SwitchPreference
+import dev.vxs.frostsoulx.ui.component.TextFieldDialog
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.utils.rememberPreference
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.spotify
+package dev.vxs.frostsoulx.spotify
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
@@ -21,20 +21,20 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.SpotifyAccessTokenExpiresAtKey
-import moe.rukamori.archivetune.constants.SpotifyAccessTokenKey
-import moe.rukamori.archivetune.constants.SpotifyAccountAvatarUrlKey
-import moe.rukamori.archivetune.constants.SpotifyAccountNameKey
-import moe.rukamori.archivetune.constants.SpotifyLibraryPlaylistsCacheKey
-import moe.rukamori.archivetune.constants.SpotifySpDcKey
-import moe.rukamori.archivetune.constants.SpotifySpKeyKey
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylist
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylistTracksRef
-import moe.rukamori.archivetune.spotify.models.SpotifyTrack
-import moe.rukamori.archivetune.utils.clearWebAuthSession
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.SpotifyAccessTokenExpiresAtKey
+import dev.vxs.frostsoulx.constants.SpotifyAccessTokenKey
+import dev.vxs.frostsoulx.constants.SpotifyAccountAvatarUrlKey
+import dev.vxs.frostsoulx.constants.SpotifyAccountNameKey
+import dev.vxs.frostsoulx.constants.SpotifyLibraryPlaylistsCacheKey
+import dev.vxs.frostsoulx.constants.SpotifySpDcKey
+import dev.vxs.frostsoulx.constants.SpotifySpKeyKey
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylist
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylistTracksRef
+import dev.vxs.frostsoulx.spotify.models.SpotifyTrack
+import dev.vxs.frostsoulx.utils.clearWebAuthSession
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 import javax.inject.Singleton
 

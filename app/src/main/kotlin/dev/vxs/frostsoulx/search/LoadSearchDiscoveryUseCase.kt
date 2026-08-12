@@ -5,15 +5,15 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.search
+package dev.vxs.frostsoulx.search
 
 import androidx.compose.runtime.Immutable
 import com.google.common.collect.ImmutableList
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.pages.MoodAndGenres
-import moe.rukamori.archivetune.repository.SearchDiscoveryRepository
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.pages.MoodAndGenres
+import dev.vxs.frostsoulx.repository.SearchDiscoveryRepository
 import javax.inject.Inject
 
 class LoadSearchDiscoveryUseCase

@@ -5,9 +5,9 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.constants
+package dev.vxs.frostsoulx.constants
 
-import moe.rukamori.archivetune.ui.screens.OptionStats
+import dev.vxs.frostsoulx.ui.screens.OptionStats
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 

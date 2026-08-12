@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.backup
+package dev.vxs.frostsoulx.backup
 
 import android.content.Context
 import android.content.Intent
@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.utils.dataStore
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton

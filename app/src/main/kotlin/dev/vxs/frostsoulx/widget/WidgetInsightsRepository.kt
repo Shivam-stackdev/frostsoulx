@@ -5,17 +5,17 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.widget
+package dev.vxs.frostsoulx.widget
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.LibraryTopMixEntity
-import moe.rukamori.archivetune.db.entities.ListeningTotals
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.db.entities.SongWithStats
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.LibraryTopMixEntity
+import dev.vxs.frostsoulx.db.entities.ListeningTotals
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.db.entities.SongWithStats
 import java.time.Duration
 import javax.inject.Inject
 

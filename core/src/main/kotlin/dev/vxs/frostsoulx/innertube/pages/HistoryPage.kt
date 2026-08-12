@@ -5,13 +5,13 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.MusicResponsiveListItemRenderer
-import moe.rukamori.archivetune.innertube.models.MusicShelfRenderer
-import moe.rukamori.archivetune.innertube.models.SectionListRenderer
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.getItems
+import dev.vxs.frostsoulx.innertube.models.MusicResponsiveListItemRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicShelfRenderer
+import dev.vxs.frostsoulx.innertube.models.SectionListRenderer
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.getItems
 
 data class HistoryPage(
     val sections: List<HistorySection>?,

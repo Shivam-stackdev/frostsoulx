@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-import moe.rukamori.archivetune.constants.MyTopFilter
-import moe.rukamori.archivetune.db.MusicDatabase
+import dev.vxs.frostsoulx.constants.MyTopFilter
+import dev.vxs.frostsoulx.db.MusicDatabase
 import javax.inject.Inject
 
 @HiltViewModel

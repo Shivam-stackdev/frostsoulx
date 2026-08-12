@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube
+package dev.vxs.frostsoulx.innertube
 
-import moe.rukamori.archivetune.innertube.models.YouTubeClient
-import moe.rukamori.archivetune.innertube.utils.hasYouTubeLoginCookie
-import moe.rukamori.archivetune.innertube.utils.sha1
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient
+import dev.vxs.frostsoulx.innertube.utils.hasYouTubeLoginCookie
+import dev.vxs.frostsoulx.innertube.utils.sha1
 import java.util.Locale
 
 data class PlaybackAuthState(

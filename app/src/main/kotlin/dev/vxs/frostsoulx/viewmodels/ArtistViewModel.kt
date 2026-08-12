@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.annotation.StringRes
@@ -34,24 +34,24 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.artist.ArtistBlockRequest
-import moe.rukamori.archivetune.artist.ObserveArtistBlockedUseCase
-import moe.rukamori.archivetune.artist.SetArtistBlockedUseCase
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.extensions.filterBlockedArtists
-import moe.rukamori.archivetune.extensions.filterExplicit
-import moe.rukamori.archivetune.extensions.filterExplicitAlbums
-import moe.rukamori.archivetune.extensions.filterVideo
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.filterExplicit
-import moe.rukamori.archivetune.innertube.models.filterVideo
-import moe.rukamori.archivetune.innertube.pages.ArtistPage
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.artist.ArtistBlockRequest
+import dev.vxs.frostsoulx.artist.ObserveArtistBlockedUseCase
+import dev.vxs.frostsoulx.artist.SetArtistBlockedUseCase
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.extensions.filterBlockedArtists
+import dev.vxs.frostsoulx.extensions.filterExplicit
+import dev.vxs.frostsoulx.extensions.filterExplicitAlbums
+import dev.vxs.frostsoulx.extensions.filterVideo
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.filterExplicit
+import dev.vxs.frostsoulx.innertube.models.filterVideo
+import dev.vxs.frostsoulx.innertube.pages.ArtistPage
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 sealed interface ArtistBlockState {

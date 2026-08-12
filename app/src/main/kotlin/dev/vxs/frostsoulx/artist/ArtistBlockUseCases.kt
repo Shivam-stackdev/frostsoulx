@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.artist
+package dev.vxs.frostsoulx.artist
 
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.aicontentfilter
+package dev.vxs.frostsoulx.aicontentfilter
 
 import android.content.Context
 import android.util.AtomicFile
@@ -24,10 +24,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.constants.AiContentFilterEnabledKey
-import moe.rukamori.archivetune.constants.AiContentFilterIncludeModerateKey
-import moe.rukamori.archivetune.constants.AiContentFilterLastUpdatedKey
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.constants.AiContentFilterEnabledKey
+import dev.vxs.frostsoulx.constants.AiContentFilterIncludeModerateKey
+import dev.vxs.frostsoulx.constants.AiContentFilterLastUpdatedKey
+import dev.vxs.frostsoulx.utils.dataStore
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient

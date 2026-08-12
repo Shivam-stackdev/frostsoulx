@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -42,15 +42,15 @@ import coil3.request.allowHardware
 import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.constants.MiniPlayerBackgroundStyle
-import moe.rukamori.archivetune.constants.MiniPlayerBackgroundStyleKey
-import moe.rukamori.archivetune.constants.MiniPlayerHeight
-import moe.rukamori.archivetune.constants.NavigationBarMaxWidth
-import moe.rukamori.archivetune.constants.SwipeSensitivityKey
-import moe.rukamori.archivetune.ui.theme.PlayerColorExtractor
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.constants.MiniPlayerBackgroundStyle
+import dev.vxs.frostsoulx.constants.MiniPlayerBackgroundStyleKey
+import dev.vxs.frostsoulx.constants.MiniPlayerHeight
+import dev.vxs.frostsoulx.constants.NavigationBarMaxWidth
+import dev.vxs.frostsoulx.constants.SwipeSensitivityKey
+import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
 import kotlin.math.roundToInt
 
 private const val MiniPlayerPaletteCacheSize = 24
@@ -85,7 +85,7 @@ private fun NewMiniPlayer(
     val layoutDirection = LocalLayoutDirection.current
     val coroutineScope = rememberCoroutineScope()
     val swipeSensitivity by rememberPreference(SwipeSensitivityKey, 0.73f)
-    val swipeThumbnail by rememberPreference(moe.rukamori.archivetune.constants.SwipeThumbnailKey, true)
+    val swipeThumbnail by rememberPreference(dev.vxs.frostsoulx.constants.SwipeThumbnailKey, true)
     val miniPlayerBackgroundStyle by rememberEnumPreference(
         key = MiniPlayerBackgroundStyleKey,
         defaultValue = MiniPlayerBackgroundStyle.THEME,

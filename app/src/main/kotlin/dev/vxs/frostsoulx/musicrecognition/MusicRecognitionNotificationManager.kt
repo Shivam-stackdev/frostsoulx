@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.musicrecognition
+package dev.vxs.frostsoulx.musicrecognition
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -20,8 +20,8 @@ import androidx.core.app.NotificationManagerCompat
 import android.util.Base64
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.MainActivity
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.MainActivity
+import dev.vxs.frostsoulx.R
 import javax.inject.Inject
 
 class MusicRecognitionNotificationManager

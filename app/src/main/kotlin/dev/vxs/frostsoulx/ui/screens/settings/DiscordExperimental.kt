@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,14 +19,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.*
-import moe.rukamori.archivetune.ui.component.EditTextPreference
-import moe.rukamori.archivetune.ui.component.ListPreference
-import moe.rukamori.archivetune.ui.component.PreferenceGroup
-import moe.rukamori.archivetune.ui.component.SwitchPreference
-import moe.rukamori.archivetune.utils.TranslatorLanguages
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.*
+import dev.vxs.frostsoulx.ui.component.EditTextPreference
+import dev.vxs.frostsoulx.ui.component.ListPreference
+import dev.vxs.frostsoulx.ui.component.PreferenceGroup
+import dev.vxs.frostsoulx.ui.component.SwitchPreference
+import dev.vxs.frostsoulx.utils.TranslatorLanguages
+import dev.vxs.frostsoulx.utils.rememberPreference
 
 private val DiscordExperimentalButtonUrlOptions =
     listOf("songurl", "artisturl", "albumurl", "custom")

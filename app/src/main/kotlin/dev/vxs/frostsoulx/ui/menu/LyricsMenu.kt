@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.menu
+package dev.vxs.frostsoulx.ui.menu
 
 import android.app.SearchManager
 import android.content.Intent
@@ -96,31 +96,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.bush.translator.Language
 import me.bush.translator.Translator
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ai.AiLyricsDocumentParser
-import moe.rukamori.archivetune.ai.AiLyricsSegment
-import moe.rukamori.archivetune.constants.AiApiKeyKey
-import moe.rukamori.archivetune.constants.AiApiValidationStatus
-import moe.rukamori.archivetune.constants.AiApiValidationStatusKey
-import moe.rukamori.archivetune.constants.AiCustomEndpointKey
-import moe.rukamori.archivetune.constants.AiProvider
-import moe.rukamori.archivetune.constants.AiProviderKey
-import moe.rukamori.archivetune.constants.TranslatorTargetLangKey
-import moe.rukamori.archivetune.db.entities.LyricsEntity
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.ui.component.DefaultDialog
-import moe.rukamori.archivetune.ui.component.MenuSurfaceSection
-import moe.rukamori.archivetune.ui.component.NewAction
-import moe.rukamori.archivetune.ui.component.NewActionGrid
-import moe.rukamori.archivetune.ui.component.NewMenuItem
-import moe.rukamori.archivetune.ui.component.TextFieldDialog
-import moe.rukamori.archivetune.utils.TranslatorLang
-import moe.rukamori.archivetune.utils.TranslatorLanguages
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.LyricsMenuViewModel
-import moe.rukamori.archivetune.viewmodels.LyricsSearchResultUiModel
-import moe.rukamori.archivetune.viewmodels.LyricsSearchScreenState
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ai.AiLyricsDocumentParser
+import dev.vxs.frostsoulx.ai.AiLyricsSegment
+import dev.vxs.frostsoulx.constants.AiApiKeyKey
+import dev.vxs.frostsoulx.constants.AiApiValidationStatus
+import dev.vxs.frostsoulx.constants.AiApiValidationStatusKey
+import dev.vxs.frostsoulx.constants.AiCustomEndpointKey
+import dev.vxs.frostsoulx.constants.AiProvider
+import dev.vxs.frostsoulx.constants.AiProviderKey
+import dev.vxs.frostsoulx.constants.TranslatorTargetLangKey
+import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.ui.component.DefaultDialog
+import dev.vxs.frostsoulx.ui.component.MenuSurfaceSection
+import dev.vxs.frostsoulx.ui.component.NewAction
+import dev.vxs.frostsoulx.ui.component.NewActionGrid
+import dev.vxs.frostsoulx.ui.component.NewMenuItem
+import dev.vxs.frostsoulx.ui.component.TextFieldDialog
+import dev.vxs.frostsoulx.utils.TranslatorLang
+import dev.vxs.frostsoulx.utils.TranslatorLanguages
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.LyricsMenuViewModel
+import dev.vxs.frostsoulx.viewmodels.LyricsSearchResultUiModel
+import dev.vxs.frostsoulx.viewmodels.LyricsSearchScreenState
 import java.util.Locale
 import java.util.UUID
 import kotlin.math.roundToInt

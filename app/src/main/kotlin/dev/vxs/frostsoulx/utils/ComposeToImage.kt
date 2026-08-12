@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.app.Activity
 import android.content.ContentValues
@@ -37,8 +37,8 @@ import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ui.component.LyricsShareImageOptions
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.component.LyricsShareImageOptions
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.coroutines.resume
@@ -192,11 +192,11 @@ object ComposeToImage {
         backgroundColor: Int? = null,
         textColor: Int? = null,
         secondaryTextColor: Int? = null,
-        glassStyle: moe.rukamori.archivetune.ui.component.LyricsGlassStyle? = null,
+        glassStyle: dev.vxs.frostsoulx.ui.component.LyricsGlassStyle? = null,
         shareOptions: LyricsShareImageOptions = LyricsShareImageOptions(),
     ): Bitmap =
         withContext(Dispatchers.Default) {
-            val style = glassStyle ?: moe.rukamori.archivetune.ui.component.LyricsGlassStyle.FrostedDark
+            val style = glassStyle ?: dev.vxs.frostsoulx.ui.component.LyricsGlassStyle.FrostedDark
             val canvasWidth = width.coerceAtLeast(1)
             val canvasHeight = height.coerceAtLeast(1)
             val baseSize = minOf(canvasWidth, canvasHeight)

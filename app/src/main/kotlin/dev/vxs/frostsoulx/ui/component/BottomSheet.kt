@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
@@ -53,9 +53,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.LocalAnimationsDisabled
-import moe.rukamori.archivetune.constants.BottomSheetAnimationSpec
-import moe.rukamori.archivetune.constants.BottomSheetSoftAnimationSpec
+import dev.vxs.frostsoulx.LocalAnimationsDisabled
+import dev.vxs.frostsoulx.constants.BottomSheetAnimationSpec
+import dev.vxs.frostsoulx.constants.BottomSheetSoftAnimationSpec
 
 /**
  * Bottom Sheet

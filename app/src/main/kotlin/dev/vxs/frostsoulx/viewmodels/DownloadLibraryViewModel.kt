@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
@@ -24,13 +24,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.downloads.DownloadEntryUiModel
-import moe.rukamori.archivetune.downloads.DownloadLibraryUiModel
-import moe.rukamori.archivetune.downloads.DownloadMediaType
-import moe.rukamori.archivetune.downloads.DownloadSectionUiModel
-import moe.rukamori.archivetune.downloads.ManageDownloadsUseCase
-import moe.rukamori.archivetune.models.MediaMetadata
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.downloads.DownloadEntryUiModel
+import dev.vxs.frostsoulx.downloads.DownloadLibraryUiModel
+import dev.vxs.frostsoulx.downloads.DownloadMediaType
+import dev.vxs.frostsoulx.downloads.DownloadSectionUiModel
+import dev.vxs.frostsoulx.downloads.ManageDownloadsUseCase
+import dev.vxs.frostsoulx.models.MediaMetadata
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 

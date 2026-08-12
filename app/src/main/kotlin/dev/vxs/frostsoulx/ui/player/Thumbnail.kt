@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.graphics.Bitmap
 import android.os.Build
@@ -86,32 +86,32 @@ import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.canvas.models.CanvasArtwork
-import moe.rukamori.archivetune.constants.ArchiveTuneCanvasKey
-import moe.rukamori.archivetune.constants.BackdropBlurAmountKey
-import moe.rukamori.archivetune.constants.BackdropEnabledKey
-import moe.rukamori.archivetune.constants.CropThumbnailToSquareKey
-import moe.rukamori.archivetune.constants.DisableBlurKey
-import moe.rukamori.archivetune.constants.EnableHapticFeedbackKey
-import moe.rukamori.archivetune.constants.HidePlayerThumbnailKey
-import moe.rukamori.archivetune.constants.MaxCanvasCacheSizeKey
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyle
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyleKey
-import moe.rukamori.archivetune.constants.PlayerDesignStyle
-import moe.rukamori.archivetune.constants.PlayerDesignStyleKey
-import moe.rukamori.archivetune.constants.PlayerHorizontalPadding
-import moe.rukamori.archivetune.constants.SeekExtraSeconds
-import moe.rukamori.archivetune.constants.SwipeThumbnailKey
-import moe.rukamori.archivetune.constants.ThumbnailCornerRadiusKey
-import moe.rukamori.archivetune.extensions.metadata
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.ui.utils.highRes
-import moe.rukamori.archivetune.utils.ImageBlurUtils
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberLowDataModeActive
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.canvas.models.CanvasArtwork
+import dev.vxs.frostsoulx.constants.ArchiveTuneCanvasKey
+import dev.vxs.frostsoulx.constants.BackdropBlurAmountKey
+import dev.vxs.frostsoulx.constants.BackdropEnabledKey
+import dev.vxs.frostsoulx.constants.CropThumbnailToSquareKey
+import dev.vxs.frostsoulx.constants.DisableBlurKey
+import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.constants.HidePlayerThumbnailKey
+import dev.vxs.frostsoulx.constants.MaxCanvasCacheSizeKey
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyleKey
+import dev.vxs.frostsoulx.constants.PlayerDesignStyle
+import dev.vxs.frostsoulx.constants.PlayerDesignStyleKey
+import dev.vxs.frostsoulx.constants.PlayerHorizontalPadding
+import dev.vxs.frostsoulx.constants.SeekExtraSeconds
+import dev.vxs.frostsoulx.constants.SwipeThumbnailKey
+import dev.vxs.frostsoulx.constants.ThumbnailCornerRadiusKey
+import dev.vxs.frostsoulx.extensions.metadata
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.ui.utils.highRes
+import dev.vxs.frostsoulx.utils.ImageBlurUtils
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberLowDataModeActive
+import dev.vxs.frostsoulx.utils.rememberPreference
 import java.util.Locale
 import kotlin.math.abs
 

@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import android.os.SystemClock
 import android.view.ViewConfiguration
@@ -45,9 +45,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import moe.rukamori.archivetune.constants.NavigationBarHeight
-import moe.rukamori.archivetune.constants.NavigationBarMaxWidth
-import moe.rukamori.archivetune.ui.screens.Screens
+import dev.vxs.frostsoulx.constants.NavigationBarHeight
+import dev.vxs.frostsoulx.constants.NavigationBarMaxWidth
+import dev.vxs.frostsoulx.ui.screens.Screens
 
 private val NavigationItemsMaxWidth = 360.dp
 private val NavigationItemVerticalPadding = 8.dp

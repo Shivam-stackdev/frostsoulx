@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.menu
+package dev.vxs.frostsoulx.ui.menu
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -71,41 +71,41 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalDownloadUtil
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.LocalSyncUtils
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.ListThumbnailSize
-import moe.rukamori.archivetune.constants.SpeedDialSongIdsKey
-import moe.rukamori.archivetune.constants.ThumbnailCornerRadius
-import moe.rukamori.archivetune.db.entities.PlaylistEntity
-import moe.rukamori.archivetune.db.entities.PlaylistSongMap
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.utils.completed
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.playback.ExoDownloadService
-import moe.rukamori.archivetune.playback.queues.YouTubeQueue
-import moe.rukamori.archivetune.ui.component.DefaultDialog
-import moe.rukamori.archivetune.ui.component.ListDialog
-import moe.rukamori.archivetune.ui.component.MenuSurfaceSection
-import moe.rukamori.archivetune.ui.component.NewAction
-import moe.rukamori.archivetune.ui.component.NewActionGrid
-import moe.rukamori.archivetune.ui.component.YouTubeListItem
-import moe.rukamori.archivetune.ui.utils.HeaderDownloadItem
-import moe.rukamori.archivetune.ui.utils.sendAddMissingDownloads
-import moe.rukamori.archivetune.utils.SpeedDialPin
-import moe.rukamori.archivetune.utils.SpeedDialPinType
-import moe.rukamori.archivetune.utils.joinByBullet
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.utils.parseSpeedDialPins
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.utils.serializeSpeedDialPins
-import moe.rukamori.archivetune.utils.toggleSpeedDialPin
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalDownloadUtil
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.LocalSyncUtils
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.ListThumbnailSize
+import dev.vxs.frostsoulx.constants.SpeedDialSongIdsKey
+import dev.vxs.frostsoulx.constants.ThumbnailCornerRadius
+import dev.vxs.frostsoulx.db.entities.PlaylistEntity
+import dev.vxs.frostsoulx.db.entities.PlaylistSongMap
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.utils.completed
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.playback.ExoDownloadService
+import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
+import dev.vxs.frostsoulx.ui.component.DefaultDialog
+import dev.vxs.frostsoulx.ui.component.ListDialog
+import dev.vxs.frostsoulx.ui.component.MenuSurfaceSection
+import dev.vxs.frostsoulx.ui.component.NewAction
+import dev.vxs.frostsoulx.ui.component.NewActionGrid
+import dev.vxs.frostsoulx.ui.component.YouTubeListItem
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadItem
+import dev.vxs.frostsoulx.ui.utils.sendAddMissingDownloads
+import dev.vxs.frostsoulx.utils.SpeedDialPin
+import dev.vxs.frostsoulx.utils.SpeedDialPinType
+import dev.vxs.frostsoulx.utils.joinByBullet
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.utils.parseSpeedDialPins
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.utils.serializeSpeedDialPins
+import dev.vxs.frostsoulx.utils.toggleSpeedDialPin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")

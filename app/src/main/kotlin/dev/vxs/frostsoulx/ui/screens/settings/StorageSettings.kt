@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
@@ -69,37 +69,37 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.MaxCanvasCacheSizeKey
-import moe.rukamori.archivetune.constants.MaxImageCacheSizeKey
-import moe.rukamori.archivetune.constants.MaxSongCacheSizeKey
-import moe.rukamori.archivetune.constants.SmartTrimmerKey
-import moe.rukamori.archivetune.extensions.directorySizeBytes
-import moe.rukamori.archivetune.extensions.tryOrNull
-import moe.rukamori.archivetune.storage.StorageFolderKind
-import moe.rukamori.archivetune.storage.StorageLocationKind
-import moe.rukamori.archivetune.storage.StorageLocationRepository
-import moe.rukamori.archivetune.ui.component.ActionPromptDialog
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.ListPreference
-import moe.rukamori.archivetune.ui.component.PreferenceEntry
-import moe.rukamori.archivetune.ui.component.PreferenceGroup
-import moe.rukamori.archivetune.ui.component.SwitchPreference
-import moe.rukamori.archivetune.ui.player.CanvasArtworkPlaybackCache
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.ui.utils.formatFileSize
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.StorageCacheClearUiKind
-import moe.rukamori.archivetune.viewmodels.StorageCacheClearUiModel
-import moe.rukamori.archivetune.viewmodels.StorageFolderUiModel
-import moe.rukamori.archivetune.viewmodels.StorageLocationUiModel
-import moe.rukamori.archivetune.viewmodels.StorageLocationUiOptions
-import moe.rukamori.archivetune.viewmodels.StorageMigrationUiModel
-import moe.rukamori.archivetune.viewmodels.StorageMigrationUiPhase
-import moe.rukamori.archivetune.viewmodels.StorageSettingsScreenState
-import moe.rukamori.archivetune.viewmodels.StorageSettingsViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.MaxCanvasCacheSizeKey
+import dev.vxs.frostsoulx.constants.MaxImageCacheSizeKey
+import dev.vxs.frostsoulx.constants.MaxSongCacheSizeKey
+import dev.vxs.frostsoulx.constants.SmartTrimmerKey
+import dev.vxs.frostsoulx.extensions.directorySizeBytes
+import dev.vxs.frostsoulx.extensions.tryOrNull
+import dev.vxs.frostsoulx.storage.StorageFolderKind
+import dev.vxs.frostsoulx.storage.StorageLocationKind
+import dev.vxs.frostsoulx.storage.StorageLocationRepository
+import dev.vxs.frostsoulx.ui.component.ActionPromptDialog
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.ListPreference
+import dev.vxs.frostsoulx.ui.component.PreferenceEntry
+import dev.vxs.frostsoulx.ui.component.PreferenceGroup
+import dev.vxs.frostsoulx.ui.component.SwitchPreference
+import dev.vxs.frostsoulx.ui.player.CanvasArtworkPlaybackCache
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.ui.utils.formatFileSize
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.StorageCacheClearUiKind
+import dev.vxs.frostsoulx.viewmodels.StorageCacheClearUiModel
+import dev.vxs.frostsoulx.viewmodels.StorageFolderUiModel
+import dev.vxs.frostsoulx.viewmodels.StorageLocationUiModel
+import dev.vxs.frostsoulx.viewmodels.StorageLocationUiOptions
+import dev.vxs.frostsoulx.viewmodels.StorageMigrationUiModel
+import dev.vxs.frostsoulx.viewmodels.StorageMigrationUiPhase
+import dev.vxs.frostsoulx.viewmodels.StorageSettingsScreenState
+import dev.vxs.frostsoulx.viewmodels.StorageSettingsViewModel
 
 @OptIn(ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
 @Composable

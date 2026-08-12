@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.musicrecognition
+package dev.vxs.frostsoulx.ui.screens.musicrecognition
 
 import android.content.Intent
 import android.net.Uri
@@ -37,13 +37,13 @@ import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.musicrecognition.decodeRecognizedTrack
-import moe.rukamori.archivetune.musicrecognition.openMusicRecognition
-import moe.rukamori.archivetune.ui.screens.search.onlineSearchResultRoute
-import moe.rukamori.archivetune.ui.utils.appBarScrollBehavior
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.musicrecognition.decodeRecognizedTrack
+import dev.vxs.frostsoulx.musicrecognition.openMusicRecognition
+import dev.vxs.frostsoulx.ui.screens.search.onlineSearchResultRoute
+import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
 import androidx.compose.material3.LargeFlexibleTopAppBar
-import moe.rukamori.archivetune.viewmodels.RecognizedTrackUiModel
+import dev.vxs.frostsoulx.viewmodels.RecognizedTrackUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

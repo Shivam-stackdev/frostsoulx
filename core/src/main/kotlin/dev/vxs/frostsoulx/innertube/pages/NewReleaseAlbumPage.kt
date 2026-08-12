@@ -5,14 +5,14 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.AlbumReleaseType
-import moe.rukamori.archivetune.innertube.models.Artist
-import moe.rukamori.archivetune.innertube.models.MusicTwoRowItemRenderer
-import moe.rukamori.archivetune.innertube.models.oddElements
-import moe.rukamori.archivetune.innertube.models.splitBySeparator
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.AlbumReleaseType
+import dev.vxs.frostsoulx.innertube.models.Artist
+import dev.vxs.frostsoulx.innertube.models.MusicTwoRowItemRenderer
+import dev.vxs.frostsoulx.innertube.models.oddElements
+import dev.vxs.frostsoulx.innertube.models.splitBySeparator
 
 object NewReleaseAlbumPage {
     fun fromMusicTwoRowItemRenderer(renderer: MusicTwoRowItemRenderer): AlbumItem? {

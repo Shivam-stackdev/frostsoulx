@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.spotify
+package dev.vxs.frostsoulx.spotify
 
 import androidx.compose.runtime.Immutable
 import com.google.common.collect.ImmutableList
@@ -14,7 +14,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.spotify.models.SpotifyTrack
+import dev.vxs.frostsoulx.spotify.models.SpotifyTrack
 import javax.inject.Inject
 
 class ResolveSpotifyPlaylistDownloadsUseCase

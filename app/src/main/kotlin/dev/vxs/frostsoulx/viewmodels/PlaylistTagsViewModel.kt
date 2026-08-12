@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
@@ -26,17 +26,17 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.db.entities.TagEntity
-import moe.rukamori.archivetune.playlisttags.AddTagsToPlaylistsUseCase
-import moe.rukamori.archivetune.playlisttags.CreatePlaylistTagUseCase
-import moe.rukamori.archivetune.playlisttags.DeletePlaylistTagUseCase
-import moe.rukamori.archivetune.playlisttags.ObservePlaylistTagsUseCase
-import moe.rukamori.archivetune.playlisttags.PlaylistTagModel
-import moe.rukamori.archivetune.playlisttags.PlaylistTagPlaylistModel
-import moe.rukamori.archivetune.playlisttags.SavePlaylistTagsUseCase
-import moe.rukamori.archivetune.playlisttags.UpdatePlaylistTagColorUseCase
-import moe.rukamori.archivetune.playlisttags.UpdatePlaylistTagUseCase
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.db.entities.TagEntity
+import dev.vxs.frostsoulx.playlisttags.AddTagsToPlaylistsUseCase
+import dev.vxs.frostsoulx.playlisttags.CreatePlaylistTagUseCase
+import dev.vxs.frostsoulx.playlisttags.DeletePlaylistTagUseCase
+import dev.vxs.frostsoulx.playlisttags.ObservePlaylistTagsUseCase
+import dev.vxs.frostsoulx.playlisttags.PlaylistTagModel
+import dev.vxs.frostsoulx.playlisttags.PlaylistTagPlaylistModel
+import dev.vxs.frostsoulx.playlisttags.SavePlaylistTagsUseCase
+import dev.vxs.frostsoulx.playlisttags.UpdatePlaylistTagColorUseCase
+import dev.vxs.frostsoulx.playlisttags.UpdatePlaylistTagUseCase
 import javax.inject.Inject
 
 sealed interface PlaylistTagsScreenState {

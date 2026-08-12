@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens
+package dev.vxs.frostsoulx.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
@@ -55,19 +55,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.CoroutineScope
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.home.HomeAction
-import moe.rukamori.archivetune.home.HomeScreenState
-import moe.rukamori.archivetune.home.HomeUiState
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.playback.PlayerConnection
-import moe.rukamori.archivetune.ui.component.ExpressivePullToRefreshBox
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.MenuState
-import moe.rukamori.archivetune.ui.utils.SnapLayoutInfoProvider
-import moe.rukamori.archivetune.viewmodels.HomeViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.home.HomeAction
+import dev.vxs.frostsoulx.home.HomeScreenState
+import dev.vxs.frostsoulx.home.HomeUiState
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.playback.PlayerConnection
+import dev.vxs.frostsoulx.ui.component.ExpressivePullToRefreshBox
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.MenuState
+import dev.vxs.frostsoulx.ui.utils.SnapLayoutInfoProvider
+import dev.vxs.frostsoulx.viewmodels.HomeViewModel
 
 private val HomeFeedMaxWidth = 1_200.dp
 private val HomeSectionSpacing = 18.dp

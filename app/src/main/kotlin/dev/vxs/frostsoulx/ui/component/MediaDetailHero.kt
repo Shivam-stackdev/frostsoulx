@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -59,11 +59,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.AppBarHeight
-import moe.rukamori.archivetune.ui.utils.YtimgResizePolicy
-import moe.rukamori.archivetune.ui.utils.fadingEdge
-import moe.rukamori.archivetune.ui.utils.resize
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.AppBarHeight
+import dev.vxs.frostsoulx.ui.utils.YtimgResizePolicy
+import dev.vxs.frostsoulx.ui.utils.fadingEdge
+import dev.vxs.frostsoulx.ui.utils.resize
 
 @Composable
 public fun MediaDetailHero(

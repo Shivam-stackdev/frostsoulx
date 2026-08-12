@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.canvas.models
+package dev.vxs.frostsoulx.canvas.models
 
 import java.text.Normalizer
 import java.util.Locale

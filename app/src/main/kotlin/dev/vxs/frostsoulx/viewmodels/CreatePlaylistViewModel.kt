@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
@@ -21,9 +21,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.playlist.CreatePlaylistUseCase
-import moe.rukamori.archivetune.playlist.GetCreatePlaylistOptionsUseCase
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.playlist.CreatePlaylistUseCase
+import dev.vxs.frostsoulx.playlist.GetCreatePlaylistOptionsUseCase
 import javax.inject.Inject
 
 sealed interface CreatePlaylistScreenState {

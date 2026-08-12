@@ -11,7 +11,7 @@
     androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class,
 )
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import android.content.Context
 import android.content.Intent
@@ -85,9 +85,9 @@ import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.utils.ComposeToImage
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.utils.ComposeToImage
 
 @Immutable
 private data class LyricsGlassStyleOptions(

@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.library
+package dev.vxs.frostsoulx.library
 
 import kotlinx.coroutines.flow.Flow
-import moe.rukamori.archivetune.repository.LibraryTopMixRepository
+import dev.vxs.frostsoulx.repository.LibraryTopMixRepository
 import javax.inject.Inject
 
 class ObserveLibraryTopMixesUseCase

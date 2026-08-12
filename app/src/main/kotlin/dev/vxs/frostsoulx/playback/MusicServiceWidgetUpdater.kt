@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -32,21 +32,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.extensions.SilentHandler
-import moe.rukamori.archivetune.utils.reportException
-import moe.rukamori.archivetune.widget.AlbumArtWidget
-import moe.rukamori.archivetune.widget.ListeningInsightsWidget
-import moe.rukamori.archivetune.widget.LoadWidgetInsightsUseCase
-import moe.rukamori.archivetune.widget.MusicWidget
-import moe.rukamori.archivetune.widget.MusicWidgetKeys
-import moe.rukamori.archivetune.widget.NowPlayingCardWidget
-import moe.rukamori.archivetune.widget.PlaybackCapsuleWidget
-import moe.rukamori.archivetune.widget.PlaybackCommandWidget
-import moe.rukamori.archivetune.widget.PlaybackDeckWidget
-import moe.rukamori.archivetune.widget.PlaybackSpotlightWidget
-import moe.rukamori.archivetune.widget.WidgetInsightsSnapshot
-import moe.rukamori.archivetune.widget.toWidgetPreferenceValue
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.extensions.SilentHandler
+import dev.vxs.frostsoulx.utils.reportException
+import dev.vxs.frostsoulx.widget.AlbumArtWidget
+import dev.vxs.frostsoulx.widget.ListeningInsightsWidget
+import dev.vxs.frostsoulx.widget.LoadWidgetInsightsUseCase
+import dev.vxs.frostsoulx.widget.MusicWidget
+import dev.vxs.frostsoulx.widget.MusicWidgetKeys
+import dev.vxs.frostsoulx.widget.NowPlayingCardWidget
+import dev.vxs.frostsoulx.widget.PlaybackCapsuleWidget
+import dev.vxs.frostsoulx.widget.PlaybackCommandWidget
+import dev.vxs.frostsoulx.widget.PlaybackDeckWidget
+import dev.vxs.frostsoulx.widget.PlaybackSpotlightWidget
+import dev.vxs.frostsoulx.widget.WidgetInsightsSnapshot
+import dev.vxs.frostsoulx.widget.toWidgetPreferenceValue
 import java.io.File
 
 internal class MusicServiceWidgetUpdater(

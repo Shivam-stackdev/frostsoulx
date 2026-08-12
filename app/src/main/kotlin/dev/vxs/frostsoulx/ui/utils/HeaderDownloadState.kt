@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.utils
+package dev.vxs.frostsoulx.ui.utils
 
 import android.content.Context
 import androidx.compose.runtime.Immutable
@@ -13,7 +13,7 @@ import androidx.core.net.toUri
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
-import moe.rukamori.archivetune.playback.ExoDownloadService
+import dev.vxs.frostsoulx.playback.ExoDownloadService
 
 @Immutable
 sealed interface HeaderDownloadState {

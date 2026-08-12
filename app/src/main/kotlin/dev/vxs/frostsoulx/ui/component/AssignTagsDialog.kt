@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -58,11 +58,11 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.viewmodels.PlaylistTagPlaylistUiModel
-import moe.rukamori.archivetune.viewmodels.PlaylistTagUiModel
-import moe.rukamori.archivetune.viewmodels.PlaylistTagsScreenState
-import moe.rukamori.archivetune.viewmodels.PlaylistTagsViewModel
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.viewmodels.PlaylistTagPlaylistUiModel
+import dev.vxs.frostsoulx.viewmodels.PlaylistTagUiModel
+import dev.vxs.frostsoulx.viewmodels.PlaylistTagsScreenState
+import dev.vxs.frostsoulx.viewmodels.PlaylistTagsViewModel
 
 @Composable
 fun AssignTagsDialog(

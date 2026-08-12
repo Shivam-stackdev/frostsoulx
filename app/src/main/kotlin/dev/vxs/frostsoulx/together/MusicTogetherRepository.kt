@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.together
+package dev.vxs.frostsoulx.together
 
 import android.content.Context
 import android.os.Build
@@ -18,16 +18,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.TogetherAllowGuestsToAddTracksKey
-import moe.rukamori.archivetune.constants.TogetherAllowGuestsToControlPlaybackKey
-import moe.rukamori.archivetune.constants.TogetherDefaultPortKey
-import moe.rukamori.archivetune.constants.TogetherDisplayNameKey
-import moe.rukamori.archivetune.constants.TogetherLastJoinLinkKey
-import moe.rukamori.archivetune.constants.TogetherRequireHostApprovalToJoinKey
-import moe.rukamori.archivetune.constants.TogetherWelcomeShownKey
-import moe.rukamori.archivetune.playback.MusicService
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.TogetherAllowGuestsToAddTracksKey
+import dev.vxs.frostsoulx.constants.TogetherAllowGuestsToControlPlaybackKey
+import dev.vxs.frostsoulx.constants.TogetherDefaultPortKey
+import dev.vxs.frostsoulx.constants.TogetherDisplayNameKey
+import dev.vxs.frostsoulx.constants.TogetherLastJoinLinkKey
+import dev.vxs.frostsoulx.constants.TogetherRequireHostApprovalToJoinKey
+import dev.vxs.frostsoulx.constants.TogetherWelcomeShownKey
+import dev.vxs.frostsoulx.playback.MusicService
+import dev.vxs.frostsoulx.utils.dataStore
 import javax.inject.Inject
 import javax.inject.Singleton
 

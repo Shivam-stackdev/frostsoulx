@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube
+package dev.vxs.frostsoulx.innertube
 
 import io.ktor.client.*
 import io.ktor.client.call.body
@@ -21,16 +21,16 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.innertube.models.Context
-import moe.rukamori.archivetune.innertube.models.MediaInfo
-import moe.rukamori.archivetune.innertube.models.ReturnYouTubeDislikeResponse
-import moe.rukamori.archivetune.innertube.models.YouTubeClient
-import moe.rukamori.archivetune.innertube.models.YouTubeLocale
-import moe.rukamori.archivetune.innertube.models.body.*
-import moe.rukamori.archivetune.innertube.models.response.NextResponse
-import moe.rukamori.archivetune.innertube.proxy.RotatingProxySelector
-import moe.rukamori.archivetune.innertube.utils.sha1
-import moe.rukamori.archivetune.innertube.utils.youtubeLoginCookieValue
+import dev.vxs.frostsoulx.innertube.models.Context
+import dev.vxs.frostsoulx.innertube.models.MediaInfo
+import dev.vxs.frostsoulx.innertube.models.ReturnYouTubeDislikeResponse
+import dev.vxs.frostsoulx.innertube.models.YouTubeClient
+import dev.vxs.frostsoulx.innertube.models.YouTubeLocale
+import dev.vxs.frostsoulx.innertube.models.body.*
+import dev.vxs.frostsoulx.innertube.models.response.NextResponse
+import dev.vxs.frostsoulx.innertube.proxy.RotatingProxySelector
+import dev.vxs.frostsoulx.innertube.utils.sha1
+import dev.vxs.frostsoulx.innertube.utils.youtubeLoginCookieValue
 import okhttp3.Dns
 import java.io.IOException
 import java.net.Proxy

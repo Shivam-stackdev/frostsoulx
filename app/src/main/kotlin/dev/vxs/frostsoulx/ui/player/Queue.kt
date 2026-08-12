@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.annotation.SuppressLint
 import android.view.ViewTreeObserver
@@ -97,34 +97,34 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.AutoLoadMoreKey
-import moe.rukamori.archivetune.constants.EnableHapticFeedbackKey
-import moe.rukamori.archivetune.constants.ListItemHeight
-import moe.rukamori.archivetune.constants.PlayerDesignStyle
-import moe.rukamori.archivetune.constants.PlayerDesignStyleKey
-import moe.rukamori.archivetune.constants.QueueEditLockKey
-import moe.rukamori.archivetune.db.entities.PlaylistEntity
-import moe.rukamori.archivetune.db.entities.PlaylistSongMap
-import moe.rukamori.archivetune.extensions.metadata
-import moe.rukamori.archivetune.extensions.move
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.extensions.toggleRepeatMode
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.ui.component.BottomSheet
-import moe.rukamori.archivetune.ui.component.BottomSheetState
-import moe.rukamori.archivetune.ui.component.LocalBottomSheetPageState
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.MediaMetadataListItem
-import moe.rukamori.archivetune.ui.component.TextFieldDialog
-import moe.rukamori.archivetune.ui.menu.AddToPlaylistDialog
-import moe.rukamori.archivetune.ui.menu.PlayerMenu
-import moe.rukamori.archivetune.ui.utils.ShowMediaInfo
-import moe.rukamori.archivetune.utils.oem.SystemMediaControlResolver
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.AutoLoadMoreKey
+import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.constants.ListItemHeight
+import dev.vxs.frostsoulx.constants.PlayerDesignStyle
+import dev.vxs.frostsoulx.constants.PlayerDesignStyleKey
+import dev.vxs.frostsoulx.constants.QueueEditLockKey
+import dev.vxs.frostsoulx.db.entities.PlaylistEntity
+import dev.vxs.frostsoulx.db.entities.PlaylistSongMap
+import dev.vxs.frostsoulx.extensions.metadata
+import dev.vxs.frostsoulx.extensions.move
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.extensions.toggleRepeatMode
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.ui.component.BottomSheet
+import dev.vxs.frostsoulx.ui.component.BottomSheetState
+import dev.vxs.frostsoulx.ui.component.LocalBottomSheetPageState
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.MediaMetadataListItem
+import dev.vxs.frostsoulx.ui.component.TextFieldDialog
+import dev.vxs.frostsoulx.ui.menu.AddToPlaylistDialog
+import dev.vxs.frostsoulx.ui.menu.PlayerMenu
+import dev.vxs.frostsoulx.ui.utils.ShowMediaInfo
+import dev.vxs.frostsoulx.utils.oem.SystemMediaControlResolver
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.time.LocalDateTime
@@ -185,8 +185,8 @@ fun Queue(
     val infiniteQueueLoading by playerConnection.service.infiniteQueueLoading.collectAsState()
     val togetherSessionState by playerConnection.service.togetherSessionState.collectAsState()
     val togetherForcesLock =
-        togetherSessionState is moe.rukamori.archivetune.together.TogetherSessionState.Joined &&
-            (togetherSessionState as moe.rukamori.archivetune.together.TogetherSessionState.Joined).role is moe.rukamori.archivetune.together.TogetherRole.Guest
+        togetherSessionState is dev.vxs.frostsoulx.together.TogetherSessionState.Joined &&
+            (togetherSessionState as dev.vxs.frostsoulx.together.TogetherSessionState.Joined).role is dev.vxs.frostsoulx.together.TogetherRole.Guest
     val effectiveLocked = locked || togetherForcesLock
 
     val playerDesignStyle by rememberEnumPreference(
@@ -1056,8 +1056,8 @@ fun Queue(
                                                                 playerConnection.player.togglePlayPause()
                                                             } else {
                                                                 val joined =
-                                                                    togetherSessionState as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-                                                                val isGuest = joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest
+                                                                    togetherSessionState as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+                                                                val isGuest = joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest
                                                                 if (isGuest) {
                                                                     if (joined?.roomState?.settings?.allowGuestsToControlPlayback != true) {
                                                                         Toast
@@ -1080,7 +1080,7 @@ fun Queue(
                                                                             Toast.LENGTH_SHORT,
                                                                         ).show()
                                                                     playerConnection.service.requestTogetherControl(
-                                                                        moe.rukamori.archivetune.together.ControlAction.SeekToTrack(
+                                                                        dev.vxs.frostsoulx.together.ControlAction.SeekToTrack(
                                                                             trackId = trackId,
                                                                             positionMs = 0L,
                                                                         ),

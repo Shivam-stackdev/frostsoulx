@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.spotify
+package dev.vxs.frostsoulx.spotify
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -37,21 +37,21 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
-import moe.rukamori.archivetune.spotify.models.SpotifyAlbum
-import moe.rukamori.archivetune.spotify.models.SpotifyArtist
-import moe.rukamori.archivetune.spotify.models.SpotifyImage
-import moe.rukamori.archivetune.spotify.models.SpotifyPaging
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylist
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylistOwner
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylistTrack
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylistTracksRef
-import moe.rukamori.archivetune.spotify.models.SpotifyRecommendations
-import moe.rukamori.archivetune.spotify.models.SpotifySavedTrack
-import moe.rukamori.archivetune.spotify.models.SpotifySearchResult
-import moe.rukamori.archivetune.spotify.models.SpotifySimpleAlbum
-import moe.rukamori.archivetune.spotify.models.SpotifySimpleArtist
-import moe.rukamori.archivetune.spotify.models.SpotifyTrack
-import moe.rukamori.archivetune.spotify.models.SpotifyUser
+import dev.vxs.frostsoulx.spotify.models.SpotifyAlbum
+import dev.vxs.frostsoulx.spotify.models.SpotifyArtist
+import dev.vxs.frostsoulx.spotify.models.SpotifyImage
+import dev.vxs.frostsoulx.spotify.models.SpotifyPaging
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylist
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylistOwner
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylistTrack
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylistTracksRef
+import dev.vxs.frostsoulx.spotify.models.SpotifyRecommendations
+import dev.vxs.frostsoulx.spotify.models.SpotifySavedTrack
+import dev.vxs.frostsoulx.spotify.models.SpotifySearchResult
+import dev.vxs.frostsoulx.spotify.models.SpotifySimpleAlbum
+import dev.vxs.frostsoulx.spotify.models.SpotifySimpleArtist
+import dev.vxs.frostsoulx.spotify.models.SpotifyTrack
+import dev.vxs.frostsoulx.spotify.models.SpotifyUser
 
 /**
  * Spotify API client that uses the internal GraphQL API (api-partner.spotify.com)
@@ -553,7 +553,7 @@ object Spotify {
         folderUri: String? = null,
         limit: Int = 50,
         offset: Int = 0,
-    ): Result<SpotifyPaging<moe.rukamori.archivetune.spotify.models.SpotifyLibraryItem>> =
+    ): Result<SpotifyPaging<dev.vxs.frostsoulx.spotify.models.SpotifyLibraryItem>> =
         runCatching {
             val vars =
                 buildJsonObject {
@@ -610,7 +610,7 @@ object Spotify {
                         typeName == "PlaylistResponseWrapper" || typeName.contains("Playlist", ignoreCase = true) -> {
                             parsePlaylistWrapper(wrapper)
                                 ?.let {
-                                    moe.rukamori.archivetune.spotify.models.SpotifyLibraryItem
+                                    dev.vxs.frostsoulx.spotify.models.SpotifyLibraryItem
                                         .Playlist(it)
                                 }
                         }
@@ -618,7 +618,7 @@ object Spotify {
                         typeName == "FolderResponseWrapper" || typeName.contains("Folder", ignoreCase = true) -> {
                             parseFolderWrapper(wrapper)
                                 ?.let {
-                                    moe.rukamori.archivetune.spotify.models.SpotifyLibraryItem
+                                    dev.vxs.frostsoulx.spotify.models.SpotifyLibraryItem
                                         .Folder(it)
                                 }
                                 ?: run {
@@ -682,7 +682,7 @@ object Spotify {
             ?: data.int("trackCount")
             ?: data.int("numTracks")
 
-    private fun parseFolderWrapper(wrapper: JsonObject): moe.rukamori.archivetune.spotify.models.SpotifyLibraryFolder? {
+    private fun parseFolderWrapper(wrapper: JsonObject): dev.vxs.frostsoulx.spotify.models.SpotifyLibraryFolder? {
         val uri = wrapper.str("_uri") ?: return null
         // Spotify has shipped this object under several shapes over time; the name
         // and child count have lived in `data` and at the root of the wrapper.
@@ -696,7 +696,7 @@ object Spotify {
                 ?: wrapper.obj("data")?.int("numberOfItems")
                 ?: wrapper.int("totalLength")
                 ?: 0
-        return moe.rukamori.archivetune.spotify.models.SpotifyLibraryFolder(
+        return dev.vxs.frostsoulx.spotify.models.SpotifyLibraryFolder(
             uri = uri,
             name = name,
             totalChildren = total,
@@ -1348,7 +1348,7 @@ object Spotify {
             java.util.TimeZone
                 .getDefault()
                 .id,
-    ): Result<moe.rukamori.archivetune.spotify.models.SpotifyHomeFeed> =
+    ): Result<dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeed> =
         runCatching {
             log("D", "spotifyHome: GQL home() request — timeZone=$timeZone limit=$sectionItemsLimit")
             val vars =
@@ -1384,7 +1384,7 @@ object Spotify {
                     ?.arr("items")
                     ?: run {
                         log("W", "spotifyHome: no sectionContainer.sections.items in response")
-                        return@runCatching moe.rukamori.archivetune.spotify.models.SpotifyHomeFeed(
+                        return@runCatching dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeed(
                             greeting = greeting,
                             sections = emptyList(),
                         )
@@ -1397,13 +1397,13 @@ object Spotify {
                 }
             log("D", "spotifyHome: parsed ${sections.size}/${sectionElements.size} sections successfully")
 
-            moe.rukamori.archivetune.spotify.models.SpotifyHomeFeed(
+            dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeed(
                 greeting = greeting,
                 sections = sections,
             )
         }
 
-    private fun parseHomeSection(sectionObj: JsonObject): moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedSection? {
+    private fun parseHomeSection(sectionObj: JsonObject): dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedSection? {
         val sectionData = sectionObj.obj("data") ?: return null
         val typename = sectionData.str("__typename") ?: return null
         val titleObj = sectionData.obj("title")
@@ -1423,7 +1423,7 @@ object Spotify {
 
         if (items.isEmpty()) return null
 
-        return moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedSection(
+        return dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedSection(
             sectionUri = sectionObj.str("uri") ?: "",
             title = title,
             typename = typename,
@@ -1432,7 +1432,7 @@ object Spotify {
         )
     }
 
-    private fun parseHomeItem(itemObj: JsonObject): moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedItem? {
+    private fun parseHomeItem(itemObj: JsonObject): dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedItem? {
         val content = itemObj.obj("content") ?: return null
         val wrapper = content.str("__typename") ?: return null
         val data = content.obj("data") ?: return null
@@ -1445,7 +1445,7 @@ object Spotify {
         }
     }
 
-    private fun parseHomePlaylist(data: JsonObject): moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedItem.Playlist? {
+    private fun parseHomePlaylist(data: JsonObject): dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedItem.Playlist? {
         val uri = data.str("uri") ?: return null
         val imageItem =
             data
@@ -1467,7 +1467,7 @@ object Spotify {
                 ?.jsonObject
                 ?.str("value")
 
-        return moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedItem.Playlist(
+        return dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedItem.Playlist(
             uri = uri,
             id = uri.substringAfterLast(":"),
             name = data.str("name") ?: "",
@@ -1481,7 +1481,7 @@ object Spotify {
         )
     }
 
-    private fun parseHomeAlbum(data: JsonObject): moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedItem.Album? {
+    private fun parseHomeAlbum(data: JsonObject): dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedItem.Album? {
         val uri = data.str("uri") ?: return null
         val artists =
             data.obj("artists")?.arr("items")?.mapNotNull {
@@ -1495,7 +1495,7 @@ object Spotify {
                 ?.jsonObject
                 ?.str("url")
 
-        return moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedItem.Album(
+        return dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedItem.Album(
             uri = uri,
             id = uri.substringAfterLast(":"),
             name = data.str("name") ?: "",
@@ -1505,7 +1505,7 @@ object Spotify {
         )
     }
 
-    private fun parseHomeArtist(data: JsonObject): moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedItem.Artist? {
+    private fun parseHomeArtist(data: JsonObject): dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedItem.Artist? {
         val uri = data.str("uri") ?: return null
         val profile = data.obj("profile")
         val imageUrl =
@@ -1516,7 +1516,7 @@ object Spotify {
                 ?.firstOrNull()
                 ?.jsonObject
                 ?.str("url")
-        return moe.rukamori.archivetune.spotify.models.SpotifyHomeFeedItem.Artist(
+        return dev.vxs.frostsoulx.spotify.models.SpotifyHomeFeedItem.Artist(
             uri = uri,
             id = uri.substringAfterLast(":"),
             name = profile?.str("name") ?: "",

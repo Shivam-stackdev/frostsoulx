@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.library
+package dev.vxs.frostsoulx.ui.screens.library
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -66,18 +66,18 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.AppBarHeight
-import moe.rukamori.archivetune.constants.ChipSortTypeKey
-import moe.rukamori.archivetune.constants.DisableBlurKey
-import moe.rukamori.archivetune.constants.LibraryFilter
-import moe.rukamori.archivetune.constants.ShowSpotifyPlaylistsKey
-import moe.rukamori.archivetune.constants.ShowTagsInLibraryKey
-import moe.rukamori.archivetune.db.entities.TagEntity
-import moe.rukamori.archivetune.ui.component.TagsManagementDialog
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.AppBarHeight
+import dev.vxs.frostsoulx.constants.ChipSortTypeKey
+import dev.vxs.frostsoulx.constants.DisableBlurKey
+import dev.vxs.frostsoulx.constants.LibraryFilter
+import dev.vxs.frostsoulx.constants.ShowSpotifyPlaylistsKey
+import dev.vxs.frostsoulx.constants.ShowTagsInLibraryKey
+import dev.vxs.frostsoulx.db.entities.TagEntity
+import dev.vxs.frostsoulx.ui.component.TagsManagementDialog
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
 
 internal val LibraryHeaderContentPadding = 64.dp
 internal val LibraryPullToRefreshIndicatorOffset = 0.dp

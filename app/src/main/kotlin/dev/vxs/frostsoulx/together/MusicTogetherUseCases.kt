@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.together
+package dev.vxs.frostsoulx.together
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import moe.rukamori.archivetune.playback.MusicService
+import dev.vxs.frostsoulx.playback.MusicService
 import javax.inject.Inject
 
 class AttachMusicTogetherServiceUseCase

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.together
+package dev.vxs.frostsoulx.together
 
 import androidx.compose.runtime.Immutable
 import io.ktor.client.HttpClient
@@ -42,11 +42,11 @@ sealed interface TogetherClientEvent {
     ) : TogetherClientEvent
 
     data class JoinDecision(
-        val decision: moe.rukamori.archivetune.together.JoinDecision,
+        val decision: dev.vxs.frostsoulx.together.JoinDecision,
     ) : TogetherClientEvent
 
     data class HostTransferred(
-        val transfer: moe.rukamori.archivetune.together.HostTransferred,
+        val transfer: dev.vxs.frostsoulx.together.HostTransferred,
     ) : TogetherClientEvent
 
     data class ControlRequested(
@@ -68,7 +68,7 @@ sealed interface TogetherClientEvent {
     ) : TogetherClientEvent
 
     data class HeartbeatPong(
-        val pong: moe.rukamori.archivetune.together.HeartbeatPong,
+        val pong: dev.vxs.frostsoulx.together.HeartbeatPong,
         val receivedAtElapsedRealtimeMs: Long,
     ) : TogetherClientEvent
 
@@ -397,13 +397,13 @@ class TogetherClient(
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.JoinDecision -> {
+                            is dev.vxs.frostsoulx.together.JoinDecision -> {
                                 if (message.sessionId == sessionId && message.participantId == selfParticipantId) {
                                     _events.tryEmit(TogetherClientEvent.JoinDecision(message))
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.HostTransferred -> {
+                            is dev.vxs.frostsoulx.together.HostTransferred -> {
                                 if (message.sessionId == sessionId) {
                                     _events.tryEmit(TogetherClientEvent.HostTransferred(message))
                                 }

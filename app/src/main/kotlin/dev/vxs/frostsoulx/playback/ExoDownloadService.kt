@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -22,7 +22,7 @@ import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
 import dagger.hilt.android.AndroidEntryPoint
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 import javax.inject.Inject
 
 @AndroidEntryPoint

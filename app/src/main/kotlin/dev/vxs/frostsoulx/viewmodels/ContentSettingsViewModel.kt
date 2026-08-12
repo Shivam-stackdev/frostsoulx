@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -25,15 +25,15 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.aicontentfilter.AiContentFilterRefreshResult
-import moe.rukamori.archivetune.aicontentfilter.ObserveAiContentFilterUseCase
-import moe.rukamori.archivetune.aicontentfilter.RefreshAiContentFilterUseCase
-import moe.rukamori.archivetune.aicontentfilter.UpdateAiContentFilterSettingsUseCase
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.lyrics.LyricsHelper
-import moe.rukamori.archivetune.paxsenix.PaxsenixLyrics
-import moe.rukamori.archivetune.paxsenix.models.PaxsenixStats
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.aicontentfilter.AiContentFilterRefreshResult
+import dev.vxs.frostsoulx.aicontentfilter.ObserveAiContentFilterUseCase
+import dev.vxs.frostsoulx.aicontentfilter.RefreshAiContentFilterUseCase
+import dev.vxs.frostsoulx.aicontentfilter.UpdateAiContentFilterSettingsUseCase
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.lyrics.LyricsHelper
+import dev.vxs.frostsoulx.paxsenix.PaxsenixLyrics
+import dev.vxs.frostsoulx.paxsenix.models.PaxsenixStats
 import javax.inject.Inject
 
 sealed interface PaxsenixStatsState {

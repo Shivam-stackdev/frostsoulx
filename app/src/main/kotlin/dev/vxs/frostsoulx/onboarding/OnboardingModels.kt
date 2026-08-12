@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.onboarding
+package dev.vxs.frostsoulx.onboarding
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

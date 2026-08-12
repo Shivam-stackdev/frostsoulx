@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
@@ -29,7 +29,7 @@ import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.image.network.OkHttpNetworkSchemeHandler
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.simple.ext.SimpleExtPlugin
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 
 @Composable
 fun MarkdownText(

@@ -5,22 +5,22 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.Album
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.Artist
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.MusicCardShelfRenderer
-import moe.rukamori.archivetune.innertube.models.MusicResponsiveListItemRenderer
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.YTItem
-import moe.rukamori.archivetune.innertube.models.filterExplicit
-import moe.rukamori.archivetune.innertube.models.filterVideo
-import moe.rukamori.archivetune.innertube.models.oddElements
-import moe.rukamori.archivetune.innertube.models.splitBySeparator
-import moe.rukamori.archivetune.innertube.utils.parseTime
+import dev.vxs.frostsoulx.innertube.models.Album
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.Artist
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.MusicCardShelfRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicResponsiveListItemRenderer
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.YTItem
+import dev.vxs.frostsoulx.innertube.models.filterExplicit
+import dev.vxs.frostsoulx.innertube.models.filterVideo
+import dev.vxs.frostsoulx.innertube.models.oddElements
+import dev.vxs.frostsoulx.innertube.models.splitBySeparator
+import dev.vxs.frostsoulx.innertube.utils.parseTime
 
 data class SearchSummary(
     val title: String,

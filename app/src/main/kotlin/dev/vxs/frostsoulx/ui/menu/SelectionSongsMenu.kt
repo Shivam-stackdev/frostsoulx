@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.menu
+package dev.vxs.frostsoulx.ui.menu
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
@@ -56,24 +56,24 @@ import androidx.media3.exoplayer.offline.DownloadService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalDownloadUtil
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.LocalSyncUtils
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.db.entities.PlaylistSongMap
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.playback.ExoDownloadService
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.DefaultDialog
-import moe.rukamori.archivetune.ui.component.MenuSurfaceSection
-import moe.rukamori.archivetune.ui.component.NewAction
-import moe.rukamori.archivetune.ui.component.NewActionGrid
-import moe.rukamori.archivetune.ui.utils.HeaderDownloadItem
-import moe.rukamori.archivetune.ui.utils.sendAddMissingDownloads
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalDownloadUtil
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.LocalSyncUtils
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.db.entities.PlaylistSongMap
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.playback.ExoDownloadService
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.DefaultDialog
+import dev.vxs.frostsoulx.ui.component.MenuSurfaceSection
+import dev.vxs.frostsoulx.ui.component.NewAction
+import dev.vxs.frostsoulx.ui.component.NewActionGrid
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadItem
+import dev.vxs.frostsoulx.ui.utils.sendAddMissingDownloads
 import java.time.LocalDateTime
 
 @SuppressLint("MutableCollectionMutableState")
@@ -358,7 +358,7 @@ fun SelectionSongMenu(
                                     val shouldAdd = !allInLibrary
                                     val now = LocalDateTime.now()
                                     val failed = LinkedHashSet<String>()
-                                    val updatedSongs = ArrayList<moe.rukamori.archivetune.db.entities.SongEntity>()
+                                    val updatedSongs = ArrayList<dev.vxs.frostsoulx.db.entities.SongEntity>()
                                     for (song in songSelection.asSequence().map { it.song }.distinctBy { it.id }) {
                                         val remoteResult = YouTube.likeVideo(song.id, shouldAdd)
                                         if (remoteResult.isFailure) {

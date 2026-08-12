@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lyrics
+package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
 import android.util.Log
@@ -19,15 +19,15 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.constants.LyricsProviderOrderKey
-import moe.rukamori.archivetune.constants.PreferredLyricsProvider
-import moe.rukamori.archivetune.constants.deserializeLyricsProviderOrder
-import moe.rukamori.archivetune.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.utils.GlobalLog
-import moe.rukamori.archivetune.utils.NetworkConnectivityObserver
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.constants.LyricsProviderOrderKey
+import dev.vxs.frostsoulx.constants.PreferredLyricsProvider
+import dev.vxs.frostsoulx.constants.deserializeLyricsProviderOrder
+import dev.vxs.frostsoulx.db.entities.LyricsEntity.Companion.LYRICS_NOT_FOUND
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.utils.GlobalLog
+import dev.vxs.frostsoulx.utils.NetworkConnectivityObserver
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 class LyricsHelper

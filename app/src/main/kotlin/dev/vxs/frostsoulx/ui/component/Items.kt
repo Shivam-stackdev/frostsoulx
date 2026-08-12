@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import android.widget.Toast
 import androidx.annotation.DrawableRes
@@ -105,41 +105,41 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalDownloadUtil
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.CropThumbnailToSquareKey
-import moe.rukamori.archivetune.constants.GridThumbnailCornerRadius
-import moe.rukamori.archivetune.constants.GridThumbnailHeight
-import moe.rukamori.archivetune.constants.ListItemHeight
-import moe.rukamori.archivetune.constants.ListThumbnailSize
-import moe.rukamori.archivetune.constants.SwipeToSongKey
-import moe.rukamori.archivetune.constants.ThumbnailCornerRadius
-import moe.rukamori.archivetune.db.entities.Album
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.YTItem
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.playback.queues.LocalAlbumRadio
-import moe.rukamori.archivetune.ui.theme.PlayerColorExtractor
-import moe.rukamori.archivetune.ui.theme.extractThemeColor
-import moe.rukamori.archivetune.ui.utils.YtimgResizePolicy
-import moe.rukamori.archivetune.ui.utils.getNextFallbackUrl
-import moe.rukamori.archivetune.ui.utils.preferredThumbnailRatio
-import moe.rukamori.archivetune.ui.utils.resize
-import moe.rukamori.archivetune.ui.utils.thumbnailSourceRatio
-import moe.rukamori.archivetune.utils.joinByBullet
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalDownloadUtil
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.CropThumbnailToSquareKey
+import dev.vxs.frostsoulx.constants.GridThumbnailCornerRadius
+import dev.vxs.frostsoulx.constants.GridThumbnailHeight
+import dev.vxs.frostsoulx.constants.ListItemHeight
+import dev.vxs.frostsoulx.constants.ListThumbnailSize
+import dev.vxs.frostsoulx.constants.SwipeToSongKey
+import dev.vxs.frostsoulx.constants.ThumbnailCornerRadius
+import dev.vxs.frostsoulx.db.entities.Album
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.YTItem
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.playback.queues.LocalAlbumRadio
+import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
+import dev.vxs.frostsoulx.ui.theme.extractThemeColor
+import dev.vxs.frostsoulx.ui.utils.YtimgResizePolicy
+import dev.vxs.frostsoulx.ui.utils.getNextFallbackUrl
+import dev.vxs.frostsoulx.ui.utils.preferredThumbnailRatio
+import dev.vxs.frostsoulx.ui.utils.resize
+import dev.vxs.frostsoulx.ui.utils.thumbnailSourceRatio
+import dev.vxs.frostsoulx.utils.joinByBullet
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.utils.reportException
 import kotlin.math.roundToInt
 
 const val ActiveBoxAlpha = 0.6f

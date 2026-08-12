@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
@@ -17,9 +17,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.search.LoadSearchDiscoveryUseCase
-import moe.rukamori.archivetune.search.SearchDiscoveryUiModel
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.search.LoadSearchDiscoveryUseCase
+import dev.vxs.frostsoulx.search.SearchDiscoveryUiModel
 import javax.inject.Inject
 
 sealed interface SearchDiscoveryScreenState {

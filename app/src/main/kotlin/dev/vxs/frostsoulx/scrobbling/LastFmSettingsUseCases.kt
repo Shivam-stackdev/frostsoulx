@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.scrobbling
+package dev.vxs.frostsoulx.scrobbling
 
 import kotlinx.coroutines.flow.Flow
-import moe.rukamori.archivetune.constants.LastFmProvider
-import moe.rukamori.archivetune.lastfm.models.Authentication
+import dev.vxs.frostsoulx.constants.LastFmProvider
+import dev.vxs.frostsoulx.lastfm.models.Authentication
 import javax.inject.Inject
 
 class ObserveLastFmSettingsUseCase

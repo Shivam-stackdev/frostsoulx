@@ -5,23 +5,23 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.Album
-import moe.rukamori.archivetune.innertube.models.AlbumItem
-import moe.rukamori.archivetune.innertube.models.Artist
-import moe.rukamori.archivetune.innertube.models.ArtistItem
-import moe.rukamori.archivetune.innertube.models.BrowseEndpoint
-import moe.rukamori.archivetune.innertube.models.MusicCarouselShelfRenderer
-import moe.rukamori.archivetune.innertube.models.MusicResponsiveListItemRenderer
-import moe.rukamori.archivetune.innertube.models.MusicShelfRenderer
-import moe.rukamori.archivetune.innertube.models.MusicTwoRowItemRenderer
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.SectionListRenderer
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.YTItem
-import moe.rukamori.archivetune.innertube.models.getItems
-import moe.rukamori.archivetune.innertube.models.oddElements
+import dev.vxs.frostsoulx.innertube.models.Album
+import dev.vxs.frostsoulx.innertube.models.AlbumItem
+import dev.vxs.frostsoulx.innertube.models.Artist
+import dev.vxs.frostsoulx.innertube.models.ArtistItem
+import dev.vxs.frostsoulx.innertube.models.BrowseEndpoint
+import dev.vxs.frostsoulx.innertube.models.MusicCarouselShelfRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicResponsiveListItemRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicShelfRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicTwoRowItemRenderer
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.SectionListRenderer
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.YTItem
+import dev.vxs.frostsoulx.innertube.models.getItems
+import dev.vxs.frostsoulx.innertube.models.oddElements
 
 enum class ArtistSectionLayout {
     LIST,

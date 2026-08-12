@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
@@ -74,16 +74,16 @@ import androidx.media3.common.Player
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.EnableHapticFeedbackKey
-import moe.rukamori.archivetune.constants.MiniPlayerHeight
-import moe.rukamori.archivetune.constants.NavigationBarHorizontalPadding
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.playback.PlayerConnection
-import moe.rukamori.archivetune.together.isConnectedToSession
-import moe.rukamori.archivetune.utils.rememberLowDataModeActive
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.constants.MiniPlayerHeight
+import dev.vxs.frostsoulx.constants.NavigationBarHorizontalPadding
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.playback.PlayerConnection
+import dev.vxs.frostsoulx.together.isConnectedToSession
+import dev.vxs.frostsoulx.utils.rememberLowDataModeActive
+import dev.vxs.frostsoulx.utils.rememberPreference
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 

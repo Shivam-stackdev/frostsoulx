@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.cast
+package dev.vxs.frostsoulx.cast
 
 class ObserveCastStateUseCase(
     private val repository: CastPlaybackRepository,

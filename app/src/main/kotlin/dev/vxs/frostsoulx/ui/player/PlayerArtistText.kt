@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material3.Text
@@ -22,7 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import moe.rukamori.archivetune.models.MediaMetadata
+import dev.vxs.frostsoulx.models.MediaMetadata
 
 /**
  * Renders a comma-separated artist line where **each artist name is individually tappable**.

@@ -5,14 +5,14 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.cast
+package dev.vxs.frostsoulx.cast
 
 import android.content.Context
 import com.google.android.gms.cast.CastMediaControlIntent
 import com.google.android.gms.cast.framework.CastOptions
 import com.google.android.gms.cast.framework.OptionsProvider
 import com.google.android.gms.cast.framework.SessionProvider
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 
 class ArchiveTuneCastOptionsProvider : OptionsProvider {
     override fun getCastOptions(context: Context): CastOptions {

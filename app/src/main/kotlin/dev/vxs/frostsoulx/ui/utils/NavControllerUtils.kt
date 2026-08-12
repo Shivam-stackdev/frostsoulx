@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.utils
+package dev.vxs.frostsoulx.ui.utils
 
 import androidx.navigation.NavController
-import moe.rukamori.archivetune.ui.screens.Screens
+import dev.vxs.frostsoulx.ui.screens.Screens
 
 fun NavController.backToMain() {
     val mainRoutes = Screens.MainScreens.map { it.route }

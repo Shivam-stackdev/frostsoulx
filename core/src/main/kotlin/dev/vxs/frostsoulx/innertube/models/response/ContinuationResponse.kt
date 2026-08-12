@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.models.response
+package dev.vxs.frostsoulx.innertube.models.response
 
 import kotlinx.serialization.Serializable
-import moe.rukamori.archivetune.innertube.models.MusicShelfRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicShelfRenderer
 
 @Serializable
 data class ContinuationResponse(

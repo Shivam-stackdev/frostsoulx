@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
@@ -91,9 +91,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.HISTORY_DURATION_DEFAULT
-import moe.rukamori.archivetune.constants.HISTORY_DURATION_RANGE
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.HISTORY_DURATION_DEFAULT
+import dev.vxs.frostsoulx.constants.HISTORY_DURATION_RANGE
 import kotlin.math.roundToInt
 
 val LocalPreferenceInGroup = compositionLocalOf { false }

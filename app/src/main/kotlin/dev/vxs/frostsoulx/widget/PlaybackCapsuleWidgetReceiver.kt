@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.widget
+package dev.vxs.frostsoulx.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.Context

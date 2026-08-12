@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.storage
+package dev.vxs.frostsoulx.storage
 
 import android.content.Context
 import android.content.Intent
@@ -29,22 +29,22 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.constants.GitHubContributorsEtagKey
-import moe.rukamori.archivetune.constants.GitHubContributorsJsonKey
-import moe.rukamori.archivetune.constants.GitHubContributorsLastCheckedAtKey
-import moe.rukamori.archivetune.constants.GitHubTranslationContributorsJsonKey
-import moe.rukamori.archivetune.constants.GitHubTranslationContributorsLastCheckedAtKey
-import moe.rukamori.archivetune.constants.StorageFolderDisplayNameKey
-import moe.rukamori.archivetune.constants.StorageFolderIdKey
-import moe.rukamori.archivetune.constants.StorageFolderPathKey
-import moe.rukamori.archivetune.constants.StorageFolderTreeUriKey
-import moe.rukamori.archivetune.di.DownloadCache
-import moe.rukamori.archivetune.di.PlayerCache
-import moe.rukamori.archivetune.playback.DownloadUtil
-import moe.rukamori.archivetune.ui.player.CanvasArtworkPlaybackCache
-import moe.rukamori.archivetune.utils.ArtworkStorage
-import moe.rukamori.archivetune.utils.PreferenceStore
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.constants.GitHubContributorsEtagKey
+import dev.vxs.frostsoulx.constants.GitHubContributorsJsonKey
+import dev.vxs.frostsoulx.constants.GitHubContributorsLastCheckedAtKey
+import dev.vxs.frostsoulx.constants.GitHubTranslationContributorsJsonKey
+import dev.vxs.frostsoulx.constants.GitHubTranslationContributorsLastCheckedAtKey
+import dev.vxs.frostsoulx.constants.StorageFolderDisplayNameKey
+import dev.vxs.frostsoulx.constants.StorageFolderIdKey
+import dev.vxs.frostsoulx.constants.StorageFolderPathKey
+import dev.vxs.frostsoulx.constants.StorageFolderTreeUriKey
+import dev.vxs.frostsoulx.di.DownloadCache
+import dev.vxs.frostsoulx.di.PlayerCache
+import dev.vxs.frostsoulx.playback.DownloadUtil
+import dev.vxs.frostsoulx.ui.player.CanvasArtworkPlaybackCache
+import dev.vxs.frostsoulx.utils.ArtworkStorage
+import dev.vxs.frostsoulx.utils.PreferenceStore
+import dev.vxs.frostsoulx.utils.dataStore
 import java.io.File
 import javax.inject.Inject
 

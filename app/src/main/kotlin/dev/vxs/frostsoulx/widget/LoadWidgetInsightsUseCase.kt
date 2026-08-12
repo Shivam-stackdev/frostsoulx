@@ -5,13 +5,13 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.widget
+package dev.vxs.frostsoulx.widget
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.db.entities.Song
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.db.entities.Song
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

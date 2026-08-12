@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.models.NewsItem
-import moe.rukamori.archivetune.repository.NewsRepository
+import dev.vxs.frostsoulx.models.NewsItem
+import dev.vxs.frostsoulx.repository.NewsRepository
 import javax.inject.Inject
 
 sealed interface ViewNewsUiState {

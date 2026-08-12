@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.annotation.DrawableRes
@@ -29,21 +29,21 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.playback.MusicService
-import moe.rukamori.archivetune.together.AttachMusicTogetherServiceUseCase
-import moe.rukamori.archivetune.together.MusicTogetherConnectionMode
-import moe.rukamori.archivetune.together.MusicTogetherPreferences
-import moe.rukamori.archivetune.together.MusicTogetherSessionActionsUseCase
-import moe.rukamori.archivetune.together.MusicTogetherSnapshot
-import moe.rukamori.archivetune.together.ObserveMusicTogetherStateUseCase
-import moe.rukamori.archivetune.together.TogetherLink
-import moe.rukamori.archivetune.together.TogetherRole
-import moe.rukamori.archivetune.together.TogetherRoomSettings
-import moe.rukamori.archivetune.together.TogetherRoomState
-import moe.rukamori.archivetune.together.TogetherSessionState
-import moe.rukamori.archivetune.together.UpdateMusicTogetherPreferencesUseCase
-import moe.rukamori.archivetune.together.isConnectedToSession
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.playback.MusicService
+import dev.vxs.frostsoulx.together.AttachMusicTogetherServiceUseCase
+import dev.vxs.frostsoulx.together.MusicTogetherConnectionMode
+import dev.vxs.frostsoulx.together.MusicTogetherPreferences
+import dev.vxs.frostsoulx.together.MusicTogetherSessionActionsUseCase
+import dev.vxs.frostsoulx.together.MusicTogetherSnapshot
+import dev.vxs.frostsoulx.together.ObserveMusicTogetherStateUseCase
+import dev.vxs.frostsoulx.together.TogetherLink
+import dev.vxs.frostsoulx.together.TogetherRole
+import dev.vxs.frostsoulx.together.TogetherRoomSettings
+import dev.vxs.frostsoulx.together.TogetherRoomState
+import dev.vxs.frostsoulx.together.TogetherSessionState
+import dev.vxs.frostsoulx.together.UpdateMusicTogetherPreferencesUseCase
+import dev.vxs.frostsoulx.together.isConnectedToSession
 import java.text.DateFormat
 import java.util.Date
 import javax.inject.Inject

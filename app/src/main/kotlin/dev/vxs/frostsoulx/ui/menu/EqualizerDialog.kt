@@ -10,7 +10,7 @@
     androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class,
 )
 
-package moe.rukamori.archivetune.ui.menu
+package dev.vxs.frostsoulx.ui.menu
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -89,16 +89,16 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.equalizer.EqualizerControlMode
-import moe.rukamori.archivetune.equalizer.EqualizerTone
-import moe.rukamori.archivetune.viewmodels.EqualizerBandUiModel
-import moe.rukamori.archivetune.viewmodels.EqualizerEffect
-import moe.rukamori.archivetune.viewmodels.EqualizerProfileUiModel
-import moe.rukamori.archivetune.viewmodels.EqualizerScreenState
-import moe.rukamori.archivetune.viewmodels.EqualizerToneUiModel
-import moe.rukamori.archivetune.viewmodels.EqualizerUiModel
-import moe.rukamori.archivetune.viewmodels.EqualizerViewModel
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.equalizer.EqualizerControlMode
+import dev.vxs.frostsoulx.equalizer.EqualizerTone
+import dev.vxs.frostsoulx.viewmodels.EqualizerBandUiModel
+import dev.vxs.frostsoulx.viewmodels.EqualizerEffect
+import dev.vxs.frostsoulx.viewmodels.EqualizerProfileUiModel
+import dev.vxs.frostsoulx.viewmodels.EqualizerScreenState
+import dev.vxs.frostsoulx.viewmodels.EqualizerToneUiModel
+import dev.vxs.frostsoulx.viewmodels.EqualizerUiModel
+import dev.vxs.frostsoulx.viewmodels.EqualizerViewModel
 import kotlin.math.roundToInt
 
 @Composable
@@ -862,7 +862,7 @@ private fun SaveProfileDialog(
 
 @Composable
 private fun ManageProfilesDialog(
-    profiles: moe.rukamori.archivetune.viewmodels.EqualizerProfileUiModels,
+    profiles: dev.vxs.frostsoulx.viewmodels.EqualizerProfileUiModels,
     onApply: (String) -> Unit,
     onDelete: (String) -> Unit,
     onExport: (String) -> Unit,

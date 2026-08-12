@@ -10,7 +10,7 @@
     ExperimentalMaterial3ExpressiveApi::class,
 )
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.app.Activity
 import android.app.ActivityManager
@@ -89,16 +89,16 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.AppIconSortOrder
-import moe.rukamori.archivetune.viewmodels.AppIconUiModel
-import moe.rukamori.archivetune.viewmodels.IconScreenEffect
-import moe.rukamori.archivetune.viewmodels.IconScreenState
-import moe.rukamori.archivetune.viewmodels.IconScreenUiModel
-import moe.rukamori.archivetune.viewmodels.IconViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.AppIconSortOrder
+import dev.vxs.frostsoulx.viewmodels.AppIconUiModel
+import dev.vxs.frostsoulx.viewmodels.IconScreenEffect
+import dev.vxs.frostsoulx.viewmodels.IconScreenState
+import dev.vxs.frostsoulx.viewmodels.IconScreenUiModel
+import dev.vxs.frostsoulx.viewmodels.IconViewModel
 import androidx.compose.material3.IconButton as MaterialIconButton
 
 @Composable

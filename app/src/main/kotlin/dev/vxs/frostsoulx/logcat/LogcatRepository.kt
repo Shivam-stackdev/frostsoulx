@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.logcat
+package dev.vxs.frostsoulx.logcat
 
 import android.content.Context
 import android.net.Uri
@@ -24,8 +24,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.utils.GlobalLog
-import moe.rukamori.archivetune.utils.LogEntry
+import dev.vxs.frostsoulx.utils.GlobalLog
+import dev.vxs.frostsoulx.utils.LogEntry
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException

@@ -5,15 +5,15 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.models.response
+package dev.vxs.frostsoulx.innertube.models.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import moe.rukamori.archivetune.innertube.models.ResponseContext
-import moe.rukamori.archivetune.innertube.models.Thumbnails
+import dev.vxs.frostsoulx.innertube.models.ResponseContext
+import dev.vxs.frostsoulx.innertube.models.Thumbnails
 
 /**
- * PlayerResponse with [moe.rukamori.archivetune.innertube.models.YouTubeClient.WEB_REMIX] client
+ * PlayerResponse with [dev.vxs.frostsoulx.innertube.models.YouTubeClient.WEB_REMIX] client
  */
 @Serializable
 data class PlayerResponse(

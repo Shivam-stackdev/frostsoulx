@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.library
+package dev.vxs.frostsoulx.ui.screens.library
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,11 +38,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ads.presentation.StartIoConsentDialog
-import moe.rukamori.archivetune.ads.presentation.SupportArchiveTuneScreenState
-import moe.rukamori.archivetune.ads.presentation.SupportArchiveTuneUiEvent
-import moe.rukamori.archivetune.ads.presentation.SupportArchiveTuneViewModel
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ads.presentation.StartIoConsentDialog
+import dev.vxs.frostsoulx.ads.presentation.SupportArchiveTuneScreenState
+import dev.vxs.frostsoulx.ads.presentation.SupportArchiveTuneUiEvent
+import dev.vxs.frostsoulx.ads.presentation.SupportArchiveTuneViewModel
 
 internal const val supportArchiveTuneAvailable = true
 

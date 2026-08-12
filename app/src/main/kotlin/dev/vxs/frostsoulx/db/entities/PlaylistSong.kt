@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.db.entities
+package dev.vxs.frostsoulx.db.entities
 
 import androidx.room.Embedded
 import androidx.room.Relation

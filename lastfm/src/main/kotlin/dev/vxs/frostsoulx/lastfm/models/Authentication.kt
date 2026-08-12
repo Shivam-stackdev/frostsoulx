@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lastfm.models
+package dev.vxs.frostsoulx.lastfm.models
 
 import kotlinx.serialization.Serializable
 

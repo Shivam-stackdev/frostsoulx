@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.menu
+package dev.vxs.frostsoulx.ui.menu
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -41,24 +41,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.ArtistSongSortType
-import moe.rukamori.archivetune.constants.SpeedDialSongIdsKey
-import moe.rukamori.archivetune.db.entities.Artist
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.ArtistListItem
-import moe.rukamori.archivetune.ui.component.MenuSurfaceSection
-import moe.rukamori.archivetune.ui.component.NewAction
-import moe.rukamori.archivetune.ui.component.NewActionGrid
-import moe.rukamori.archivetune.utils.SpeedDialPin
-import moe.rukamori.archivetune.utils.SpeedDialPinType
-import moe.rukamori.archivetune.utils.parseSpeedDialPins
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.utils.serializeSpeedDialPins
-import moe.rukamori.archivetune.utils.toggleSpeedDialPin
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.ArtistSongSortType
+import dev.vxs.frostsoulx.constants.SpeedDialSongIdsKey
+import dev.vxs.frostsoulx.db.entities.Artist
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.ArtistListItem
+import dev.vxs.frostsoulx.ui.component.MenuSurfaceSection
+import dev.vxs.frostsoulx.ui.component.NewAction
+import dev.vxs.frostsoulx.ui.component.NewActionGrid
+import dev.vxs.frostsoulx.utils.SpeedDialPin
+import dev.vxs.frostsoulx.utils.SpeedDialPinType
+import dev.vxs.frostsoulx.utils.parseSpeedDialPins
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.utils.serializeSpeedDialPins
+import dev.vxs.frostsoulx.utils.toggleSpeedDialPin
 
 @Composable
 fun ArtistMenu(

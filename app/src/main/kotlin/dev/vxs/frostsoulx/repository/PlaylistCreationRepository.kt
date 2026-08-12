@@ -5,21 +5,21 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.repository
+package dev.vxs.frostsoulx.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.constants.InnerTubeCookieKey
-import moe.rukamori.archivetune.constants.YtmSyncKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.PlaylistEntity
-import moe.rukamori.archivetune.extensions.isInternetConnected
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.utils.hasYouTubeLoginCookie
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.constants.InnerTubeCookieKey
+import dev.vxs.frostsoulx.constants.YtmSyncKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.PlaylistEntity
+import dev.vxs.frostsoulx.extensions.isInternetConnected
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.utils.hasYouTubeLoginCookie
+import dev.vxs.frostsoulx.utils.dataStore
 import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton

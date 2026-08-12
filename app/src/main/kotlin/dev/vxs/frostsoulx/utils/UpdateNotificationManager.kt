@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils
+package dev.vxs.frostsoulx.utils
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -28,15 +28,15 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.MainActivity
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.EnableUpdateNotificationKey
-import moe.rukamori.archivetune.constants.LastNotifiedVersionKey
-import moe.rukamori.archivetune.constants.LastUpdateCheckKey
-import moe.rukamori.archivetune.constants.UpdateChannel
-import moe.rukamori.archivetune.constants.UpdateChannelKey
-import moe.rukamori.archivetune.defaultUpdateChannel
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.MainActivity
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.EnableUpdateNotificationKey
+import dev.vxs.frostsoulx.constants.LastNotifiedVersionKey
+import dev.vxs.frostsoulx.constants.LastUpdateCheckKey
+import dev.vxs.frostsoulx.constants.UpdateChannel
+import dev.vxs.frostsoulx.constants.UpdateChannelKey
+import dev.vxs.frostsoulx.defaultUpdateChannel
 import java.util.concurrent.TimeUnit
 
 object UpdateNotificationManager {

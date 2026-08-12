@@ -5,14 +5,14 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ads
+package dev.vxs.frostsoulx.ads
 
 import android.app.Application
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import moe.rukamori.archivetune.ads.data.StartIoSupportAdRepository
+import dev.vxs.frostsoulx.ads.data.StartIoSupportAdRepository
 
 object SupportAdsInitializer {
     fun initialize(application: Application) {

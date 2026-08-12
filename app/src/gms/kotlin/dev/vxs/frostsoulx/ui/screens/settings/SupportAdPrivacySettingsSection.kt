@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -18,12 +18,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ads.presentation.StartIoConsentDialog
-import moe.rukamori.archivetune.ads.presentation.SupportArchiveTuneUiEvent
-import moe.rukamori.archivetune.ads.presentation.SupportArchiveTuneViewModel
-import moe.rukamori.archivetune.ui.component.PreferenceEntry
-import moe.rukamori.archivetune.ui.component.PreferenceGroup
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ads.presentation.StartIoConsentDialog
+import dev.vxs.frostsoulx.ads.presentation.SupportArchiveTuneUiEvent
+import dev.vxs.frostsoulx.ads.presentation.SupportArchiveTuneViewModel
+import dev.vxs.frostsoulx.ui.component.PreferenceEntry
+import dev.vxs.frostsoulx.ui.component.PreferenceGroup
 
 @Composable
 internal fun SupportAdPrivacySettingsSection(

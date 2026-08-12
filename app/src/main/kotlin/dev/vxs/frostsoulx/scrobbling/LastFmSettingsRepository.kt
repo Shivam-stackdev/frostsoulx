@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.scrobbling
+package dev.vxs.frostsoulx.scrobbling
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
@@ -14,23 +14,23 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.constants.EnableLastFMScrobblingKey
-import moe.rukamori.archivetune.constants.LastFMApiKeyOverrideKey
-import moe.rukamori.archivetune.constants.LastFMCustomEndpointKey
-import moe.rukamori.archivetune.constants.LastFMProviderKey
-import moe.rukamori.archivetune.constants.LastFMSecretOverrideKey
-import moe.rukamori.archivetune.constants.LastFMSessionKey
-import moe.rukamori.archivetune.constants.LastFMUseNowPlaying
-import moe.rukamori.archivetune.constants.LastFMUsernameKey
-import moe.rukamori.archivetune.constants.LastFmProvider
-import moe.rukamori.archivetune.constants.ScrobbleDelayPercentKey
-import moe.rukamori.archivetune.constants.ScrobbleDelaySecondsKey
-import moe.rukamori.archivetune.constants.ScrobbleMinSongDurationKey
-import moe.rukamori.archivetune.extensions.toEnum
-import moe.rukamori.archivetune.lastfm.LastFM
-import moe.rukamori.archivetune.lastfm.models.Authentication
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.constants.EnableLastFMScrobblingKey
+import dev.vxs.frostsoulx.constants.LastFMApiKeyOverrideKey
+import dev.vxs.frostsoulx.constants.LastFMCustomEndpointKey
+import dev.vxs.frostsoulx.constants.LastFMProviderKey
+import dev.vxs.frostsoulx.constants.LastFMSecretOverrideKey
+import dev.vxs.frostsoulx.constants.LastFMSessionKey
+import dev.vxs.frostsoulx.constants.LastFMUseNowPlaying
+import dev.vxs.frostsoulx.constants.LastFMUsernameKey
+import dev.vxs.frostsoulx.constants.LastFmProvider
+import dev.vxs.frostsoulx.constants.ScrobbleDelayPercentKey
+import dev.vxs.frostsoulx.constants.ScrobbleDelaySecondsKey
+import dev.vxs.frostsoulx.constants.ScrobbleMinSongDurationKey
+import dev.vxs.frostsoulx.extensions.toEnum
+import dev.vxs.frostsoulx.lastfm.LastFM
+import dev.vxs.frostsoulx.lastfm.models.Authentication
+import dev.vxs.frostsoulx.utils.dataStore
 import javax.inject.Inject
 import javax.inject.Singleton
 

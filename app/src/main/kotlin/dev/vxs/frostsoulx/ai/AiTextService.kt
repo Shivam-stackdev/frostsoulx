@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ai
+package dev.vxs.frostsoulx.ai
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -16,8 +16,8 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.constants.AiProvider
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.constants.AiProvider
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit

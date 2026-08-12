@@ -5,12 +5,12 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.home
+package dev.vxs.frostsoulx.home
 
 import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import moe.rukamori.archivetune.constants.QuickPicksDisplayMode
+import dev.vxs.frostsoulx.constants.QuickPicksDisplayMode
 import javax.inject.Inject
 
 class ObserveHomePresentationPreferencesUseCase

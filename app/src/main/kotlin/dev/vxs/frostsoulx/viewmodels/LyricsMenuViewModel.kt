@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.annotation.StringRes
@@ -27,29 +27,29 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ai.AiLyricsTranslator
-import moe.rukamori.archivetune.ai.AiServiceConfig
-import moe.rukamori.archivetune.constants.AiApiKeyKey
-import moe.rukamori.archivetune.constants.AiApiValidationStatus
-import moe.rukamori.archivetune.constants.AiApiValidationStatusKey
-import moe.rukamori.archivetune.constants.AiCustomEndpointKey
-import moe.rukamori.archivetune.constants.AiCustomModelKey
-import moe.rukamori.archivetune.constants.AiProvider
-import moe.rukamori.archivetune.constants.AiProviderKey
-import moe.rukamori.archivetune.constants.AiSelectedModelKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.LyricsEntity
-import moe.rukamori.archivetune.extensions.toEnum
-import moe.rukamori.archivetune.lyrics.LyricsHelper
-import moe.rukamori.archivetune.lyrics.LyricsResult
-import moe.rukamori.archivetune.lyrics.LyricsUtils
-import moe.rukamori.archivetune.lyrics.LyricsUtils.displayLyricsText
-import moe.rukamori.archivetune.lyrics.LyricsUtils.isLineSyncedLrc
-import moe.rukamori.archivetune.lyrics.LyricsUtils.isTtml
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.utils.NetworkConnectivityObserver
-import moe.rukamori.archivetune.utils.dataStore
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ai.AiLyricsTranslator
+import dev.vxs.frostsoulx.ai.AiServiceConfig
+import dev.vxs.frostsoulx.constants.AiApiKeyKey
+import dev.vxs.frostsoulx.constants.AiApiValidationStatus
+import dev.vxs.frostsoulx.constants.AiApiValidationStatusKey
+import dev.vxs.frostsoulx.constants.AiCustomEndpointKey
+import dev.vxs.frostsoulx.constants.AiCustomModelKey
+import dev.vxs.frostsoulx.constants.AiProvider
+import dev.vxs.frostsoulx.constants.AiProviderKey
+import dev.vxs.frostsoulx.constants.AiSelectedModelKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.extensions.toEnum
+import dev.vxs.frostsoulx.lyrics.LyricsHelper
+import dev.vxs.frostsoulx.lyrics.LyricsResult
+import dev.vxs.frostsoulx.lyrics.LyricsUtils
+import dev.vxs.frostsoulx.lyrics.LyricsUtils.displayLyricsText
+import dev.vxs.frostsoulx.lyrics.LyricsUtils.isLineSyncedLrc
+import dev.vxs.frostsoulx.lyrics.LyricsUtils.isTtml
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.utils.NetworkConnectivityObserver
+import dev.vxs.frostsoulx.utils.dataStore
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 

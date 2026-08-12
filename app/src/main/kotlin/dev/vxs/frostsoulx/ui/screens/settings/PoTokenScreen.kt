@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.app.Activity
 import android.content.Intent
@@ -73,22 +73,22 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.PoTokenGvsKey
-import moe.rukamori.archivetune.constants.PoTokenPlayerKey
-import moe.rukamori.archivetune.constants.PoTokenSourceUrlKey
-import moe.rukamori.archivetune.constants.VisitorDataKey
-import moe.rukamori.archivetune.constants.WebClientPoTokenEnabledKey
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.component.PreferenceGroup
-import moe.rukamori.archivetune.ui.component.SwitchPreference
-import moe.rukamori.archivetune.ui.utils.appBarScrollBehavior
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.PoTokenEvent
-import moe.rukamori.archivetune.viewmodels.PoTokenState
-import moe.rukamori.archivetune.viewmodels.PoTokenViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.PoTokenGvsKey
+import dev.vxs.frostsoulx.constants.PoTokenPlayerKey
+import dev.vxs.frostsoulx.constants.PoTokenSourceUrlKey
+import dev.vxs.frostsoulx.constants.VisitorDataKey
+import dev.vxs.frostsoulx.constants.WebClientPoTokenEnabledKey
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.component.PreferenceGroup
+import dev.vxs.frostsoulx.ui.component.SwitchPreference
+import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.PoTokenEvent
+import dev.vxs.frostsoulx.viewmodels.PoTokenState
+import dev.vxs.frostsoulx.viewmodels.PoTokenViewModel
 
 const val PO_TOKEN_ROUTE = "settings/po_token"
 

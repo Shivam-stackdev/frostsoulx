@@ -5,15 +5,15 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lyrics
+package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
 import android.util.Log
-import moe.rukamori.archivetune.constants.EnableYouLyPlusLyricsKey
-import moe.rukamori.archivetune.utils.GlobalLog
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
-import moe.rukamori.archivetune.youlyplus.YouLyPlus
+import dev.vxs.frostsoulx.constants.EnableYouLyPlusLyricsKey
+import dev.vxs.frostsoulx.utils.GlobalLog
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.youlyplus.YouLyPlus
 
 object YouLyPlusLyricsProvider : LyricsProvider {
     init {

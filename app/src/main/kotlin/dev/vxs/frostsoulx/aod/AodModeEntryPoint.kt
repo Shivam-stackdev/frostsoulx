@@ -5,6 +5,6 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.aod
+package dev.vxs.frostsoulx.aod
 
-const val ACTION_AOD_MODE = "moe.rukamori.archivetune.action.AOD_MODE"
+const val ACTION_AOD_MODE = "dev.vxs.frostsoulx.action.AOD_MODE"

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.svg
+package dev.vxs.frostsoulx.ui.svg
 
 import android.graphics.Picture
 import androidx.compose.foundation.Canvas
@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import com.caverock.androidsvg.SVG
-import moe.rukamori.archivetune.ui.theme.palette.TonalPalettes
+import dev.vxs.frostsoulx.ui.theme.palette.TonalPalettes
 
 @Composable
 fun DynamicSVGImage(

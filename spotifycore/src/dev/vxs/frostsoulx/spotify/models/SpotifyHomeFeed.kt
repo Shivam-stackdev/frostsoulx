@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.spotify.models
+package dev.vxs.frostsoulx.spotify.models
 
 /**
  * Personalized Spotify home feed returned by the `home` GQL operation.

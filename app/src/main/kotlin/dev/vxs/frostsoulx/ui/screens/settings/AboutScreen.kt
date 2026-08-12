@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -77,25 +77,25 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.utils.appBarScrollBehavior
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.AboutContributorUiCollection
-import moe.rukamori.archivetune.viewmodels.AboutContributorsUiState
-import moe.rukamori.archivetune.viewmodels.AboutDependencyLicenseUiCollection
-import moe.rukamori.archivetune.viewmodels.AboutDependencyLicensesUiState
-import moe.rukamori.archivetune.viewmodels.AboutDialog
-import moe.rukamori.archivetune.viewmodels.AboutLinkCollection
-import moe.rukamori.archivetune.viewmodels.AboutScreenEffect
-import moe.rukamori.archivetune.viewmodels.AboutScreenState
-import moe.rukamori.archivetune.viewmodels.AboutTranslationContributorUiCollection
-import moe.rukamori.archivetune.viewmodels.AboutTranslationContributorsUiState
-import moe.rukamori.archivetune.viewmodels.AboutUiModel
-import moe.rukamori.archivetune.viewmodels.AboutViewModel
-import moe.rukamori.archivetune.viewmodels.TeamMember
-import moe.rukamori.archivetune.viewmodels.TeamMemberCollection
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.AboutContributorUiCollection
+import dev.vxs.frostsoulx.viewmodels.AboutContributorsUiState
+import dev.vxs.frostsoulx.viewmodels.AboutDependencyLicenseUiCollection
+import dev.vxs.frostsoulx.viewmodels.AboutDependencyLicensesUiState
+import dev.vxs.frostsoulx.viewmodels.AboutDialog
+import dev.vxs.frostsoulx.viewmodels.AboutLinkCollection
+import dev.vxs.frostsoulx.viewmodels.AboutScreenEffect
+import dev.vxs.frostsoulx.viewmodels.AboutScreenState
+import dev.vxs.frostsoulx.viewmodels.AboutTranslationContributorUiCollection
+import dev.vxs.frostsoulx.viewmodels.AboutTranslationContributorsUiState
+import dev.vxs.frostsoulx.viewmodels.AboutUiModel
+import dev.vxs.frostsoulx.viewmodels.AboutViewModel
+import dev.vxs.frostsoulx.viewmodels.TeamMember
+import dev.vxs.frostsoulx.viewmodels.TeamMemberCollection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

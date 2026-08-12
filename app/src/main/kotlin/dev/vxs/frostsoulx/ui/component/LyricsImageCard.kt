@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.component
+package dev.vxs.frostsoulx.ui.component
 
 import android.os.Build
 import androidx.compose.foundation.Image
@@ -61,8 +61,8 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ui.theme.rememberArchiveTuneLyricsFontFamily
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.theme.rememberArchiveTuneLyricsFontFamily
 
 @Stable
 private data class LyricsShareColors(

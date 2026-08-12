@@ -5,10 +5,10 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.pages
+package dev.vxs.frostsoulx.innertube.pages
 
-import moe.rukamori.archivetune.innertube.models.MusicResponsiveListItemRenderer.FlexColumn
-import moe.rukamori.archivetune.innertube.models.Run
+import dev.vxs.frostsoulx.innertube.models.MusicResponsiveListItemRenderer.FlexColumn
+import dev.vxs.frostsoulx.innertube.models.Run
 
 object PageHelper {
     fun extractRuns(

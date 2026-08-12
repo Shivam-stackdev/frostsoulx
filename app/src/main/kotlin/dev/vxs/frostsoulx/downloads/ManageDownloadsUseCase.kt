@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.downloads
+package dev.vxs.frostsoulx.downloads
 
 import android.os.SystemClock
 import androidx.compose.runtime.Immutable
@@ -14,9 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.models.toMediaMetadata
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.models.toMediaMetadata
 import javax.inject.Inject
 import kotlin.math.roundToInt
 

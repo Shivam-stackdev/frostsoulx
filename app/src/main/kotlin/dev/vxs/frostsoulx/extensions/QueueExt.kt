@@ -5,18 +5,18 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.extensions
+package dev.vxs.frostsoulx.extensions
 
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.models.PersistQueue
-import moe.rukamori.archivetune.models.QueueData
-import moe.rukamori.archivetune.models.QueueType
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.playback.queues.LocalAlbumRadio
-import moe.rukamori.archivetune.playback.queues.Queue
-import moe.rukamori.archivetune.playback.queues.YouTubeAlbumRadio
-import moe.rukamori.archivetune.playback.queues.YouTubeQueue
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.models.PersistQueue
+import dev.vxs.frostsoulx.models.QueueData
+import dev.vxs.frostsoulx.models.QueueType
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.playback.queues.LocalAlbumRadio
+import dev.vxs.frostsoulx.playback.queues.Queue
+import dev.vxs.frostsoulx.playback.queues.YouTubeAlbumRadio
+import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
 
 fun Queue.toPersistQueue(
     title: String?,

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -22,18 +22,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.BuildConfig
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.about.AboutContributor
-import moe.rukamori.archivetune.about.AboutContributorCollection
-import moe.rukamori.archivetune.about.AboutDependencyLicense
-import moe.rukamori.archivetune.about.AboutDependencyLicenseCollection
-import moe.rukamori.archivetune.about.AboutTranslationContributor
-import moe.rukamori.archivetune.about.AboutTranslationContributorCollection
-import moe.rukamori.archivetune.about.FetchAboutContributorsUseCase
-import moe.rukamori.archivetune.about.FetchAboutDependencyLicensesUseCase
-import moe.rukamori.archivetune.about.FetchAboutTranslationContributorsUseCase
-import moe.rukamori.archivetune.currentBuildHash
+import dev.vxs.frostsoulx.BuildConfig
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.about.AboutContributor
+import dev.vxs.frostsoulx.about.AboutContributorCollection
+import dev.vxs.frostsoulx.about.AboutDependencyLicense
+import dev.vxs.frostsoulx.about.AboutDependencyLicenseCollection
+import dev.vxs.frostsoulx.about.AboutTranslationContributor
+import dev.vxs.frostsoulx.about.AboutTranslationContributorCollection
+import dev.vxs.frostsoulx.about.FetchAboutContributorsUseCase
+import dev.vxs.frostsoulx.about.FetchAboutDependencyLicensesUseCase
+import dev.vxs.frostsoulx.about.FetchAboutTranslationContributorsUseCase
+import dev.vxs.frostsoulx.currentBuildHash
 import javax.inject.Inject
 
 sealed interface AboutScreenState {

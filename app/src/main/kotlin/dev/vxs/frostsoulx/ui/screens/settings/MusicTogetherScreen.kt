@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -93,27 +93,27 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.window.core.layout.WindowSizeClass
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.ui.component.TextFieldDialog
-import moe.rukamori.archivetune.ui.utils.appBarScrollBehavior
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.viewmodels.MusicTogetherActivityLogItemUiModel
-import moe.rukamori.archivetune.viewmodels.MusicTogetherActivityLogUiModels
-import moe.rukamori.archivetune.viewmodels.MusicTogetherDialogUiState
-import moe.rukamori.archivetune.viewmodels.MusicTogetherEffect
-import moe.rukamori.archivetune.viewmodels.MusicTogetherHostUiModel
-import moe.rukamori.archivetune.viewmodels.MusicTogetherJoinUiModel
-import moe.rukamori.archivetune.viewmodels.MusicTogetherParticipantUiModel
-import moe.rukamori.archivetune.viewmodels.MusicTogetherParticipantUiModels
-import moe.rukamori.archivetune.viewmodels.MusicTogetherPlaybackUiModel
-import moe.rukamori.archivetune.viewmodels.MusicTogetherScreenState
-import moe.rukamori.archivetune.viewmodels.MusicTogetherSessionShareUiModel
-import moe.rukamori.archivetune.viewmodels.MusicTogetherStatusUiModel
-import moe.rukamori.archivetune.viewmodels.MusicTogetherUiModel
-import moe.rukamori.archivetune.viewmodels.MusicTogetherViewModel
-import moe.rukamori.archivetune.ui.component.IconButton as AtIconButton
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.component.TextFieldDialog
+import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherActivityLogItemUiModel
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherActivityLogUiModels
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherDialogUiState
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherEffect
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherHostUiModel
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherJoinUiModel
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherParticipantUiModel
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherParticipantUiModels
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherPlaybackUiModel
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherScreenState
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherSessionShareUiModel
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherStatusUiModel
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherUiModel
+import dev.vxs.frostsoulx.viewmodels.MusicTogetherViewModel
+import dev.vxs.frostsoulx.ui.component.IconButton as AtIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -416,7 +416,7 @@ private fun MusicTogetherDialogs(
                     if (dialog.onlineMode) {
                         it.trim().isNotBlank()
                     } else {
-                        moe.rukamori.archivetune.together.TogetherLink
+                        dev.vxs.frostsoulx.together.TogetherLink
                             .decode(it) != null
                     }
                 },

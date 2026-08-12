@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.library
+package dev.vxs.frostsoulx.ui.screens.library
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -79,25 +79,25 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.LibraryFilter
-import moe.rukamori.archivetune.constants.ShowSpotifyPlaylistsKey
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.spotify.SpotifyLibraryViewModel
-import moe.rukamori.archivetune.spotify.SpotifyMapper
-import moe.rukamori.archivetune.spotify.models.SpotifyPlaylist
-import moe.rukamori.archivetune.ui.component.ExpressivePullToRefreshBox
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.LibraryMixViewModel
-import moe.rukamori.archivetune.viewmodels.LibraryTopMixEmptyReason
-import moe.rukamori.archivetune.viewmodels.LibraryTopMixUiModel
-import moe.rukamori.archivetune.viewmodels.LibraryTopMixesUiState
-import moe.rukamori.archivetune.viewmodels.MostPlayedAlbumUiModel
-import moe.rukamori.archivetune.viewmodels.MostPlayedAlbumUiState
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.LibraryFilter
+import dev.vxs.frostsoulx.constants.ShowSpotifyPlaylistsKey
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.spotify.SpotifyLibraryViewModel
+import dev.vxs.frostsoulx.spotify.SpotifyMapper
+import dev.vxs.frostsoulx.spotify.models.SpotifyPlaylist
+import dev.vxs.frostsoulx.ui.component.ExpressivePullToRefreshBox
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.LibraryMixViewModel
+import dev.vxs.frostsoulx.viewmodels.LibraryTopMixEmptyReason
+import dev.vxs.frostsoulx.viewmodels.LibraryTopMixUiModel
+import dev.vxs.frostsoulx.viewmodels.LibraryTopMixesUiState
+import dev.vxs.frostsoulx.viewmodels.MostPlayedAlbumUiModel
+import dev.vxs.frostsoulx.viewmodels.MostPlayedAlbumUiState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

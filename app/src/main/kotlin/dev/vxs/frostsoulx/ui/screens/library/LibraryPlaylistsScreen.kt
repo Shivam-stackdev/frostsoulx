@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens.library
+package dev.vxs.frostsoulx.ui.screens.library
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -84,31 +84,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.PlaylistEditLockKey
-import moe.rukamori.archivetune.constants.PlaylistSortDescendingKey
-import moe.rukamori.archivetune.constants.PlaylistSortType
-import moe.rukamori.archivetune.constants.PlaylistSortTypeKey
-import moe.rukamori.archivetune.constants.PureBlackKey
-import moe.rukamori.archivetune.db.entities.Playlist
-import moe.rukamori.archivetune.extensions.move
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.innertube.models.PlaylistItem
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.ui.component.CreatePlaylistDialog
-import moe.rukamori.archivetune.ui.component.ExpressivePullToRefreshBox
-import moe.rukamori.archivetune.ui.component.ItemThumbnail
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.menu.PlaylistMenu
-import moe.rukamori.archivetune.ui.menu.YouTubePlaylistMenu
-import moe.rukamori.archivetune.ui.theme.PlayerColorExtractor
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberPreference
-import moe.rukamori.archivetune.viewmodels.LibraryPlaylistsViewModel
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.PlaylistEditLockKey
+import dev.vxs.frostsoulx.constants.PlaylistSortDescendingKey
+import dev.vxs.frostsoulx.constants.PlaylistSortType
+import dev.vxs.frostsoulx.constants.PlaylistSortTypeKey
+import dev.vxs.frostsoulx.constants.PureBlackKey
+import dev.vxs.frostsoulx.db.entities.Playlist
+import dev.vxs.frostsoulx.extensions.move
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.ui.component.CreatePlaylistDialog
+import dev.vxs.frostsoulx.ui.component.ExpressivePullToRefreshBox
+import dev.vxs.frostsoulx.ui.component.ItemThumbnail
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.menu.PlaylistMenu
+import dev.vxs.frostsoulx.ui.menu.YouTubePlaylistMenu
+import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberPreference
+import dev.vxs.frostsoulx.viewmodels.LibraryPlaylistsViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -577,7 +577,7 @@ private fun openPlaylist(
 private fun triggerPlaylistMenu(
     playlist: Playlist,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
-    menuState: moe.rukamori.archivetune.ui.component.MenuState,
+    menuState: dev.vxs.frostsoulx.ui.component.MenuState,
 ) {
     if (playlist.playlist.isEditable || playlist.songCount != 0) {
         PlaylistMenu(

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.screens
+package dev.vxs.frostsoulx.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -55,14 +55,14 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.BrowseEndpoint
-import moe.rukamori.archivetune.ui.component.NavigationTitle
-import moe.rukamori.archivetune.ui.component.shimmer.ShimmerHost
-import moe.rukamori.archivetune.ui.component.shimmer.TextPlaceholder
-import moe.rukamori.archivetune.viewmodels.MoodAndGenresViewModel
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.BrowseEndpoint
+import dev.vxs.frostsoulx.ui.component.NavigationTitle
+import dev.vxs.frostsoulx.ui.component.shimmer.ShimmerHost
+import dev.vxs.frostsoulx.ui.component.shimmer.TextPlaceholder
+import dev.vxs.frostsoulx.viewmodels.MoodAndGenresViewModel
 import java.util.concurrent.ConcurrentHashMap
 
 @OptIn(ExperimentalFoundationApi::class)

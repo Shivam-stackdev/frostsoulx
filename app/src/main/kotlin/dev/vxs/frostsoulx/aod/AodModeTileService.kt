@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.aod
+package dev.vxs.frostsoulx.aod
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -13,8 +13,8 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import moe.rukamori.archivetune.MainActivity
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.MainActivity
+import dev.vxs.frostsoulx.R
 
 class AodModeTileService : TileService() {
     override fun onStartListening() {

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.utils.potoken
+package dev.vxs.frostsoulx.utils.potoken
 
 /**
  * Thrown when BotGuard PoToken generation fails in a recoverable way

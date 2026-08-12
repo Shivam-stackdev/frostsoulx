@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -17,16 +17,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.di.DownloadCache
-import moe.rukamori.archivetune.di.PlayerCache
-import moe.rukamori.archivetune.extensions.filterExplicit
-import moe.rukamori.archivetune.extensions.filterVideo
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.di.DownloadCache
+import dev.vxs.frostsoulx.di.PlayerCache
+import dev.vxs.frostsoulx.extensions.filterExplicit
+import dev.vxs.frostsoulx.extensions.filterVideo
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
 import java.time.LocalDateTime
 import javax.inject.Inject
 

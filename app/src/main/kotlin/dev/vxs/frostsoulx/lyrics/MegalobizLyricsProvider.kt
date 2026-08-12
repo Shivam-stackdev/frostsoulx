@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lyrics
+package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
@@ -15,9 +15,9 @@ import okhttp3.Request
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 
-import moe.rukamori.archivetune.constants.EnableMegalobizLyricsKey
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.get
+import dev.vxs.frostsoulx.constants.EnableMegalobizLyricsKey
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.get
 
 object MegalobizLyricsProvider : LyricsProvider {
     override val name: String = "Megalobiz"

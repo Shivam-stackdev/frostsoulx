@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.di
+package dev.vxs.frostsoulx.di
 
 import android.content.Context
 import dagger.Module
@@ -13,7 +13,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import moe.rukamori.archivetune.utils.NetworkConnectivityObserver
+import dev.vxs.frostsoulx.utils.NetworkConnectivityObserver
 import javax.inject.Singleton
 
 @Module

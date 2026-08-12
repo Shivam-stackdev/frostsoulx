@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.content.Context
 import android.content.res.Configuration
@@ -152,60 +152,60 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalDownloadUtil
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.canvas.models.CanvasArtwork
-import moe.rukamori.archivetune.constants.ArchiveTuneCanvasKey
-import moe.rukamori.archivetune.constants.BackdropBlurAmountKey
-import moe.rukamori.archivetune.constants.BackdropEnabledKey
-import moe.rukamori.archivetune.constants.BlurRadiusKey
-import moe.rukamori.archivetune.constants.DarkModeKey
-import moe.rukamori.archivetune.constants.DisableBlurKey
-import moe.rukamori.archivetune.constants.EnableHapticFeedbackKey
-import moe.rukamori.archivetune.constants.InnerTubeCookieKey
-import moe.rukamori.archivetune.constants.MaxCanvasCacheSizeKey
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyle
-import moe.rukamori.archivetune.constants.PlayerBackgroundStyleKey
-import moe.rukamori.archivetune.constants.PlayerButtonsStyle
-import moe.rukamori.archivetune.constants.PlayerButtonsStyleKey
-import moe.rukamori.archivetune.constants.PlayerCustomBlurKey
-import moe.rukamori.archivetune.constants.PlayerCustomBrightnessKey
-import moe.rukamori.archivetune.constants.PlayerCustomContrastKey
-import moe.rukamori.archivetune.constants.PlayerCustomImageUriKey
-import moe.rukamori.archivetune.constants.PlayerDesignStyle
-import moe.rukamori.archivetune.constants.PlayerDesignStyleKey
-import moe.rukamori.archivetune.constants.PoTokenGvsKey
-import moe.rukamori.archivetune.constants.PoTokenPlayerKey
-import moe.rukamori.archivetune.constants.QueuePeekHeight
-import moe.rukamori.archivetune.constants.ShowPlayerVolumeBarKey
-import moe.rukamori.archivetune.constants.SliderStyle
-import moe.rukamori.archivetune.constants.SliderStyleKey
-import moe.rukamori.archivetune.constants.ThumbnailCornerRadiusKey
-import moe.rukamori.archivetune.extensions.metadata
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.innertube.utils.hasYouTubeLoginCookie
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.ui.component.BottomSheet
-import moe.rukamori.archivetune.ui.component.BottomSheetState
-import moe.rukamori.archivetune.ui.component.LocalBottomSheetPageState
-import moe.rukamori.archivetune.ui.component.LocalMenuState
-import moe.rukamori.archivetune.ui.component.rememberBottomSheetState
-import moe.rukamori.archivetune.ui.menu.PlayerMenu
-import moe.rukamori.archivetune.ui.screens.LOGIN_ROUTE
-import moe.rukamori.archivetune.ui.screens.buildLoginRoute
-import moe.rukamori.archivetune.ui.screens.settings.DarkMode
-import moe.rukamori.archivetune.ui.screens.settings.PO_TOKEN_ROUTE
-import moe.rukamori.archivetune.ui.theme.PlayerColorExtractor
-import moe.rukamori.archivetune.ui.utils.ShowMediaInfo
-import moe.rukamori.archivetune.ui.utils.YtimgResizePolicy
-import moe.rukamori.archivetune.ui.utils.getNextFallbackUrl
-import moe.rukamori.archivetune.ui.utils.resize
-import moe.rukamori.archivetune.utils.ImageBlurUtils
-import moe.rukamori.archivetune.utils.makeTimeString
-import moe.rukamori.archivetune.utils.rememberEnumPreference
-import moe.rukamori.archivetune.utils.rememberLowDataModeActive
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalDownloadUtil
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.canvas.models.CanvasArtwork
+import dev.vxs.frostsoulx.constants.ArchiveTuneCanvasKey
+import dev.vxs.frostsoulx.constants.BackdropBlurAmountKey
+import dev.vxs.frostsoulx.constants.BackdropEnabledKey
+import dev.vxs.frostsoulx.constants.BlurRadiusKey
+import dev.vxs.frostsoulx.constants.DarkModeKey
+import dev.vxs.frostsoulx.constants.DisableBlurKey
+import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.constants.InnerTubeCookieKey
+import dev.vxs.frostsoulx.constants.MaxCanvasCacheSizeKey
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyleKey
+import dev.vxs.frostsoulx.constants.PlayerButtonsStyle
+import dev.vxs.frostsoulx.constants.PlayerButtonsStyleKey
+import dev.vxs.frostsoulx.constants.PlayerCustomBlurKey
+import dev.vxs.frostsoulx.constants.PlayerCustomBrightnessKey
+import dev.vxs.frostsoulx.constants.PlayerCustomContrastKey
+import dev.vxs.frostsoulx.constants.PlayerCustomImageUriKey
+import dev.vxs.frostsoulx.constants.PlayerDesignStyle
+import dev.vxs.frostsoulx.constants.PlayerDesignStyleKey
+import dev.vxs.frostsoulx.constants.PoTokenGvsKey
+import dev.vxs.frostsoulx.constants.PoTokenPlayerKey
+import dev.vxs.frostsoulx.constants.QueuePeekHeight
+import dev.vxs.frostsoulx.constants.ShowPlayerVolumeBarKey
+import dev.vxs.frostsoulx.constants.SliderStyle
+import dev.vxs.frostsoulx.constants.SliderStyleKey
+import dev.vxs.frostsoulx.constants.ThumbnailCornerRadiusKey
+import dev.vxs.frostsoulx.extensions.metadata
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.innertube.utils.hasYouTubeLoginCookie
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.ui.component.BottomSheet
+import dev.vxs.frostsoulx.ui.component.BottomSheetState
+import dev.vxs.frostsoulx.ui.component.LocalBottomSheetPageState
+import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.component.rememberBottomSheetState
+import dev.vxs.frostsoulx.ui.menu.PlayerMenu
+import dev.vxs.frostsoulx.ui.screens.LOGIN_ROUTE
+import dev.vxs.frostsoulx.ui.screens.buildLoginRoute
+import dev.vxs.frostsoulx.ui.screens.settings.DarkMode
+import dev.vxs.frostsoulx.ui.screens.settings.PO_TOKEN_ROUTE
+import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
+import dev.vxs.frostsoulx.ui.utils.ShowMediaInfo
+import dev.vxs.frostsoulx.ui.utils.YtimgResizePolicy
+import dev.vxs.frostsoulx.ui.utils.getNextFallbackUrl
+import dev.vxs.frostsoulx.ui.utils.resize
+import dev.vxs.frostsoulx.utils.ImageBlurUtils
+import dev.vxs.frostsoulx.utils.makeTimeString
+import dev.vxs.frostsoulx.utils.rememberEnumPreference
+import dev.vxs.frostsoulx.utils.rememberLowDataModeActive
+import dev.vxs.frostsoulx.utils.rememberPreference
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -388,7 +388,7 @@ fun BottomSheetPlayer(
     val (backdropEnabled) = rememberPreference(BackdropEnabledKey, defaultValue = true)
     val (backdropBlurAmount) = rememberPreference(BackdropBlurAmountKey, defaultValue = 60)
     val (showCodecOnPlayer) = rememberPreference(booleanPreferencesKey("show_codec_on_player"), false)
-    val (incrementalSeekSkipEnabled) = rememberPreference(moe.rukamori.archivetune.constants.SeekExtraSeconds, defaultValue = false)
+    val (incrementalSeekSkipEnabled) = rememberPreference(dev.vxs.frostsoulx.constants.SeekExtraSeconds, defaultValue = false)
     var keyboardSkipMultiplier by remember { mutableStateOf(1) }
     var lastKeyboardTapTime by remember { mutableLongStateOf(0L) }
 

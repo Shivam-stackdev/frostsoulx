@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -47,8 +47,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.delay
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.AodClockStyle
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.AodClockStyle
 
 @Composable
 fun AodClockWidget(

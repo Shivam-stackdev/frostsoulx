@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import android.net.Uri
@@ -40,32 +40,32 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.constants.PlaylistSongSortType
-import moe.rukamori.archivetune.constants.PlaylistSuggestionSource
-import moe.rukamori.archivetune.constants.PlaylistSuggestionSourceKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.PlaylistSong
-import moe.rukamori.archivetune.extensions.filterBlockedArtists
-import moe.rukamori.archivetune.extensions.reversed
-import moe.rukamori.archivetune.extensions.toEnum
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.YTItem
-import moe.rukamori.archivetune.innertube.models.filterExplicit
-import moe.rukamori.archivetune.innertube.models.filterVideo
-import moe.rukamori.archivetune.models.PlaylistSuggestion
-import moe.rukamori.archivetune.models.PlaylistSuggestionPage
-import moe.rukamori.archivetune.models.PlaylistSuggestionQuery
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.playlist.RemovePlaylistCoverUseCase
-import moe.rukamori.archivetune.playlist.UpdatePlaylistCoverUseCase
-import moe.rukamori.archivetune.utils.PlaylistSuggestionQueryBuilder
-import moe.rukamori.archivetune.utils.SyncUtils
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.constants.PlaylistSongSortType
+import dev.vxs.frostsoulx.constants.PlaylistSuggestionSource
+import dev.vxs.frostsoulx.constants.PlaylistSuggestionSourceKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.PlaylistSong
+import dev.vxs.frostsoulx.extensions.filterBlockedArtists
+import dev.vxs.frostsoulx.extensions.reversed
+import dev.vxs.frostsoulx.extensions.toEnum
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.YTItem
+import dev.vxs.frostsoulx.innertube.models.filterExplicit
+import dev.vxs.frostsoulx.innertube.models.filterVideo
+import dev.vxs.frostsoulx.models.PlaylistSuggestion
+import dev.vxs.frostsoulx.models.PlaylistSuggestionPage
+import dev.vxs.frostsoulx.models.PlaylistSuggestionQuery
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.playlist.RemovePlaylistCoverUseCase
+import dev.vxs.frostsoulx.playlist.UpdatePlaylistCoverUseCase
+import dev.vxs.frostsoulx.utils.PlaylistSuggestionQueryBuilder
+import dev.vxs.frostsoulx.utils.SyncUtils
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.reportException
 import java.text.Collator
 import java.util.Locale
 import javax.inject.Inject
@@ -463,7 +463,7 @@ class LocalPlaylistViewModel
         }
 
         suspend fun addSongToPlaylist(
-            song: moe.rukamori.archivetune.innertube.models.SongItem,
+            song: dev.vxs.frostsoulx.innertube.models.SongItem,
             browseId: String?,
         ): Boolean {
             return try {
@@ -483,9 +483,9 @@ class LocalPlaylistViewModel
                         if (p == null) {
                             // If not found, we can't add to it.
                             // This might happen if it's a special playlist that hasn't been created yet.
-                            if (playlistId == moe.rukamori.archivetune.db.entities.PlaylistEntity.LIKED_PLAYLIST_ID) {
+                            if (playlistId == dev.vxs.frostsoulx.db.entities.PlaylistEntity.LIKED_PLAYLIST_ID) {
                                 insert(
-                                    moe.rukamori.archivetune.db.entities.PlaylistEntity(
+                                    dev.vxs.frostsoulx.db.entities.PlaylistEntity(
                                         id = playlistId,
                                         name = context.getString(R.string.liked_songs),
                                         isEditable = false,
@@ -504,7 +504,7 @@ class LocalPlaylistViewModel
                         val maxPosition = maxPlaylistSongPosition(playlistId)
                         val position = (maxPosition ?: -1) + 1
                         insert(
-                            moe.rukamori.archivetune.db.entities.PlaylistSongMap(
+                            dev.vxs.frostsoulx.db.entities.PlaylistSongMap(
                                 songId = song.id,
                                 playlistId = playlistId,
                                 position = position,

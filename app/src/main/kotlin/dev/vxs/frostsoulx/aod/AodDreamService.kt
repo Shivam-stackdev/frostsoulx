@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.aod
+package dev.vxs.frostsoulx.aod
 
 import android.content.ComponentName
 import android.content.Context
@@ -37,15 +37,15 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.LyricsEntity
-import moe.rukamori.archivetune.extensions.togglePlayPause
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.playback.MusicService
-import moe.rukamori.archivetune.playback.PlayerConnection
-import moe.rukamori.archivetune.ui.player.AodPlayerScreen
-import moe.rukamori.archivetune.ui.theme.ArchiveTuneTheme
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.playback.MusicService
+import dev.vxs.frostsoulx.playback.PlayerConnection
+import dev.vxs.frostsoulx.ui.player.AodPlayerScreen
+import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
 
 @AndroidEntryPoint
 class AodDreamService : DreamService(), LifecycleOwner, SavedStateRegistryOwner {

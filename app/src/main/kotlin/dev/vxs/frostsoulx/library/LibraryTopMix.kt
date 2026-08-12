@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.library
+package dev.vxs.frostsoulx.library
 
 import androidx.compose.runtime.Immutable
 import com.google.common.collect.ImmutableList
-import moe.rukamori.archivetune.models.MediaMetadata
+import dev.vxs.frostsoulx.models.MediaMetadata
 
 @Immutable
 data class LibraryTopMix(

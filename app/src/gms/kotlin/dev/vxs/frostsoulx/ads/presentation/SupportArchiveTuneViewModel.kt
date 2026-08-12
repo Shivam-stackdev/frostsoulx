@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ads.presentation
+package dev.vxs.frostsoulx.ads.presentation
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
@@ -19,13 +19,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import moe.rukamori.archivetune.ads.domain.ObserveSupportAdAvailabilityUseCase
-import moe.rukamori.archivetune.ads.domain.ObserveSupportAdEventsUseCase
-import moe.rukamori.archivetune.ads.domain.SetPersonalizedAdsConsentUseCase
-import moe.rukamori.archivetune.ads.domain.ShowSupportAdUseCase
-import moe.rukamori.archivetune.ads.domain.SupportAdAvailability
-import moe.rukamori.archivetune.ads.domain.SupportAdEvent
-import moe.rukamori.archivetune.ads.domain.SupportAdRequestResult
+import dev.vxs.frostsoulx.ads.domain.ObserveSupportAdAvailabilityUseCase
+import dev.vxs.frostsoulx.ads.domain.ObserveSupportAdEventsUseCase
+import dev.vxs.frostsoulx.ads.domain.SetPersonalizedAdsConsentUseCase
+import dev.vxs.frostsoulx.ads.domain.ShowSupportAdUseCase
+import dev.vxs.frostsoulx.ads.domain.SupportAdAvailability
+import dev.vxs.frostsoulx.ads.domain.SupportAdEvent
+import dev.vxs.frostsoulx.ads.domain.SupportAdRequestResult
 import javax.inject.Inject
 
 internal sealed interface SupportArchiveTuneScreenState {

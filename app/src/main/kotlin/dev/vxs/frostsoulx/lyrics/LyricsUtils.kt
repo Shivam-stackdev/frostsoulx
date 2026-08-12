@@ -5,15 +5,15 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lyrics
+package dev.vxs.frostsoulx.lyrics
 
 import android.icu.text.Transliterator
 import android.text.format.DateUtils
 import com.atilika.kuromoji.ipadic.Tokenizer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.betterlyrics.TTMLParser
-import moe.rukamori.archivetune.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.betterlyrics.TTMLParser
+import dev.vxs.frostsoulx.db.entities.LyricsEntity
 import java.lang.Character.UnicodeScript
 
 data class LyricsRomanizationPreferences(

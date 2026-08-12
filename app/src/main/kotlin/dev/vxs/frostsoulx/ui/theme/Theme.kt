@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.theme
+package dev.vxs.frostsoulx.ui.theme
 
 import android.graphics.Bitmap
 import android.os.Build
@@ -44,7 +44,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import moe.rukamori.archivetune.constants.AppFontPreference
+import dev.vxs.frostsoulx.constants.AppFontPreference
 import kotlin.math.abs
 import kotlin.math.min
 

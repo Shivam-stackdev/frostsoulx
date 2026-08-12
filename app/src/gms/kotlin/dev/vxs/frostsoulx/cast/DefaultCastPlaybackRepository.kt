@@ -7,7 +7,7 @@
 
 @file:OptIn(UnstableApi::class)
 
-package moe.rukamori.archivetune.cast
+package dev.vxs.frostsoulx.cast
 
 import android.content.Context
 import android.net.Uri
@@ -365,14 +365,14 @@ private class GmsCastMediaItemConverter(
             .build()
     }
 
-    private fun MediaInfo?.toAppMediaMetadata(mediaId: String): moe.rukamori.archivetune.models.MediaMetadata {
+    private fun MediaInfo?.toAppMediaMetadata(mediaId: String): dev.vxs.frostsoulx.models.MediaMetadata {
         val castMetadata = this?.metadata
         val title = castMetadata?.stringValue(CastMetadata.KEY_TITLE) ?: mediaId
         val artistText =
             castMetadata?.stringValue(CastMetadata.KEY_ARTIST)
                 ?: castMetadata?.stringValue(CastMetadata.KEY_SUBTITLE)
         val albumTitle = castMetadata?.stringValue(CastMetadata.KEY_ALBUM_TITLE)
-        return moe.rukamori.archivetune.models.MediaMetadata(
+        return dev.vxs.frostsoulx.models.MediaMetadata(
             id = mediaId,
             title = title,
             artists =
@@ -380,7 +380,7 @@ private class GmsCastMediaItemConverter(
                     ?.split(",")
                     ?.mapNotNull { it.trim().takeIf(String::isNotBlank) }
                     ?.map {
-                        moe.rukamori.archivetune.models.MediaMetadata
+                        dev.vxs.frostsoulx.models.MediaMetadata
                             .Artist(id = null, name = it)
                     }.orEmpty(),
             duration = -1,
@@ -392,7 +392,7 @@ private class GmsCastMediaItemConverter(
                     ?.toString(),
             album =
                 albumTitle?.let {
-                    moe.rukamori.archivetune.models.MediaMetadata.Album(
+                    dev.vxs.frostsoulx.models.MediaMetadata.Album(
                         id = it,
                         title = it,
                     )

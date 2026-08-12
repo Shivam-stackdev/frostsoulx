@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.widget
+package dev.vxs.frostsoulx.widget
 
 import android.content.Context
 import android.content.Intent
@@ -13,7 +13,7 @@ import android.util.Log
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
-import moe.rukamori.archivetune.playback.MusicService
+import dev.vxs.frostsoulx.playback.MusicService
 
 class PlayPauseAction : ActionCallback {
     override suspend fun onAction(
@@ -45,9 +45,9 @@ class SkipPrevAction : ActionCallback {
     }
 }
 
-private const val ACTION_PLAY_PAUSE = "moe.rukamori.archivetune.WIDGET_PLAY_PAUSE"
-private const val ACTION_SKIP_NEXT = "moe.rukamori.archivetune.WIDGET_SKIP_NEXT"
-private const val ACTION_SKIP_PREV = "moe.rukamori.archivetune.WIDGET_SKIP_PREV"
+private const val ACTION_PLAY_PAUSE = "dev.vxs.frostsoulx.WIDGET_PLAY_PAUSE"
+private const val ACTION_SKIP_NEXT = "dev.vxs.frostsoulx.WIDGET_SKIP_NEXT"
+private const val ACTION_SKIP_PREV = "dev.vxs.frostsoulx.WIDGET_SKIP_PREV"
 private const val TAG = "MusicWidgetActions"
 
 private fun sendWidgetAction(

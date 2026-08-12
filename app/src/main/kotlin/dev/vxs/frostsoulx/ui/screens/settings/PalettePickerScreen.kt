@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.screens.settings
+package dev.vxs.frostsoulx.ui.screens.settings
 
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -104,20 +104,20 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.LocalPlayerAwareWindowInsets
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.CustomThemeColorKey
-import moe.rukamori.archivetune.constants.DynamicThemeKey
-import moe.rukamori.archivetune.ui.component.IconButton
-import moe.rukamori.archivetune.ui.svg.DynamicSVGImage
-import moe.rukamori.archivetune.ui.svg.PALETTE
-import moe.rukamori.archivetune.ui.svg.SVGString
-import moe.rukamori.archivetune.ui.theme.ColorSaver
-import moe.rukamori.archivetune.ui.theme.ThemeSeedPalette
-import moe.rukamori.archivetune.ui.theme.ThemeSeedPaletteCodec
-import moe.rukamori.archivetune.ui.theme.palette.TonalPalettes
-import moe.rukamori.archivetune.ui.utils.backToMain
-import moe.rukamori.archivetune.utils.rememberPreference
+import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.CustomThemeColorKey
+import dev.vxs.frostsoulx.constants.DynamicThemeKey
+import dev.vxs.frostsoulx.ui.component.IconButton
+import dev.vxs.frostsoulx.ui.svg.DynamicSVGImage
+import dev.vxs.frostsoulx.ui.svg.PALETTE
+import dev.vxs.frostsoulx.ui.svg.SVGString
+import dev.vxs.frostsoulx.ui.theme.ColorSaver
+import dev.vxs.frostsoulx.ui.theme.ThemeSeedPalette
+import dev.vxs.frostsoulx.ui.theme.ThemeSeedPaletteCodec
+import dev.vxs.frostsoulx.ui.theme.palette.TonalPalettes
+import dev.vxs.frostsoulx.ui.utils.backToMain
+import dev.vxs.frostsoulx.utils.rememberPreference
 
 private enum class SeedRole {
     PRIMARY,

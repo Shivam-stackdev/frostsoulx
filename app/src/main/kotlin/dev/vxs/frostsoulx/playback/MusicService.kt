@@ -7,7 +7,7 @@
 
 @file:Suppress("DEPRECATION")
 
-package moe.rukamori.archivetune.playback
+package dev.vxs.frostsoulx.playback
 
 import android.app.ActivityManager
 import android.app.Notification
@@ -124,143 +124,143 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import moe.rukamori.archivetune.MainActivity
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.aod.ACTION_AOD_MODE
-import moe.rukamori.archivetune.constants.AodAutoStartScreenOffKey
-import moe.rukamori.archivetune.cast.CastMediaItemResolver
-import moe.rukamori.archivetune.cast.CastPlaybackRepository
-import moe.rukamori.archivetune.cast.CastPlaybackRepositoryLocator
-import moe.rukamori.archivetune.constants.AudioNormalizationKey
-import moe.rukamori.archivetune.constants.AudioOffload
-import moe.rukamori.archivetune.constants.AudioQuality
-import moe.rukamori.archivetune.constants.AudioQualityKey
-import moe.rukamori.archivetune.constants.AutoDownloadOnLikeKey
-import moe.rukamori.archivetune.constants.AutoLoadMoreKey
-import moe.rukamori.archivetune.constants.AutoSkipNextOnErrorKey
-import moe.rukamori.archivetune.constants.AutoStartOnBluetoothKey
-import moe.rukamori.archivetune.constants.CrossfadeDurationKey
-import moe.rukamori.archivetune.constants.CrossfadeEnabledKey
-import moe.rukamori.archivetune.constants.CrossfadeGaplessKey
-import moe.rukamori.archivetune.constants.DeviceMutePlaybackRecoveryVolumeKey
-import moe.rukamori.archivetune.constants.DiscordShowWhenPausedKey
-import moe.rukamori.archivetune.constants.DiscordTokenKey
-import moe.rukamori.archivetune.constants.EnableDiscordRPCKey
-import moe.rukamori.archivetune.constants.EnableLastFMScrobblingKey
-import moe.rukamori.archivetune.constants.EqualizerAutoHeadroomEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerBandLevelsMbKey
-import moe.rukamori.archivetune.constants.EqualizerBassBoostEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerBassBoostStrengthKey
-import moe.rukamori.archivetune.constants.EqualizerEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerOutputGainEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerOutputGainMbKey
-import moe.rukamori.archivetune.constants.EqualizerSelectedProfileIdKey
-import moe.rukamori.archivetune.constants.EqualizerVirtualizerEnabledKey
-import moe.rukamori.archivetune.constants.EqualizerVirtualizerStrengthKey
-import moe.rukamori.archivetune.constants.HISTORY_DURATION_DEFAULT
-import moe.rukamori.archivetune.constants.HISTORY_DURATION_MAX
-import moe.rukamori.archivetune.constants.HISTORY_DURATION_MIN
-import moe.rukamori.archivetune.constants.HideExplicitKey
-import moe.rukamori.archivetune.constants.HideVideoKey
-import moe.rukamori.archivetune.constants.HistoryDuration
-import moe.rukamori.archivetune.constants.LastFMSessionKey
-import moe.rukamori.archivetune.constants.LastFMUseNowPlaying
-import moe.rukamori.archivetune.constants.ListenBrainzEnabledKey
-import moe.rukamori.archivetune.constants.ListenBrainzTokenKey
-import moe.rukamori.archivetune.constants.MaxSongCacheSizeKey
-import moe.rukamori.archivetune.constants.MediaSessionConstants.CommandToggleLike
-import moe.rukamori.archivetune.constants.MediaSessionConstants.CommandToggleRepeatMode
-import moe.rukamori.archivetune.constants.MediaSessionConstants.CommandToggleShuffle
-import moe.rukamori.archivetune.constants.MediaSessionConstants.CommandToggleStartRadio
-import moe.rukamori.archivetune.constants.PauseListenHistoryKey
-import moe.rukamori.archivetune.constants.PauseOnDeviceMuteKey
-import moe.rukamori.archivetune.constants.PermanentShuffleKey
-import moe.rukamori.archivetune.constants.PersistentQueueKey
-import moe.rukamori.archivetune.constants.PlayerStreamClient
-import moe.rukamori.archivetune.constants.PlayerStreamClientKey
-import moe.rukamori.archivetune.constants.PlayerVolumeKey
-import moe.rukamori.archivetune.constants.RepeatModeKey
-import moe.rukamori.archivetune.constants.ScrobbleDelayPercentKey
-import moe.rukamori.archivetune.constants.ScrobbleDelaySecondsKey
-import moe.rukamori.archivetune.constants.ScrobbleMinSongDurationKey
-import moe.rukamori.archivetune.constants.ShowLyricsKey
-import moe.rukamori.archivetune.constants.LyricsDarkCyanHighlightKey
-import moe.rukamori.archivetune.constants.SkipSilenceKey
-import moe.rukamori.archivetune.constants.SmartTrimmerKey
-import moe.rukamori.archivetune.constants.StopMusicOnTaskClearKey
-import moe.rukamori.archivetune.constants.TogetherClientIdKey
-import moe.rukamori.archivetune.constants.WakelockKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.AlbumEntity
-import moe.rukamori.archivetune.db.entities.ArtistEntity
-import moe.rukamori.archivetune.db.entities.Event
-import moe.rukamori.archivetune.db.entities.FormatEntity
-import moe.rukamori.archivetune.db.entities.RelatedSongMap
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.db.entities.SongEntity
-import moe.rukamori.archivetune.di.DownloadCache
-import moe.rukamori.archivetune.di.PlayerCache
-import moe.rukamori.archivetune.extensions.SilentHandler
-import moe.rukamori.archivetune.extensions.collect
-import moe.rukamori.archivetune.extensions.collectLatest
-import moe.rukamori.archivetune.extensions.currentMetadata
-import moe.rukamori.archivetune.extensions.directorySizeBytes
-import moe.rukamori.archivetune.extensions.findNextMediaItemById
-import moe.rukamori.archivetune.extensions.mediaItems
-import moe.rukamori.archivetune.extensions.metadata
-import moe.rukamori.archivetune.extensions.setOffloadEnabled
-import moe.rukamori.archivetune.extensions.toContinuationQueue
-import moe.rukamori.archivetune.extensions.toMediaItem
-import moe.rukamori.archivetune.extensions.toPersistQueue
-import moe.rukamori.archivetune.extensions.toQueue
-import moe.rukamori.archivetune.innertube.PlaybackAuthState
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.SongItem
-import moe.rukamori.archivetune.innertube.models.WatchEndpoint
-import moe.rukamori.archivetune.innertube.models.response.PlayerResponse
-import moe.rukamori.archivetune.lastfm.LastFM
-import moe.rukamori.archivetune.lyrics.LyricsHelper
-import moe.rukamori.archivetune.lyrics.LyricsPreloadManager
-import moe.rukamori.archivetune.lyrics.LyricsUtils.isLineSyncedLrc
-import moe.rukamori.archivetune.lyrics.LyricsUtils.isTtml
-import moe.rukamori.archivetune.lyrics.LyricsUtils.parseLyrics
-import moe.rukamori.archivetune.lyrics.LyricsUtils.parseTtml
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.models.PersistPlayerState
-import moe.rukamori.archivetune.models.PersistQueue
-import moe.rukamori.archivetune.models.toMediaMetadata
-import moe.rukamori.archivetune.moriextractor.ArchiveTuneExtractorException
-import moe.rukamori.archivetune.moriextractor.InMemoryBearerTokenRepository
-import moe.rukamori.archivetune.moriextractor.StreamingExtractionManager
-import moe.rukamori.archivetune.playback.queues.EmptyQueue
-import moe.rukamori.archivetune.playback.queues.ListQueue
-import moe.rukamori.archivetune.playback.queues.Queue
-import moe.rukamori.archivetune.playback.queues.YouTubeQueue
-import moe.rukamori.archivetune.playback.queues.filterBlockedArtists
-import moe.rukamori.archivetune.playback.queues.filterExplicit
-import moe.rukamori.archivetune.playback.queues.filterVideo
-import moe.rukamori.archivetune.playback.queues.hasBlockedArtist
-import moe.rukamori.archivetune.scrobbling.LastFmServiceConfig
-import moe.rukamori.archivetune.storage.StorageFolderKind
-import moe.rukamori.archivetune.storage.StorageLocationRepository
-import moe.rukamori.archivetune.together.TogetherPlaybackSync
-import moe.rukamori.archivetune.ui.screens.settings.DiscordPresenceManager
-import moe.rukamori.archivetune.ui.screens.settings.ListenBrainzManager
-import moe.rukamori.archivetune.utils.AuthScopedCacheValue
-import moe.rukamori.archivetune.utils.CoilBitmapLoader
-import moe.rukamori.archivetune.utils.NetworkConnectivityObserver
-import moe.rukamori.archivetune.utils.StreamClientUtils
-import moe.rukamori.archivetune.utils.SyncUtils
-import moe.rukamori.archivetune.utils.YTPlayerUtils
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.enumPreference
-import moe.rukamori.archivetune.utils.get
-import moe.rukamori.archivetune.utils.getAsync
-import moe.rukamori.archivetune.utils.isLocalMediaId
-import moe.rukamori.archivetune.utils.isLowDataModeActive
-import moe.rukamori.archivetune.utils.reportException
-import moe.rukamori.archivetune.utils.retryWithoutPlaybackLoginContext
-import moe.rukamori.archivetune.widget.LoadWidgetInsightsUseCase
+import dev.vxs.frostsoulx.MainActivity
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.aod.ACTION_AOD_MODE
+import dev.vxs.frostsoulx.constants.AodAutoStartScreenOffKey
+import dev.vxs.frostsoulx.cast.CastMediaItemResolver
+import dev.vxs.frostsoulx.cast.CastPlaybackRepository
+import dev.vxs.frostsoulx.cast.CastPlaybackRepositoryLocator
+import dev.vxs.frostsoulx.constants.AudioNormalizationKey
+import dev.vxs.frostsoulx.constants.AudioOffload
+import dev.vxs.frostsoulx.constants.AudioQuality
+import dev.vxs.frostsoulx.constants.AudioQualityKey
+import dev.vxs.frostsoulx.constants.AutoDownloadOnLikeKey
+import dev.vxs.frostsoulx.constants.AutoLoadMoreKey
+import dev.vxs.frostsoulx.constants.AutoSkipNextOnErrorKey
+import dev.vxs.frostsoulx.constants.AutoStartOnBluetoothKey
+import dev.vxs.frostsoulx.constants.CrossfadeDurationKey
+import dev.vxs.frostsoulx.constants.CrossfadeEnabledKey
+import dev.vxs.frostsoulx.constants.CrossfadeGaplessKey
+import dev.vxs.frostsoulx.constants.DeviceMutePlaybackRecoveryVolumeKey
+import dev.vxs.frostsoulx.constants.DiscordShowWhenPausedKey
+import dev.vxs.frostsoulx.constants.DiscordTokenKey
+import dev.vxs.frostsoulx.constants.EnableDiscordRPCKey
+import dev.vxs.frostsoulx.constants.EnableLastFMScrobblingKey
+import dev.vxs.frostsoulx.constants.EqualizerAutoHeadroomEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerBandLevelsMbKey
+import dev.vxs.frostsoulx.constants.EqualizerBassBoostEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerBassBoostStrengthKey
+import dev.vxs.frostsoulx.constants.EqualizerEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerOutputGainEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerOutputGainMbKey
+import dev.vxs.frostsoulx.constants.EqualizerSelectedProfileIdKey
+import dev.vxs.frostsoulx.constants.EqualizerVirtualizerEnabledKey
+import dev.vxs.frostsoulx.constants.EqualizerVirtualizerStrengthKey
+import dev.vxs.frostsoulx.constants.HISTORY_DURATION_DEFAULT
+import dev.vxs.frostsoulx.constants.HISTORY_DURATION_MAX
+import dev.vxs.frostsoulx.constants.HISTORY_DURATION_MIN
+import dev.vxs.frostsoulx.constants.HideExplicitKey
+import dev.vxs.frostsoulx.constants.HideVideoKey
+import dev.vxs.frostsoulx.constants.HistoryDuration
+import dev.vxs.frostsoulx.constants.LastFMSessionKey
+import dev.vxs.frostsoulx.constants.LastFMUseNowPlaying
+import dev.vxs.frostsoulx.constants.ListenBrainzEnabledKey
+import dev.vxs.frostsoulx.constants.ListenBrainzTokenKey
+import dev.vxs.frostsoulx.constants.MaxSongCacheSizeKey
+import dev.vxs.frostsoulx.constants.MediaSessionConstants.CommandToggleLike
+import dev.vxs.frostsoulx.constants.MediaSessionConstants.CommandToggleRepeatMode
+import dev.vxs.frostsoulx.constants.MediaSessionConstants.CommandToggleShuffle
+import dev.vxs.frostsoulx.constants.MediaSessionConstants.CommandToggleStartRadio
+import dev.vxs.frostsoulx.constants.PauseListenHistoryKey
+import dev.vxs.frostsoulx.constants.PauseOnDeviceMuteKey
+import dev.vxs.frostsoulx.constants.PermanentShuffleKey
+import dev.vxs.frostsoulx.constants.PersistentQueueKey
+import dev.vxs.frostsoulx.constants.PlayerStreamClient
+import dev.vxs.frostsoulx.constants.PlayerStreamClientKey
+import dev.vxs.frostsoulx.constants.PlayerVolumeKey
+import dev.vxs.frostsoulx.constants.RepeatModeKey
+import dev.vxs.frostsoulx.constants.ScrobbleDelayPercentKey
+import dev.vxs.frostsoulx.constants.ScrobbleDelaySecondsKey
+import dev.vxs.frostsoulx.constants.ScrobbleMinSongDurationKey
+import dev.vxs.frostsoulx.constants.ShowLyricsKey
+import dev.vxs.frostsoulx.constants.LyricsDarkCyanHighlightKey
+import dev.vxs.frostsoulx.constants.SkipSilenceKey
+import dev.vxs.frostsoulx.constants.SmartTrimmerKey
+import dev.vxs.frostsoulx.constants.StopMusicOnTaskClearKey
+import dev.vxs.frostsoulx.constants.TogetherClientIdKey
+import dev.vxs.frostsoulx.constants.WakelockKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.AlbumEntity
+import dev.vxs.frostsoulx.db.entities.ArtistEntity
+import dev.vxs.frostsoulx.db.entities.Event
+import dev.vxs.frostsoulx.db.entities.FormatEntity
+import dev.vxs.frostsoulx.db.entities.RelatedSongMap
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.db.entities.SongEntity
+import dev.vxs.frostsoulx.di.DownloadCache
+import dev.vxs.frostsoulx.di.PlayerCache
+import dev.vxs.frostsoulx.extensions.SilentHandler
+import dev.vxs.frostsoulx.extensions.collect
+import dev.vxs.frostsoulx.extensions.collectLatest
+import dev.vxs.frostsoulx.extensions.currentMetadata
+import dev.vxs.frostsoulx.extensions.directorySizeBytes
+import dev.vxs.frostsoulx.extensions.findNextMediaItemById
+import dev.vxs.frostsoulx.extensions.mediaItems
+import dev.vxs.frostsoulx.extensions.metadata
+import dev.vxs.frostsoulx.extensions.setOffloadEnabled
+import dev.vxs.frostsoulx.extensions.toContinuationQueue
+import dev.vxs.frostsoulx.extensions.toMediaItem
+import dev.vxs.frostsoulx.extensions.toPersistQueue
+import dev.vxs.frostsoulx.extensions.toQueue
+import dev.vxs.frostsoulx.innertube.PlaybackAuthState
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.SongItem
+import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
+import dev.vxs.frostsoulx.innertube.models.response.PlayerResponse
+import dev.vxs.frostsoulx.lastfm.LastFM
+import dev.vxs.frostsoulx.lyrics.LyricsHelper
+import dev.vxs.frostsoulx.lyrics.LyricsPreloadManager
+import dev.vxs.frostsoulx.lyrics.LyricsUtils.isLineSyncedLrc
+import dev.vxs.frostsoulx.lyrics.LyricsUtils.isTtml
+import dev.vxs.frostsoulx.lyrics.LyricsUtils.parseLyrics
+import dev.vxs.frostsoulx.lyrics.LyricsUtils.parseTtml
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.models.PersistPlayerState
+import dev.vxs.frostsoulx.models.PersistQueue
+import dev.vxs.frostsoulx.models.toMediaMetadata
+import dev.vxs.frostsoulx.moriextractor.ArchiveTuneExtractorException
+import dev.vxs.frostsoulx.moriextractor.InMemoryBearerTokenRepository
+import dev.vxs.frostsoulx.moriextractor.StreamingExtractionManager
+import dev.vxs.frostsoulx.playback.queues.EmptyQueue
+import dev.vxs.frostsoulx.playback.queues.ListQueue
+import dev.vxs.frostsoulx.playback.queues.Queue
+import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
+import dev.vxs.frostsoulx.playback.queues.filterBlockedArtists
+import dev.vxs.frostsoulx.playback.queues.filterExplicit
+import dev.vxs.frostsoulx.playback.queues.filterVideo
+import dev.vxs.frostsoulx.playback.queues.hasBlockedArtist
+import dev.vxs.frostsoulx.scrobbling.LastFmServiceConfig
+import dev.vxs.frostsoulx.storage.StorageFolderKind
+import dev.vxs.frostsoulx.storage.StorageLocationRepository
+import dev.vxs.frostsoulx.together.TogetherPlaybackSync
+import dev.vxs.frostsoulx.ui.screens.settings.DiscordPresenceManager
+import dev.vxs.frostsoulx.ui.screens.settings.ListenBrainzManager
+import dev.vxs.frostsoulx.utils.AuthScopedCacheValue
+import dev.vxs.frostsoulx.utils.CoilBitmapLoader
+import dev.vxs.frostsoulx.utils.NetworkConnectivityObserver
+import dev.vxs.frostsoulx.utils.StreamClientUtils
+import dev.vxs.frostsoulx.utils.SyncUtils
+import dev.vxs.frostsoulx.utils.YTPlayerUtils
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.enumPreference
+import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.utils.getAsync
+import dev.vxs.frostsoulx.utils.isLocalMediaId
+import dev.vxs.frostsoulx.utils.isLowDataModeActive
+import dev.vxs.frostsoulx.utils.reportException
+import dev.vxs.frostsoulx.utils.retryWithoutPlaybackLoginContext
+import dev.vxs.frostsoulx.widget.LoadWidgetInsightsUseCase
 import okhttp3.OkHttpClient
 import timber.log.Timber
 import java.io.EOFException
@@ -365,7 +365,7 @@ class MusicService :
     private val audioQuality by enumPreference(
         this,
         AudioQualityKey,
-        moe.rukamori.archivetune.constants.AudioQuality.AUTO,
+        dev.vxs.frostsoulx.constants.AudioQuality.AUTO,
     )
     private val preferredStreamClient by enumPreference(
         this,
@@ -377,7 +377,7 @@ class MusicService :
     private val remotePlaybackTrackingUrlCache = ConcurrentHashMap<String, String>()
     private val contentLengthCache = ConcurrentHashMap<String, Long>()
     private val extractorTokenRepository by lazy {
-        InMemoryBearerTokenRepository(moe.rukamori.archivetune.BuildConfig.EXTRACTOR_BEARER)
+        InMemoryBearerTokenRepository(dev.vxs.frostsoulx.BuildConfig.EXTRACTOR_BEARER)
     }
     private val _extractorAuthenticationEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val extractorAuthenticationEvents = _extractorAuthenticationEvents.asSharedFlow()
@@ -491,7 +491,7 @@ class MusicService :
     private val pendingHistoryFinalizations = mutableMapOf<String, MutableList<PendingHistoryFinalization>>()
     private val historyRecordingJobs = ConcurrentHashMap<Long, kotlinx.coroutines.Deferred<ImmediateHistoryResult>>()
 
-    val currentMediaMetadata = MutableStateFlow<moe.rukamori.archivetune.models.MediaMetadata?>(null)
+    val currentMediaMetadata = MutableStateFlow<dev.vxs.frostsoulx.models.MediaMetadata?>(null)
     val queueRestoreCompleted = MutableStateFlow(false)
     val infiniteQueueLoading = MutableStateFlow(false)
     private val playerInitialized = MutableStateFlow(false)
@@ -532,7 +532,7 @@ class MusicService :
     private var lyricsUpdateRunnable: Runnable? = null
         @Volatile
 private var lyricsNotificationHighlightEnabled = false
-    private var currentSongLyrics: List<moe.rukamori.archivetune.lyrics.LyricsEntry>? = null
+    private var currentSongLyrics: List<dev.vxs.frostsoulx.lyrics.LyricsEntry>? = null
 
     private val secondaryCrossfadeListener =
         object : Player.Listener {
@@ -702,7 +702,7 @@ private var lyricsNotificationHighlightEnabled = false
 
     private var lastDiscordUpdateTime = 0L
 
-    private var scrobbleManager: moe.rukamori.archivetune.utils.ScrobbleManager? = null
+    private var scrobbleManager: dev.vxs.frostsoulx.utils.ScrobbleManager? = null
 
     private lateinit var widgetUpdater: MusicServiceWidgetUpdater
 
@@ -716,19 +716,19 @@ private var lyricsNotificationHighlightEnabled = false
     private var hasCalledStartForeground = false
 
     val togetherSessionState =
-        MutableStateFlow<moe.rukamori.archivetune.together.TogetherSessionState>(
-            moe.rukamori.archivetune.together.TogetherSessionState.Idle,
+        MutableStateFlow<dev.vxs.frostsoulx.together.TogetherSessionState>(
+            dev.vxs.frostsoulx.together.TogetherSessionState.Idle,
         )
-    private var togetherServer: moe.rukamori.archivetune.together.TogetherServer? = null
-    private var togetherOnlineHost: moe.rukamori.archivetune.together.TogetherOnlineHost? = null
-    private var togetherClient: moe.rukamori.archivetune.together.TogetherClient? = null
+    private var togetherServer: dev.vxs.frostsoulx.together.TogetherServer? = null
+    private var togetherOnlineHost: dev.vxs.frostsoulx.together.TogetherOnlineHost? = null
+    private var togetherClient: dev.vxs.frostsoulx.together.TogetherClient? = null
     private var togetherBroadcastJob: Job? = null
     private var togetherOnlineConnectJob: Job? = null
     private var togetherClientEventsJob: Job? = null
     private var togetherHeartbeatJob: Job? = null
     private var togetherHostInactivityJob: Job? = null
     private var togetherHostInactivityEndSession: (suspend () -> Unit)? = null
-    private var togetherClock: moe.rukamori.archivetune.together.TogetherClock? = null
+    private var togetherClock: dev.vxs.frostsoulx.together.TogetherClock? = null
     private var togetherSelfParticipantId: String? = null
     private var togetherAuthorityParticipantId: String? = null
     private var togetherLastAppliedQueueHash: String? = null
@@ -753,7 +753,7 @@ private var lyricsNotificationHighlightEnabled = false
     private var togetherLastSentControlAtElapsedMs: Long = 0L
 
     @Volatile
-    private var togetherLastSentControlAction: moe.rukamori.archivetune.together.ControlAction? = null
+    private var togetherLastSentControlAction: dev.vxs.frostsoulx.together.ControlAction? = null
 
     @Volatile
     private var togetherPendingGuestControl: TogetherPendingGuestControl? = null
@@ -874,17 +874,17 @@ private var lyricsNotificationHighlightEnabled = false
                 val currentState = togetherSessionState.value
                 val isCurrentHostSession =
                     when (currentState) {
-                        is moe.rukamori.archivetune.together.TogetherSessionState.Hosting -> {
+                        is dev.vxs.frostsoulx.together.TogetherSessionState.Hosting -> {
                             currentState.sessionId == sessionId
                         }
 
-                        is moe.rukamori.archivetune.together.TogetherSessionState.HostingOnline -> {
+                        is dev.vxs.frostsoulx.together.TogetherSessionState.HostingOnline -> {
                             currentState.sessionId == sessionId
                         }
 
-                        is moe.rukamori.archivetune.together.TogetherSessionState.Joined -> {
+                        is dev.vxs.frostsoulx.together.TogetherSessionState.Joined -> {
                             currentState.sessionId == sessionId &&
-                                currentState.role is moe.rukamori.archivetune.together.TogetherRole.Host
+                                currentState.role is dev.vxs.frostsoulx.together.TogetherRole.Host
                         }
 
                         else -> {
@@ -919,7 +919,7 @@ private var lyricsNotificationHighlightEnabled = false
                         Timber.tag("Together").w(error, "Unable to end inactive online room")
                     }
                 stopTogetherInternal()
-                togetherSessionState.value = moe.rukamori.archivetune.together.TogetherSessionState.Idle
+                togetherSessionState.value = dev.vxs.frostsoulx.together.TogetherSessionState.Idle
                 showTogetherInactivityNotification()
                 scheduleStopIfIdle()
             }
@@ -1020,7 +1020,7 @@ private var lyricsNotificationHighlightEnabled = false
             ensureStartedAsForeground()
             return
         }
-        val togetherIdle = togetherSessionState.value is moe.rukamori.archivetune.together.TogetherSessionState.Idle
+        val togetherIdle = togetherSessionState.value is dev.vxs.frostsoulx.together.TogetherSessionState.Idle
         if (!togetherIdle) {
             cancelIdleStop()
             return
@@ -1039,7 +1039,7 @@ private var lyricsNotificationHighlightEnabled = false
                 delay(delayMs)
                 if (hasBoundClients) return@launch
                 if (hasResumablePlaybackNotification()) return@launch
-                if (togetherSessionState.value !is moe.rukamori.archivetune.together.TogetherSessionState.Idle) return@launch
+                if (togetherSessionState.value !is dev.vxs.frostsoulx.together.TogetherSessionState.Idle) return@launch
                 stopForegroundAndSelf()
             }
     }
@@ -1358,7 +1358,7 @@ private var lyricsNotificationHighlightEnabled = false
             val durationSeconds = prefs[CrossfadeDurationKey] ?: 5f
             val gapless = prefs[CrossfadeGaplessKey] ?: true
             CrossfadeConfig(
-                enabled = enabled && togetherState is moe.rukamori.archivetune.together.TogetherSessionState.Idle,
+                enabled = enabled && togetherState is dev.vxs.frostsoulx.together.TogetherSessionState.Idle,
                 durationSeconds = durationSeconds,
                 gapless = gapless,
             )
@@ -1473,7 +1473,7 @@ private var lyricsNotificationHighlightEnabled = false
                     val delaySeconds = dataStore.get(ScrobbleDelaySecondsKey, LastFM.DEFAULT_SCROBBLE_DELAY_SECONDS)
 
                     scrobbleManager =
-                        moe.rukamori.archivetune.utils.ScrobbleManager(
+                        dev.vxs.frostsoulx.utils.ScrobbleManager(
                             ioScope,
                             minSongDuration = minSongDuration,
                             scrobbleDelayPercent = delayPercent,
@@ -3146,8 +3146,8 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     private fun isTogetherGuestSession(): Boolean {
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        return joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        return joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest
     }
 
     private fun registerMuteRecoveryObserver() {
@@ -3650,8 +3650,8 @@ private var lyricsNotificationHighlightEnabled = false
         queue: Queue,
         playWhenReady: Boolean = true,
     ) {
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (!isTogetherApplyingRemote() && joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (!isTogetherApplyingRemote() && joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
             if (!joined.roomState.settings.allowGuestsToControlPlayback) {
                 showTogetherNotice(getString(R.string.not_allowed), key = "GUEST_PLAYQUEUE_DISABLED")
                 return
@@ -3687,7 +3687,7 @@ private var lyricsNotificationHighlightEnabled = false
                 }
 
                 val track =
-                    moe.rukamori.archivetune.together.TogetherTrack(
+                    dev.vxs.frostsoulx.together.TogetherTrack(
                         id = trackId,
                         title = meta?.title ?: trackId,
                         artists = meta?.artists?.map { it.name }.orEmpty(),
@@ -3696,7 +3696,7 @@ private var lyricsNotificationHighlightEnabled = false
                     )
 
                 val ops =
-                    moe.rukamori.archivetune.together.TogetherGuestPlaybackPlanner.planPlayTrackNow(
+                    dev.vxs.frostsoulx.together.TogetherGuestPlaybackPlanner.planPlayTrackNow(
                         roomState = joined.roomState,
                         track = track,
                         positionMs = initialStatus.position,
@@ -3711,8 +3711,8 @@ private var lyricsNotificationHighlightEnabled = false
                 showTogetherNotice(getString(R.string.together_requesting_song_change), key = "GUEST_PLAYQUEUE_REQUEST")
                 ops.forEach { op ->
                     when (op) {
-                        is moe.rukamori.archivetune.together.TogetherGuestOp.Control -> requestTogetherControl(op.action)
-                        is moe.rukamori.archivetune.together.TogetherGuestOp.AddTrack -> requestTogetherAddTrack(op.track, op.mode)
+                        is dev.vxs.frostsoulx.together.TogetherGuestOp.Control -> requestTogetherControl(op.action)
+                        is dev.vxs.frostsoulx.together.TogetherGuestOp.AddTrack -> requestTogetherAddTrack(op.track, op.mode)
                     }
                 }
             }
@@ -3874,8 +3874,8 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     fun startRadioSeamlessly() {
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (!isTogetherApplyingRemote() && joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (!isTogetherApplyingRemote() && joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
             if (!joined.roomState.settings.allowGuestsToControlPlayback) {
                 showTogetherNotice(getString(R.string.not_allowed), key = "GUEST_RADIO_DISABLED")
                 return
@@ -4058,14 +4058,14 @@ private var lyricsNotificationHighlightEnabled = false
                 .filterBlockedArtists(blockedArtistIds)
                 .filterVideo(hideMusicVideos)
         if (allowedItems.isEmpty()) return
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
             if (!joined.roomState.settings.allowGuestsToAddTracks) {
                 return
             }
             val tracks =
                 allowedItems.mapNotNull { it.metadata }.map { meta ->
-                    moe.rukamori.archivetune.together.TogetherTrack(
+                    dev.vxs.frostsoulx.together.TogetherTrack(
                         id = meta.id,
                         title = meta.title,
                         artists = meta.artists.map { it.name },
@@ -4074,7 +4074,7 @@ private var lyricsNotificationHighlightEnabled = false
                     )
                 }
             tracks.asReversed().forEach { track ->
-                requestTogetherAddTrack(track, moe.rukamori.archivetune.together.AddTrackMode.PLAY_NEXT)
+                requestTogetherAddTrack(track, dev.vxs.frostsoulx.together.AddTrackMode.PLAY_NEXT)
             }
             return
         }
@@ -4102,14 +4102,14 @@ private var lyricsNotificationHighlightEnabled = false
                 .filterBlockedArtists(blockedArtistIds)
                 .filterVideo(hideMusicVideos)
         if (allowedItems.isEmpty()) return
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
             if (!joined.roomState.settings.allowGuestsToAddTracks) {
                 return
             }
             val tracks =
                 allowedItems.mapNotNull { it.metadata }.map { meta ->
-                    moe.rukamori.archivetune.together.TogetherTrack(
+                    dev.vxs.frostsoulx.together.TogetherTrack(
                         id = meta.id,
                         title = meta.title,
                         artists = meta.artists.map { it.name },
@@ -4118,7 +4118,7 @@ private var lyricsNotificationHighlightEnabled = false
                     )
                 }
             tracks.forEach { track ->
-                requestTogetherAddTrack(track, moe.rukamori.archivetune.together.AddTrackMode.ADD_TO_QUEUE)
+                requestTogetherAddTrack(track, dev.vxs.frostsoulx.together.AddTrackMode.ADD_TO_QUEUE)
             }
             return
         }
@@ -4144,11 +4144,11 @@ private var lyricsNotificationHighlightEnabled = false
     fun startTogetherHost(
         port: Int,
         displayName: String,
-        settings: moe.rukamori.archivetune.together.TogetherRoomSettings,
+        settings: dev.vxs.frostsoulx.together.TogetherRoomSettings,
     ) {
         ensureScopesActive()
         scope.launch(SilentHandler) {
-            togetherSessionState.value = moe.rukamori.archivetune.together.TogetherSessionState.Idle
+            togetherSessionState.value = dev.vxs.frostsoulx.together.TogetherSessionState.Idle
         }
 
         ioScope.launch(SilentHandler) {
@@ -4165,18 +4165,18 @@ private var lyricsNotificationHighlightEnabled = false
                     .randomUUID()
                     .toString()
             val joinInfo =
-                moe.rukamori.archivetune.together.TogetherJoinInfo(
+                dev.vxs.frostsoulx.together.TogetherJoinInfo(
                     host = localIp ?: "127.0.0.1",
                     port = port,
                     sessionId = sessionId,
                     sessionKey = sessionKey,
                 )
             val joinLink =
-                moe.rukamori.archivetune.together.TogetherLink
+                dev.vxs.frostsoulx.together.TogetherLink
                     .encode(joinInfo)
 
             val server =
-                moe.rukamori.archivetune.together.TogetherServer(
+                dev.vxs.frostsoulx.together.TogetherServer(
                     scope = ioScope,
                     sessionId = sessionId,
                     sessionKey = sessionKey,
@@ -4197,7 +4197,7 @@ private var lyricsNotificationHighlightEnabled = false
 
             scope.launch(SilentHandler) {
                 togetherSessionState.value =
-                    moe.rukamori.archivetune.together.TogetherSessionState.Hosting(
+                    dev.vxs.frostsoulx.together.TogetherSessionState.Hosting(
                         sessionId = sessionId,
                         joinLink = joinLink,
                         localAddressHint = localIp,
@@ -4214,7 +4214,7 @@ private var lyricsNotificationHighlightEnabled = false
                             val state = buildTogetherRoomState(sessionId = sessionId, hostId = togetherHostId)
                             server.broadcastRoomState(state)
                             scope.launch(SilentHandler) {
-                                val hosting = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Hosting
+                                val hosting = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Hosting
                                 if (hosting?.sessionId == sessionId) {
                                     togetherSessionState.value =
                                         hosting.copy(
@@ -4235,7 +4235,7 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     private fun togetherOnlineErrorMessage(t: Throwable): String {
-        if (t is moe.rukamori.archivetune.together.TogetherOnlineApiException) {
+        if (t is dev.vxs.frostsoulx.together.TogetherOnlineApiException) {
             val code = t.statusCode
             return when {
                 code == 404 -> getString(R.string.together_session_not_found)
@@ -4255,11 +4255,11 @@ private var lyricsNotificationHighlightEnabled = false
 
     fun startTogetherOnlineHost(
         displayName: String,
-        settings: moe.rukamori.archivetune.together.TogetherRoomSettings,
+        settings: dev.vxs.frostsoulx.together.TogetherRoomSettings,
     ) {
         ensureScopesActive()
         scope.launch(SilentHandler) {
-            togetherSessionState.value = moe.rukamori.archivetune.together.TogetherSessionState.Idle
+            togetherSessionState.value = dev.vxs.frostsoulx.together.TogetherSessionState.Idle
         }
 
         ioScope.launch(SilentHandler) {
@@ -4267,12 +4267,12 @@ private var lyricsNotificationHighlightEnabled = false
             togetherIsOnlineSession = true
 
             val baseUrl =
-                moe.rukamori.archivetune.together.TogetherOnlineEndpoint
+                dev.vxs.frostsoulx.together.TogetherOnlineEndpoint
                     .baseUrlOrNull(dataStore)
             if (baseUrl == null) {
                 scope.launch(SilentHandler) {
                     togetherSessionState.value =
-                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                             message = getString(R.string.together_online_not_configured),
                             recoverable = true,
                         )
@@ -4281,13 +4281,13 @@ private var lyricsNotificationHighlightEnabled = false
             }
 
             val togetherToken =
-                moe.rukamori.archivetune.BuildConfig.TOGETHER_BEARER_TOKEN
+                dev.vxs.frostsoulx.BuildConfig.TOGETHER_BEARER_TOKEN
                     .trim()
                     .takeIf { it.isNotBlank() }
             if (togetherToken == null) {
                 scope.launch(SilentHandler) {
                     togetherSessionState.value =
-                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                             message = getString(R.string.together_token_missing),
                             recoverable = true,
                         )
@@ -4296,7 +4296,7 @@ private var lyricsNotificationHighlightEnabled = false
             }
 
             val api =
-                moe.rukamori.archivetune.together
+                dev.vxs.frostsoulx.together
                     .TogetherOnlineApi(baseUrl = baseUrl, bearerToken = togetherToken)
             val hostName = displayName.trim().ifBlank { getString(R.string.app_name) }
 
@@ -4309,7 +4309,7 @@ private var lyricsNotificationHighlightEnabled = false
                 }.getOrElse { t ->
                     scope.launch(SilentHandler) {
                         togetherSessionState.value =
-                            moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                            dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                 message = togetherOnlineErrorMessage(t),
                                 recoverable = true,
                             )
@@ -4319,7 +4319,7 @@ private var lyricsNotificationHighlightEnabled = false
                 }
 
             val onlineHost =
-                moe.rukamori.archivetune.together.TogetherOnlineHost(
+                dev.vxs.frostsoulx.together.TogetherOnlineHost(
                     externalScope = ioScope,
                     sessionId = created.sessionId,
                     sessionKey = created.hostKey,
@@ -4346,7 +4346,7 @@ private var lyricsNotificationHighlightEnabled = false
 
             scope.launch(SilentHandler) {
                 togetherSessionState.value =
-                    moe.rukamori.archivetune.together.TogetherSessionState.HostingOnline(
+                    dev.vxs.frostsoulx.together.TogetherSessionState.HostingOnline(
                         sessionId = created.sessionId,
                         code = created.code,
                         settings = created.settings,
@@ -4355,14 +4355,14 @@ private var lyricsNotificationHighlightEnabled = false
             }
 
             val wsUrl =
-                moe.rukamori.archivetune.together.TogetherOnlineEndpoint.onlineWebSocketUrlOrNull(
+                dev.vxs.frostsoulx.together.TogetherOnlineEndpoint.onlineWebSocketUrlOrNull(
                     rawWsUrl = created.wsUrl,
                     baseUrl = baseUrl,
                 )
             if (wsUrl == null) {
                 scope.launch(SilentHandler) {
                     togetherSessionState.value =
-                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                             message = "Connection failed: Invalid server websocket URL",
                             recoverable = true,
                         )
@@ -4393,7 +4393,7 @@ private var lyricsNotificationHighlightEnabled = false
                             onlineHost.broadcastRoomState(state)
                             scope.launch(SilentHandler) {
                                 val hosting =
-                                    togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.HostingOnline
+                                    togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.HostingOnline
                                 if (hosting?.sessionId == created.sessionId) {
                                     val currentSettings = onlineHost.currentSettings()
                                     togetherSessionState.value =
@@ -4420,12 +4420,12 @@ private var lyricsNotificationHighlightEnabled = false
     ) {
         ensureScopesActive()
         val joinInfo =
-            moe.rukamori.archivetune.together.TogetherLink
+            dev.vxs.frostsoulx.together.TogetherLink
                 .decode(rawLink)
         if (joinInfo == null) {
             scope.launch(SilentHandler) {
                 togetherSessionState.value =
-                    moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                    dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                         message = getString(R.string.invalid_link),
                         recoverable = true,
                     )
@@ -4435,7 +4435,7 @@ private var lyricsNotificationHighlightEnabled = false
 
         scope.launch(SilentHandler) {
             togetherSessionState.value =
-                moe.rukamori.archivetune.together.TogetherSessionState
+                dev.vxs.frostsoulx.together.TogetherSessionState
                     .Joining(joinInfo.toDeepLink())
         }
 
@@ -4443,13 +4443,13 @@ private var lyricsNotificationHighlightEnabled = false
             stopTogetherInternal()
             togetherIsOnlineSession = false
             val client =
-                moe.rukamori.archivetune.together.TogetherClient(
+                dev.vxs.frostsoulx.together.TogetherClient(
                     ioScope,
                     clientId = getOrCreateTogetherClientId(),
                 )
             togetherClient = client
             togetherClock =
-                moe.rukamori.archivetune.together
+                dev.vxs.frostsoulx.together
                     .TogetherClock()
             togetherSelfParticipantId = null
             togetherLastAppliedQueueHash = null
@@ -4459,19 +4459,19 @@ private var lyricsNotificationHighlightEnabled = false
                 ioScope.launch(SilentHandler) {
                     client.events.collect { event ->
                         when (event) {
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.Welcome -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.Welcome -> {
                                 togetherSelfParticipantId = event.welcome.participantId
                                 scope.launch(SilentHandler) {
                                     val state = togetherSessionState.value
-                                    if (state is moe.rukamori.archivetune.together.TogetherSessionState.Joining) {
+                                    if (state is dev.vxs.frostsoulx.together.TogetherSessionState.Joining) {
                                         val selfName = displayName.trim().ifBlank { getString(R.string.together_role_guest) }
                                         val initial =
-                                            moe.rukamori.archivetune.together.TogetherRoomState(
+                                            dev.vxs.frostsoulx.together.TogetherRoomState(
                                                 sessionId = joinInfo.sessionId,
                                                 hostId = togetherHostId,
                                                 participants =
                                                     listOf(
-                                                        moe.rukamori.archivetune.together.TogetherParticipant(
+                                                        dev.vxs.frostsoulx.together.TogetherParticipant(
                                                             id = event.welcome.participantId,
                                                             name = selfName,
                                                             isHost = false,
@@ -4490,8 +4490,8 @@ private var lyricsNotificationHighlightEnabled = false
                                                 sentAtElapsedRealtimeMs = android.os.SystemClock.elapsedRealtime(),
                                             )
                                         togetherSessionState.value =
-                                            moe.rukamori.archivetune.together.TogetherSessionState.Joined(
-                                                role = moe.rukamori.archivetune.together.TogetherRole.Guest,
+                                            dev.vxs.frostsoulx.together.TogetherSessionState.Joined(
+                                                role = dev.vxs.frostsoulx.together.TogetherRole.Guest,
                                                 sessionId = joinInfo.sessionId,
                                                 selfParticipantId = event.welcome.participantId,
                                                 roomState = initial,
@@ -4501,17 +4501,17 @@ private var lyricsNotificationHighlightEnabled = false
                                 startTogetherHeartbeat(joinInfo.sessionId, client)
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.RoomState -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.RoomState -> {
                                 applyRemoteRoomState(event.state)
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.HostTransferred -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.HostTransferred -> {
                                 handleTogetherClientHostTransferred(event.transfer)
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.ControlRequested -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.ControlRequested -> {
                                 val joined =
-                                    togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
+                                    togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
                                 if (togetherAuthorityParticipantId == togetherSelfParticipantId &&
                                     joined?.roomState?.settings?.allowGuestsToControlPlayback == true
                                 ) {
@@ -4519,9 +4519,9 @@ private var lyricsNotificationHighlightEnabled = false
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.AddTrackRequested -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.AddTrackRequested -> {
                                 val joined =
-                                    togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
+                                    togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
                                 if (togetherAuthorityParticipantId == togetherSelfParticipantId &&
                                     joined?.roomState?.settings?.allowGuestsToAddTracks == true
                                 ) {
@@ -4529,11 +4529,11 @@ private var lyricsNotificationHighlightEnabled = false
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.JoinDecision -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.JoinDecision -> {
                                 if (!event.decision.approved) {
                                     scope.launch(SilentHandler) {
                                         togetherSessionState.value =
-                                            moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                            dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                                 message = getString(R.string.not_allowed),
                                                 recoverable = true,
                                             )
@@ -4542,14 +4542,14 @@ private var lyricsNotificationHighlightEnabled = false
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.ServerIssue -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.ServerIssue -> {
                                 Timber.tag("Together").w("server issue (lan) code=${event.code.orEmpty()} message=${event.message}")
                                 when (event.code) {
                                     "GUEST_CONTROL_DISABLED" -> {
                                         showTogetherNotice(event.message, key = "GUEST_CONTROL_DISABLED")
                                         val joined =
-                                            togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-                                        if (joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
+                                            togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+                                        if (joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
                                             togetherPendingGuestControl = null
                                             togetherLastSentControlAction = null
                                             scope.launch(SilentHandler) { applyRemoteRoomState(joined.roomState, force = true) }
@@ -4567,7 +4567,7 @@ private var lyricsNotificationHighlightEnabled = false
                                     else -> {
                                         scope.launch(SilentHandler) {
                                             togetherSessionState.value =
-                                                moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                                dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                                     message = event.message,
                                                     recoverable = true,
                                                 )
@@ -4577,7 +4577,7 @@ private var lyricsNotificationHighlightEnabled = false
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.HeartbeatPong -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.HeartbeatPong -> {
                                 val clock = togetherClock ?: return@collect
                                 clock.onPong(
                                     sentAtElapsedMs = event.pong.clientElapsedRealtimeMs,
@@ -4586,10 +4586,10 @@ private var lyricsNotificationHighlightEnabled = false
                                 )
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.Error -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.Error -> {
                                 scope.launch(SilentHandler) {
                                     togetherSessionState.value =
-                                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                             message = event.message,
                                             recoverable = true,
                                         )
@@ -4597,16 +4597,16 @@ private var lyricsNotificationHighlightEnabled = false
                                 ioScope.launch(SilentHandler) { stopTogetherInternal() }
                             }
 
-                            moe.rukamori.archivetune.together.TogetherClientEvent.Disconnected -> {
+                            dev.vxs.frostsoulx.together.TogetherClientEvent.Disconnected -> {
                                 val current = togetherSessionState.value
-                                if (current is moe.rukamori.archivetune.together.TogetherSessionState.Idle) return@collect
+                                if (current is dev.vxs.frostsoulx.together.TogetherSessionState.Idle) return@collect
                                 scope.launch(SilentHandler) {
                                     val currentState = togetherSessionState.value
                                     togetherSessionState.value =
-                                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                             message =
-                                                if (currentState is moe.rukamori.archivetune.together.TogetherSessionState.Joined &&
-                                                    currentState.role is moe.rukamori.archivetune.together.TogetherRole.Guest
+                                                if (currentState is dev.vxs.frostsoulx.together.TogetherSessionState.Joined &&
+                                                    currentState.role is dev.vxs.frostsoulx.together.TogetherRole.Guest
                                                 ) {
                                                     getString(R.string.together_host_left_session)
                                                 } else {
@@ -4634,7 +4634,7 @@ private var lyricsNotificationHighlightEnabled = false
         if (trimmedCode.isBlank()) {
             scope.launch(SilentHandler) {
                 togetherSessionState.value =
-                    moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                    dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                         message = getString(R.string.invalid_code),
                         recoverable = true,
                     )
@@ -4644,7 +4644,7 @@ private var lyricsNotificationHighlightEnabled = false
 
         scope.launch(SilentHandler) {
             togetherSessionState.value =
-                moe.rukamori.archivetune.together.TogetherSessionState
+                dev.vxs.frostsoulx.together.TogetherSessionState
                     .JoiningOnline(trimmedCode)
         }
 
@@ -4653,12 +4653,12 @@ private var lyricsNotificationHighlightEnabled = false
             togetherIsOnlineSession = true
 
             val baseUrl =
-                moe.rukamori.archivetune.together.TogetherOnlineEndpoint
+                dev.vxs.frostsoulx.together.TogetherOnlineEndpoint
                     .baseUrlOrNull(dataStore)
             if (baseUrl == null) {
                 scope.launch(SilentHandler) {
                     togetherSessionState.value =
-                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                             message = getString(R.string.together_online_not_configured),
                             recoverable = true,
                         )
@@ -4667,13 +4667,13 @@ private var lyricsNotificationHighlightEnabled = false
             }
 
             val togetherToken =
-                moe.rukamori.archivetune.BuildConfig.TOGETHER_BEARER_TOKEN
+                dev.vxs.frostsoulx.BuildConfig.TOGETHER_BEARER_TOKEN
                     .trim()
                     .takeIf { it.isNotBlank() }
             if (togetherToken == null) {
                 scope.launch(SilentHandler) {
                     togetherSessionState.value =
-                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                             message = getString(R.string.together_token_missing),
                             recoverable = true,
                         )
@@ -4682,14 +4682,14 @@ private var lyricsNotificationHighlightEnabled = false
             }
 
             val api =
-                moe.rukamori.archivetune.together
+                dev.vxs.frostsoulx.together
                     .TogetherOnlineApi(baseUrl = baseUrl, bearerToken = togetherToken)
             val resolved =
                 runCatching { api.resolveCode(trimmedCode) }
                     .getOrElse { t ->
                         scope.launch(SilentHandler) {
                             togetherSessionState.value =
-                                moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                     message = togetherOnlineErrorMessage(t),
                                     recoverable = true,
                                 )
@@ -4699,14 +4699,14 @@ private var lyricsNotificationHighlightEnabled = false
                     }
 
             val client =
-                moe.rukamori.archivetune.together.TogetherClient(
+                dev.vxs.frostsoulx.together.TogetherClient(
                     ioScope,
                     clientId = getOrCreateTogetherClientId(),
                     bearerToken = togetherToken,
                 )
             togetherClient = client
             togetherClock =
-                moe.rukamori.archivetune.together
+                dev.vxs.frostsoulx.together
                     .TogetherClock()
             togetherSelfParticipantId = null
             togetherLastAppliedQueueHash = null
@@ -4716,19 +4716,19 @@ private var lyricsNotificationHighlightEnabled = false
                 ioScope.launch(SilentHandler) {
                     client.events.collect { event ->
                         when (event) {
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.Welcome -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.Welcome -> {
                                 togetherSelfParticipantId = event.welcome.participantId
                                 scope.launch(SilentHandler) {
                                     val state = togetherSessionState.value
-                                    if (state is moe.rukamori.archivetune.together.TogetherSessionState.JoiningOnline) {
+                                    if (state is dev.vxs.frostsoulx.together.TogetherSessionState.JoiningOnline) {
                                         val selfName = displayName.trim().ifBlank { getString(R.string.together_role_guest) }
                                         val initial =
-                                            moe.rukamori.archivetune.together.TogetherRoomState(
+                                            dev.vxs.frostsoulx.together.TogetherRoomState(
                                                 sessionId = resolved.sessionId,
                                                 hostId = togetherHostId,
                                                 participants =
                                                     listOf(
-                                                        moe.rukamori.archivetune.together.TogetherParticipant(
+                                                        dev.vxs.frostsoulx.together.TogetherParticipant(
                                                             id = event.welcome.participantId,
                                                             name = selfName,
                                                             isHost = false,
@@ -4747,8 +4747,8 @@ private var lyricsNotificationHighlightEnabled = false
                                                 sentAtElapsedRealtimeMs = android.os.SystemClock.elapsedRealtime(),
                                             )
                                         togetherSessionState.value =
-                                            moe.rukamori.archivetune.together.TogetherSessionState.Joined(
-                                                role = moe.rukamori.archivetune.together.TogetherRole.Guest,
+                                            dev.vxs.frostsoulx.together.TogetherSessionState.Joined(
+                                                role = dev.vxs.frostsoulx.together.TogetherRole.Guest,
                                                 sessionId = resolved.sessionId,
                                                 selfParticipantId = event.welcome.participantId,
                                                 roomState = initial,
@@ -4758,17 +4758,17 @@ private var lyricsNotificationHighlightEnabled = false
                                 startTogetherHeartbeat(resolved.sessionId, client)
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.RoomState -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.RoomState -> {
                                 applyRemoteRoomState(event.state)
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.HostTransferred -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.HostTransferred -> {
                                 handleTogetherClientHostTransferred(event.transfer)
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.ControlRequested -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.ControlRequested -> {
                                 val joined =
-                                    togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
+                                    togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
                                 if (togetherAuthorityParticipantId == togetherSelfParticipantId &&
                                     joined?.roomState?.settings?.allowGuestsToControlPlayback == true
                                 ) {
@@ -4776,9 +4776,9 @@ private var lyricsNotificationHighlightEnabled = false
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.AddTrackRequested -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.AddTrackRequested -> {
                                 val joined =
-                                    togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
+                                    togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
                                 if (togetherAuthorityParticipantId == togetherSelfParticipantId &&
                                     joined?.roomState?.settings?.allowGuestsToAddTracks == true
                                 ) {
@@ -4786,11 +4786,11 @@ private var lyricsNotificationHighlightEnabled = false
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.JoinDecision -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.JoinDecision -> {
                                 if (!event.decision.approved) {
                                     scope.launch(SilentHandler) {
                                         togetherSessionState.value =
-                                            moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                            dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                                 message = getString(R.string.not_allowed),
                                                 recoverable = true,
                                             )
@@ -4799,14 +4799,14 @@ private var lyricsNotificationHighlightEnabled = false
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.ServerIssue -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.ServerIssue -> {
                                 Timber.tag("Together").w("server issue (online) code=${event.code.orEmpty()} message=${event.message}")
                                 when (event.code) {
                                     "GUEST_CONTROL_DISABLED" -> {
                                         showTogetherNotice(event.message, key = "GUEST_CONTROL_DISABLED")
                                         val joined =
-                                            togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-                                        if (joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
+                                            togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+                                        if (joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
                                             togetherPendingGuestControl = null
                                             togetherLastSentControlAction = null
                                             scope.launch(SilentHandler) { applyRemoteRoomState(joined.roomState, force = true) }
@@ -4824,7 +4824,7 @@ private var lyricsNotificationHighlightEnabled = false
                                     else -> {
                                         scope.launch(SilentHandler) {
                                             togetherSessionState.value =
-                                                moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                                dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                                     message = event.message,
                                                     recoverable = true,
                                                 )
@@ -4834,7 +4834,7 @@ private var lyricsNotificationHighlightEnabled = false
                                 }
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.HeartbeatPong -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.HeartbeatPong -> {
                                 val clock = togetherClock ?: return@collect
                                 clock.onPong(
                                     sentAtElapsedMs = event.pong.clientElapsedRealtimeMs,
@@ -4843,10 +4843,10 @@ private var lyricsNotificationHighlightEnabled = false
                                 )
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherClientEvent.Error -> {
+                            is dev.vxs.frostsoulx.together.TogetherClientEvent.Error -> {
                                 scope.launch(SilentHandler) {
                                     togetherSessionState.value =
-                                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                             message = event.message,
                                             recoverable = true,
                                         )
@@ -4854,16 +4854,16 @@ private var lyricsNotificationHighlightEnabled = false
                                 ioScope.launch(SilentHandler) { stopTogetherInternal() }
                             }
 
-                            moe.rukamori.archivetune.together.TogetherClientEvent.Disconnected -> {
+                            dev.vxs.frostsoulx.together.TogetherClientEvent.Disconnected -> {
                                 val current = togetherSessionState.value
-                                if (current is moe.rukamori.archivetune.together.TogetherSessionState.Idle) return@collect
+                                if (current is dev.vxs.frostsoulx.together.TogetherSessionState.Idle) return@collect
                                 scope.launch(SilentHandler) {
                                     val currentState = togetherSessionState.value
                                     togetherSessionState.value =
-                                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                                             message =
-                                                if (currentState is moe.rukamori.archivetune.together.TogetherSessionState.Joined &&
-                                                    currentState.role is moe.rukamori.archivetune.together.TogetherRole.Guest
+                                                if (currentState is dev.vxs.frostsoulx.together.TogetherSessionState.Joined &&
+                                                    currentState.role is dev.vxs.frostsoulx.together.TogetherRole.Guest
                                                 ) {
                                                     getString(R.string.together_host_left_session)
                                                 } else {
@@ -4879,14 +4879,14 @@ private var lyricsNotificationHighlightEnabled = false
                 }
 
             val wsUrl =
-                moe.rukamori.archivetune.together.TogetherOnlineEndpoint.onlineWebSocketUrlOrNull(
+                dev.vxs.frostsoulx.together.TogetherOnlineEndpoint.onlineWebSocketUrlOrNull(
                     rawWsUrl = resolved.wsUrl,
                     baseUrl = baseUrl,
                 )
             if (wsUrl == null) {
                 scope.launch(SilentHandler) {
                     togetherSessionState.value =
-                        moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                        dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                             message = "Connection failed: Invalid server websocket URL",
                             recoverable = true,
                         )
@@ -4907,12 +4907,12 @@ private var lyricsNotificationHighlightEnabled = false
     fun leaveTogether() {
         ensureScopesActive()
         scope.launch(SilentHandler) {
-            togetherSessionState.value = moe.rukamori.archivetune.together.TogetherSessionState.Idle
+            togetherSessionState.value = dev.vxs.frostsoulx.together.TogetherSessionState.Idle
         }
         ioScope.launch(SilentHandler) { stopTogetherInternal() }
     }
 
-    fun updateTogetherSettings(settings: moe.rukamori.archivetune.together.TogetherRoomSettings) {
+    fun updateTogetherSettings(settings: dev.vxs.frostsoulx.together.TogetherRoomSettings) {
         val server = togetherServer
         val onlineHost = togetherOnlineHost
         if (server == null && onlineHost == null) return
@@ -4961,7 +4961,7 @@ private var lyricsNotificationHighlightEnabled = false
         val server = togetherServer
         val onlineHost = togetherOnlineHost
         val client = togetherClient
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
         ioScope.launch(SilentHandler) {
             when {
                 server != null -> {
@@ -4972,21 +4972,21 @@ private var lyricsNotificationHighlightEnabled = false
                     onlineHost.transferHostOwnership(targetId)
                 }
 
-                joined?.role is moe.rukamori.archivetune.together.TogetherRole.Host && client != null -> {
+                joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Host && client != null -> {
                     client.transferHostOwnership(joined.sessionId, targetId)
                 }
             }
         }
     }
 
-    fun requestTogetherControl(action: moe.rukamori.archivetune.together.ControlAction) {
+    fun requestTogetherControl(action: dev.vxs.frostsoulx.together.ControlAction) {
         val client =
             togetherClient ?: run {
                 showTogetherNotice(getString(R.string.network_unavailable), key = "TOGETHER_CLIENT_MISSING")
                 return
             }
-        val state = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined ?: return
-        if (state.role !is moe.rukamori.archivetune.together.TogetherRole.Guest) return
+        val state = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined ?: return
+        if (state.role !is dev.vxs.frostsoulx.together.TogetherRole.Guest) return
         if (!state.roomState.settings.allowGuestsToControlPlayback) {
             Timber.tag("Together").i("control blocked locally (disabled) action=${action::class.java.simpleName}")
             showTogetherNotice(getString(R.string.not_allowed), key = "GUEST_CONTROL_DISABLED_LOCAL")
@@ -5002,15 +5002,15 @@ private var lyricsNotificationHighlightEnabled = false
         val timeout = if (togetherIsOnlineSession) 5000L else 2000L
         togetherPendingGuestControl =
             when (action) {
-                moe.rukamori.archivetune.together.ControlAction.Play -> {
+                dev.vxs.frostsoulx.together.ControlAction.Play -> {
                     TogetherPendingGuestControl(desiredIsPlaying = true, requestedAtElapsedMs = now, expiresAtElapsedMs = now + timeout)
                 }
 
-                moe.rukamori.archivetune.together.ControlAction.Pause -> {
+                dev.vxs.frostsoulx.together.ControlAction.Pause -> {
                     TogetherPendingGuestControl(desiredIsPlaying = false, requestedAtElapsedMs = now, expiresAtElapsedMs = now + timeout)
                 }
 
-                is moe.rukamori.archivetune.together.ControlAction.SeekToIndex -> {
+                is dev.vxs.frostsoulx.together.ControlAction.SeekToIndex -> {
                     TogetherPendingGuestControl(
                         desiredIndex = action.index.coerceAtLeast(0),
                         requestedAtElapsedMs = now,
@@ -5019,7 +5019,7 @@ private var lyricsNotificationHighlightEnabled = false
                     )
                 }
 
-                is moe.rukamori.archivetune.together.ControlAction.SeekToTrack -> {
+                is dev.vxs.frostsoulx.together.ControlAction.SeekToTrack -> {
                     TogetherPendingGuestControl(
                         desiredTrackId = action.trackId.trim().ifBlank { null },
                         requestedAtElapsedMs = now,
@@ -5035,12 +5035,12 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     fun requestTogetherAddTrack(
-        track: moe.rukamori.archivetune.together.TogetherTrack,
-        mode: moe.rukamori.archivetune.together.AddTrackMode,
+        track: dev.vxs.frostsoulx.together.TogetherTrack,
+        mode: dev.vxs.frostsoulx.together.AddTrackMode,
     ) {
         val client = togetherClient ?: return
-        val state = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined ?: return
-        if (state.role !is moe.rukamori.archivetune.together.TogetherRole.Guest) return
+        val state = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined ?: return
+        if (state.role !is dev.vxs.frostsoulx.together.TogetherRole.Guest) return
         if (!state.roomState.settings.allowGuestsToAddTracks) {
             Timber.tag("Together").i("add blocked locally (disabled) mode=$mode trackId=${track.id}")
             showTogetherNotice(getString(R.string.not_allowed), key = "GUEST_ADD_DISABLED_LOCAL")
@@ -5050,23 +5050,23 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     private suspend fun handleTogetherHostEvent(
-        event: moe.rukamori.archivetune.together.TogetherServerEvent,
-        currentSettings: suspend () -> moe.rukamori.archivetune.together.TogetherRoomSettings,
+        event: dev.vxs.frostsoulx.together.TogetherServerEvent,
+        currentSettings: suspend () -> dev.vxs.frostsoulx.together.TogetherRoomSettings,
     ) {
         when (event) {
-            is moe.rukamori.archivetune.together.TogetherServerEvent.ControlRequested -> {
+            is dev.vxs.frostsoulx.together.TogetherServerEvent.ControlRequested -> {
                 val settings = currentSettings()
                 if (!settings.allowGuestsToControlPlayback) return
                 applyHostControl(event.request.action)
             }
 
-            is moe.rukamori.archivetune.together.TogetherServerEvent.AddTrackRequested -> {
+            is dev.vxs.frostsoulx.together.TogetherServerEvent.AddTrackRequested -> {
                 val settings = currentSettings()
                 if (!settings.allowGuestsToAddTracks) return
                 applyHostAddTrack(event.request.track, event.request.mode)
             }
 
-            is moe.rukamori.archivetune.together.TogetherServerEvent.ParticipantJoined -> {
+            is dev.vxs.frostsoulx.together.TogetherServerEvent.ParticipantJoined -> {
                 val participant = event.participant
                 if (!participant.isHost && !participant.isPending) {
                     togetherParticipantNames[participant.id] = participant.name
@@ -5075,7 +5075,7 @@ private var lyricsNotificationHighlightEnabled = false
                 }
             }
 
-            is moe.rukamori.archivetune.together.TogetherServerEvent.ParticipantLeft -> {
+            is dev.vxs.frostsoulx.together.TogetherServerEvent.ParticipantLeft -> {
                 val participantName =
                     togetherParticipantNames.remove(event.participantId)
                         ?: return
@@ -5083,17 +5083,17 @@ private var lyricsNotificationHighlightEnabled = false
                 if (togetherParticipantNames.isEmpty()) {
                     val sessionId =
                         when (val state = togetherSessionState.value) {
-                            is moe.rukamori.archivetune.together.TogetherSessionState.Hosting -> {
+                            is dev.vxs.frostsoulx.together.TogetherSessionState.Hosting -> {
                                 state.sessionId
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherSessionState.HostingOnline -> {
+                            is dev.vxs.frostsoulx.together.TogetherSessionState.HostingOnline -> {
                                 state.sessionId
                             }
 
-                            is moe.rukamori.archivetune.together.TogetherSessionState.Joined -> {
+                            is dev.vxs.frostsoulx.together.TogetherSessionState.Joined -> {
                                 state.sessionId.takeIf {
-                                    state.role is moe.rukamori.archivetune.together.TogetherRole.Host
+                                    state.role is dev.vxs.frostsoulx.together.TogetherRole.Host
                                 }
                             }
 
@@ -5107,13 +5107,13 @@ private var lyricsNotificationHighlightEnabled = false
                 }
             }
 
-            is moe.rukamori.archivetune.together.TogetherServerEvent.HostTransferred -> {
+            is dev.vxs.frostsoulx.together.TogetherServerEvent.HostTransferred -> {
                 val currentState = togetherSessionState.value
                 val sessionId =
                     when (currentState) {
-                        is moe.rukamori.archivetune.together.TogetherSessionState.Hosting -> currentState.sessionId
-                        is moe.rukamori.archivetune.together.TogetherSessionState.HostingOnline -> currentState.sessionId
-                        is moe.rukamori.archivetune.together.TogetherSessionState.Joined -> currentState.sessionId
+                        is dev.vxs.frostsoulx.together.TogetherSessionState.Hosting -> currentState.sessionId
+                        is dev.vxs.frostsoulx.together.TogetherSessionState.HostingOnline -> currentState.sessionId
+                        is dev.vxs.frostsoulx.together.TogetherSessionState.Joined -> currentState.sessionId
                         else -> null
                     }
                 if (event.participantId == togetherHostId &&
@@ -5128,18 +5128,18 @@ private var lyricsNotificationHighlightEnabled = false
                 handleTogetherHostTransferred(event.participantId)
             }
 
-            is moe.rukamori.archivetune.together.TogetherServerEvent.RoomStateReceived -> {
+            is dev.vxs.frostsoulx.together.TogetherServerEvent.RoomStateReceived -> {
                 if (event.state.hostId != togetherHostId) {
                     togetherSelfParticipantId = togetherHostId
                     applyRemoteRoomState(event.state, force = true)
                 }
             }
 
-            is moe.rukamori.archivetune.together.TogetherServerEvent.Error -> {
+            is dev.vxs.frostsoulx.together.TogetherServerEvent.Error -> {
                 val current = togetherSessionState.value
-                if (current is moe.rukamori.archivetune.together.TogetherSessionState.Idle) return
+                if (current is dev.vxs.frostsoulx.together.TogetherSessionState.Idle) return
                 togetherSessionState.value =
-                    moe.rukamori.archivetune.together.TogetherSessionState.Error(
+                    dev.vxs.frostsoulx.together.TogetherSessionState.Error(
                         message = event.message,
                         recoverable = true,
                     )
@@ -5152,28 +5152,28 @@ private var lyricsNotificationHighlightEnabled = false
         }
     }
 
-    private suspend fun applyHostControl(action: moe.rukamori.archivetune.together.ControlAction) {
+    private suspend fun applyHostControl(action: dev.vxs.frostsoulx.together.ControlAction) {
         withContext(Dispatchers.Main) {
             when (action) {
-                moe.rukamori.archivetune.together.ControlAction.Play -> {
+                dev.vxs.frostsoulx.together.ControlAction.Play -> {
                     if (!player.playWhenReady) {
                         player.prepare()
                         player.playWhenReady = true
                     }
                 }
 
-                moe.rukamori.archivetune.together.ControlAction.Pause -> {
+                dev.vxs.frostsoulx.together.ControlAction.Pause -> {
                     if (player.playWhenReady) {
                         player.playWhenReady = false
                     }
                 }
 
-                is moe.rukamori.archivetune.together.ControlAction.SeekTo -> {
+                is dev.vxs.frostsoulx.together.ControlAction.SeekTo -> {
                     player.seekTo(action.positionMs.coerceAtLeast(0L))
                     player.prepare()
                 }
 
-                moe.rukamori.archivetune.together.ControlAction.SkipNext -> {
+                dev.vxs.frostsoulx.together.ControlAction.SkipNext -> {
                     if (player.hasNextMediaItem()) {
                         player.seekToNext()
                         player.prepare()
@@ -5181,7 +5181,7 @@ private var lyricsNotificationHighlightEnabled = false
                     }
                 }
 
-                moe.rukamori.archivetune.together.ControlAction.SkipPrevious -> {
+                dev.vxs.frostsoulx.together.ControlAction.SkipPrevious -> {
                     if (player.hasPreviousMediaItem()) {
                         player.seekToPrevious()
                         player.prepare()
@@ -5189,7 +5189,7 @@ private var lyricsNotificationHighlightEnabled = false
                     }
                 }
 
-                is moe.rukamori.archivetune.together.ControlAction.SeekToTrack -> {
+                is dev.vxs.frostsoulx.together.ControlAction.SeekToTrack -> {
                     val trackId = action.trackId.trim()
                     if (trackId.isNotBlank()) {
                         val idx =
@@ -5204,7 +5204,7 @@ private var lyricsNotificationHighlightEnabled = false
                     }
                 }
 
-                is moe.rukamori.archivetune.together.ControlAction.SeekToIndex -> {
+                is dev.vxs.frostsoulx.together.ControlAction.SeekToIndex -> {
                     val idx = action.index.coerceAtLeast(0)
                     if (idx < player.mediaItemCount) {
                         player.seekTo(idx, action.positionMs.coerceAtLeast(0L))
@@ -5212,13 +5212,13 @@ private var lyricsNotificationHighlightEnabled = false
                     }
                 }
 
-                is moe.rukamori.archivetune.together.ControlAction.SetRepeatMode -> {
+                is dev.vxs.frostsoulx.together.ControlAction.SetRepeatMode -> {
                     if (player.repeatMode != action.repeatMode) {
                         player.repeatMode = action.repeatMode
                     }
                 }
 
-                is moe.rukamori.archivetune.together.ControlAction.SetShuffleEnabled -> {
+                is dev.vxs.frostsoulx.together.ControlAction.SetShuffleEnabled -> {
                     if (player.shuffleModeEnabled != action.shuffleEnabled) {
                         player.shuffleModeEnabled = action.shuffleEnabled
                     }
@@ -5228,14 +5228,14 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     private suspend fun applyHostAddTrack(
-        track: moe.rukamori.archivetune.together.TogetherTrack,
-        mode: moe.rukamori.archivetune.together.AddTrackMode,
+        track: dev.vxs.frostsoulx.together.TogetherTrack,
+        mode: dev.vxs.frostsoulx.together.AddTrackMode,
     ) {
         val mediaItem = track.toMediaMetadata().toMediaItem()
         withContext(Dispatchers.Main) {
             when (mode) {
-                moe.rukamori.archivetune.together.AddTrackMode.PLAY_NEXT -> playNext(listOf(mediaItem))
-                moe.rukamori.archivetune.together.AddTrackMode.ADD_TO_QUEUE -> addToQueue(listOf(mediaItem))
+                dev.vxs.frostsoulx.together.AddTrackMode.PLAY_NEXT -> playNext(listOf(mediaItem))
+                dev.vxs.frostsoulx.together.AddTrackMode.ADD_TO_QUEUE -> addToQueue(listOf(mediaItem))
             }
         }
     }
@@ -5243,11 +5243,11 @@ private var lyricsNotificationHighlightEnabled = false
     private suspend fun buildTogetherRoomState(
         sessionId: String,
         hostId: String,
-    ): moe.rukamori.archivetune.together.TogetherRoomState =
+    ): dev.vxs.frostsoulx.together.TogetherRoomState =
         withContext(Dispatchers.Main) {
             val tracks =
                 player.mediaItems.mapNotNull { it.metadata }.map { meta ->
-                    moe.rukamori.archivetune.together.TogetherTrack(
+                    dev.vxs.frostsoulx.together.TogetherTrack(
                         id = meta.id,
                         title = meta.title,
                         artists = meta.artists.map { it.name },
@@ -5257,14 +5257,14 @@ private var lyricsNotificationHighlightEnabled = false
                 }
 
             val queueHash =
-                moe.rukamori.archivetune.utils
+                dev.vxs.frostsoulx.utils
                     .md5(tracks.joinToString(separator = "|") { it.id })
 
-            moe.rukamori.archivetune.together.TogetherRoomState(
+            dev.vxs.frostsoulx.together.TogetherRoomState(
                 sessionId = sessionId,
                 hostId = hostId,
                 settings =
-                    moe.rukamori.archivetune.together
+                    dev.vxs.frostsoulx.together
                         .TogetherRoomSettings(),
                 participants = emptyList(),
                 queue = tracks,
@@ -5279,9 +5279,9 @@ private var lyricsNotificationHighlightEnabled = false
         }
 
     private fun markTogetherHostParticipant(
-        state: moe.rukamori.archivetune.together.TogetherRoomState,
+        state: dev.vxs.frostsoulx.together.TogetherRoomState,
         hostId: String,
-    ): moe.rukamori.archivetune.together.TogetherRoomState =
+    ): dev.vxs.frostsoulx.together.TogetherRoomState =
         state.copy(
             hostId = hostId,
             participants =
@@ -5297,56 +5297,56 @@ private var lyricsNotificationHighlightEnabled = false
         }
         scope.launch(SilentHandler) {
             when (val current = togetherSessionState.value) {
-                is moe.rukamori.archivetune.together.TogetherSessionState.Hosting -> {
+                is dev.vxs.frostsoulx.together.TogetherSessionState.Hosting -> {
                     val roomState = current.roomState?.let { markTogetherHostParticipant(it, participantId) }
                     togetherSessionState.value =
-                        moe.rukamori.archivetune.together.TogetherSessionState.Joined(
+                        dev.vxs.frostsoulx.together.TogetherSessionState.Joined(
                             role =
                                 if (participantId == togetherHostId) {
-                                    moe.rukamori.archivetune.together.TogetherRole.Host
+                                    dev.vxs.frostsoulx.together.TogetherRole.Host
                                 } else {
-                                    moe.rukamori.archivetune.together.TogetherRole.Guest
+                                    dev.vxs.frostsoulx.together.TogetherRole.Guest
                                 },
                             sessionId = current.sessionId,
                             selfParticipantId = togetherHostId,
                             roomState =
                                 roomState
-                                    ?: moe.rukamori.archivetune.together.TogetherRoomState(
+                                    ?: dev.vxs.frostsoulx.together.TogetherRoomState(
                                         sessionId = current.sessionId,
                                         hostId = participantId,
                                     ),
                         )
                 }
 
-                is moe.rukamori.archivetune.together.TogetherSessionState.HostingOnline -> {
+                is dev.vxs.frostsoulx.together.TogetherSessionState.HostingOnline -> {
                     val roomState = current.roomState?.let { markTogetherHostParticipant(it, participantId) }
                     togetherSessionState.value =
-                        moe.rukamori.archivetune.together.TogetherSessionState.Joined(
+                        dev.vxs.frostsoulx.together.TogetherSessionState.Joined(
                             role =
                                 if (participantId == togetherHostId) {
-                                    moe.rukamori.archivetune.together.TogetherRole.Host
+                                    dev.vxs.frostsoulx.together.TogetherRole.Host
                                 } else {
-                                    moe.rukamori.archivetune.together.TogetherRole.Guest
+                                    dev.vxs.frostsoulx.together.TogetherRole.Guest
                                 },
                             sessionId = current.sessionId,
                             selfParticipantId = togetherHostId,
                             roomState =
                                 roomState
-                                    ?: moe.rukamori.archivetune.together.TogetherRoomState(
+                                    ?: dev.vxs.frostsoulx.together.TogetherRoomState(
                                         sessionId = current.sessionId,
                                         hostId = participantId,
                                     ),
                         )
                 }
 
-                is moe.rukamori.archivetune.together.TogetherSessionState.Joined -> {
+                is dev.vxs.frostsoulx.together.TogetherSessionState.Joined -> {
                     togetherSessionState.value =
                         current.copy(
                             role =
                                 if (current.selfParticipantId == participantId) {
-                                    moe.rukamori.archivetune.together.TogetherRole.Host
+                                    dev.vxs.frostsoulx.together.TogetherRole.Host
                                 } else {
-                                    moe.rukamori.archivetune.together.TogetherRole.Guest
+                                    dev.vxs.frostsoulx.together.TogetherRole.Guest
                                 },
                             roomState = markTogetherHostParticipant(current.roomState, participantId),
                         )
@@ -5359,7 +5359,7 @@ private var lyricsNotificationHighlightEnabled = false
         }
     }
 
-    private fun handleTogetherClientHostTransferred(transfer: moe.rukamori.archivetune.together.HostTransferred) {
+    private fun handleTogetherClientHostTransferred(transfer: dev.vxs.frostsoulx.together.HostTransferred) {
         val participantId = transfer.participantId
         handleTogetherHostTransferred(participantId)
         val client = togetherClient ?: return
@@ -5370,7 +5370,7 @@ private var lyricsNotificationHighlightEnabled = false
     private fun startTogetherAuthorityBroadcast(
         sessionId: String,
         participantId: String,
-        client: moe.rukamori.archivetune.together.TogetherClient,
+        client: dev.vxs.frostsoulx.together.TogetherClient,
     ) {
         togetherBroadcastJob?.cancel()
         togetherBroadcastJob =
@@ -5384,7 +5384,7 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     private suspend fun applyRemoteRoomState(
-        state: moe.rukamori.archivetune.together.TogetherRoomState,
+        state: dev.vxs.frostsoulx.together.TogetherRoomState,
         force: Boolean = false,
     ) {
         val pid = togetherSelfParticipantId ?: return
@@ -5446,7 +5446,7 @@ private var lyricsNotificationHighlightEnabled = false
                     if (localIds.isEmpty()) {
                         ""
                     } else {
-                        moe.rukamori.archivetune.utils
+                        dev.vxs.frostsoulx.utils
                             .md5(localIds.joinToString(separator = "|"))
                     }
                 val needsRebuild =
@@ -5462,7 +5462,7 @@ private var lyricsNotificationHighlightEnabled = false
                     val startIndex = state.currentIndex.coerceIn(0, desiredItems.lastIndex)
                     suppressAutoPlayback = false
                     currentQueue =
-                        moe.rukamori.archivetune.playback.queues.ListQueue(
+                        dev.vxs.frostsoulx.playback.queues.ListQueue(
                             title = getString(R.string.music_player),
                             items = desiredItems,
                             startIndex = startIndex,
@@ -5513,8 +5513,8 @@ private var lyricsNotificationHighlightEnabled = false
                 togetherLastAppliedRoomStateSentAtElapsedMs = sentAt
 
                 togetherSessionState.value =
-                    moe.rukamori.archivetune.together.TogetherSessionState.Joined(
-                        role = moe.rukamori.archivetune.together.TogetherRole.Guest,
+                    dev.vxs.frostsoulx.together.TogetherSessionState.Joined(
+                        role = dev.vxs.frostsoulx.together.TogetherRole.Guest,
                         sessionId = state.sessionId,
                         selfParticipantId = pid,
                         roomState = state,
@@ -5527,7 +5527,7 @@ private var lyricsNotificationHighlightEnabled = false
 
     private fun startTogetherHeartbeat(
         sessionId: String,
-        client: moe.rukamori.archivetune.together.TogetherClient,
+        client: dev.vxs.frostsoulx.together.TogetherClient,
     ) {
         togetherHeartbeatJob?.cancel()
         togetherHeartbeatJob =
@@ -5591,13 +5591,13 @@ private var lyricsNotificationHighlightEnabled = false
         togetherServer = null
     }
 
-    private fun moe.rukamori.archivetune.together.TogetherTrack.toMediaMetadata(): moe.rukamori.archivetune.models.MediaMetadata =
-        moe.rukamori.archivetune.models.MediaMetadata(
+    private fun dev.vxs.frostsoulx.together.TogetherTrack.toMediaMetadata(): dev.vxs.frostsoulx.models.MediaMetadata =
+        dev.vxs.frostsoulx.models.MediaMetadata(
             id = id,
             title = title,
             artists =
                 artists.map { name ->
-                    moe.rukamori.archivetune.models.MediaMetadata
+                    dev.vxs.frostsoulx.models.MediaMetadata
                         .Artist(id = null, name = name)
                 },
             duration = durationSec,
@@ -6213,7 +6213,7 @@ private var lyricsNotificationHighlightEnabled = false
     private suspend fun insertPlaybackHistoryEvent(
         mediaId: String,
         playTimeMs: Long,
-        mediaMetadata: moe.rukamori.archivetune.models.MediaMetadata?,
+        mediaMetadata: dev.vxs.frostsoulx.models.MediaMetadata?,
     ): Long? =
         try {
             database.withTransaction {
@@ -6330,8 +6330,8 @@ private var lyricsNotificationHighlightEnabled = false
             lyricsPreloadManager?.onSongChanged(currentIndex, queue)
         }
 
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest &&
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest &&
             reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK
         ) {
             if (!joined.roomState.settings.allowGuestsToControlPlayback) {
@@ -6347,12 +6347,12 @@ private var lyricsNotificationHighlightEnabled = false
                 val trackId = (mediaItem?.metadata ?: player.currentMetadata)?.id?.trim().orEmpty()
                 requestTogetherControl(
                     if (trackId.isBlank()) {
-                        moe.rukamori.archivetune.together.ControlAction.SeekToIndex(
+                        dev.vxs.frostsoulx.together.ControlAction.SeekToIndex(
                             index = index,
                             positionMs = player.currentPosition.coerceAtLeast(0L),
                         )
                     } else {
-                        moe.rukamori.archivetune.together.ControlAction.SeekToTrack(
+                        dev.vxs.frostsoulx.together.ControlAction.SeekToTrack(
                             trackId = trackId,
                             positionMs = player.currentPosition.coerceAtLeast(0L),
                         )
@@ -6576,8 +6576,8 @@ private var lyricsNotificationHighlightEnabled = false
         ) {
             updateHistoryTrackingPlaybackState()
         }
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest &&
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest &&
             events.contains(Player.EVENT_PLAY_WHEN_READY_CHANGED)
         ) {
             if (!joined.roomState.settings.allowGuestsToControlPlayback) {
@@ -6595,9 +6595,9 @@ private var lyricsNotificationHighlightEnabled = false
                 if (!isEcho) {
                     val action =
                         if (playWhenReady) {
-                            moe.rukamori.archivetune.together.ControlAction.Play
+                            dev.vxs.frostsoulx.together.ControlAction.Play
                         } else {
-                            moe.rukamori.archivetune.together.ControlAction.Pause
+                            dev.vxs.frostsoulx.together.ControlAction.Pause
                         }
                     requestTogetherControl(action)
                 }
@@ -6784,15 +6784,15 @@ private var lyricsNotificationHighlightEnabled = false
 
     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
         updateNotification()
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
             if (!isTogetherApplyingRemote()) {
                 if (!joined.roomState.settings.allowGuestsToControlPlayback) {
                     scope.launch(SilentHandler) { applyRemoteRoomState(joined.roomState, force = true) }
                     return
                 }
                 requestTogetherControl(
-                    moe.rukamori.archivetune.together.ControlAction.SetShuffleEnabled(
+                    dev.vxs.frostsoulx.together.ControlAction.SetShuffleEnabled(
                         shuffleEnabled = shuffleModeEnabled,
                     ),
                 )
@@ -6816,15 +6816,15 @@ private var lyricsNotificationHighlightEnabled = false
 
     override fun onRepeatModeChanged(repeatMode: Int) {
         updateNotification()
-        val joined = togetherSessionState.value as? moe.rukamori.archivetune.together.TogetherSessionState.Joined
-        if (joined?.role is moe.rukamori.archivetune.together.TogetherRole.Guest) {
+        val joined = togetherSessionState.value as? dev.vxs.frostsoulx.together.TogetherSessionState.Joined
+        if (joined?.role is dev.vxs.frostsoulx.together.TogetherRole.Guest) {
             if (!isTogetherApplyingRemote()) {
                 if (!joined.roomState.settings.allowGuestsToControlPlayback) {
                     scope.launch(SilentHandler) { applyRemoteRoomState(joined.roomState, force = true) }
                     return
                 }
                 requestTogetherControl(
-                    moe.rukamori.archivetune.together.ControlAction.SetRepeatMode(
+                    dev.vxs.frostsoulx.together.ControlAction.SetRepeatMode(
                         repeatMode = repeatMode,
                     ),
                 )
@@ -8048,7 +8048,7 @@ private var lyricsNotificationHighlightEnabled = false
         }
     }
 
-    private fun MediaItem.toPersistableMetadata(): moe.rukamori.archivetune.models.MediaMetadata? {
+    private fun MediaItem.toPersistableMetadata(): dev.vxs.frostsoulx.models.MediaMetadata? {
         val tagged = metadata
         if (tagged != null) return tagged
 
@@ -8085,7 +8085,7 @@ private var lyricsNotificationHighlightEnabled = false
                 ?.split(",")
                 ?.mapNotNull { it.trim().takeIf(String::isNotBlank) }
                 ?.map { name ->
-                    moe.rukamori.archivetune.models.MediaMetadata
+                    dev.vxs.frostsoulx.models.MediaMetadata
                         .Artist(id = null, name = name)
                 }.orEmpty()
 
@@ -8097,11 +8097,11 @@ private var lyricsNotificationHighlightEnabled = false
                 .takeIf { !it.isNullOrBlank() }
         val album =
             albumTitle?.let { titleValue ->
-                moe.rukamori.archivetune.models.MediaMetadata
+                dev.vxs.frostsoulx.models.MediaMetadata
                     .Album(id = titleValue, title = titleValue)
             }
 
-        return moe.rukamori.archivetune.models.MediaMetadata(
+        return dev.vxs.frostsoulx.models.MediaMetadata(
             id = id,
             title = title,
             artists = artists,
@@ -8302,11 +8302,11 @@ private var lyricsNotificationHighlightEnabled = false
         try {
             val state = togetherSessionState.value
             val isHostSessionActive =
-                state is moe.rukamori.archivetune.together.TogetherSessionState.Hosting ||
-                    state is moe.rukamori.archivetune.together.TogetherSessionState.HostingOnline ||
+                state is dev.vxs.frostsoulx.together.TogetherSessionState.Hosting ||
+                    state is dev.vxs.frostsoulx.together.TogetherSessionState.HostingOnline ||
                     (
-                        state is moe.rukamori.archivetune.together.TogetherSessionState.Joined &&
-                            state.role is moe.rukamori.archivetune.together.TogetherRole.Host
+                        state is dev.vxs.frostsoulx.together.TogetherSessionState.Joined &&
+                            state.role is dev.vxs.frostsoulx.together.TogetherRole.Host
                     )
 
             val isPlaybackInactive = player.playbackState == Player.STATE_IDLE || player.mediaItemCount == 0
@@ -8330,7 +8330,7 @@ private var lyricsNotificationHighlightEnabled = false
                         force = true,
                     )
                     runCatching { scope.launch { stopTogetherInternal() } }
-                    runCatching { togetherSessionState.value = moe.rukamori.archivetune.together.TogetherSessionState.Idle }
+                    runCatching { togetherSessionState.value = dev.vxs.frostsoulx.together.TogetherSessionState.Idle }
                     stopSelf()
                     return
                 }
@@ -8388,11 +8388,11 @@ private var lyricsNotificationHighlightEnabled = false
 
         ensureStartedAsForeground()
         when (intent?.action) {
-            "moe.rukamori.archivetune.WIDGET_PLAY_PAUSE" -> {
+            "dev.vxs.frostsoulx.WIDGET_PLAY_PAUSE" -> {
                 if (player.isPlaying) player.pause() else player.play()
             }
 
-            "moe.rukamori.archivetune.WIDGET_SKIP_NEXT" -> {
+            "dev.vxs.frostsoulx.WIDGET_SKIP_NEXT" -> {
                 if (player.hasNextMediaItem()) {
                     player.seekToNext()
                     player.prepare()
@@ -8400,7 +8400,7 @@ private var lyricsNotificationHighlightEnabled = false
                 }
             }
 
-            "moe.rukamori.archivetune.WIDGET_SKIP_PREV" -> {
+            "dev.vxs.frostsoulx.WIDGET_SKIP_PREV" -> {
                 if (player.hasPreviousMediaItem()) {
                     player.seekToPrevious()
                     player.prepare()
@@ -8477,9 +8477,9 @@ private var lyricsNotificationHighlightEnabled = false
         private const val DISCORD_HOLD_TIMEOUT_MS = 7_000L
         const val CHANNEL_ID = "music_channel_01"
         const val ACTION_MEDIA_NOTIFICATION_DISMISSED =
-            "moe.rukamori.archivetune.action.MEDIA_NOTIFICATION_DISMISSED"
+            "dev.vxs.frostsoulx.action.MEDIA_NOTIFICATION_DISMISSED"
         const val EXTRA_MEDIA_NOTIFICATION_DELETE_INTENT =
-            "moe.rukamori.archivetune.extra.MEDIA_NOTIFICATION_DELETE_INTENT"
+            "dev.vxs.frostsoulx.extra.MEDIA_NOTIFICATION_DELETE_INTENT"
         const val NOTIFICATION_ID = 888
         private const val TOGETHER_NOTIFICATION_CHANNEL_ID = "together_room_events"
         private const val TOGETHER_PARTICIPANT_NOTIFICATION_ID = 891

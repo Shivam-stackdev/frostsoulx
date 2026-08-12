@@ -5,22 +5,22 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.innertube.models.response
+package dev.vxs.frostsoulx.innertube.models.response
 
 import kotlinx.serialization.Serializable
-import moe.rukamori.archivetune.innertube.models.Button
-import moe.rukamori.archivetune.innertube.models.Continuation
-import moe.rukamori.archivetune.innertube.models.GridRenderer
-import moe.rukamori.archivetune.innertube.models.Menu
-import moe.rukamori.archivetune.innertube.models.MusicDetailHeaderRenderer
-import moe.rukamori.archivetune.innertube.models.MusicEditablePlaylistDetailHeaderRenderer
-import moe.rukamori.archivetune.innertube.models.MusicShelfRenderer
-import moe.rukamori.archivetune.innertube.models.ResponseContext
-import moe.rukamori.archivetune.innertube.models.Runs
-import moe.rukamori.archivetune.innertube.models.SectionListRenderer
-import moe.rukamori.archivetune.innertube.models.SubscriptionButton
-import moe.rukamori.archivetune.innertube.models.Tabs
-import moe.rukamori.archivetune.innertube.models.ThumbnailRenderer
+import dev.vxs.frostsoulx.innertube.models.Button
+import dev.vxs.frostsoulx.innertube.models.Continuation
+import dev.vxs.frostsoulx.innertube.models.GridRenderer
+import dev.vxs.frostsoulx.innertube.models.Menu
+import dev.vxs.frostsoulx.innertube.models.MusicDetailHeaderRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicEditablePlaylistDetailHeaderRenderer
+import dev.vxs.frostsoulx.innertube.models.MusicShelfRenderer
+import dev.vxs.frostsoulx.innertube.models.ResponseContext
+import dev.vxs.frostsoulx.innertube.models.Runs
+import dev.vxs.frostsoulx.innertube.models.SectionListRenderer
+import dev.vxs.frostsoulx.innertube.models.SubscriptionButton
+import dev.vxs.frostsoulx.innertube.models.Tabs
+import dev.vxs.frostsoulx.innertube.models.ThumbnailRenderer
 
 @Serializable
 data class BrowseResponse(

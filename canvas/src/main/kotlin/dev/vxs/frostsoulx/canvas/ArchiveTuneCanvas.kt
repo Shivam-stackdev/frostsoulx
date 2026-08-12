@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.canvas
+package dev.vxs.frostsoulx.canvas
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -23,8 +23,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.canvas.models.CanvasArtwork
-import moe.rukamori.archivetune.canvas.models.matchesSongIdentity
+import dev.vxs.frostsoulx.canvas.models.CanvasArtwork
+import dev.vxs.frostsoulx.canvas.models.matchesSongIdentity
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 

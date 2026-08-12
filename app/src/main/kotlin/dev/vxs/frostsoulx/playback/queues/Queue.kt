@@ -5,12 +5,12 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.playback.queues
+package dev.vxs.frostsoulx.playback.queues
 
 import androidx.media3.common.MediaItem
-import moe.rukamori.archivetune.extensions.ExtraIsMusicVideo
-import moe.rukamori.archivetune.extensions.metadata
-import moe.rukamori.archivetune.models.MediaMetadata
+import dev.vxs.frostsoulx.extensions.ExtraIsMusicVideo
+import dev.vxs.frostsoulx.extensions.metadata
+import dev.vxs.frostsoulx.models.MediaMetadata
 
 interface Queue {
     val preloadItem: MediaMetadata?

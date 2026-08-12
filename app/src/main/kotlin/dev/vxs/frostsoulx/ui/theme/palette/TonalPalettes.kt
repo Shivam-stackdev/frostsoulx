@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.theme.palette
+package dev.vxs.frostsoulx.ui.theme.palette
 
 import androidx.compose.ui.graphics.Color
 import com.materialkolor.hct.Hct

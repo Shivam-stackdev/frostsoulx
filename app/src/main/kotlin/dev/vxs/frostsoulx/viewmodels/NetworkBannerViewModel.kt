@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,8 +13,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import moe.rukamori.archivetune.network.NetworkBannerUiState
-import moe.rukamori.archivetune.network.ObserveNetworkBannerStateUseCase
+import dev.vxs.frostsoulx.network.NetworkBannerUiState
+import dev.vxs.frostsoulx.network.ObserveNetworkBannerStateUseCase
 import javax.inject.Inject
 
 @HiltViewModel

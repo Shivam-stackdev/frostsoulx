@@ -5,11 +5,11 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import androidx.media3.common.PlaybackException
 import androidx.media3.datasource.HttpDataSource
-import moe.rukamori.archivetune.utils.YTPlayerUtils
+import dev.vxs.frostsoulx.utils.YTPlayerUtils
 
 internal enum class PlaybackErrorKind {
     LoginRefreshRequired,

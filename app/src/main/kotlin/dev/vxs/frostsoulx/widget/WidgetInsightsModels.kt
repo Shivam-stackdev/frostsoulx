@@ -5,12 +5,12 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.widget
+package dev.vxs.frostsoulx.widget
 
 import android.content.Context
 import androidx.compose.runtime.Immutable
 import androidx.datastore.preferences.core.Preferences
-import moe.rukamori.archivetune.R
+import dev.vxs.frostsoulx.R
 
 @Immutable
 internal data class WidgetInsightsSnapshot(

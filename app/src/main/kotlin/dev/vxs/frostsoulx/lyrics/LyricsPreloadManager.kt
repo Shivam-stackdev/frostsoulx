@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.lyrics
+package dev.vxs.frostsoulx.lyrics
 
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,16 +22,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
-import moe.rukamori.archivetune.constants.LowDataModeKey
-import moe.rukamori.archivetune.constants.PreloadQueueLyricsEnabledKey
-import moe.rukamori.archivetune.constants.QueueLyricsPreloadCountKey
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.LyricsEntity
-import moe.rukamori.archivetune.models.MediaMetadata
-import moe.rukamori.archivetune.utils.NetworkConnectivityObserver
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.isLowDataModeActive
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.constants.LowDataModeKey
+import dev.vxs.frostsoulx.constants.PreloadQueueLyricsEnabledKey
+import dev.vxs.frostsoulx.constants.QueueLyricsPreloadCountKey
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.utils.NetworkConnectivityObserver
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.isLowDataModeActive
+import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
 
 /**

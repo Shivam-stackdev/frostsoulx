@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.ui.player
+package dev.vxs.frostsoulx.ui.player
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -55,8 +55,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.constants.AodUnlockMethod
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.AodUnlockMethod
 
 @Composable
 fun AodSlideToLockButton(

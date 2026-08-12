@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.viewmodels
+package dev.vxs.frostsoulx.viewmodels
 
 import android.content.Context
 import android.content.Intent
@@ -35,27 +35,27 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import moe.rukamori.archivetune.MainActivity
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.backup.BackupArchiveCategory
-import moe.rukamori.archivetune.backup.BackupArchiveRepository
-import moe.rukamori.archivetune.backup.BackupArchiveStep
-import moe.rukamori.archivetune.backup.CreateBackupUseCase
-import moe.rukamori.archivetune.backup.ObserveScheduledBackupSettingsUseCase
-import moe.rukamori.archivetune.backup.ScheduledBackupFrequency
-import moe.rukamori.archivetune.backup.ScheduledBackupSettings
-import moe.rukamori.archivetune.backup.UpdateScheduledBackupUseCase
-import moe.rukamori.archivetune.db.InternalDatabase
-import moe.rukamori.archivetune.db.MusicDatabase
-import moe.rukamori.archivetune.db.entities.ArtistEntity
-import moe.rukamori.archivetune.db.entities.Song
-import moe.rukamori.archivetune.db.entities.SongEntity
-import moe.rukamori.archivetune.extensions.div
-import moe.rukamori.archivetune.extensions.zipInputStream
-import moe.rukamori.archivetune.playback.MusicService
-import moe.rukamori.archivetune.playback.MusicService.Companion.PERSISTENT_QUEUE_FILE
-import moe.rukamori.archivetune.utils.dataStore
-import moe.rukamori.archivetune.utils.reportException
+import dev.vxs.frostsoulx.MainActivity
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.backup.BackupArchiveCategory
+import dev.vxs.frostsoulx.backup.BackupArchiveRepository
+import dev.vxs.frostsoulx.backup.BackupArchiveStep
+import dev.vxs.frostsoulx.backup.CreateBackupUseCase
+import dev.vxs.frostsoulx.backup.ObserveScheduledBackupSettingsUseCase
+import dev.vxs.frostsoulx.backup.ScheduledBackupFrequency
+import dev.vxs.frostsoulx.backup.ScheduledBackupSettings
+import dev.vxs.frostsoulx.backup.UpdateScheduledBackupUseCase
+import dev.vxs.frostsoulx.db.InternalDatabase
+import dev.vxs.frostsoulx.db.MusicDatabase
+import dev.vxs.frostsoulx.db.entities.ArtistEntity
+import dev.vxs.frostsoulx.db.entities.Song
+import dev.vxs.frostsoulx.db.entities.SongEntity
+import dev.vxs.frostsoulx.extensions.div
+import dev.vxs.frostsoulx.extensions.zipInputStream
+import dev.vxs.frostsoulx.playback.MusicService
+import dev.vxs.frostsoulx.playback.MusicService.Companion.PERSISTENT_QUEUE_FILE
+import dev.vxs.frostsoulx.utils.dataStore
+import dev.vxs.frostsoulx.utils.reportException
 import org.xmlpull.v1.XmlPullParser
 import java.io.FileOutputStream
 import java.io.InputStreamReader

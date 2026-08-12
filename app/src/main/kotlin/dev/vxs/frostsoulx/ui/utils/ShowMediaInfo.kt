@@ -7,7 +7,7 @@
 
 @file:OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 
-package moe.rukamori.archivetune.ui.utils
+package dev.vxs.frostsoulx.ui.utils
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -80,12 +80,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import moe.rukamori.archivetune.LocalDatabase
-import moe.rukamori.archivetune.LocalPlayerConnection
-import moe.rukamori.archivetune.R
-import moe.rukamori.archivetune.innertube.YouTube
-import moe.rukamori.archivetune.innertube.models.MediaInfo
-import moe.rukamori.archivetune.ui.component.LocalBottomSheetPageState
+import dev.vxs.frostsoulx.LocalDatabase
+import dev.vxs.frostsoulx.LocalPlayerConnection
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.innertube.models.MediaInfo
+import dev.vxs.frostsoulx.ui.component.LocalBottomSheetPageState
 
 private enum class MediaInfoTab(
     @StringRes val labelRes: Int,
