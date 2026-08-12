@@ -695,6 +695,17 @@ interface DatabaseDao {
     fun allSongs(): Flow<List<Song>>
 
     @Transaction
+    @Query(
+        """
+        SELECT * FROM song
+        WHERE inLibrary IS NOT NULL AND isMusicVideo = 0
+        ORDER BY liked DESC, totalPlayTime DESC, rowId DESC
+        LIMIT :limit
+        """,
+    )
+    fun recommendationSongs(limit: Int): Flow<List<Song>>
+
+    @Transaction
     @SuppressWarnings(RoomWarnings.QUERY_MISMATCH)
     @Query("SELECT * FROM album ORDER BY rowId")
     fun allAlbumsForDownloads(): Flow<List<Album>>
