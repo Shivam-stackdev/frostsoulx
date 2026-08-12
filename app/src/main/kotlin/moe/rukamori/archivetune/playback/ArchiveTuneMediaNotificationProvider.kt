@@ -13,7 +13,6 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import android.widget.RemoteViews
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.util.UnstableApi
@@ -41,9 +40,10 @@ class ArchiveTuneMediaNotificationProvider(
             setSmallIcon(smallIconResId)
         }
 
-    private val bigRemoteViews by lazy {
-        RemoteViews(context.packageName, R.layout.notification_player_big)
-    }
+    private var mediaSession: MediaSession? = null
+    private var mediaButtonPreferences: ImmutableList<CommandButton> = ImmutableList.of()
+    private var actionFactory: MediaNotification.ActionFactory? = null
+    private var onNotificationChangedCallback: MediaNotification.Provider.Callback? = null
     private var lastLyricLine: CharSequence = ""
     private var lastLyricsHash: Int? = null
     private var lastActiveIndex = -1
@@ -56,23 +56,41 @@ class ArchiveTuneMediaNotificationProvider(
         actionFactory: MediaNotification.ActionFactory,
         onNotificationChangedCallback: MediaNotification.Provider.Callback,
     ): MediaNotification {
+        this.mediaSession = mediaSession
+        this.mediaButtonPreferences = mediaButtonPreferences
+        this.actionFactory = actionFactory
+        this.onNotificationChangedCallback = onNotificationChangedCallback
+        return createNotificationWithCurrentLyric(
+            mediaSession = mediaSession,
+            mediaButtonPreferences = mediaButtonPreferences,
+            actionFactory = actionFactory,
+            callback = onNotificationChangedCallback,
+        )
+    }
+
+    /**
+     * Media3 owns posting a provider-created notification. Android 16 can ignore a retained
+     * custom RemoteViews surface in the compact media player, so lyrics are placed in the
+     * delegated notification's standard content text and republished through Media3's callback.
+     */
+    private fun createNotificationWithCurrentLyric(
+        mediaSession: MediaSession,
+        mediaButtonPreferences: ImmutableList<CommandButton>,
+        actionFactory: MediaNotification.ActionFactory,
+        callback: MediaNotification.Provider.Callback,
+    ): MediaNotification {
         val mediaNotification =
             delegate.createNotification(
                 mediaSession,
                 mediaButtonPreferences,
                 actionFactory,
-                onNotificationChangedCallback,
+                callback,
             )
         val original = mediaNotification.notification
         val originalDeleteIntent = original.deleteIntent
         val notification =
             NotificationCompat.Builder(context, original)
-                .setContentText(lastLyricLine)
-                .setStyle(androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle())
-                .setCustomContentView(bigRemoteViews.apply {
-                    setTextViewText(R.id.notification_lyrics, lastLyricLine)
-                })
-                .setCustomBigContentView(bigRemoteViews)
+                .setContentText(lastLyricLine.takeIf { it.isNotEmpty() })
                 .setOnlyAlertOnce(true)
                 .build()
         if (originalDeleteIntent != null) {
@@ -117,7 +135,20 @@ class ArchiveTuneMediaNotificationProvider(
         lastActiveWordCount = wordCount
         lastLyricsEnabled = lyricsEnabled
         lastLyricLine = buildLyricLine(entry, positionMs, highlightEnabled)
-        bigRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricLine)
+
+        val session = mediaSession
+        val factory = actionFactory
+        val callback = onNotificationChangedCallback
+        if (session != null && factory != null && callback != null) {
+            callback.onNotificationChanged(
+                createNotificationWithCurrentLyric(
+                    mediaSession = session,
+                    mediaButtonPreferences = mediaButtonPreferences,
+                    actionFactory = factory,
+                    callback = callback,
+                ),
+            )
+        }
         return true
     }
 

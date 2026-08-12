@@ -1062,15 +1062,13 @@ class MusicService :
             .collectLatest(ioScope) {
                 lyricsNotificationEnabled = it
                 withContext(Dispatchers.Main.immediate) {
-                    if (::lyricsNotificationProvider.isInitialized &&
+                    if (::lyricsNotificationProvider.isInitialized) {
                         lyricsNotificationProvider.updateLyricsPosition(
                             currentSongLyrics,
                             player.currentPosition,
                             lyricsNotificationHighlightEnabled,
                             lyricsNotificationEnabled,
                         )
-                    ) {
-                        refreshPlaybackNotification()
                     }
                 }
             }
@@ -6517,14 +6515,12 @@ class MusicService :
             }
         }
         currentSongLyrics = null
-        if (lyricsNotificationProvider.updateLyricsPosition(
-                null,
-                0L,
-                lyricsNotificationHighlightEnabled,
-                lyricsNotificationEnabled,
-            )) {
-            refreshPlaybackNotification()
-        }
+        lyricsNotificationProvider.updateLyricsPosition(
+            null,
+            0L,
+            lyricsNotificationHighlightEnabled,
+            lyricsNotificationEnabled,
+        )
         if (player.currentMediaItem != null) loadLyricsForCurrentSong()
         if (playWhenReady && !isCrossfading) {
             scheduleCrossfade()
@@ -8196,15 +8192,12 @@ class MusicService :
             override fun run() {
                 if (!player.isPlaying) return
                 if (currentSongLyrics == null) loadLyricsForCurrentSong()
-                if (lyricsNotificationProvider.updateLyricsPosition(
-        currentSongLyrics,
-        player.currentPosition,
-        lyricsNotificationHighlightEnabled,
-        lyricsNotificationEnabled,
-    )
-) {
-                    refreshPlaybackNotification()
-                }
+                lyricsNotificationProvider.updateLyricsPosition(
+                    currentSongLyrics,
+                    player.currentPosition,
+                    lyricsNotificationHighlightEnabled,
+                    lyricsNotificationEnabled,
+                )
                 lyricsHandler.postDelayed(this, 350L)
             }
         }
@@ -8226,15 +8219,12 @@ class MusicService :
                 isLineSyncedLrc(rawLyrics) -> parseLyrics(rawLyrics)
                 else -> emptyList()
             }
-            if (lyricsNotificationProvider.updateLyricsPosition(
-                    currentSongLyrics,
-                    player.currentPosition,
-                    lyricsNotificationHighlightEnabled,
-                    lyricsNotificationEnabled,
-                )
-            ) {
-                refreshPlaybackNotification()
-            }
+            lyricsNotificationProvider.updateLyricsPosition(
+                currentSongLyrics,
+                player.currentPosition,
+                lyricsNotificationHighlightEnabled,
+                lyricsNotificationEnabled,
+            )
         }
     }
 

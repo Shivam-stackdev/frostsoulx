@@ -79,12 +79,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -177,7 +175,6 @@ private const val MIN_KARAOKE_SYLLABLE_DURATION_MS = 1
 private fun buildProgressiveKaraokeText(
     words: List<WordTimestamp>,
     positionMs: Long,
-    textColor: Color,
 ): AnnotatedString = buildAnnotatedString {
     val darkCyan = Color(KARAOKE_DARK_CYAN.toInt())
     words.forEach { word ->
@@ -749,6 +746,7 @@ fun LyricsEnhanced(
                             .nestedScroll(nestedScrollConnection),
                 ) {
                     val lyricsViewportOffset = remember(maxHeight) { maxHeight * 0.38f }
+                    val karaokeKeepAliveZone = 72.dp
 
                     key(lyricsSessionKey, syncedLyricsRenderVersion) {
                         KaraokeLyricsView(
@@ -782,58 +780,69 @@ fun LyricsEnhanced(
                             showTranslation = showTranslations,
                             showPhonetic = romanizationPreferences.isEnabled,
                             offset = lyricsViewportOffset,
-                            keepAliveZone = 72.dp,
+                            keepAliveZone = karaokeKeepAliveZone,
                             modifier = Modifier.fillMaxSize(),
                         )
                     }
 
                     if (lyricsDarkCyanHighlight) {
-                        // KaraokeLyricsView owns timing, scrolling, and row layout. Match its
-                        // actual line index and row bounds rather than drawing a second line at
-                        // the viewport origin. This keeps the sweep attached to the active row.
+                        /*
+                         * QQ Music behaviour requires a fully readable base line plus a separate
+                         * progressive colour layer. KaraokeLyricsView intentionally fades its
+                         * native unplayed syllables, so using its activeColor alone cannot leave
+                         * upcoming words white. This overlay is constrained to the current lazy
+                         * item and duplicates only its main-text canvas: white base first, then a
+                         * Dark Cyan completed/current-word sweep.
+                         */
                         val overlayPositionMs = playbackSyncPosition().toLong()
                         val overlayLineIndex = syncedLyrics.findLastStartedLineIndex(overlayPositionMs.toInt())
                         val activeItem =
                             listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == overlayLineIndex }
-                        val overlayLine = syncedLyrics.lines.getOrNull(overlayLineIndex)
-                        val overlayStartMs = overlayLine?.start?.toLong()
+                        val overlayLine = syncedLyrics.lines.getOrNull(overlayLineIndex) as? KaraokeLine
                         val overlayEntry =
-                            lyricsEntries.firstOrNull { entry ->
-                                val mainStartMs =
+                            overlayLine?.let { karaokeLine ->
+                                lyricsEntries.firstOrNull { entry ->
                                     entry.words
-                                        ?.firstOrNull { !it.isBackground }
-                                        ?.let { (it.startTime * 1000.0).roundToLong() }
-                                mainStartMs != null && mainStartMs == overlayStartMs
+                                        ?.filterNot(WordTimestamp::isBackground)
+                                        ?.let { words ->
+                                            words.isNotEmpty() &&
+                                                words.first().startTime.toMilliseconds() == karaokeLine.start
+                                        } == true
+                                }
                             }
                         val overlayWords = overlayEntry?.words?.filterNot(WordTimestamp::isBackground)
                         if (overlayWords != null && overlayWords.isNotEmpty() && activeItem != null) {
+                            val isRightAligned = overlayLine.alignment == KaraokeAlignment.End
+                            val textAlignment = if (isRightAligned) TextAlign.End else TextAlign.Start
+                            val rowAlignment = if (isRightAligned) Alignment.TopEnd else Alignment.TopStart
+                            val visualItemOffset =
+                                activeItem.offset - with(density) { karaokeKeepAliveZone.roundToPx() }
+                            val lineText = remember(overlayWords) { overlayWords.joinToString(separator = "") { it.text } }
+
                             Box(
-                                contentAlignment = Alignment.Center,
+                                contentAlignment = rowAlignment,
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
                                         .height(with(density) { activeItem.size.toDp() })
-                                        .offset { IntOffset(0, activeItem.offset) },
+                                        .offset { IntOffset(0, visualItemOffset) }
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
                             ) {
+                                Text(
+                                    text = lineText,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = textColor,
+                                    style = normalTextStyle,
+                                    textAlign = textAlignment,
+                                )
                                 Text(
                                     text = buildProgressiveKaraokeText(
                                         words = overlayWords,
                                         positionMs = overlayPositionMs,
-                                        textColor = textColor,
                                     ),
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .graphicsLayer {
-                                                compositingStrategy = CompositingStrategy.Offscreen
-                                            }
-                                            .drawWithContent {
-                                                // Keep the overlay in the row’s own drawing layer;
-                                                // the gradient span supplies the smooth word sweep.
-                                                drawContent()
-                                            },
+                                    modifier = Modifier.fillMaxWidth(),
                                     style = normalTextStyle.copy(color = Color.Transparent),
-                                    textAlign = TextAlign.Center,
+                                    textAlign = textAlignment,
                                 )
                             }
                         }
