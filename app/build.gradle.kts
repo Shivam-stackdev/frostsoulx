@@ -43,11 +43,11 @@ val startIoAppId =
         ).trim()
 
 android {
-    namespace = "moe.rukamori.archivetune"
+    namespace = "dev.vxs.frostsoulx"
     compileSdk = 37
 
     defaultConfig {
-    applicationId = "moe.rukamori.archivetune"
+    applicationId = "dev.vxs.frostsoulx"
         minSdk = 26
         targetSdk = 37
         versionCode = 139
@@ -367,7 +367,7 @@ androidComponents {
                 metadataFile.set(rootProject.layout.projectDirectory.file("IconPack/metadata.json"))
                 svgDirectory.set(rootProject.layout.projectDirectory.dir("IconPack/svg"))
                 applicationId.set(variant.applicationId)
-                targetActivityClassName.set("moe.rukamori.archivetune.MainActivity")
+                targetActivityClassName.set("dev.vxs.frostsoulx.MainActivity")
                 resourceOutputDirectory.set(
                     layout.buildDirectory.dir("generated/iconPack/${variant.name}/res"),
                 )

@@ -5,7 +5,7 @@
  * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
-package moe.rukamori.archivetune.shazamkit
+package dev.vxs.frostsoulx.shazamkit
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -27,9 +27,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
-import moe.rukamori.archivetune.shazamkit.models.RecognitionResult
-import moe.rukamori.archivetune.shazamkit.models.ShazamRequestJson
-import moe.rukamori.archivetune.shazamkit.models.ShazamResponseJson
+import dev.vxs.frostsoulx.shazamkit.models.RecognitionResult
+import dev.vxs.frostsoulx.shazamkit.models.ShazamRequestJson
+import dev.vxs.frostsoulx.shazamkit.models.ShazamResponseJson
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue

@@ -193,7 +193,7 @@ If you choose to use a fork, you do so at your own risk.
         </a>
       </td>
       <td align="center">
-        <a href="https://apt.izzysoft.de/fdroid/index/apk/moe.rukamori.archivetune">
+        <a href="https://apt.izzysoft.de/fdroid/index/apk/dev.vxs.frostsoulx">
           <img src="https://raw.githubusercontent.com/rukamori/ArchiveTune/757d5932832e1da27ced56de98c5ad1275cf0db1/assets/IzzyOnDroidButtonBorder.svg" height="50" alt="Get ArchiveTune on IzzyOnDroid">
         </a>
       </td>
@@ -214,7 +214,7 @@ If you choose to use a fork, you do so at your own risk.
     </tr>
     <tr>
       <td align="center">
-        <a href="https://www.openapk.net/archivetune/moe.rukamori.archivetune/">
+        <a href="https://www.openapk.net/archivetune/dev.vxs.frostsoulx/">
           <img src="https://www.openapk.net/images/openapk-badge.png" height="75" alt="Get ArchiveTune on OpenAPK">
         </a>
       </td>

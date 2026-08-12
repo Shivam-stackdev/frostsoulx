@@ -110,7 +110,7 @@ flowchart TB
 ## Package Structure
 
 ```
-moe.rukamori.archivetune.innertube/
+dev.vxs.frostsoulx.innertube/
 ├── InnerTube.kt              — Core HTTP client
 ├── YouTube.kt                — High-level API singleton (main entry point)
 ├── MusicBackend.kt           — API contract interface
