@@ -8207,6 +8207,9 @@ class MusicService :
     private fun stopLyricsSync() {
         lyricsUpdateRunnable?.let(lyricsHandler::removeCallbacks)
         lyricsUpdateRunnable = null
+        if (::lyricsNotificationProvider.isInitialized) {
+            lyricsNotificationProvider.clearLyricsShadeNotification()
+        }
     }
 
     private fun loadLyricsForCurrentSong() {

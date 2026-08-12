@@ -6,15 +6,20 @@
  */
 package dev.vxs.frostsoulx.playback
 
+import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
@@ -28,8 +33,14 @@ import dev.vxs.frostsoulx.lyrics.LyricsEntry
 @UnstableApi
 class ArchiveTuneMediaNotificationProvider(
     private val context: Context,
-    @DrawableRes smallIconResId: Int,
+    @DrawableRes private val smallIconResId: Int,
 ) : MediaNotification.Provider {
+    private companion object {
+        const val LYRICS_NOTIFICATION_ID_OFFSET = 1
+    }
+
+    private val notificationManager = NotificationManagerCompat.from(context)
+    private val lyricsNotificationId = MusicService.NOTIFICATION_ID + LYRICS_NOTIFICATION_ID_OFFSET
     private val delegate =
         DefaultMediaNotificationProvider(
             context,
@@ -135,6 +146,7 @@ class ArchiveTuneMediaNotificationProvider(
         lastActiveWordCount = wordCount
         lastLyricsEnabled = lyricsEnabled
         lastLyricLine = buildLyricLine(entry, positionMs, highlightEnabled)
+        publishLyricsShadeNotification(lyricsEnabled)
 
         val session = mediaSession
         val factory = actionFactory
@@ -150,6 +162,44 @@ class ArchiveTuneMediaNotificationProvider(
             )
         }
         return true
+    }
+
+    /**
+     * Android 16 may render the system compact media template without its content-text field.
+     * A quiet companion notification guarantees that the synchronized lyric remains visible in
+     * the shade, while the Media3 callback above continues to update the media card itself.
+     */
+    private fun publishLyricsShadeNotification(lyricsEnabled: Boolean) {
+        if (!lyricsEnabled || lastLyricLine.isBlank()) {
+            notificationManager.cancel(lyricsNotificationId)
+            return
+        }
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        val notification =
+            NotificationCompat.Builder(context, MusicService.CHANNEL_ID)
+                .setSmallIcon(smallIconResId)
+                .setContentTitle(context.getString(R.string.music_player))
+                .setContentText(lastLyricLine)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(lastLyricLine))
+                .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setOnlyAlertOnce(true)
+                .setOngoing(true)
+                .setShowWhen(false)
+                .build()
+        runCatching { notificationManager.notify(lyricsNotificationId, notification) }
+    }
+
+    fun clearLyricsShadeNotification() {
+        notificationManager.cancel(lyricsNotificationId)
     }
 
     private fun countHighlightedWords(entry: LyricsEntry?, positionMs: Long): Int {

@@ -41,6 +41,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
@@ -96,7 +97,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -173,19 +173,19 @@ private const val LYRIC_FOCUS_SCROLL_DURATION_MS = 520
 private const val MIN_KARAOKE_SYLLABLE_DURATION_MS = 1
 
 private fun buildProgressiveKaraokeText(
-    words: List<WordTimestamp>,
+    syllables: List<KaraokeSyllable>,
     positionMs: Long,
 ): AnnotatedString = buildAnnotatedString {
     val darkCyan = Color(KARAOKE_DARK_CYAN.toInt())
-    words.forEach { word ->
-        val start = word.startTime * 1000.0
-        val end = (word.endTime * 1000.0).coerceAtLeast(start + 1.0)
-        val progress = ((positionMs - start) / (end - start)).toFloat().coerceIn(0f, 1f)
+    syllables.forEach { syllable ->
+        val start = syllable.start.toLong()
+        val end = syllable.end.toLong().coerceAtLeast(start + 1L)
+        val progress = ((positionMs - start).toFloat() / (end - start).toFloat()).coerceIn(0f, 1f)
         val style = when {
             positionMs >= end -> SpanStyle(color = darkCyan)
             positionMs <= start -> SpanStyle(color = Color.Transparent)
             else -> {
-                val edge = (progress + 0.02f).coerceAtMost(1f)
+                val edge = (progress + 0.025f).coerceAtMost(1f)
                 SpanStyle(
                     brush = Brush.horizontalGradient(
                         colorStops = arrayOf(
@@ -198,7 +198,7 @@ private fun buildProgressiveKaraokeText(
                 )
             }
         }
-        withStyle(style) { append(word.text) }
+        withStyle(style) { append(syllable.content) }
     }
 }
 
@@ -748,15 +748,27 @@ fun LyricsEnhanced(
                     val lyricsViewportOffset = remember(maxHeight) { maxHeight * 0.38f }
                     val karaokeKeepAliveZone = 72.dp
 
-                    key(lyricsSessionKey, syncedLyricsRenderVersion) {
-                        KaraokeLyricsView(
+                    if (lyricsDarkCyanHighlight) {
+                        /*
+                         * Draw the complete karaoke item in this composition rather than trying to
+                         * overlay a second LazyColumn. The base text and Dark Cyan sweep now share
+                         * the exact same Text layout, so they cannot drift apart while the list
+                         * scrolls, scales, or focuses the active row.
+                         */
+                        QQMusicKaraokeLyricsView(
+                            lines = syncedLyrics.lines,
                             listState = listState,
-                            lyrics = syncedLyrics,
-                            currentPosition = playbackSyncPosition,
+                            currentPositionMs = playbackSyncPosition().toLong(),
+                            contentTopPadding = lyricsViewportOffset,
+                            selectedLineKeys = selectedLineKeySet,
+                            textColor = textColor,
+                            textStyle = normalTextStyle,
+                            translationTextStyle = accompanimentTextStyle,
+                            showTranslation = showTranslations,
                             onLineClicked = { line ->
                                 if (isSelectionModeActive) {
                                     toggleSelectedLine(line.selectionKey())
-                                } else if (lyricsClick && isSynced && line.start > 0) {
+                                } else if (lyricsClick && line.start > 0) {
                                     player.seekTo(line.start.toLong())
                                 }
                             },
@@ -771,80 +783,44 @@ fun LyricsEnhanced(
                                     toggleSelectedLine(lineKey)
                                 }
                             },
-                            textColor = textColor,
-                            normalLineTextStyle = normalTextStyle,
-                            accompanimentLineTextStyle = accompanimentTextStyle,
-                            phoneticTextStyle = phoneticTextStyle,
-                            blendMode = BlendMode.SrcOver,
-                            useBlurEffect = lyricsLineBlur,
-                            showTranslation = showTranslations,
-                            showPhonetic = romanizationPreferences.isEnabled,
-                            offset = lyricsViewportOffset,
-                            keepAliveZone = karaokeKeepAliveZone,
                             modifier = Modifier.fillMaxSize(),
                         )
-                    }
-
-                    if (lyricsDarkCyanHighlight) {
-                        /*
-                         * QQ Music behaviour requires a fully readable base line plus a separate
-                         * progressive colour layer. KaraokeLyricsView intentionally fades its
-                         * native unplayed syllables, so using its activeColor alone cannot leave
-                         * upcoming words white. This overlay is constrained to the current lazy
-                         * item and duplicates only its main-text canvas: white base first, then a
-                         * Dark Cyan completed/current-word sweep.
-                         */
-                        val overlayPositionMs = playbackSyncPosition().toLong()
-                        val overlayLineIndex = syncedLyrics.findLastStartedLineIndex(overlayPositionMs.toInt())
-                        val activeItem =
-                            listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == overlayLineIndex }
-                        val overlayLine = syncedLyrics.lines.getOrNull(overlayLineIndex) as? KaraokeLine
-                        val overlayEntry =
-                            overlayLine?.let { karaokeLine ->
-                                lyricsEntries.firstOrNull { entry ->
-                                    entry.words
-                                        ?.filterNot(WordTimestamp::isBackground)
-                                        ?.let { words ->
-                                            words.isNotEmpty() &&
-                                                words.first().startTime.toMilliseconds() == karaokeLine.start
-                                        } == true
-                                }
-                            }
-                        val overlayWords = overlayEntry?.words?.filterNot(WordTimestamp::isBackground)
-                        if (overlayWords != null && overlayWords.isNotEmpty() && activeItem != null) {
-                            val isRightAligned = overlayLine.alignment == KaraokeAlignment.End
-                            val textAlignment = if (isRightAligned) TextAlign.End else TextAlign.Start
-                            val rowAlignment = if (isRightAligned) Alignment.TopEnd else Alignment.TopStart
-                            val visualItemOffset =
-                                activeItem.offset - with(density) { karaokeKeepAliveZone.roundToPx() }
-                            val lineText = remember(overlayWords) { overlayWords.joinToString(separator = "") { it.text } }
-
-                            Box(
-                                contentAlignment = rowAlignment,
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .height(with(density) { activeItem.size.toDp() })
-                                        .offset { IntOffset(0, visualItemOffset) }
-                                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                            ) {
-                                Text(
-                                    text = lineText,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = textColor,
-                                    style = normalTextStyle,
-                                    textAlign = textAlignment,
-                                )
-                                Text(
-                                    text = buildProgressiveKaraokeText(
-                                        words = overlayWords,
-                                        positionMs = overlayPositionMs,
-                                    ),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    style = normalTextStyle.copy(color = Color.Transparent),
-                                    textAlign = textAlignment,
-                                )
-                            }
+                    } else {
+                        key(lyricsSessionKey, syncedLyricsRenderVersion) {
+                            KaraokeLyricsView(
+                                listState = listState,
+                                lyrics = syncedLyrics,
+                                currentPosition = playbackSyncPosition,
+                                onLineClicked = { line ->
+                                    if (isSelectionModeActive) {
+                                        toggleSelectedLine(line.selectionKey())
+                                    } else if (lyricsClick && isSynced && line.start > 0) {
+                                        player.seekTo(line.start.toLong())
+                                    }
+                                },
+                                onLinePressed = { line ->
+                                    val lineKey = line.selectionKey()
+                                    if (!isSelectionModeActive) {
+                                        isSelectionModeActive = true
+                                        if (!selectedLineKeys.contains(lineKey)) {
+                                            selectedLineKeys.add(lineKey)
+                                        }
+                                    } else if (!selectedLineKeys.contains(lineKey)) {
+                                        toggleSelectedLine(lineKey)
+                                    }
+                                },
+                                textColor = textColor,
+                                normalLineTextStyle = normalTextStyle,
+                                accompanimentLineTextStyle = accompanimentTextStyle,
+                                phoneticTextStyle = phoneticTextStyle,
+                                blendMode = BlendMode.SrcOver,
+                                useBlurEffect = lyricsLineBlur,
+                                showTranslation = showTranslations,
+                                showPhonetic = romanizationPreferences.isEnabled,
+                                offset = lyricsViewportOffset,
+                                keepAliveZone = karaokeKeepAliveZone,
+                                modifier = Modifier.fillMaxSize(),
+                            )
                         }
                     }
                 }
@@ -982,6 +958,111 @@ private data class LyricSelectionLine(
     val selectionId: String,
     val text: String,
 )
+
+@Composable
+private fun QQMusicKaraokeLyricsView(
+    lines: List<ISyncedLine>,
+    listState: LazyListState,
+    currentPositionMs: Long,
+    contentTopPadding: androidx.compose.ui.unit.Dp,
+    selectedLineKeys: Set<String>,
+    textColor: Color,
+    textStyle: TextStyle,
+    translationTextStyle: TextStyle,
+    showTranslation: Boolean,
+    onLineClicked: (ISyncedLine) -> Unit,
+    onLinePressed: (ISyncedLine) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        state = listState,
+        modifier = modifier,
+        contentPadding = PaddingValues(start = 16.dp, top = contentTopPadding, end = 16.dp, bottom = 96.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        itemsIndexed(
+            items = lines,
+            key = { _, line -> line.selectionKey() },
+            contentType = { _, _ -> "qq_music_karaoke_line" },
+        ) { _, line ->
+            QQMusicKaraokeLineItem(
+                line = line,
+                currentPositionMs = currentPositionMs,
+                selected = line.selectionKey() in selectedLineKeys,
+                textColor = textColor,
+                textStyle = textStyle,
+                translationTextStyle = translationTextStyle,
+                showTranslation = showTranslation,
+                onClick = { onLineClicked(line) },
+                onLongClick = { onLinePressed(line) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun QQMusicKaraokeLineItem(
+    line: ISyncedLine,
+    currentPositionMs: Long,
+    selected: Boolean,
+    textColor: Color,
+    textStyle: TextStyle,
+    translationTextStyle: TextStyle,
+    showTranslation: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+) {
+    val karaokeLine = line as? KaraokeLine
+    val syllables = karaokeLine?.syllables.orEmpty()
+    val isActive = currentPositionMs in line.start.toLong()..line.end.toLong()
+    val isRightAligned = karaokeLine?.alignment == KaraokeAlignment.End
+    val textAlignment = if (isRightAligned) TextAlign.End else TextAlign.Start
+    val contentColor = if (selected) MaterialTheme.colorScheme.primary else textColor
+    val rowAlpha = if (isActive || selected) 1f else 0.46f
+    val translation = karaokeLine?.translation
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+                .graphicsLayer(alpha = rowAlpha)
+                .padding(vertical = 8.dp),
+        horizontalAlignment = if (isRightAligned) Alignment.End else Alignment.Start,
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = line.lineText(),
+                modifier = Modifier.fillMaxWidth(),
+                color = contentColor,
+                style = textStyle,
+                textAlign = textAlignment,
+            )
+            if (isActive && syllables.isNotEmpty()) {
+                Text(
+                    text = buildProgressiveKaraokeText(
+                        syllables = syllables,
+                        positionMs = currentPositionMs,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.Transparent,
+                    style = textStyle,
+                    textAlign = textAlignment,
+                )
+            }
+        }
+
+        if (showTranslation && !translation.isNullOrBlank()) {
+            Text(
+                text = translation,
+                modifier = Modifier.fillMaxWidth().padding(top = 3.dp),
+                color = contentColor.copy(alpha = 0.58f),
+                style = translationTextStyle,
+                textAlign = textAlignment,
+            )
+        }
+    }
+}
 
 @Composable
 private fun PlainLyricsView(
