@@ -8,10 +8,13 @@
 package dev.vxs.frostsoulx.ui.player.frostsoul
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -82,10 +85,11 @@ internal fun FrostSoulPlayer(
     actions: FrostSoulPlayerActions,
     modifier: Modifier = Modifier,
 ) {
-    val pages = FrostSoulPage.entries
+    val pages = remember { listOf(FrostSoulPage.Album, FrostSoulPage.Lyrics) }
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     val page = pages.getOrElse(pagerState.currentPage) { FrostSoulPage.Album }
+    var queueVisible by remember { mutableStateOf(false) }
 
     Box(
         modifier =
@@ -108,11 +112,7 @@ internal fun FrostSoulPlayer(
             FSTopBar(
                 currentPage = page,
                 onDismiss = actions.onDismiss,
-                onPageSelected = { selectedPage ->
-                    scope.launch {
-                        pagerState.animateScrollToPage(pages.indexOf(selectedPage))
-                    }
-                },
+                onOpenQueue = { queueVisible = true },
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
             )
             HorizontalPager(
@@ -141,13 +141,49 @@ internal fun FrostSoulPlayer(
                                 onSeek = actions.onSeek,
                             )
 
-                        FrostSoulPage.Queue ->
-                            FSQueue(
-                                title = uiState.queueTitle ?: "Up next",
-                                queue = uiState.queue,
-                                onSelect = actions.onSelectQueueItem,
-                            )
+                        FrostSoulPage.Queue -> Unit
                     }
+                }
+            }
+        }
+        AnimatedVisibility(
+            visible = queueVisible,
+            enter = fadeIn() + slideInVertically { height -> height / 3 },
+            exit = fadeOut() + slideOutVertically { height -> height / 3 },
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 12.dp, vertical = 18.dp),
+        ) {
+            FSGlassCard(
+                accent = uiState.palette.accent,
+                modifier = Modifier.fillMaxWidth().height(420.dp),
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 10.dp),
+                    ) {
+                        Text(
+                            text = uiState.queueTitle ?: "Up next",
+                            color = FrostSoulOnSurface,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.weight(1f),
+                        )
+                        FSIconButton(
+                            painter = painterResource(R.drawable.close),
+                            contentDescription = "Close playback queue",
+                            onClick = { queueVisible = false },
+                            compact = true,
+                        )
+                    }
+                    FSQueue(
+                        title = "",
+                        queue = uiState.queue,
+                        onSelect = { index ->
+                            actions.onSelectQueueItem(index)
+                            queueVisible = false
+                        },
+                        modifier = Modifier.weight(1f).padding(horizontal = 6.dp, vertical = 4.dp),
+                    )
                 }
             }
         }
@@ -400,14 +436,16 @@ internal fun FSQueue(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier.fillMaxSize(),
     ) {
-        item {
-            Text(
-                text = title.uppercase(),
-                color = FrostSoulCyanBright,
-                fontSize = 12.sp,
-                letterSpacing = 1.7.sp,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 14.dp),
-            )
+        if (title.isNotBlank()) {
+            item {
+                Text(
+                    text = title.uppercase(),
+                    color = FrostSoulCyanBright,
+                    fontSize = 12.sp,
+                    letterSpacing = 1.7.sp,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 14.dp),
+                )
+            }
         }
         if (queue.isEmpty()) {
             item {

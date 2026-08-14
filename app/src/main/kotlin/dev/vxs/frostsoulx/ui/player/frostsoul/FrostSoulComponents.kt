@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -158,7 +159,7 @@ internal fun FSAlbumArt(
         animationSpec = infiniteRepeatable(tween(durationMillis = 26_000, easing = LinearEasing)),
         label = "fs-album-rotation-value",
     )
-    val artShape = if (compact) RoundedCornerShape(16.dp) else RoundedCornerShape(36.dp)
+    val artShape = if (compact) RoundedCornerShape(16.dp) else CircleShape
 
     Box(
         contentAlignment = Alignment.Center,
@@ -312,7 +313,7 @@ internal fun FSSeekbar(
 internal fun FSTopBar(
     currentPage: FrostSoulPage,
     onDismiss: () -> Unit,
-    onPageSelected: (FrostSoulPage) -> Unit,
+    onOpenQueue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -320,67 +321,36 @@ internal fun FSTopBar(
         modifier = modifier.fillMaxWidth(),
     ) {
         FSIconButton(
-            painter = painterResource(R.drawable.close),
+            painter = painterResource(R.drawable.expand_less),
             contentDescription = "Collapse player",
             onClick = onDismiss,
             compact = true,
         )
         Spacer(Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "FROSTSOUL",
-                color = FrostSoulCyanBright,
-                fontSize = 11.sp,
-                letterSpacing = 2.2.sp,
-            )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
             Text(
                 text = "NOW PLAYING",
-                color = FrostSoulOnSurfaceMuted,
-                fontSize = 10.sp,
-                letterSpacing = 1.6.sp,
+                color = FrostSoulOnSurface,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 1.8.sp,
+            )
+            Text(
+                text = if (currentPage == FrostSoulPage.Lyrics) "SYNCHRONIZED LYRICS" else "ALBUM VIEW",
+                color = FrostSoulCyanBright.copy(alpha = 0.78f),
+                fontSize = 9.sp,
+                letterSpacing = 1.1.sp,
+                modifier = Modifier.padding(top = 2.dp),
             )
         }
-        FSPageSelector(currentPage = currentPage, onPageSelected = onPageSelected)
-    }
-}
-
-@Composable
-private fun FSPageSelector(
-    currentPage: FrostSoulPage,
-    onPageSelected: (FrostSoulPage) -> Unit,
-) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        FrostSoulPage.entries.forEach { page ->
-            val isSelected = page == currentPage
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier =
-                    Modifier
-                        .height(30.dp)
-                        .clip(RoundedCornerShape(15.dp))
-                        .background(if (isSelected) FrostSoulCyan.copy(alpha = 0.20f) else Color.Transparent)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            role = Role.Tab,
-                            onClick = { onPageSelected(page) },
-                        ).padding(horizontal = 9.dp),
-            ) {
-                Text(
-                    text =
-                        when (page) {
-                            FrostSoulPage.Album -> "ART"
-                            FrostSoulPage.Lyrics -> "WORDS"
-                            FrostSoulPage.Queue -> "QUEUE"
-                        },
-                    color = if (isSelected) FrostSoulCyanBright else FrostSoulOnSurfaceMuted,
-                    fontSize = 10.sp,
-                    letterSpacing = 0.5.sp,
-                )
-            }
-        }
+        FSIconButton(
+            painter = painterResource(R.drawable.queue_music),
+            contentDescription = "Open playback queue",
+            onClick = onOpenQueue,
+            compact = true,
+        )
     }
 }
