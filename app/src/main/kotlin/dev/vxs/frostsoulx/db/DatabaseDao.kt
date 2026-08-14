@@ -1516,6 +1516,38 @@ interface DatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecommendationSignals(signals: List<RecommendationSignalEntity>)
 
+    @Query(
+        """
+        INSERT INTO recommendation_signal (
+            songId,
+            type,
+            occurredAtMs,
+            positionMs,
+            listenedMs,
+            sessionId,
+            contextFlags
+        )
+        SELECT
+            :songId,
+            :type,
+            :occurredAtMs,
+            :positionMs,
+            :listenedMs,
+            :sessionId,
+            :contextFlags
+        WHERE EXISTS (SELECT 1 FROM song WHERE id = :songId)
+        """,
+    )
+    suspend fun insertRecommendationSignalIfSongExists(
+        songId: String,
+        type: String,
+        occurredAtMs: Long,
+        positionMs: Long,
+        listenedMs: Long,
+        sessionId: Long,
+        contextFlags: Int,
+    ): Long
+
     @Query("DELETE FROM recommendation_signal WHERE occurredAtMs < :beforeMs")
     suspend fun pruneRecommendationSignals(beforeMs: Long): Int
 

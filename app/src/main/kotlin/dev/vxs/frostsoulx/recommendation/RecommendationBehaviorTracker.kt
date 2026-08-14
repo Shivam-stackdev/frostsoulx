@@ -7,6 +7,7 @@
 
 package dev.vxs.frostsoulx.recommendation
 
+import android.util.Log
 import dev.vxs.frostsoulx.db.MusicDatabase
 import dev.vxs.frostsoulx.db.entities.RecommendationSignalEntity
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +44,7 @@ class RecommendationBehaviorTracker @Inject constructor(
                     val next = pending.tryReceive().getOrNull() ?: break
                     batch += next
                 }
-                database.insertRecommendationSignals(batch.toList())
+                persistSignals(batch)
                 batch.clear()
                 pruneIfNeeded()
             }
@@ -77,6 +78,24 @@ class RecommendationBehaviorTracker @Inject constructor(
         sessionId.set(System.currentTimeMillis())
     }
 
+    private suspend fun persistSignals(signals: List<RecommendationSignalEntity>) {
+        signals.forEach { signal ->
+            runCatching {
+                database.insertRecommendationSignalIfSongExists(
+                    songId = signal.songId,
+                    type = signal.type,
+                    occurredAtMs = signal.occurredAtMs,
+                    positionMs = signal.positionMs,
+                    listenedMs = signal.listenedMs,
+                    sessionId = signal.sessionId,
+                    contextFlags = signal.contextFlags,
+                )
+            }.onFailure { error ->
+                Log.w(LogTag, "Skipping noncritical recommendation signal persistence", error)
+            }
+        }
+    }
+
     private suspend fun pruneIfNeeded() {
         if (database.recommendationSignalCount() <= budget.maximumSignalsRetained) return
         val cutoff = database.recommendationSignalCutoff(budget.maximumSignalsRetained - 1) ?: return
@@ -84,6 +103,7 @@ class RecommendationBehaviorTracker @Inject constructor(
     }
 
     private companion object {
+        const val LogTag = "RecommendationTracker"
         const val BufferCapacity = 512
         const val BatchSize = 32
         val DefaultContext =
