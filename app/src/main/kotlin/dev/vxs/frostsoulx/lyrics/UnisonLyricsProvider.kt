@@ -10,7 +10,7 @@ package dev.vxs.frostsoulx.lyrics
 import android.content.Context
 import android.util.Log
 import dev.vxs.frostsoulx.constants.EnableUnisonLyricsKey
-import dev.vxs.frostsoulx.unison.Unison
+import moe.rukamori.archivetune.unison.Unison
 import dev.vxs.frostsoulx.utils.GlobalLog
 import dev.vxs.frostsoulx.utils.dataStore
 import dev.vxs.frostsoulx.utils.get

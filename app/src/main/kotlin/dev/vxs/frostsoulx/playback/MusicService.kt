@@ -227,9 +227,9 @@ import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.models.PersistPlayerState
 import dev.vxs.frostsoulx.models.PersistQueue
 import dev.vxs.frostsoulx.models.toMediaMetadata
-import dev.vxs.frostsoulx.moriextractor.ArchiveTuneExtractorException
-import dev.vxs.frostsoulx.moriextractor.InMemoryBearerTokenRepository
-import dev.vxs.frostsoulx.moriextractor.StreamingExtractionManager
+import moe.rukamori.archivetune.moriextractor.ArchiveTuneExtractorException
+import moe.rukamori.archivetune.moriextractor.InMemoryBearerTokenRepository
+import moe.rukamori.archivetune.moriextractor.StreamingExtractionManager
 import dev.vxs.frostsoulx.playback.core.Media3PlaybackCore
 import dev.vxs.frostsoulx.playback.core.PlaybackCoreState
 import dev.vxs.frostsoulx.playback.core.PlaybackSnapshotRepository

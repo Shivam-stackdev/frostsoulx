@@ -37,11 +37,11 @@ import dev.vxs.frostsoulx.constants.*
 import dev.vxs.frostsoulx.extensions.*
 import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.innertube.models.YouTubeLocale
-import dev.vxs.frostsoulx.kugou.KuGou
+import moe.rukamori.archivetune.kugou.KuGou
 import dev.vxs.frostsoulx.lastfm.LastFM
 import moe.rukamori.archivetune.morideobfuscator.MoriCipherConfig
 import moe.rukamori.archivetune.morideobfuscator.MoriCipherRuntime
-import dev.vxs.frostsoulx.paxsenix.PaxsenixLyrics
+import moe.rukamori.archivetune.paxsenix.PaxsenixLyrics
 import dev.vxs.frostsoulx.scrobbling.LastFmServiceConfig
 import dev.vxs.frostsoulx.storage.StorageFolderKind
 import dev.vxs.frostsoulx.storage.StorageLocationRepository

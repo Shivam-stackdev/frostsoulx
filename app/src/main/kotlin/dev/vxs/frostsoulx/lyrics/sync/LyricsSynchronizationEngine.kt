@@ -63,13 +63,13 @@ class LyricsSynchronizationEngine @Inject constructor() {
         val lines = source.original.lines
         if (lines.isEmpty()) return LyricsSyncState(timestampMs = playbackPositionMs.coerceAtLeast(0L))
         val timestamp = (playbackPositionMs + source.offsetMs).coerceAtLeast(0L)
-        val lineIndex = lines.floorIndex(timestamp)
+        val lineIndex = lines.floorLineIndex(timestamp)
         val current = lines.getOrNull(lineIndex)
         val previous = lines.getOrNull(lineIndex - 1)
         val next = lines.getOrNull(lineIndex + 1)
         val lineEnd = current?.endMs?.takeIf { it > current.startMs } ?: next?.startMs ?: (current?.startMs ?: timestamp) + DefaultLineDurationMs
         val lineProgress = current?.let { ((timestamp - it.startMs).toFloat() / (lineEnd - it.startMs).coerceAtLeast(1L)).coerceIn(0f, 1f) } ?: 0f
-        val wordIndex = current?.words?.floorIndex(timestamp) ?: -1
+        val wordIndex = current?.words?.floorWordIndex(timestamp) ?: -1
         val word = current?.words?.getOrNull(wordIndex)
         val wordProgress =
             word?.let {
@@ -97,7 +97,7 @@ class LyricsSynchronizationEngine @Inject constructor() {
         )
     }
 
-    private fun List<LyricsLine>.floorIndex(timestampMs: Long): Int {
+    private fun List<LyricsLine>.floorLineIndex(timestampMs: Long): Int {
         var low = 0
         var high = lastIndex
         var result = -1
@@ -113,7 +113,7 @@ class LyricsSynchronizationEngine @Inject constructor() {
         return result
     }
 
-    private fun List<dev.vxs.frostsoulx.lyrics.core.LyricsWord>.floorIndex(timestampMs: Long): Int {
+    private fun List<dev.vxs.frostsoulx.lyrics.core.LyricsWord>.floorWordIndex(timestampMs: Long): Int {
         var low = 0
         var high = lastIndex
         var result = -1

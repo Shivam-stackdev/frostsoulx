@@ -9,7 +9,7 @@ package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
 import android.util.Log
-import dev.vxs.frostsoulx.betterlyrics.BetterLyrics
+import moe.rukamori.archivetune.betterlyrics.BetterLyrics
 import dev.vxs.frostsoulx.constants.EnableBetterLyricsKey
 import dev.vxs.frostsoulx.utils.GlobalLog
 import dev.vxs.frostsoulx.utils.dataStore

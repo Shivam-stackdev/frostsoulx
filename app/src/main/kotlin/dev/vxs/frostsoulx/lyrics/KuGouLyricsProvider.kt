@@ -9,7 +9,7 @@ package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
 import dev.vxs.frostsoulx.constants.EnableKugouKey
-import dev.vxs.frostsoulx.kugou.KuGou
+import moe.rukamori.archivetune.kugou.KuGou
 import dev.vxs.frostsoulx.utils.dataStore
 import dev.vxs.frostsoulx.utils.get
 

@@ -9,7 +9,7 @@ package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
 import dev.vxs.frostsoulx.constants.EnableLrcLibKey
-import dev.vxs.frostsoulx.lrclib.LrcLib
+import moe.rukamori.archivetune.lrclib.LrcLib
 import dev.vxs.frostsoulx.utils.dataStore
 import dev.vxs.frostsoulx.utils.get
 

@@ -96,8 +96,8 @@ import dev.vxs.frostsoulx.constants.PreferredLyricsProvider
 import dev.vxs.frostsoulx.constants.PreloadQueueLyricsEnabledKey
 import dev.vxs.frostsoulx.constants.QueueLyricsPreloadCountKey
 import dev.vxs.frostsoulx.constants.deserializeLyricsProviderOrder
-import dev.vxs.frostsoulx.paxsenix.models.PaxsenixStats
-import dev.vxs.frostsoulx.paxsenix.models.ProviderStats
+import moe.rukamori.archivetune.paxsenix.models.PaxsenixStats
+import moe.rukamori.archivetune.paxsenix.models.ProviderStats
 import dev.vxs.frostsoulx.ui.component.ActionPromptDialog
 import dev.vxs.frostsoulx.ui.component.DefaultDialog
 import dev.vxs.frostsoulx.ui.component.EnumListPreference

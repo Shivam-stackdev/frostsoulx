@@ -32,8 +32,8 @@ import dev.vxs.frostsoulx.aicontentfilter.RefreshAiContentFilterUseCase
 import dev.vxs.frostsoulx.aicontentfilter.UpdateAiContentFilterSettingsUseCase
 import dev.vxs.frostsoulx.db.MusicDatabase
 import dev.vxs.frostsoulx.lyrics.LyricsHelper
-import dev.vxs.frostsoulx.paxsenix.PaxsenixLyrics
-import dev.vxs.frostsoulx.paxsenix.models.PaxsenixStats
+import moe.rukamori.archivetune.paxsenix.PaxsenixLyrics
+import moe.rukamori.archivetune.paxsenix.models.PaxsenixStats
 import javax.inject.Inject
 
 sealed interface PaxsenixStatsState {

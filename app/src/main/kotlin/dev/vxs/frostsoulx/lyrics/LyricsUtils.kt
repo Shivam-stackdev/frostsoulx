@@ -12,7 +12,7 @@ import android.text.format.DateUtils
 import com.atilika.kuromoji.ipadic.Tokenizer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import dev.vxs.frostsoulx.betterlyrics.TTMLParser
+import moe.rukamori.archivetune.betterlyrics.TTMLParser
 import dev.vxs.frostsoulx.db.entities.LyricsEntity
 import java.lang.Character.UnicodeScript
 

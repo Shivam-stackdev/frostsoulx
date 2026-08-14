@@ -9,7 +9,7 @@ package dev.vxs.frostsoulx.lyrics
 
 import android.content.Context
 import dev.vxs.frostsoulx.constants.EnableSimpMusicLyricsKey
-import dev.vxs.frostsoulx.simpmusic.SimpMusicLyrics
+import moe.rukamori.archivetune.simpmusic.SimpMusicLyrics
 import dev.vxs.frostsoulx.utils.dataStore
 import dev.vxs.frostsoulx.utils.get
 

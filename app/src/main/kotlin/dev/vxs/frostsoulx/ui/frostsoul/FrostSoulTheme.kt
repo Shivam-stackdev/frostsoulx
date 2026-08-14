@@ -270,16 +270,18 @@ fun Modifier.frostSoulGlow(
     }
 
 @Composable
-fun Modifier.frostSoulScreenBackground(): Modifier =
-    background(FrostSoulTheme.colors.background)
+fun Modifier.frostSoulScreenBackground(): Modifier {
+    val colors = FrostSoulTheme.colors
+    return background(colors.background)
         .drawBehind {
             drawRect(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        FrostSoulTheme.colors.accent.copy(alpha = 0.09f),
+                        colors.accent.copy(alpha = 0.09f),
                         Color.Transparent,
                     ),
                     endY = size.height * 0.42f,
                 ),
             )
         }
+}

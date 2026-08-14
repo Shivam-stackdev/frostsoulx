@@ -58,7 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.graphicsLayer
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -473,8 +473,8 @@ fun FSBottomSheet(
     var dragOffset by remember { mutableFloatStateOf(0f) }
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(FrostSoulTheme.motion.expressiveTween()) + scaleIn(initialScale = 0.96f),
-        exit = fadeOut(FrostSoulTheme.motion.standardTween()) + scaleOut(targetScale = 0.98f),
+        enter = fadeIn(animationSpec = tween(durationMillis = FrostSoulTheme.motion.expressive)) + scaleIn(initialScale = 0.96f),
+        exit = fadeOut(animationSpec = tween(durationMillis = FrostSoulTheme.motion.standard)) + scaleOut(targetScale = 0.98f),
         modifier = modifier.fillMaxSize(),
     ) {
         Box(
@@ -706,6 +706,7 @@ fun FSLoading(
     size: Dp = 34.dp,
 ) {
     val transition: InfiniteTransition = rememberInfiniteTransition(label = "frostSoulLoading")
+    val accentColor = FrostSoulTheme.colors.accentBright
     val rotation by transition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -714,7 +715,7 @@ fun FSLoading(
     )
     Canvas(modifier = modifier.size(size).rotate(rotation)) {
         drawArc(
-            color = FrostSoulTheme.colors.accentBright,
+            color = accentColor,
             startAngle = 18f,
             sweepAngle = 282f,
             useCenter = false,

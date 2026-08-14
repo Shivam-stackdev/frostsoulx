@@ -13,7 +13,7 @@ import dev.vxs.frostsoulx.constants.EnableYouLyPlusLyricsKey
 import dev.vxs.frostsoulx.utils.GlobalLog
 import dev.vxs.frostsoulx.utils.dataStore
 import dev.vxs.frostsoulx.utils.get
-import dev.vxs.frostsoulx.youlyplus.YouLyPlus
+import moe.rukamori.archivetune.youlyplus.YouLyPlus
 
 object YouLyPlusLyricsProvider : LyricsProvider {
     init {
