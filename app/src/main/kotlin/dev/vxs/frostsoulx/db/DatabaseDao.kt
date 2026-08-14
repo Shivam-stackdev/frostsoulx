@@ -49,6 +49,9 @@ import dev.vxs.frostsoulx.db.entities.PlaylistSong
 import dev.vxs.frostsoulx.db.entities.PlaylistSongMap
 import dev.vxs.frostsoulx.db.entities.PlaylistTagMap
 import dev.vxs.frostsoulx.db.entities.RelatedSongMap
+import dev.vxs.frostsoulx.db.entities.RecommendationFeatureEntity
+import dev.vxs.frostsoulx.db.entities.RecommendationProfileEntity
+import dev.vxs.frostsoulx.db.entities.RecommendationSignalEntity
 import dev.vxs.frostsoulx.db.entities.SearchHistory
 import dev.vxs.frostsoulx.db.entities.SetVideoIdEntity
 import dev.vxs.frostsoulx.db.entities.Song
@@ -1485,6 +1488,50 @@ interface DatabaseDao {
     @Transaction
     @Query("DELETE FROM event WHERE id IN (:eventIds)")
     fun deleteEventsByIds(eventIds: List<Long>)
+
+    @Transaction
+    @Query(
+        """
+        SELECT * FROM song
+        WHERE inLibrary IS NOT NULL AND isMusicVideo = 0
+        ORDER BY liked DESC, totalPlayTime DESC, inLibrary DESC
+        LIMIT :limit
+        """,
+    )
+    suspend fun offlineRecommendationCandidates(limit: Int): List<Song>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRecommendationSignals(signals: List<RecommendationSignalEntity>)
+
+    @Query("DELETE FROM recommendation_signal WHERE occurredAtMs < :beforeMs")
+    suspend fun pruneRecommendationSignals(beforeMs: Long): Int
+
+    @Query("SELECT * FROM recommendation_signal ORDER BY occurredAtMs DESC LIMIT :limit")
+    suspend fun recentRecommendationSignals(limit: Int): List<RecommendationSignalEntity>
+
+    @Query("SELECT COUNT(1) FROM recommendation_signal")
+    suspend fun recommendationSignalCount(): Int
+
+    @Query("SELECT occurredAtMs FROM recommendation_signal ORDER BY occurredAtMs DESC LIMIT 1 OFFSET :offset")
+    suspend fun recommendationSignalCutoff(offset: Int): Long?
+
+    @Query("SELECT * FROM recommendation_signal WHERE songId = :songId ORDER BY occurredAtMs DESC LIMIT :limit")
+    suspend fun recommendationSignalsForSong(songId: String, limit: Int): List<RecommendationSignalEntity>
+
+    @Upsert
+    suspend fun upsertRecommendationFeatures(features: List<RecommendationFeatureEntity>)
+
+    @Query("SELECT * FROM recommendation_feature WHERE songId IN (:songIds)")
+    suspend fun recommendationFeatures(songIds: List<String>): List<RecommendationFeatureEntity>
+
+    @Query("SELECT * FROM recommendation_feature ORDER BY updatedAtMs DESC LIMIT :limit")
+    suspend fun recentRecommendationFeatures(limit: Int): List<RecommendationFeatureEntity>
+
+    @Upsert
+    suspend fun upsertRecommendationProfile(profile: RecommendationProfileEntity)
+
+    @Query("SELECT * FROM recommendation_profile WHERE profile = :profile LIMIT 1")
+    suspend fun recommendationProfile(profile: String): RecommendationProfileEntity?
 
     @Transaction
     @Query("SELECT * FROM search_history WHERE `query` LIKE :query || '%' ORDER BY id DESC")

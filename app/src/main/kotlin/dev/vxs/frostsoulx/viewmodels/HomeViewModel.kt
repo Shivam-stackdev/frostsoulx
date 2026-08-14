@@ -57,6 +57,7 @@ import dev.vxs.frostsoulx.innertube.pages.HomePage
 import dev.vxs.frostsoulx.innertube.utils.completed
 import dev.vxs.frostsoulx.innertube.utils.hasYouTubeLoginCookie
 import dev.vxs.frostsoulx.models.SimilarRecommendation
+import dev.vxs.frostsoulx.repository.LibraryTopMixRepository
 import dev.vxs.frostsoulx.utils.SavedAccount
 import dev.vxs.frostsoulx.utils.SpeedDialPinType
 import dev.vxs.frostsoulx.utils.SyncUtils
@@ -102,6 +103,7 @@ private data class HomeLocalContent(
     val speedDialItems: List<LocalItem>,
     val forgottenFavorites: List<Song>,
     val keepListening: List<LocalItem>,
+    val offlineMixes: List<dev.vxs.frostsoulx.library.LibraryTopMix>,
 )
 
 private data class HomeRemoteContent(
@@ -123,6 +125,7 @@ private data class HomeContent(
                 local.speedDialItems.isNotEmpty() ||
                 local.forgottenFavorites.isNotEmpty() ||
                 local.keepListening.isNotEmpty() ||
+                local.offlineMixes.isNotEmpty() ||
                 remote.similarRecommendations.isNotEmpty() ||
                 remote.accountPlaylists.isNotEmpty() ||
                 remote.homePage?.sections?.any { it.items.isNotEmpty() } == true
@@ -155,6 +158,7 @@ private data class HomeStateInputs(
                 speedDialItems = ImmutableList.copyOf(content.local.speedDialItems),
                 forgottenFavorites = ImmutableList.copyOf(content.local.forgottenFavorites),
                 keepListening = ImmutableList.copyOf(content.local.keepListening),
+                offlineMixes = ImmutableList.copyOf(content.local.offlineMixes),
                 similarRecommendations = ImmutableList.copyOf(content.remote.similarRecommendations),
                 accountPlaylists = ImmutableList.copyOf(content.remote.accountPlaylists),
                 homePage = content.remote.homePage,
@@ -177,6 +181,7 @@ class HomeViewModel
     constructor(
         @ApplicationContext private val context: Context,
         private val database: MusicDatabase,
+        private val offlineMixRepository: LibraryTopMixRepository,
         private val syncUtils: SyncUtils,
         private val switchSavedYouTubeAccount: SwitchSavedYouTubeAccountUseCase,
         observeHomePresentationPreferences: ObserveHomePresentationPreferencesUseCase,
@@ -230,12 +235,14 @@ class HomeViewModel
                 speedDialItems,
                 forgottenFavorites,
                 keepListening,
-            ) { quickPicks, speedDialItems, forgottenFavorites, keepListening ->
+                offlineMixRepository.observePersistedTopMixes(),
+            ) { quickPicks, speedDialItems, forgottenFavorites, keepListening, offlineMixes ->
                 HomeLocalContent(
                     quickPicks = quickPicks.orEmpty(),
                     speedDialItems = speedDialItems,
                     forgottenFavorites = forgottenFavorites.orEmpty(),
                     keepListening = keepListening.orEmpty(),
+                    offlineMixes = offlineMixes,
                 )
             }
 

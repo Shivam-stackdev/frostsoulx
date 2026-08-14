@@ -172,6 +172,35 @@ internal fun FrostSoulHomeFeed(
             }
         }
 
+        uiState.offlineMixes.forEach { mix ->
+            item(key = "frostsoul_offline_mix_header_${mix.id}") {
+                FSSectionHeader(title = mix.title, eyebrow = "ON DEVICE")
+            }
+            item(key = "frostsoul_offline_mix_${mix.id}") {
+                FSGlassCard(
+                    modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
+                    contentPadding = PaddingValues(vertical = FrostSoulTheme.spacing.small),
+                ) {
+                    mix.tracks.take(6).forEach { track ->
+                        FSListItem(
+                            title = track.title,
+                            subtitle = track.artists.joinToString { it.name }.ifBlank { mix.description },
+                            artworkUrl = track.thumbnailUrl,
+                            isActive = track.id == mediaMetadata?.id && isPlaying,
+                            onClick = {
+                                playerConnection.playQueue(
+                                    ListQueue(
+                                        title = mix.title,
+                                        items = mix.tracks.map { it.toMediaItem() },
+                                    ),
+                                )
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
         if (uiState.forgottenFavorites.isNotEmpty()) {
             item(key = "frostsoul_forgotten_header") {
                 FSSectionHeader(title = "Forgotten Gems", eyebrow = "REVISIT")

@@ -243,6 +243,7 @@ import dev.vxs.frostsoulx.playback.DownloadUtil
 import dev.vxs.frostsoulx.playback.MusicService
 import dev.vxs.frostsoulx.playback.MusicService.MusicBinder
 import dev.vxs.frostsoulx.playback.PlayerConnection
+import dev.vxs.frostsoulx.recommendation.OfflineRecommendationScheduler
 import dev.vxs.frostsoulx.playback.queues.ListQueue
 import dev.vxs.frostsoulx.playback.queues.LocalAlbumRadio
 import dev.vxs.frostsoulx.playback.queues.Queue
@@ -504,6 +505,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        OfflineRecommendationScheduler.enqueue(applicationContext)
         window.decorView.layoutDirection = View.LAYOUT_DIRECTION_LTR
         WindowCompat.setDecorFitsSystemWindows(window, false)
 

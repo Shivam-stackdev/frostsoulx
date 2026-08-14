@@ -235,6 +235,8 @@ import dev.vxs.frostsoulx.moriextractor.StreamingExtractionManager
 import dev.vxs.frostsoulx.playback.core.Media3PlaybackCore
 import dev.vxs.frostsoulx.playback.core.PlaybackCoreState
 import dev.vxs.frostsoulx.playback.core.PlaybackSnapshotRepository
+import dev.vxs.frostsoulx.recommendation.RecommendationBehaviorTracker
+import dev.vxs.frostsoulx.recommendation.RecommendationSignalType
 import dev.vxs.frostsoulx.playback.queues.EmptyQueue
 import dev.vxs.frostsoulx.playback.queues.ListQueue
 import dev.vxs.frostsoulx.playback.queues.Queue
@@ -317,6 +319,9 @@ class MusicService :
 
     @Inject
     lateinit var playbackSnapshotRepository: PlaybackSnapshotRepository
+
+    @Inject
+    lateinit var recommendationBehaviorTracker: RecommendationBehaviorTracker
 
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: AudioFocusRequest? = null
@@ -6409,6 +6414,9 @@ private var lyricsNotificationHighlightEnabled = false
         }
 
         beginHistorySession(mediaItem?.mediaId, forceNew = true)
+        mediaItem?.mediaId?.takeIf(String::isNotBlank)?.let { mediaId ->
+            recommendationBehaviorTracker.record(mediaId, RecommendationSignalType.Play)
+        }
 
         val currentIndex = player.currentMediaItemIndex
         val queue = player.mediaItems.map { it.metadata }
@@ -6532,6 +6540,16 @@ private var lyricsNotificationHighlightEnabled = false
 
         updateHistoryTrackingPlaybackState()
         if (playbackState == Player.STATE_ENDED || playbackState == Player.STATE_IDLE) {
+            if (playbackState == Player.STATE_ENDED) {
+                player.currentMediaItem?.mediaId?.takeIf(String::isNotBlank)?.let { mediaId ->
+                    recommendationBehaviorTracker.record(
+                        songId = mediaId,
+                        type = RecommendationSignalType.Complete,
+                        positionMs = player.currentPosition.coerceAtLeast(0L),
+                        listenedMs = player.duration.coerceAtLeast(0L),
+                    )
+                }
+            }
             enqueueCurrentHistorySessionForFinalization()
             if (!isCrossfading || playbackState == Player.STATE_IDLE) {
                 cancelCrossfade(resetVolume = true, resetPauseAtEnd = true)
@@ -6580,6 +6598,13 @@ private var lyricsNotificationHighlightEnabled = false
                     secondaryPlayer.pause()
                 }
             }
+        }
+        player.currentMediaItem?.mediaId?.takeIf(String::isNotBlank)?.let { mediaId ->
+            recommendationBehaviorTracker.record(
+                songId = mediaId,
+                type = if (playWhenReady) RecommendationSignalType.Resume else RecommendationSignalType.Pause,
+                positionMs = player.currentPosition.coerceAtLeast(0L),
+            )
         }
         currentSongLyrics = null
         if (player.currentMediaItem != null) loadLyricsForCurrentSong()
@@ -6859,6 +6884,24 @@ private var lyricsNotificationHighlightEnabled = false
         val isSeekDiscontinuity =
             reason == Player.DISCONTINUITY_REASON_SEEK || reason == Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT
         if (isSeekDiscontinuity) {
+            val oldItem =
+                oldPosition.mediaItemIndex
+                    .takeIf { it in 0 until player.mediaItemCount }
+                    ?.let(player::getMediaItemAt)
+            val signalType =
+                if (oldPosition.mediaItemIndex != newPosition.mediaItemIndex) {
+                    RecommendationSignalType.Skip
+                } else {
+                    RecommendationSignalType.Seek
+                }
+            oldItem?.mediaId?.takeIf(String::isNotBlank)?.let { mediaId ->
+                recommendationBehaviorTracker.record(
+                    songId = mediaId,
+                    type = signalType,
+                    positionMs = newPosition.positionMs.coerceAtLeast(0L),
+                    listenedMs = oldPosition.positionMs.coerceAtLeast(0L),
+                )
+            }
             if (!crossfadeHandoffInProgress) {
                 cancelCrossfade(resetVolume = true, resetPauseAtEnd = true)
             }

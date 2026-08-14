@@ -42,6 +42,9 @@ import dev.vxs.frostsoulx.db.entities.PlaylistSongMap
 import dev.vxs.frostsoulx.db.entities.PlaylistSongMapPreview
 import dev.vxs.frostsoulx.db.entities.PlaylistTagMap
 import dev.vxs.frostsoulx.db.entities.RelatedSongMap
+import dev.vxs.frostsoulx.db.entities.RecommendationFeatureEntity
+import dev.vxs.frostsoulx.db.entities.RecommendationProfileEntity
+import dev.vxs.frostsoulx.db.entities.RecommendationSignalEntity
 import dev.vxs.frostsoulx.db.entities.SearchHistory
 import dev.vxs.frostsoulx.db.entities.SetVideoIdEntity
 import dev.vxs.frostsoulx.db.entities.SongAlbumMap
@@ -59,7 +62,7 @@ import java.util.concurrent.Executor
 import kotlin.coroutines.resume
 
 private const val TAG = "MusicDatabase"
-private const val CURRENT_VERSION = 33
+private const val CURRENT_VERSION = 34
 
 class MusicDatabase(
     private val delegate: InternalDatabase,
@@ -127,6 +130,9 @@ class MusicDatabase(
         PlaylistTagMap::class,
         LibraryTopMixEntity::class,
         LibraryTopMixSongMap::class,
+        RecommendationSignalEntity::class,
+        RecommendationFeatureEntity::class,
+        RecommendationProfileEntity::class,
     ],
     views = [
         SortedSongArtistMap::class,

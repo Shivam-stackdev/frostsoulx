@@ -14,6 +14,7 @@ import dev.vxs.frostsoulx.constants.QuickPicksDisplayMode
 import dev.vxs.frostsoulx.db.entities.LocalItem
 import dev.vxs.frostsoulx.db.entities.Song
 import dev.vxs.frostsoulx.innertube.models.PlaylistItem
+import dev.vxs.frostsoulx.library.LibraryTopMix
 import dev.vxs.frostsoulx.innertube.pages.HomePage
 import dev.vxs.frostsoulx.models.SimilarRecommendation
 
@@ -39,6 +40,7 @@ data class HomeUiState(
     val speedDialItems: ImmutableList<LocalItem>,
     val forgottenFavorites: ImmutableList<Song>,
     val keepListening: ImmutableList<LocalItem>,
+    val offlineMixes: ImmutableList<LibraryTopMix>,
     val similarRecommendations: ImmutableList<SimilarRecommendation>,
     val accountPlaylists: ImmutableList<PlaylistItem>,
     val homePage: HomePage?,
