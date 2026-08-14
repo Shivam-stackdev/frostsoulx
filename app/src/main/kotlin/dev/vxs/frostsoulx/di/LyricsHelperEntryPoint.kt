@@ -12,6 +12,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.vxs.frostsoulx.lyrics.LyricsHelper
 import dev.vxs.frostsoulx.lyrics.LyricsPreloadManager
+import dev.vxs.frostsoulx.lyrics.repository.LyricsRepository
+import dev.vxs.frostsoulx.lyrics.sync.LyricsSynchronizationEngine
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
@@ -19,4 +21,8 @@ interface LyricsHelperEntryPoint {
     fun lyricsHelper(): LyricsHelper
 
     fun lyricsPreloadManager(): LyricsPreloadManager
+
+    fun lyricsRepository(): LyricsRepository
+
+    fun lyricsSynchronizationEngine(): LyricsSynchronizationEngine
 }

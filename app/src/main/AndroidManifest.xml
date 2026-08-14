@@ -24,6 +24,7 @@
         android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <queries>
         <intent>
@@ -219,6 +220,10 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
+
+        <service
+            android:name=".lyrics.overlay.LyricsOverlayService"
+            android:exported="false" />
 
         <service
             android:name=".playback.ExoDownloadService"

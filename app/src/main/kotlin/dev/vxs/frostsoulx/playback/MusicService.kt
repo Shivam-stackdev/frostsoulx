@@ -220,11 +220,9 @@ import dev.vxs.frostsoulx.innertube.models.WatchEndpoint
 import dev.vxs.frostsoulx.innertube.models.response.PlayerResponse
 import dev.vxs.frostsoulx.lastfm.LastFM
 import dev.vxs.frostsoulx.lyrics.LyricsHelper
+import dev.vxs.frostsoulx.lyrics.repository.LyricsRepository
+import dev.vxs.frostsoulx.lyrics.sync.LyricsSynchronizationEngine
 import dev.vxs.frostsoulx.lyrics.LyricsPreloadManager
-import dev.vxs.frostsoulx.lyrics.LyricsUtils.isLineSyncedLrc
-import dev.vxs.frostsoulx.lyrics.LyricsUtils.isTtml
-import dev.vxs.frostsoulx.lyrics.LyricsUtils.parseLyrics
-import dev.vxs.frostsoulx.lyrics.LyricsUtils.parseTtml
 import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.models.PersistPlayerState
 import dev.vxs.frostsoulx.models.PersistQueue
@@ -304,6 +302,12 @@ class MusicService :
 
     @Inject
     lateinit var lyricsHelper: LyricsHelper
+
+    @Inject
+    lateinit var lyricsRepository: LyricsRepository
+
+    @Inject
+    lateinit var lyricsSynchronizationEngine: LyricsSynchronizationEngine
 
     @Inject
     lateinit var syncUtils: SyncUtils
@@ -546,7 +550,8 @@ class MusicService :
     private var lyricsUpdateRunnable: Runnable? = null
         @Volatile
 private var lyricsNotificationHighlightEnabled = false
-    private var currentSongLyrics: List<dev.vxs.frostsoulx.lyrics.LyricsEntry>? = null
+    private var lyricsDocumentMediaId: String? = null
+    private var lyricsLoadRequestMediaId: String? = null
 
     private val secondaryCrossfadeListener =
         object : Player.Listener {
@@ -6408,6 +6413,10 @@ private var lyricsNotificationHighlightEnabled = false
     ) {
         super.onMediaItemTransition(mediaItem, reason)
 
+        lyricsDocumentMediaId = null
+        lyricsSynchronizationEngine.setDocument(null)
+        if (mediaItem != null) loadLyricsForCurrentSong()
+
         if (sleepTimer.pauseWhenSongEnd) {
             pauseFromSleepTimer()
             return
@@ -6606,8 +6615,6 @@ private var lyricsNotificationHighlightEnabled = false
                 positionMs = player.currentPosition.coerceAtLeast(0L),
             )
         }
-        currentSongLyrics = null
-        if (player.currentMediaItem != null) loadLyricsForCurrentSong()
         if (playWhenReady && !isCrossfading) {
             scheduleCrossfade()
         } else if (!playWhenReady && !isCrossfading) {
@@ -6883,6 +6890,21 @@ private var lyricsNotificationHighlightEnabled = false
         super.onPositionDiscontinuity(oldPosition, newPosition, reason)
         val isSeekDiscontinuity =
             reason == Player.DISCONTINUITY_REASON_SEEK || reason == Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT
+        lyricsSynchronizationEngine.update(
+            playbackPositionMs = newPosition.positionMs.coerceAtLeast(0L),
+            durationMs = player.duration.coerceAtLeast(0L),
+            isPlaying = player.isPlaying,
+            isSeeking = isSeekDiscontinuity,
+        )
+        if (
+            ::lyricsNotificationProvider.isInitialized &&
+                lyricsNotificationProvider.updateLyricsState(
+                    state = lyricsSynchronizationEngine.state.value,
+                    highlightEnabled = lyricsNotificationHighlightEnabled,
+                )
+        ) {
+            refreshPlaybackNotification()
+        }
         if (isSeekDiscontinuity) {
             val oldItem =
                 oldPosition.mediaItemIndex
@@ -8297,16 +8319,21 @@ private var lyricsNotificationHighlightEnabled = false
         lyricsUpdateRunnable = object : Runnable {
             override fun run() {
                 if (!player.isPlaying) return
-                if (currentSongLyrics == null) loadLyricsForCurrentSong()
-                if (lyricsNotificationProvider.updateLyricsPosition(
-        currentSongLyrics,
-        player.currentPosition,
-        lyricsNotificationHighlightEnabled,
-    )
-) {
+                if (lyricsDocumentMediaId != player.currentMediaItem?.mediaId) loadLyricsForCurrentSong()
+                lyricsSynchronizationEngine.update(
+                    playbackPositionMs = player.currentPosition.coerceAtLeast(0L),
+                    durationMs = player.duration.coerceAtLeast(0L),
+                    isPlaying = true,
+                )
+                if (
+                    lyricsNotificationProvider.updateLyricsState(
+                        state = lyricsSynchronizationEngine.state.value,
+                        highlightEnabled = lyricsNotificationHighlightEnabled,
+                    )
+                ) {
                     refreshPlaybackNotification()
                 }
-                lyricsHandler.postDelayed(this, 400L)
+                lyricsHandler.postDelayed(this, 250L)
             }
         }
         lyricsHandler.post(lyricsUpdateRunnable!!)
@@ -8315,16 +8342,26 @@ private var lyricsNotificationHighlightEnabled = false
     private fun stopLyricsSync() {
         lyricsUpdateRunnable?.let(lyricsHandler::removeCallbacks)
         lyricsUpdateRunnable = null
+        lyricsSynchronizationEngine.update(
+            playbackPositionMs = player.currentPosition.coerceAtLeast(0L),
+            durationMs = player.duration.coerceAtLeast(0L),
+            isPlaying = false,
+        )
     }
 
     private fun loadLyricsForCurrentSong() {
-        val mediaId = player.currentMediaItem?.mediaId ?: return
+        val metadata = player.currentMetadata ?: return
+        if (lyricsLoadRequestMediaId == metadata.id || lyricsDocumentMediaId == metadata.id) return
+        lyricsLoadRequestMediaId = metadata.id
         scope.launch {
-            val rawLyrics = database.lyrics(mediaId).first()?.lyrics ?: return@launch
-            currentSongLyrics = when {
-                isTtml(rawLyrics) -> parseTtml(rawLyrics)
-                isLineSyncedLrc(rawLyrics) -> parseLyrics(rawLyrics)
-                else -> emptyList()
+            try {
+                val document = lyricsRepository.resolve(metadata)
+                if (player.currentMediaItem?.mediaId == metadata.id) {
+                    lyricsSynchronizationEngine.setDocument(document)
+                    lyricsDocumentMediaId = metadata.id
+                }
+            } finally {
+                if (lyricsLoadRequestMediaId == metadata.id) lyricsLoadRequestMediaId = null
             }
         }
     }

@@ -36,6 +36,7 @@ import dev.vxs.frostsoulx.db.entities.FormatEntity
 import dev.vxs.frostsoulx.db.entities.LibraryTopMixEntity
 import dev.vxs.frostsoulx.db.entities.LibraryTopMixSongMap
 import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.db.entities.LyricsDocumentEntity
 import dev.vxs.frostsoulx.db.entities.PlayCountEntity
 import dev.vxs.frostsoulx.db.entities.PlaylistEntity
 import dev.vxs.frostsoulx.db.entities.PlaylistSongMap
@@ -62,7 +63,7 @@ import java.util.concurrent.Executor
 import kotlin.coroutines.resume
 
 private const val TAG = "MusicDatabase"
-private const val CURRENT_VERSION = 34
+private const val CURRENT_VERSION = 35
 
 class MusicDatabase(
     private val delegate: InternalDatabase,
@@ -122,6 +123,7 @@ class MusicDatabase(
         SearchHistory::class,
         FormatEntity::class,
         LyricsEntity::class,
+        LyricsDocumentEntity::class,
         Event::class,
         RelatedSongMap::class,
         SetVideoIdEntity::class,
@@ -172,10 +174,11 @@ abstract class InternalDatabase : RoomDatabase() {
         const val DB_NAME = "song.db"
 
         fun newInstance(context: Context): MusicDatabase {
-            val universalMigrations =
+            val universalMigrations: Array<Migration> =
                 (2 until CURRENT_VERSION)
-                    .map { from -> UniversalMigration(context, from, CURRENT_VERSION) }
-                    .toTypedArray()
+                    .map { from ->
+                        if (from == 34) MIGRATION_34_35 else UniversalMigration(context, from, CURRENT_VERSION)
+                    }.toTypedArray()
 
             fun build(): InternalDatabase =
                 Room
@@ -604,6 +607,35 @@ private object SchemaTools {
         val defaultValue: String?,
     )
 }
+
+// =============================================================================
+// LYRICS DOCUMENT MIGRATION v34 -> v35
+// =============================================================================
+
+private val MIGRATION_34_35 =
+    object : Migration(34, 35) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `lyrics_document` (
+                    `songId` TEXT NOT NULL,
+                    `original` TEXT NOT NULL,
+                    `translation` TEXT,
+                    `romanization` TEXT,
+                    `format` TEXT NOT NULL,
+                    `source` TEXT NOT NULL,
+                    `offsetMs` INTEGER NOT NULL,
+                    `artworkKey` TEXT,
+                    `updatedAtMs` INTEGER NOT NULL,
+                    PRIMARY KEY(`songId`)
+                )
+                """.trimIndent(),
+            )
+            db.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_lyrics_document_updatedAtMs` ON `lyrics_document` (`updatedAtMs`)",
+            )
+        }
+    }
 
 // =============================================================================
 // LEGACY MIGRATION v1 -> v2 (Major schema rewrite, must be kept)

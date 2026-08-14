@@ -41,6 +41,7 @@ import dev.vxs.frostsoulx.db.entities.LibraryTopMixSongMap
 import dev.vxs.frostsoulx.db.entities.ListeningBySlot
 import dev.vxs.frostsoulx.db.entities.ListeningTotals
 import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.db.entities.LyricsDocumentEntity
 import dev.vxs.frostsoulx.db.entities.PlayCountEntity
 import dev.vxs.frostsoulx.db.entities.Playlist
 import dev.vxs.frostsoulx.db.entities.PlaylistEntity
@@ -1480,6 +1481,18 @@ interface DatabaseDao {
 
     @Query("SELECT songId FROM event ORDER BY rowId DESC LIMIT 1")
     fun lastEventSongId(): Flow<String?>
+
+    @Query("SELECT * FROM lyrics_document WHERE songId = :songId LIMIT 1")
+    suspend fun lyricsDocument(songId: String): LyricsDocumentEntity?
+
+    @Upsert
+    suspend fun upsertLyricsDocument(document: LyricsDocumentEntity)
+
+    @Query("UPDATE lyrics_document SET offsetMs = :offsetMs, updatedAtMs = :updatedAtMs WHERE songId = :songId")
+    suspend fun updateLyricsDocumentOffset(songId: String, offsetMs: Long, updatedAtMs: Long)
+
+    @Query("DELETE FROM lyrics_document WHERE updatedAtMs < :beforeMs")
+    suspend fun pruneLyricsDocuments(beforeMs: Long): Int
 
     @Transaction
     @Query("DELETE FROM event")

@@ -24,6 +24,7 @@ import androidx.media3.session.MediaSession
 import com.google.common.collect.ImmutableList
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.lyrics.LyricsEntry
+import dev.vxs.frostsoulx.lyrics.core.LyricsSyncState
 
 /** Media3 notification provider with an expanded, time-synced lyrics line. */
 @UnstableApi
@@ -103,6 +104,48 @@ class ArchiveTuneMediaNotificationProvider(
         lastActiveIndex = newIndex
         lastActiveWordCount = wordCount
         lastLyricLine = buildLyricLine(entry, positionMs, highlightEnabled)
+        bigRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricLine)
+        return true
+    }
+
+    fun updateLyricsState(
+        state: LyricsSyncState,
+        highlightEnabled: Boolean,
+    ): Boolean {
+        val line = state.currentLine ?: return updateLyricsPosition(null, 0L, false)
+        val activeWords =
+            if (highlightEnabled) {
+                line.words.count { state.timestampMs >= it.startMs }
+            } else {
+                -1
+            }
+        if (state.currentLineIndex == lastActiveIndex && activeWords == lastActiveWordCount) return false
+        lastActiveIndex = state.currentLineIndex
+        lastActiveWordCount = activeWords
+        val current =
+            if (highlightEnabled && line.words.isNotEmpty()) {
+                val builder = SpannableStringBuilder()
+                line.words.forEach { word ->
+                    val start = builder.length
+                    builder.append(word.text)
+                    if (state.timestampMs >= word.startMs) {
+                        builder.setSpan(
+                            ForegroundColorSpan(0xFF008B8B.toInt()),
+                            start,
+                            builder.length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        )
+                    }
+                }
+                builder
+            } else {
+                line.text
+            }
+        lastLyricLine =
+            state.nextLine?.text
+                ?.takeIf { it.isNotBlank() }
+                ?.let { next -> SpannableStringBuilder(current).append("\n").append(next) }
+                ?: current
         bigRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricLine)
         return true
     }

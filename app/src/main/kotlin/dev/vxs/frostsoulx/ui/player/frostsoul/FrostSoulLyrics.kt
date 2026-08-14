@@ -23,23 +23,33 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.vxs.frostsoulx.lyrics.LyricsEntry
-import dev.vxs.frostsoulx.lyrics.LyricsUtils
-import kotlin.math.max
+import dagger.hilt.android.EntryPointAccessors
+import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
+import dev.vxs.frostsoulx.lyrics.core.LyricsLine
+import dev.vxs.frostsoulx.lyrics.core.LyricsSyncState
 
+/**
+ * Renders karaoke directly from the singleton lyrics synchronization engine.
+ *
+ * [rawLyrics], [positionMs], and [durationMs] remain part of the player-surface contract while
+ * the service owns parsing, caching, offset correction, and timestamp resolution. This prevents
+ * a second parser or clock from drifting away from notification and overlay lyric consumers.
+ */
 @Composable
 internal fun FSLyrics(
     rawLyrics: String?,
@@ -48,48 +58,44 @@ internal fun FSLyrics(
     onSeek: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val entries =
-        remember(rawLyrics, durationMs) {
-            rawLyrics?.let { lyrics ->
-                val normalized = LyricsUtils.normalizeLyricsText(lyrics)
-                when {
-                    normalized.isBlank() || !LyricsUtils.hasMeaningfulLyricsContent(normalized) -> emptyList()
-                    LyricsUtils.isTtml(normalized) -> LyricsUtils.parseTtml(normalized, (durationMs / 1_000L).toInt())
-                    LyricsUtils.isLineSyncedLrc(normalized) -> LyricsUtils.parseLyrics(normalized)
-                    else ->
-                        LyricsUtils
-                            .displayLyricsText(normalized)
-                            .lineSequence()
-                            .mapIndexed { index, line -> LyricsEntry(time = index.toLong() * 1_000L, text = line) }
-                            .toList()
-                }
-            }.orEmpty()
+    val applicationContext = LocalContext.current.applicationContext
+    val synchronizationEngine =
+        remember(applicationContext) {
+            EntryPointAccessors
+                .fromApplication(applicationContext, LyricsHelperEntryPoint::class.java)
+                .lyricsSynchronizationEngine()
         }
-    val currentIndex =
-        remember(entries, positionMs) {
-            entries.indexOfLast { entry -> entry.time <= positionMs }.coerceAtLeast(0)
-        }
+    val document by synchronizationEngine.documentState.collectAsState()
+    val syncState by synchronizationEngine.state.collectAsState()
+    val lines = document?.original?.lines.orEmpty()
+    val currentIndex = syncState.currentLineIndex.takeIf { it in lines.indices } ?: -1
     val listState = rememberLazyListState()
 
-    LaunchedEffect(currentIndex, entries.size) {
-        if (entries.isNotEmpty() && listState.isScrollInProgress.not()) {
+    LaunchedEffect(currentIndex, lines.size) {
+        if (currentIndex >= 0 && listState.isScrollInProgress.not()) {
             listState.animateScrollToItem((currentIndex - 1).coerceAtLeast(0))
         }
     }
 
-    if (entries.isEmpty()) {
+    if (lines.isEmpty()) {
+        val lookupMessage =
+            if (rawLyrics.isNullOrBlank()) {
+                "Lyrics are unavailable for this track."
+            } else {
+                "Preparing synchronized lyrics for this track."
+            }
         Column(
             verticalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxSize().padding(horizontal = 28.dp),
         ) {
             Text(
-                text = "Lyrics are unavailable for this track.",
+                text = lookupMessage,
                 color = FrostSoulOnSurfaceMuted,
                 fontSize = 19.sp,
                 lineHeight = 28.sp,
             )
             Text(
-                text = "When timed lyrics are available, FrostSoul follows every word in real time.",
+                text = "FrostSoul keeps lyrics, notification updates, and overlays on one shared timeline.",
                 color = FrostSoulOnSurfaceMuted.copy(alpha = 0.62f),
                 fontSize = 14.sp,
                 lineHeight = 21.sp,
@@ -106,14 +112,14 @@ internal fun FSLyrics(
         modifier = modifier.fillMaxSize(),
     ) {
         itemsIndexed(
-            items = entries,
-            key = { _, entry -> "${entry.time}-${entry.text}" },
-        ) { index, entry ->
+            items = lines,
+            key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
+        ) { index, line ->
             FrostSoulKaraokeLine(
-                entry = entry,
-                positionMs = positionMs,
+                line = line,
+                syncState = syncState,
                 isCurrent = index == currentIndex,
-                isPast = index < currentIndex,
+                isPast = currentIndex >= 0 && index < currentIndex,
                 onSeek = onSeek,
             )
         }
@@ -122,8 +128,8 @@ internal fun FSLyrics(
 
 @Composable
 private fun FrostSoulKaraokeLine(
-    entry: LyricsEntry,
-    positionMs: Long,
+    line: LyricsLine,
+    syncState: LyricsSyncState,
     isCurrent: Boolean,
     isPast: Boolean,
     onSeek: (Long) -> Unit,
@@ -145,24 +151,19 @@ private fun FrostSoulKaraokeLine(
             else -> FrostSoulOnSurfaceMuted.copy(alpha = 0.46f)
         }
     val annotatedText =
-        remember(entry, positionMs, isCurrent, lineColor, emphasis) {
-            entry.asKaraokeAnnotatedText(
-                positionMs = positionMs,
+        remember(line, syncState.currentWordIndex, syncState.wordProgress, syncState.lineProgress, isCurrent, lineColor, emphasis) {
+            line.asKaraokeAnnotatedText(
                 activeLine = isCurrent,
+                currentWordIndex = syncState.currentWordIndex,
+                wordProgress = syncState.wordProgress,
+                lineProgress = syncState.lineProgress,
                 inactiveColor = lineColor,
                 activeColor = FrostSoulCyanBright,
                 glowStrength = emphasis,
             )
         }
 
-    Text(
-        text = annotatedText,
-        color = lineColor,
-        fontSize = if (isCurrent) 27.sp else 23.sp,
-        lineHeight = if (isCurrent) 36.sp else 31.sp,
-        fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Medium,
-        maxLines = 4,
-        overflow = TextOverflow.Ellipsis,
+    Column(
         modifier =
             Modifier
                 .fillMaxWidth()
@@ -171,33 +172,71 @@ private fun FrostSoulKaraokeLine(
                     scaleY = scale
                     alpha = 0.56f + (emphasis * 0.44f)
                 }.clickable(
-                    enabled = entry.time >= 0L,
+                    enabled = line.startMs >= 0L,
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
-                    onClick = { onSeek(entry.time) },
+                    onClick = { onSeek(line.startMs) },
                 ),
-    )
+    ) {
+        Text(
+            text = annotatedText,
+            color = lineColor,
+            fontSize = if (isCurrent) 27.sp else 23.sp,
+            lineHeight = if (isCurrent) 36.sp else 31.sp,
+            fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Medium,
+            maxLines = 4,
+            overflow = TextOverflow.Ellipsis,
+        )
+        line.translation?.takeIf { it.isNotBlank() }?.let { translation ->
+            Text(
+                text = translation,
+                color = FrostSoulOnSurfaceMuted.copy(alpha = if (isCurrent) 0.84f else 0.48f),
+                fontSize = if (isCurrent) 16.sp else 14.sp,
+                lineHeight = 22.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+        line.romanization?.takeIf { it.isNotBlank() }?.let { romanization ->
+            Text(
+                text = romanization,
+                color = FrostSoulOnSurfaceMuted.copy(alpha = if (isCurrent) 0.70f else 0.40f),
+                fontSize = 13.sp,
+                lineHeight = 19.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+    }
 }
 
-private fun LyricsEntry.asKaraokeAnnotatedText(
-    positionMs: Long,
+private fun LyricsLine.asKaraokeAnnotatedText(
     activeLine: Boolean,
+    currentWordIndex: Int,
+    wordProgress: Float,
+    lineProgress: Float,
     inactiveColor: Color,
     activeColor: Color,
     glowStrength: Float,
 ) =
     buildAnnotatedString {
-        val timedWords = words.orEmpty()
-        if (!activeLine || timedWords.isEmpty()) {
+        if (!activeLine) {
+            withStyle(SpanStyle(color = inactiveColor)) { append(text) }
+            return@buildAnnotatedString
+        }
+
+        if (words.isEmpty()) {
+            val progress = lineProgress.coerceIn(0f, 1f)
             withStyle(
                 SpanStyle(
-                    color = inactiveColor,
+                    color = lerpColor(inactiveColor, activeColor, progress),
                     shadow =
-                        if (activeLine) {
-                            Shadow(color = activeColor.copy(alpha = 0.42f * glowStrength), blurRadius = 15f)
-                        } else {
-                            null
-                        },
+                        Shadow(
+                            color = activeColor.copy(alpha = 0.42f * progress * glowStrength),
+                            blurRadius = 16f * progress,
+                        ),
                 ),
             ) {
                 append(text)
@@ -205,19 +244,21 @@ private fun LyricsEntry.asKaraokeAnnotatedText(
             return@buildAnnotatedString
         }
 
-        timedWords.forEachIndexed { index, word ->
-            val wordStart = (word.startTime * 1_000.0).toLong()
-            val wordEnd = max(wordStart + 1L, (word.endTime * 1_000.0).toLong())
-            val wordProgress = ((positionMs - wordStart).toFloat() / (wordEnd - wordStart).toFloat()).coerceIn(0f, 1f)
-            val color = lerpColor(inactiveColor, activeColor, wordProgress)
+        words.forEachIndexed { index, word ->
+            val progress =
+                when {
+                    index < currentWordIndex -> 1f
+                    index == currentWordIndex -> wordProgress.coerceIn(0f, 1f)
+                    else -> 0f
+                }
             withStyle(
                 SpanStyle(
-                    color = color,
+                    color = lerpColor(inactiveColor, activeColor, progress),
                     shadow =
-                        if (wordProgress > 0.02f) {
+                        if (progress > 0.02f) {
                             Shadow(
-                                color = activeColor.copy(alpha = 0.55f * wordProgress * glowStrength),
-                                blurRadius = 18f * wordProgress,
+                                color = activeColor.copy(alpha = 0.55f * progress * glowStrength),
+                                blurRadius = 18f * progress,
                             )
                         } else {
                             null
@@ -225,7 +266,7 @@ private fun LyricsEntry.asKaraokeAnnotatedText(
                 ),
             ) {
                 append(word.text)
-                if (index < timedWords.lastIndex && word.text.lastOrNull()?.isWhitespace() != true) append(" ")
+                if (index < words.lastIndex && word.text.lastOrNull()?.isWhitespace() != true) append(" ")
             }
         }
     }
