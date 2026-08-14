@@ -250,11 +250,14 @@ class Media3PlaybackCore(
     }
 
     private fun publishStateAndSnapshot() {
+        // Media3 player reads must remain on the application thread. Capture the immutable
+        // snapshot before switching to IO; only persistence is dispatched off the player thread.
+        val snapshot = buildSnapshot()
         _state.value = projectState()
         snapshotJob?.cancel()
         snapshotJob =
             scope.launch(Dispatchers.IO) {
-                snapshotRepository.save(buildSnapshot())
+                snapshotRepository.save(snapshot)
             }
     }
 
