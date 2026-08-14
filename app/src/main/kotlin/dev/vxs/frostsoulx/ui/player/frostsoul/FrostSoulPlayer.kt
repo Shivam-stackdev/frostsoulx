@@ -19,6 +19,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,6 +60,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -73,6 +76,7 @@ import coil3.request.allowHardware
 import coil3.size.Size
 import coil3.toBitmap
 import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -85,17 +89,30 @@ internal fun FrostSoulPlayer(
     actions: FrostSoulPlayerActions,
     modifier: Modifier = Modifier,
 ) {
-    val pages = remember { listOf(FrostSoulPage.Album, FrostSoulPage.Lyrics) }
+    val pages = remember { listOf(FrostSoulPage.Album, FrostSoulPage.Lyrics, FrostSoulPage.Info) }
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     val page = pages.getOrElse(pagerState.currentPage) { FrostSoulPage.Album }
     var queueVisible by remember { mutableStateOf(false) }
+    var downwardDragDistance by remember { mutableFloatStateOf(0f) }
 
     Box(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(Color.Black),
+                .background(Color.Black)
+                .pointerInput(actions.onDismiss) {
+                    detectVerticalDragGestures(
+                        onVerticalDrag = { _, dragAmount ->
+                            if (dragAmount > 0f) downwardDragDistance += dragAmount
+                        },
+                        onDragEnd = {
+                            if (downwardDragDistance >= 96f) actions.onDismiss()
+                            downwardDragDistance = 0f
+                        },
+                        onDragCancel = { downwardDragDistance = 0f },
+                    )
+                },
     ) {
         FrostSoulDynamicBackground(
             artworkUrl = uiState.track.artworkUrl,
@@ -113,7 +130,12 @@ internal fun FrostSoulPlayer(
                 currentPage = page,
                 onDismiss = actions.onDismiss,
                 onOpenQueue = { queueVisible = true },
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
+                modifier = Modifier.padding(top = 8.dp, bottom = 6.dp),
+            )
+            FrostSoulPagerDots(
+                pageCount = pages.size,
+                selectedPage = pagerState.currentPage,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 10.dp),
             )
             HorizontalPager(
                 state = pagerState,
@@ -141,6 +163,7 @@ internal fun FrostSoulPlayer(
                                 onSeek = actions.onSeek,
                             )
 
+                        FrostSoulPage.Info -> FrostSoulInfoPage(uiState = uiState, actions = actions)
                         FrostSoulPage.Queue -> Unit
                     }
                 }
@@ -354,6 +377,31 @@ private fun FSPlayButton(
 }
 
 @Composable
+private fun FrostSoulPagerDots(
+    pageCount: Int,
+    selectedPage: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = modifier,
+    ) {
+        repeat(pageCount) { index ->
+            Box(
+                modifier =
+                    Modifier
+                        .height(3.dp)
+                        .width(if (index == selectedPage) 22.dp else 7.dp)
+                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .background(
+                            if (index == selectedPage) FrostSoulCyanBright else FrostSoulOnSurfaceMuted.copy(alpha = 0.36f),
+                        ),
+            )
+        }
+    }
+}
+
+@Composable
 private fun FrostSoulAlbumPage(
     uiState: FrostSoulPlayerUiState,
     actions: FrostSoulPlayerActions,
@@ -421,6 +469,74 @@ private fun FrostSoulAlbumPage(
             state = uiState,
             actions = actions,
             modifier = Modifier.padding(top = 12.dp),
+        )
+    }
+}
+
+@Composable
+private fun FrostSoulInfoPage(
+    uiState: FrostSoulPlayerUiState,
+    actions: FrostSoulPlayerActions,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(18.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 22.dp),
+    ) {
+        Text(
+            text = "TRACK INFORMATION",
+            color = FrostSoulCyanBright,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 1.5.sp,
+        )
+        FSGlassCard(
+            accent = uiState.palette.accent,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.padding(20.dp),
+            ) {
+                FrostSoulInfoRow(label = "Title", value = uiState.track.title)
+                FrostSoulInfoRow(label = "Artist", value = uiState.track.artist)
+                FrostSoulInfoRow(label = "Album", value = uiState.track.album.ifBlank { "Single" })
+                FrostSoulInfoRow(label = "Duration", value = uiState.safeDurationMs.asFrostSoulTime())
+                FrostSoulInfoRow(label = "Library", value = if (uiState.track.isLiked) "Liked" else "Available offline" )
+            }
+        }
+        FSButton(
+            label = if (uiState.track.isLiked) "Remove from liked songs" else "Add to liked songs",
+            onClick = actions.onToggleLike,
+            emphasized = uiState.track.isLiked.not(),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            text = "Swipe left or right to return to artwork and synchronized lyrics.",
+            color = FrostSoulOnSurfaceMuted,
+            fontSize = 13.sp,
+            lineHeight = 19.sp,
+        )
+    }
+}
+
+@Composable
+private fun FrostSoulInfoRow(
+    label: String,
+    value: String,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        Text(
+            text = label.uppercase(),
+            color = FrostSoulOnSurfaceMuted,
+            fontSize = 10.sp,
+            letterSpacing = 1.2.sp,
+        )
+        Text(
+            text = value,
+            color = FrostSoulOnSurface,
+            fontSize = 16.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }

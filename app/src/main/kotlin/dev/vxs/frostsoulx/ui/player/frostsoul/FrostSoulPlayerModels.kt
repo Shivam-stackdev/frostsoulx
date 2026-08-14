@@ -103,6 +103,7 @@ internal data class FrostSoulPlayerActions(
 internal enum class FrostSoulPage {
     Album,
     Lyrics,
+    Info,
     Queue,
 }
 

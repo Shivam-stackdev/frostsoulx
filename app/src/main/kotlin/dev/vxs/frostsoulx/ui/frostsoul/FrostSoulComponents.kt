@@ -49,6 +49,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -75,6 +76,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil3.compose.AsyncImage
+import dev.vxs.frostsoulx.R
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -298,10 +300,13 @@ fun FSAlbumCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     badge: String? = null,
+    width: Dp = 154.dp,
+    artworkAspectRatio: Float = 1f,
+    showPlayOverlay: Boolean = false,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(FrostSoulTheme.spacing.small),
-        modifier = modifier.width(154.dp).clip(FrostSoulTheme.shapes.medium).clickable(
+        modifier = modifier.width(width).clip(FrostSoulTheme.shapes.medium).clickable(
             indication = null,
             interactionSource = remember { MutableInteractionSource() },
             onClick = onClick,
@@ -312,8 +317,26 @@ fun FSAlbumCard(
                 artworkUrl = artworkUrl,
                 contentDescription = title,
                 showGlow = true,
-                modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                modifier = Modifier.fillMaxWidth().aspectRatio(artworkAspectRatio),
             )
+            if (showPlayOverlay) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier =
+                        Modifier
+                            .align(Alignment.Center)
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(FrostSoulTheme.colors.accentBright.copy(alpha = 0.92f)),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.play),
+                        contentDescription = "Play $title",
+                        tint = Color(0xFF001416),
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
             badge?.let {
                 androidx.compose.material3.Text(
                     text = it,

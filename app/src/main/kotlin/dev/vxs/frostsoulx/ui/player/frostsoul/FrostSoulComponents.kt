@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -159,6 +160,11 @@ internal fun FSAlbumArt(
         animationSpec = infiniteRepeatable(tween(durationMillis = 26_000, easing = LinearEasing)),
         label = "fs-album-rotation-value",
     )
+    var pausedRotation by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(isPlaying) {
+        if (!isPlaying) pausedRotation = rotation
+    }
+    val displayedRotation = if (isPlaying) rotation else pausedRotation
     val artShape = if (compact) RoundedCornerShape(16.dp) else CircleShape
 
     Box(
@@ -185,7 +191,7 @@ internal fun FSAlbumArt(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .graphicsLayer { rotationZ = if (isPlaying) rotation else 0f }
+                    .graphicsLayer { rotationZ = displayedRotation }
                     .clip(artShape)
                     .background(FrostSoulSurfaceElevated)
                     .border(1.dp, palette.accent.copy(alpha = 0.45f), artShape),
@@ -229,6 +235,33 @@ internal fun FSAlbumArt(
                         style = Stroke(width = 1.dp.toPx()),
                     )
                 }
+            }
+        }
+        if (!compact) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val pivot = Offset(size.width * 0.77f, size.height * 0.15f)
+                val needle =
+                    if (isPlaying) {
+                        Offset(size.width * 0.57f, size.height * 0.51f)
+                    } else {
+                        Offset(size.width * 0.66f, size.height * 0.33f)
+                    }
+                drawCircle(color = Color(0xFF1B2A2E), radius = size.minDimension * 0.065f, center = pivot)
+                drawLine(
+                    color = Color(0xFFB9D1D5),
+                    start = pivot,
+                    end = needle,
+                    strokeWidth = size.minDimension * 0.022f,
+                    cap = StrokeCap.Round,
+                )
+                drawLine(
+                    color = palette.accent.copy(alpha = 0.72f),
+                    start = pivot,
+                    end = needle,
+                    strokeWidth = size.minDimension * 0.007f,
+                    cap = StrokeCap.Round,
+                )
+                drawCircle(color = Color(0xFFD5F2F5), radius = size.minDimension * 0.024f, center = needle)
             }
         }
     }
@@ -339,7 +372,13 @@ internal fun FSTopBar(
                 letterSpacing = 1.8.sp,
             )
             Text(
-                text = if (currentPage == FrostSoulPage.Lyrics) "SYNCHRONIZED LYRICS" else "ALBUM VIEW",
+                text =
+                    when (currentPage) {
+                        FrostSoulPage.Album -> "ALBUM VIEW"
+                        FrostSoulPage.Lyrics -> "SYNCHRONIZED LYRICS"
+                        FrostSoulPage.Info -> "TRACK DETAILS"
+                        FrostSoulPage.Queue -> "PLAYBACK QUEUE"
+                    },
                 color = FrostSoulCyanBright.copy(alpha = 0.78f),
                 fontSize = 9.sp,
                 letterSpacing = 1.1.sp,
