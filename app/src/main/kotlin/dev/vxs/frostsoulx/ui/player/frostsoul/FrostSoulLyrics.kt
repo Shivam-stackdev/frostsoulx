@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
@@ -158,7 +159,7 @@ private fun FrostSoulKaraokeLine(
                 wordProgress = syncState.wordProgress,
                 lineProgress = syncState.lineProgress,
                 inactiveColor = lineColor,
-                activeColor = FrostSoulCyanBright,
+                activeColor = FrostSoulCyan,
                 glowStrength = emphasis,
             )
         }
@@ -252,17 +253,11 @@ private fun LyricsLine.asKaraokeAnnotatedText(
                     else -> 0f
                 }
             withStyle(
-                SpanStyle(
-                    color = lerpColor(inactiveColor, activeColor, progress),
-                    shadow =
-                        if (progress > 0.02f) {
-                            Shadow(
-                                color = activeColor.copy(alpha = 0.55f * progress * glowStrength),
-                                blurRadius = 18f * progress,
-                            )
-                        } else {
-                            null
-                        },
+                wordKaraokeStyle(
+                    progress = progress,
+                    inactiveColor = inactiveColor,
+                    activeColor = activeColor,
+                    glowStrength = glowStrength,
                 ),
             ) {
                 append(word.text)
@@ -270,6 +265,49 @@ private fun LyricsLine.asKaraokeAnnotatedText(
             }
         }
     }
+
+private fun wordKaraokeStyle(
+    progress: Float,
+    inactiveColor: Color,
+    activeColor: Color,
+    glowStrength: Float,
+): SpanStyle {
+    val fill = progress.coerceIn(0f, 1f)
+    val brush =
+        if (fill > 0.02f && fill < 0.98f) {
+            Brush.horizontalGradient(
+                colorStops =
+                    arrayOf(
+                        0f to activeColor,
+                        fill to activeColor,
+                        (fill + 0.018f).coerceAtMost(1f) to inactiveColor,
+                        1f to inactiveColor,
+                    ),
+            )
+        } else {
+            null
+        }
+    val color =
+        when {
+            fill <= 0.02f -> inactiveColor
+            fill >= 0.98f -> activeColor
+            else -> Color.Unspecified
+        }
+    val shadow =
+        if (fill > 0.02f) {
+            Shadow(
+                color = activeColor.copy(alpha = 0.52f * fill * glowStrength),
+                blurRadius = 18f * fill,
+            )
+        } else {
+            null
+        }
+    return if (brush != null) {
+        SpanStyle(brush = brush, shadow = shadow)
+    } else {
+        SpanStyle(color = color, shadow = shadow)
+    }
+}
 
 private fun lerpColor(
     start: Color,

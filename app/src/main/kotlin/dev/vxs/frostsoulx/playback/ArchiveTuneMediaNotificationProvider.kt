@@ -46,6 +46,8 @@ class ArchiveTuneMediaNotificationProvider(
         RemoteViews(context.packageName, R.layout.notification_player_big)
     }
     private var lastLyricLine: CharSequence = ""
+    private var lastLyricPrimary: CharSequence = ""
+    private var lastLyricSecondary: CharSequence = ""
     private var lastActiveIndex = -1
     private var lastActiveWordCount = -1
 
@@ -66,6 +68,8 @@ class ArchiveTuneMediaNotificationProvider(
         val originalDeleteIntent = original.deleteIntent
         val notification =
             NotificationCompat.Builder(context, original)
+                .setContentText(lastLyricPrimary)
+                .setSubText(lastLyricSecondary)
                 .setCustomBigContentView(bigRemoteViews.apply {
                     setTextViewText(R.id.notification_lyrics, lastLyricLine)
                 })
@@ -103,8 +107,10 @@ class ArchiveTuneMediaNotificationProvider(
         if (newIndex == lastActiveIndex && wordCount == lastActiveWordCount) return false
         lastActiveIndex = newIndex
         lastActiveWordCount = wordCount
-        lastLyricLine = buildLyricLine(entry, positionMs, highlightEnabled)
-        bigRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricLine)
+        setRenderedLyrics(
+            current = buildLyricLine(entry, positionMs, highlightEnabled),
+            next = lyrics?.getOrNull(newIndex + 1)?.text,
+        )
         return true
     }
 
@@ -112,7 +118,12 @@ class ArchiveTuneMediaNotificationProvider(
         state: LyricsSyncState,
         highlightEnabled: Boolean,
     ): Boolean {
-        val line = state.currentLine ?: return updateLyricsPosition(null, 0L, false)
+        val line = state.currentLine
+            ?: run {
+                lastActiveIndex = -1
+                lastActiveWordCount = -1
+                return setRenderedLyrics(current = "", next = null)
+            }
         val activeWords =
             if (highlightEnabled) {
                 line.words.count { state.timestampMs >= it.startMs }
@@ -141,11 +152,26 @@ class ArchiveTuneMediaNotificationProvider(
             } else {
                 line.text
             }
-        lastLyricLine =
-            state.nextLine?.text
-                ?.takeIf { it.isNotBlank() }
-                ?.let { next -> SpannableStringBuilder(current).append("\n").append(next) }
+        setRenderedLyrics(current = current, next = state.nextLine?.text)
+        return true
+    }
+
+    private fun setRenderedLyrics(
+        current: CharSequence,
+        next: CharSequence?,
+    ): Boolean {
+        val normalizedNext: CharSequence = next?.takeIf { it.isNotBlank() } ?: ""
+        val combined =
+            normalizedNext
+                .takeIf { it.isNotEmpty() }
+                ?.let { SpannableStringBuilder(current).append("\n").append(it) }
                 ?: current
+        if (current == lastLyricPrimary && normalizedNext == lastLyricSecondary && combined == lastLyricLine) {
+            return false
+        }
+        lastLyricPrimary = current
+        lastLyricSecondary = normalizedNext
+        lastLyricLine = combined
         bigRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricLine)
         return true
     }

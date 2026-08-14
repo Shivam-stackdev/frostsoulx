@@ -6415,6 +6415,7 @@ private var lyricsNotificationHighlightEnabled = false
 
         lyricsDocumentMediaId = null
         lyricsSynchronizationEngine.setDocument(null)
+        synchronizeLyricsAtCurrentPosition()
         if (mediaItem != null) loadLyricsForCurrentSong()
 
         if (sleepTimer.pauseWhenSongEnd) {
@@ -8320,19 +8321,7 @@ private var lyricsNotificationHighlightEnabled = false
             override fun run() {
                 if (!player.isPlaying) return
                 if (lyricsDocumentMediaId != player.currentMediaItem?.mediaId) loadLyricsForCurrentSong()
-                lyricsSynchronizationEngine.update(
-                    playbackPositionMs = player.currentPosition.coerceAtLeast(0L),
-                    durationMs = player.duration.coerceAtLeast(0L),
-                    isPlaying = true,
-                )
-                if (
-                    lyricsNotificationProvider.updateLyricsState(
-                        state = lyricsSynchronizationEngine.state.value,
-                        highlightEnabled = lyricsNotificationHighlightEnabled,
-                    )
-                ) {
-                    refreshPlaybackNotification()
-                }
+                synchronizeLyricsAtCurrentPosition()
                 lyricsHandler.postDelayed(this, 250L)
             }
         }
@@ -8342,11 +8331,35 @@ private var lyricsNotificationHighlightEnabled = false
     private fun stopLyricsSync() {
         lyricsUpdateRunnable?.let(lyricsHandler::removeCallbacks)
         lyricsUpdateRunnable = null
+        synchronizeLyricsAtCurrentPosition()
+    }
+
+    /**
+     * Advances every lyrics consumer from one canonical player position, then refreshes the media
+     * panel only when its rendered line or word state changed. This is also invoked immediately
+     * when asynchronous document resolution completes, so a loaded lyric never waits for a later
+     * playback event before becoming visible.
+     */
+    private fun synchronizeLyricsAtCurrentPosition(isSeeking: Boolean = false) {
         lyricsSynchronizationEngine.update(
             playbackPositionMs = player.currentPosition.coerceAtLeast(0L),
             durationMs = player.duration.coerceAtLeast(0L),
-            isPlaying = false,
+            isPlaying = player.isPlaying,
+            isSeeking = isSeeking,
         )
+        publishLyricsToMediaNotification()
+    }
+
+    private fun publishLyricsToMediaNotification() {
+        if (
+            ::lyricsNotificationProvider.isInitialized &&
+                lyricsNotificationProvider.updateLyricsState(
+                    state = lyricsSynchronizationEngine.state.value,
+                    highlightEnabled = lyricsNotificationHighlightEnabled,
+                )
+        ) {
+            refreshPlaybackNotification()
+        }
     }
 
     private fun loadLyricsForCurrentSong() {
@@ -8359,6 +8372,7 @@ private var lyricsNotificationHighlightEnabled = false
                 if (player.currentMediaItem?.mediaId == metadata.id) {
                     lyricsSynchronizationEngine.setDocument(document)
                     lyricsDocumentMediaId = metadata.id
+                    synchronizeLyricsAtCurrentPosition()
                 }
             } finally {
                 if (lyricsLoadRequestMediaId == metadata.id) lyricsLoadRequestMediaId = null
