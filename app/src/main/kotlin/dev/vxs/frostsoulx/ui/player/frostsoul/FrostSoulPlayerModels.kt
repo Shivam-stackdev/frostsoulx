@@ -75,6 +75,8 @@ internal data class FrostSoulPlayerUiState(
     val queueTitle: String?,
     val queue: List<FrostSoulQueueItem>,
     val lyrics: String?,
+    val currentLyricLine: String? = null,
+    val audioQualityBadge: String? = null,
     val palette: FrostSoulPalette = FrostSoulPalette.Default,
 ) {
     val safeDurationMs: Long
@@ -97,6 +99,7 @@ internal data class FrostSoulPlayerActions(
     val onSkipNext: () -> Unit,
     val onSeek: (Long) -> Unit,
     val onToggleLike: () -> Unit,
+    val onOpenAudioOutput: () -> Unit = {},
     val onSelectQueueItem: (Int) -> Unit,
 )
 

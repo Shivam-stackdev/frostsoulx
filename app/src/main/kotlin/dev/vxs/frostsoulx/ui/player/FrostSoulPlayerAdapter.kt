@@ -8,8 +8,17 @@
 package dev.vxs.frostsoulx.ui.player
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import android.content.Intent
+import android.provider.Settings
+import dagger.hilt.android.EntryPointAccessors
+import dev.vxs.frostsoulx.db.entities.containerLabel
+import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
 import androidx.media3.common.Timeline
 import dev.vxs.frostsoulx.extensions.mediaItems
 import dev.vxs.frostsoulx.extensions.metadata
@@ -42,6 +51,24 @@ internal fun FrostSoulPlayerAdapter(
     modifier: Modifier = Modifier,
 ) {
     val palette = rememberFrostSoulPalette(mediaMetadata.thumbnailUrl)
+    val applicationContext = LocalContext.current.applicationContext
+    val lyricsSynchronizationEngine =
+        remember(applicationContext) {
+            EntryPointAccessors
+                .fromApplication(applicationContext, LyricsHelperEntryPoint::class.java)
+                .lyricsSynchronizationEngine()
+        }
+    val lyricsDocument by lyricsSynchronizationEngine.documentState.collectAsState()
+    val lyricsSyncState by lyricsSynchronizationEngine.state.collectAsState()
+    val currentLyricLine =
+        remember(lyricsDocument, lyricsSyncState.currentLineIndex) {
+            lyricsDocument?.original?.lines?.getOrNull(lyricsSyncState.currentLineIndex)?.text
+        }
+    val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
+    val audioQualityBadge =
+        remember(currentFormat) {
+            currentFormat?.containerLabel()?.uppercase()?.takeIf { it.isNotBlank() }
+        }
     val queue =
         remember(queueWindows, currentQueueIndex) {
             queueWindows.mapIndexedNotNull { index, window ->
@@ -69,6 +96,8 @@ internal fun FrostSoulPlayerAdapter(
             queueTitle,
             queue,
             lyrics,
+            currentLyricLine,
+            audioQualityBadge,
             palette,
         ) {
             FrostSoulPlayerUiState(
@@ -82,11 +111,13 @@ internal fun FrostSoulPlayerAdapter(
                 queueTitle = queueTitle,
                 queue = queue,
                 lyrics = lyrics,
+                currentLyricLine = currentLyricLine,
+                audioQualityBadge = audioQualityBadge,
                 palette = palette,
             )
         }
     val actions =
-        remember(playerConnection, queueWindows, onCollapse) {
+        remember(playerConnection, queueWindows, onCollapse, applicationContext) {
             FrostSoulPlayerActions(
                 onDismiss = onCollapse,
                 onTogglePlayPause = { playerConnection.player.togglePlayPause() },
@@ -94,6 +125,11 @@ internal fun FrostSoulPlayerAdapter(
                 onSkipNext = playerConnection::seekToNext,
                 onSeek = { targetPosition -> playerConnection.player.seekTo(targetPosition) },
                 onToggleLike = playerConnection::toggleLike,
+                onOpenAudioOutput = {
+                    applicationContext.startActivity(
+                        Intent(Settings.ACTION_BLUETOOTH_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
+                },
                 onSelectQueueItem = { queueIndex ->
                     val targetWindow = queueWindows.getOrNull(queueIndex)
                     if (targetWindow != null) {

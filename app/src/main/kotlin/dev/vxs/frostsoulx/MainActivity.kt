@@ -202,6 +202,7 @@ import dev.vxs.frostsoulx.constants.HasPressedStarKey
 import dev.vxs.frostsoulx.constants.LaunchCountKey
 import dev.vxs.frostsoulx.constants.MiniPlayerBottomSpacing
 import dev.vxs.frostsoulx.constants.MiniPlayerHeight
+import dev.vxs.frostsoulx.constants.MiniPlayerPeekHeight
 import dev.vxs.frostsoulx.constants.MiniPlayerLastAnchorKey
 import dev.vxs.frostsoulx.constants.NavigationBarAnimationSpec
 import dev.vxs.frostsoulx.constants.NavigationBarBottomPadding
@@ -980,6 +981,8 @@ class MainActivity : ComponentActivity() {
                         label = "",
                     )
 
+                    var miniPlayerPeeked by remember { mutableStateOf(false) }
+                    val miniPlayerOccupiedHeight = if (miniPlayerPeeked) MiniPlayerPeekHeight else MiniPlayerHeight
                     val playerBottomSheetState =
                         rememberBottomSheetState(
                             dismissedBound = 0.dp,
@@ -988,7 +991,7 @@ class MainActivity : ComponentActivity() {
                                     (if (shouldShowNavigationBar && !useRail) floatingBarsBottomPadding else 0.dp) +
                                     getBottomNavPadding() +
                                     MiniPlayerBottomSpacing +
-                                    MiniPlayerHeight,
+                                    miniPlayerOccupiedHeight,
                             expandedBound = maxHeight,
                         )
                     var homeOverflowMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -1150,13 +1153,14 @@ class MainActivity : ComponentActivity() {
                             bottomInset,
                             shouldShowNavigationBar,
                             playerBottomSheetState.isDismissed,
+                            miniPlayerOccupiedHeight,
                         ) {
                             var bottom = bottomInset
                             if (shouldShowNavigationBar && !useRail) {
                                 bottom += getBottomNavPadding() + floatingBarsBottomPadding
                             }
                             if (!playerBottomSheetState.isDismissed) {
-                                bottom += MiniPlayerHeight + MiniPlayerBottomSpacing
+                                bottom += miniPlayerOccupiedHeight + MiniPlayerBottomSpacing
                             }
                             windowsInsets
                                 .only(
@@ -2062,6 +2066,7 @@ class MainActivity : ComponentActivity() {
                                             navController = navController,
                                             pureBlack = pureBlack,
                                             isMiniPlayerPairedWithNavigation = areBottomBarsPaired,
+                                            onMiniPlayerPeekChanged = { miniPlayerPeeked = it },
                                         )
 
                                         if (useRail) return@Box
@@ -2138,7 +2143,7 @@ class MainActivity : ComponentActivity() {
                                                 navVisibleHeight +
                                                 HomeOverflowFabSpacing +
                                                 if (playerBottomSheetState.isCollapsed) {
-                                                    MiniPlayerHeight + MiniPlayerBottomSpacing
+                                                    miniPlayerOccupiedHeight + MiniPlayerBottomSpacing
                                                 } else {
                                                     0.dp
                                                 }

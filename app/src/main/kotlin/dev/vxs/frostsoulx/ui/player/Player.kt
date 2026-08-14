@@ -310,6 +310,7 @@ fun BottomSheetPlayer(
     modifier: Modifier = Modifier,
     pureBlack: Boolean,
     isMiniPlayerPairedWithNavigation: Boolean = false,
+    onMiniPlayerPeekChanged: (Boolean) -> Unit = {},
 ) {
     val context = LocalContext.current
     val menuState = LocalMenuState.current
@@ -1004,6 +1005,8 @@ fun BottomSheetPlayer(
                 pureBlack = pureBlack,
                 isPairedWithNavigation = isMiniPlayerPairedWithNavigation,
                 onQueueClick = openQueue,
+                onOpenFullPlayer = state::expandSoft,
+                onSmartPeekChanged = onMiniPlayerPeekChanged,
             )
         },
     ) {

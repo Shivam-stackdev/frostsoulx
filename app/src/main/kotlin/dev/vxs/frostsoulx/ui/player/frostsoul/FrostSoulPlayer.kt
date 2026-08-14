@@ -22,6 +22,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.clickable
@@ -83,6 +84,7 @@ import coil3.size.Size
 import coil3.toBitmap
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
+import dev.vxs.frostsoulx.ui.player.rememberDeviceMusicVolumeController
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -95,10 +97,9 @@ internal fun FrostSoulPlayer(
     actions: FrostSoulPlayerActions,
     modifier: Modifier = Modifier,
 ) {
-    val pages = remember { listOf(FrostSoulPage.Lyrics, FrostSoulPage.MainPlayer, FrostSoulPage.Recommendations) }
+    val pages = remember { listOf(FrostSoulPage.Recommendations, FrostSoulPage.MainPlayer, FrostSoulPage.Lyrics) }
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { pages.size })
     val scope = rememberCoroutineScope()
-    val page = pages.getOrElse(pagerState.currentPage) { FrostSoulPage.MainPlayer }
     var queueVisible by remember { mutableStateOf(false) }
     var downwardDragDistance by remember { mutableFloatStateOf(0f) }
     val settledDragOffset by animateFloatAsState(
@@ -148,15 +149,15 @@ internal fun FrostSoulPlayer(
                     .padding(horizontal = 18.dp),
         ) {
             FSTopBar(
-                currentPage = page,
+                selectedPage = pagerState.currentPage,
+                pageOffsetFraction = pagerState.currentPageOffsetFraction,
+                pageCount = pages.size,
+                onPageSelected = { targetPage ->
+                    scope.launch { pagerState.animateScrollToPage(targetPage) }
+                },
                 onDismiss = actions.onDismiss,
                 onOpenQueue = { queueVisible = true },
-                modifier = Modifier.padding(top = 8.dp, bottom = 6.dp),
-            )
-            FrostSoulPagerDots(
-                pageCount = pages.size,
-                selectedPage = pagerState.currentPage,
-                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 10.dp),
+                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
             )
             HorizontalPager(
                 state = pagerState,
@@ -188,7 +189,15 @@ internal fun FrostSoulPlayer(
                                 onSeek = actions.onSeek,
                             )
 
-                        FrostSoulPage.MainPlayer -> FrostSoulAlbumPage(uiState = uiState, actions = actions)
+                        FrostSoulPage.MainPlayer ->
+                            FrostSoulAlbumPage(
+                                uiState = uiState,
+                                actions = actions,
+                                onOpenLyrics = {
+                                    scope.launch { pagerState.animateScrollToPage(pages.indexOf(FrostSoulPage.Lyrics)) }
+                                },
+                                onOpenQueue = { queueVisible = true },
+                            )
                         FrostSoulPage.Recommendations -> FrostSoulRecommendationsPage(uiState = uiState, actions = actions)
                         FrostSoulPage.Queue -> Unit
                     }
@@ -258,6 +267,7 @@ internal fun FrostSoulPlayer(
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 internal fun FSMiniPlayer(
     track: FrostSoulTrack,
@@ -265,44 +275,102 @@ internal fun FSMiniPlayer(
     durationMs: Long,
     isPlaying: Boolean,
     isLiked: Boolean,
+    palette: FrostSoulPalette,
+    height: androidx.compose.ui.unit.Dp,
+    artworkSize: androidx.compose.ui.unit.Dp,
+    peeked: Boolean,
+    shape: RoundedCornerShape,
+    interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource,
+    pureBlack: Boolean,
+    onCardClick: () -> Unit,
+    onLongPress: () -> Unit,
     onTogglePlayPause: () -> Unit,
-    onSkipPrevious: () -> Unit,
-    onSkipNext: () -> Unit,
-    onToggleLike: () -> Unit,
     onQueueClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val progress =
+    val rawProgress =
         if (durationMs > 0L) {
             (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f)
         } else {
             0f
         }
+    val progress by animateFloatAsState(
+        targetValue = rawProgress,
+        animationSpec = tween(220),
+        label = "frostsoul-mini-player-progress",
+    )
+    val backgroundColor = if (pureBlack) Color.Black else FrostSoulSurfaceElevated
+
     Box(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(68.dp)
-                .background(Color.Black.copy(alpha = 0.86f)),
+                .height(height)
+                .graphicsLayer {
+                    shadowElevation = if (isPlaying) 18.dp.toPx() else 8.dp.toPx()
+                    this.shape = shape
+                    clip = false
+                }
+                .clip(shape)
+                .background(backgroundColor.copy(alpha = 0.94f))
+                .border(1.dp, palette.accent.copy(alpha = if (isPlaying) 0.48f else 0.20f), shape)
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onCardClick,
+                    onLongClick = onLongPress,
+                ),
     ) {
+        if (!track.artworkUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = track.artworkUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = 1.14f; scaleY = 1.14f }.blur(26.dp).alpha(0.32f),
+            )
+        }
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(Color.Black.copy(alpha = 0.76f), backgroundColor.copy(alpha = 0.94f)),
+                        ),
+                    ),
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 9.dp, vertical = 6.dp),
         ) {
-            FSAlbumArt(
-                artworkUrl = track.artworkUrl,
-                title = track.title,
-                isPlaying = isPlaying,
-                palette = FrostSoulPalette.Default,
-                compact = true,
-                modifier = Modifier.size(48.dp),
-            )
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(artworkSize).clip(RoundedCornerShape(16.dp)).background(FrostSoulSurface),
+            ) {
+                AsyncImage(
+                    model = track.artworkUrl,
+                    contentDescription = "Album artwork for ${track.title}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                if (track.artworkUrl.isNullOrBlank()) {
+                    Icon(
+                        painter = painterResource(R.drawable.music_note),
+                        contentDescription = null,
+                        tint = FrostSoulOnSurfaceMuted,
+                        modifier = Modifier.size(26.dp),
+                    )
+                }
+            }
+            Spacer(Modifier.width(10.dp))
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.weight(1f).padding(end = 6.dp),
+            ) {
                 Text(
                     text = track.title,
                     color = FrostSoulOnSurface,
-                    fontSize = 14.sp,
+                    fontSize = if (peeked) 15.sp else 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -313,40 +381,35 @@ internal fun FSMiniPlayer(
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 2.dp),
                 )
+                if (peeked && track.album.isNotBlank()) {
+                    Text(
+                        text = track.album,
+                        color = palette.accent.copy(alpha = 0.86f),
+                        fontSize = 10.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
             }
-            FSIconButton(
-                painter = painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                contentDescription = if (isLiked) "Unlike" else "Like",
-                onClick = onToggleLike,
-                active = isLiked,
-                compact = true,
-            )
-            FSIconButton(
-                painter = painterResource(R.drawable.skip_previous),
-                contentDescription = "Previous",
-                onClick = onSkipPrevious,
-                compact = true,
-            )
             FSIconButton(
                 painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
                 contentDescription = if (isPlaying) "Pause" else "Play",
                 onClick = onTogglePlayPause,
+                active = isPlaying,
                 compact = true,
             )
-            FSIconButton(
-                painter = painterResource(R.drawable.skip_next),
-                contentDescription = "Next",
-                onClick = onSkipNext,
-                compact = true,
-            )
-            onQueueClick?.let { openQueue ->
-                FSIconButton(
-                    painter = painterResource(R.drawable.queue_music),
-                    contentDescription = "Queue",
-                    onClick = openQueue,
-                    compact = true,
-                )
+            if (peeked) {
+                onQueueClick?.let { openQueue ->
+                    FSIconButton(
+                        painter = painterResource(R.drawable.queue_music),
+                        contentDescription = "Open queue",
+                        onClick = openQueue,
+                        compact = true,
+                    )
+                }
             }
         }
         Box(
@@ -354,8 +417,8 @@ internal fun FSMiniPlayer(
                 Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth(progress)
-                    .height(2.dp)
-                    .background(FrostSoulCyanBright),
+                    .height(if (peeked) 3.dp else 2.dp)
+                    .background(palette.accent),
         )
     }
 }
@@ -383,6 +446,25 @@ internal fun FSPlayerControls(
             Text(state.positionMs.asFrostSoulTime(), color = FrostSoulOnSurfaceMuted, fontSize = 11.sp)
             Text("−${remainingMs.asFrostSoulTime()}", color = FrostSoulOnSurfaceMuted, fontSize = 11.sp)
         }
+        state.audioQualityBadge?.let { badge ->
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier =
+                    Modifier
+                        .padding(top = 7.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(1.dp, state.palette.accent.copy(alpha = 0.72f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 10.dp, vertical = 3.dp),
+            ) {
+                Text(
+                    text = badge,
+                    color = FrostSoulCyanBright,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.2.sp,
+                )
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -405,13 +487,6 @@ internal fun FSPlayerControls(
                 contentDescription = "Next track",
                 onClick = actions.onSkipNext,
                 enabled = state.canSkipNext,
-            )
-            FSIconButton(
-                painter = painterResource(if (state.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                contentDescription = if (state.track.isLiked) "Unlike track" else "Like track",
-                onClick = actions.onToggleLike,
-                active = state.track.isLiked,
-                compact = true,
             )
         }
     }
@@ -454,35 +529,37 @@ private fun FSPlayButton(
 }
 
 @Composable
-private fun FrostSoulPagerDots(
+internal fun FrostSoulPagerDots(
     pageCount: Int,
     selectedPage: Int,
+    selectedPageOffsetFraction: Float = 0f,
+    onPageSelected: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val pagerPosition =
+        (selectedPage + selectedPageOffsetFraction)
+            .coerceIn(0f, (pageCount - 1).coerceAtLeast(0).toFloat())
     Row(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
         repeat(pageCount) { index ->
-            val selected = index == selectedPage
-            val width by animateDpAsState(
-                targetValue = if (selected) 22.dp else 7.dp,
-                animationSpec = spring(dampingRatio = 0.82f, stiffness = 680f),
-                label = "frostsoul-pager-dot-width",
-            )
-            val alpha by animateFloatAsState(
-                targetValue = if (selected) 1f else 0.36f,
-                animationSpec = tween(160),
-                label = "frostsoul-pager-dot-alpha",
-            )
+            val selection = (1f - kotlin.math.abs(pagerPosition - index.toFloat())).coerceIn(0f, 1f)
+            val width = 7.dp + (22.dp - 7.dp) * selection
+            val alpha = 0.36f + (1f - 0.36f) * selection
             Box(
                 modifier =
                     Modifier
-                        .height(3.dp)
+                        .height(4.dp)
                         .width(width)
-                        .graphicsLayer { this.alpha = alpha }
+                        .graphicsLayer {
+                            this.alpha = alpha
+                            shadowElevation = 10.dp.toPx() * selection
+                        }
                         .clip(androidx.compose.foundation.shape.CircleShape)
-                        .background(if (selected) FrostSoulCyanBright else FrostSoulOnSurfaceMuted),
+                        .background(if (selection > 0.5f) FrostSoulCyanBright else FrostSoulOnSurfaceMuted)
+                        .clickable { onPageSelected(index) },
             )
         }
     }
@@ -492,29 +569,48 @@ private fun FrostSoulPagerDots(
 private fun FrostSoulAlbumPage(
     uiState: FrostSoulPlayerUiState,
     actions: FrostSoulPlayerActions,
+    onOpenLyrics: () -> Unit,
+    onOpenQueue: () -> Unit,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxSize().padding(bottom = 14.dp),
+    val volumeController = rememberDeviceMusicVolumeController()
+    var lastAudibleVolume by remember { mutableFloatStateOf(0.55f) }
+    var upwardDragDistance by remember { mutableFloatStateOf(0f) }
+    var optionsVisible by remember { mutableStateOf(false) }
+    val volumeFraction = volumeController.volumeFraction.coerceIn(0f, 1f)
+
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .pointerInput(optionsVisible) {
+                    detectVerticalDragGestures(
+                        onVerticalDrag = { _, dragAmount ->
+                            upwardDragDistance += dragAmount
+                        },
+                        onDragEnd = {
+                            if (upwardDragDistance <= -72f) optionsVisible = true
+                            upwardDragDistance = 0f
+                        },
+                        onDragCancel = { upwardDragDistance = 0f },
+                    )
+                },
     ) {
-        Spacer(Modifier.height(6.dp))
-        FSAlbumArt(
-            artworkUrl = uiState.track.artworkUrl,
-            title = uiState.track.title,
-            isPlaying = uiState.isPlaying,
-            palette = uiState.palette,
-            modifier = Modifier.fillMaxWidth(0.84f),
-        )
-        FSGlassCard(
-            accent = uiState.palette.accent,
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxSize().padding(bottom = 12.dp),
         ) {
+            Spacer(Modifier.height(2.dp))
+            FSAlbumArt(
+                artworkUrl = uiState.track.artworkUrl,
+                title = uiState.track.title,
+                isPlaying = uiState.isPlaying,
+                palette = uiState.palette,
+                modifier = Modifier.fillMaxWidth(0.84f),
+            )
             Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, end = 68.dp, top = 16.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             ) {
                 Text(
                     text = uiState.track.title,
@@ -527,36 +623,241 @@ private fun FrostSoulAlbumPage(
                 Text(
                     text = uiState.track.artist,
                     color = FrostSoulCyanBright,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 5.dp),
+                    modifier = Modifier.padding(top = 3.dp),
                 )
-                if (uiState.track.album.isNotBlank()) {
+                AnimatedContent(
+                    targetState = uiState.currentLyricLine?.takeIf { it.isNotBlank() } ?: "Lyrics unavailable",
+                    transitionSpec = {
+                        (fadeIn(tween(280)) + slideInVertically(tween(280)) { it / 2 }) togetherWith
+                            (fadeOut(tween(220)) + slideOutVertically(tween(220)) { -it / 2 })
+                    },
+                    label = "frostsoul-live-lyric-preview",
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .clickable(onClick = onOpenLyrics)
+                            .padding(horizontal = 14.dp, vertical = 7.dp),
+                ) { lyricLine ->
                     Text(
-                        text = uiState.track.album,
-                        color = FrostSoulOnSurfaceMuted,
+                        text = lyricLine,
+                        color =
+                            if (uiState.currentLyricLine.isNullOrBlank()) {
+                                FrostSoulOnSurfaceMuted.copy(alpha = 0.60f)
+                            } else {
+                                FrostSoulOnSurface.copy(alpha = 0.88f)
+                            },
                         fontSize = 13.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 3.dp),
                     )
                 }
             }
-            FSIconButton(
-                painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                contentDescription = if (uiState.track.isLiked) "Unlike track" else "Like track",
-                onClick = actions.onToggleLike,
-                active = uiState.track.isLiked,
-                compact = true,
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 14.dp),
+            FSPlayerControls(
+                state = uiState,
+                actions = actions,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+            ) {
+                FSIconButton(
+                    painter = painterResource(R.drawable.volume_off),
+                    contentDescription = if (volumeFraction > 0.01f) "Mute" else "Restore volume",
+                    onClick = {
+                        if (volumeFraction > 0.01f) {
+                            lastAudibleVolume = volumeFraction
+                            volumeController.setVolumeFraction(0f)
+                        } else {
+                            volumeController.setVolumeFraction(lastAudibleVolume.coerceAtLeast(0.1f))
+                        }
+                    },
+                    active = volumeFraction <= 0.01f,
+                    compact = true,
+                )
+                FSSeekbar(
+                    progress = volumeFraction,
+                    durationMs = 1_000L,
+                    onSeek = { target -> volumeController.setVolumeFraction(target / 1_000f) },
+                    accent = uiState.palette.accent,
+                    modifier = Modifier.weight(1f),
+                )
+                FSIconButton(
+                    painter = painterResource(R.drawable.volume_up),
+                    contentDescription = "Set full volume",
+                    onClick = { volumeController.setVolumeFraction(1f) },
+                    active = volumeFraction > 0.01f,
+                    compact = true,
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+            ) {
+                FSIconButton(
+                    painter = painterResource(R.drawable.queue_music),
+                    contentDescription = "Open playback queue",
+                    onClick = onOpenQueue,
+                    compact = true,
+                )
+                FSIconButton(
+                    painter = painterResource(R.drawable.lyrics),
+                    contentDescription = "Open synchronized lyrics",
+                    onClick = onOpenLyrics,
+                    active = uiState.currentLyricLine != null,
+                    compact = true,
+                )
+                FSIconButton(
+                    painter = painterResource(R.drawable.bluetooth),
+                    contentDescription = "Open Bluetooth audio output",
+                    onClick = actions.onOpenAudioOutput,
+                    compact = true,
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = optionsVisible,
+            enter = fadeIn(tween(160)) + slideInVertically(tween(280)) { it },
+            exit = fadeOut(tween(140)) + slideOutVertically(tween(240)) { it },
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+        ) {
+            FrostSoulPlayerOptionsSheet(
+                accent = uiState.palette.accent,
+                onDismiss = { optionsVisible = false },
+                onOpenAudioOutput = actions.onOpenAudioOutput,
             )
         }
-        FSPlayerControls(
-            state = uiState,
-            actions = actions,
-            modifier = Modifier.padding(top = 12.dp),
+    }
+}
+
+@Composable
+private fun FrostSoulPlayerOptionsSheet(
+    accent: Color,
+    onDismiss: () -> Unit,
+    onOpenAudioOutput: () -> Unit,
+) {
+    val options =
+        listOf(
+            Triple(R.drawable.tune, "DSP", "Signal processing"),
+            Triple(R.drawable.equalizer, "Equalizer", "Tone shaping"),
+            Triple(R.drawable.speed, "Playback Speed", "Tempo control"),
+            Triple(R.drawable.timer, "Sleep Timer", "Automatic stop"),
+            Triple(R.drawable.bluetooth, "Cast", "Audio output"),
+            Triple(R.drawable.info, "Audio Info", "Stream details"),
+            Triple(R.drawable.replay, "ReplayGain", "Loudness balance"),
+            Triple(R.drawable.settings, "Advanced Settings", "Player preferences"),
         )
+    FSGlassCard(
+        accent = accent,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 14.dp)
+                .height(392.dp)
+                .graphicsLayer {
+                    shadowElevation = 28.dp.toPx()
+                    shape = RoundedCornerShape(30.dp)
+                    clip = false
+                },
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 10.dp),
+        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .width(42.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(FrostSoulOnSurfaceMuted.copy(alpha = 0.35f)),
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 12.dp),
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "PLAYER OPTIONS",
+                        color = FrostSoulCyanBright,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 1.7.sp,
+                    )
+                    Text(
+                        text = "Shape the listening session",
+                        color = FrostSoulOnSurfaceMuted,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(top = 3.dp),
+                    )
+                }
+                FSIconButton(
+                    painter = painterResource(R.drawable.close),
+                    contentDescription = "Close player options",
+                    onClick = onDismiss,
+                    compact = true,
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
+                options.chunked(2).forEach { rowOptions ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                    ) {
+                        rowOptions.forEach { (icon, label, description) ->
+                            val actionable = label == "Cast"
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(18.dp))
+                                        .background(Color.White.copy(alpha = 0.045f))
+                                        .border(1.dp, accent.copy(alpha = 0.18f), RoundedCornerShape(18.dp))
+                                        .clickable(enabled = actionable) {
+                                            if (actionable) onOpenAudioOutput()
+                                        }
+                                        .padding(horizontal = 10.dp),
+                            ) {
+                                Icon(
+                                    painter = painterResource(icon),
+                                    contentDescription = null,
+                                    tint = if (actionable) FrostSoulCyanBright else FrostSoulOnSurface,
+                                    modifier = Modifier.size(22.dp),
+                                )
+                                Column(modifier = Modifier.padding(start = 9.dp)) {
+                                    Text(
+                                        text = label,
+                                        color = FrostSoulOnSurface,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                    Text(
+                                        text = description,
+                                        color = FrostSoulOnSurfaceMuted.copy(alpha = 0.72f),
+                                        fontSize = 10.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(top = 2.dp),
+                                    )
+                                }
+                            }
+                        }
+                        if (rowOptions.size == 1) Spacer(Modifier.weight(1f).fillMaxSize())
+                    }
+                }
+            }
+        }
     }
 }
 

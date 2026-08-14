@@ -344,7 +344,10 @@ internal fun FSSeekbar(
 
 @Composable
 internal fun FSTopBar(
-    currentPage: FrostSoulPage,
+    selectedPage: Int,
+    pageOffsetFraction: Float,
+    pageCount: Int,
+    onPageSelected: (Int) -> Unit,
     onDismiss: () -> Unit,
     onOpenQueue: () -> Unit,
     modifier: Modifier = Modifier,
@@ -360,29 +363,15 @@ internal fun FSTopBar(
             compact = true,
         )
         Spacer(Modifier.width(12.dp))
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier.weight(1f),
         ) {
-            Text(
-                text = "NOW PLAYING",
-                color = FrostSoulOnSurface,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                letterSpacing = 1.8.sp,
-            )
-            Text(
-                text =
-                    when (currentPage) {
-                        FrostSoulPage.Lyrics -> "SYNCHRONIZED LYRICS"
-                        FrostSoulPage.MainPlayer -> "MAIN PLAYER"
-                        FrostSoulPage.Recommendations -> "RECOMMENDATIONS"
-                        FrostSoulPage.Queue -> "PLAYBACK QUEUE"
-                    },
-                color = FrostSoulCyanBright.copy(alpha = 0.78f),
-                fontSize = 9.sp,
-                letterSpacing = 1.1.sp,
-                modifier = Modifier.padding(top = 2.dp),
+            FrostSoulPagerDots(
+                pageCount = pageCount,
+                selectedPage = selectedPage,
+                selectedPageOffsetFraction = pageOffsetFraction,
+                onPageSelected = onPageSelected,
             )
         }
         FSIconButton(
