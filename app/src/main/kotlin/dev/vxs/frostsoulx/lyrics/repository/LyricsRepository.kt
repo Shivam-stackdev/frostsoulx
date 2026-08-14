@@ -69,7 +69,7 @@ class LyricsRepository @Inject constructor(
                 songAlbum = request.album,
                 duration = ((request.durationMs ?: 0L) / 1_000L).toInt(),
             ) { result ->
-                results += ManualLyricsCandidate(provider = result.provider, lyrics = result.lyrics)
+                results += ManualLyricsCandidate(provider = result.providerName, lyrics = result.lyrics)
             }
             results.distinctBy { "${it.provider}:${it.lyrics}" }
         }

@@ -104,7 +104,7 @@ object LyricsParser {
                     text = words.joinToString(separator = "") { it.text }.ifBlank { match.groupValues[3].trim() },
                     words = words,
                 )
-            }.sortedBy { it.startMs }
+            }.sortedBy { it.startMs }.toList()
         return ParsedLyricsTrack(LyricsFormat.Yrc, 0L, lines)
     }
 
