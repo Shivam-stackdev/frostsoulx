@@ -9,10 +9,14 @@ package dev.vxs.frostsoulx.ui.player.frostsoul
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -59,6 +63,7 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -95,19 +100,34 @@ internal fun FrostSoulPlayer(
     val page = pages.getOrElse(pagerState.currentPage) { FrostSoulPage.Album }
     var queueVisible by remember { mutableStateOf(false) }
     var downwardDragDistance by remember { mutableFloatStateOf(0f) }
+    val settledDragOffset by animateFloatAsState(
+        targetValue = downwardDragDistance,
+        animationSpec = spring(dampingRatio = 0.82f, stiffness = 520f),
+        label = "frostsoul-player-dismiss-drag",
+    )
+    val collapseFraction = (settledDragOffset / 280f).coerceIn(0f, 1f)
 
     Box(
         modifier =
             modifier
                 .fillMaxSize()
                 .background(Color.Black)
-                .pointerInput(actions.onDismiss) {
+                .graphicsLayer {
+                    translationY = settledDragOffset
+                    scaleX = 1f - collapseFraction * 0.035f
+                    scaleY = 1f - collapseFraction * 0.035f
+                    alpha = 1f - collapseFraction * 0.18f
+                    transformOrigin = TransformOrigin(0.5f, 0f)
+                }
+                .pointerInput(actions.onDismiss, queueVisible) {
                     detectVerticalDragGestures(
                         onVerticalDrag = { _, dragAmount ->
-                            if (dragAmount > 0f) downwardDragDistance += dragAmount
+                            if (!queueVisible) {
+                                downwardDragDistance = (downwardDragDistance + dragAmount).coerceAtLeast(0f)
+                            }
                         },
                         onDragEnd = {
-                            if (downwardDragDistance >= 96f) actions.onDismiss()
+                            if (downwardDragDistance >= 112f) actions.onDismiss()
                             downwardDragDistance = 0f
                         },
                         onDragCancel = { downwardDragDistance = 0f },
@@ -149,8 +169,13 @@ internal fun FrostSoulPlayer(
                         Modifier
                             .fillMaxSize()
                             .graphicsLayer {
-                                alpha = (1f - kotlin.math.abs(pageDistance) * 0.26f).coerceIn(0.70f, 1f)
-                                translationX = -pageDistance * 18f
+                                val distance = kotlin.math.abs(pageDistance).coerceIn(0f, 1f)
+                                alpha = (1f - distance * 0.34f).coerceIn(0.62f, 1f)
+                                translationX = -pageDistance * 28f
+                                scaleX = 1f - distance * 0.055f
+                                scaleY = 1f - distance * 0.055f
+                                rotationY = pageDistance * 2.8f
+                                cameraDistance = 16f * density
                             },
                 ) {
                     when (pages[pageIndex]) {
@@ -171,13 +196,32 @@ internal fun FrostSoulPlayer(
         }
         AnimatedVisibility(
             visible = queueVisible,
-            enter = fadeIn() + slideInVertically { height -> height / 3 },
-            exit = fadeOut() + slideOutVertically { height -> height / 3 },
+            enter =
+                fadeIn(animationSpec = tween(160)) +
+                    slideInVertically(
+                        animationSpec = spring(dampingRatio = 0.82f, stiffness = 460f),
+                    ) { height -> height / 2 } +
+                    scaleIn(
+                        initialScale = 0.94f,
+                        animationSpec = spring(dampingRatio = 0.84f, stiffness = 500f),
+                    ),
+            exit =
+                fadeOut(animationSpec = tween(120)) +
+                    slideOutVertically(animationSpec = tween(180)) { height -> height / 3 } +
+                    scaleOut(targetScale = 0.96f, animationSpec = tween(180)),
             modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 12.dp, vertical = 18.dp),
         ) {
             FSGlassCard(
                 accent = uiState.palette.accent,
-                modifier = Modifier.fillMaxWidth().height(420.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(420.dp)
+                        .graphicsLayer {
+                            shadowElevation = 28.dp.toPx()
+                            shape = RoundedCornerShape(30.dp)
+                            clip = false
+                        },
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Row(
@@ -387,15 +431,25 @@ private fun FrostSoulPagerDots(
         modifier = modifier,
     ) {
         repeat(pageCount) { index ->
+            val selected = index == selectedPage
+            val width by animateDpAsState(
+                targetValue = if (selected) 22.dp else 7.dp,
+                animationSpec = spring(dampingRatio = 0.82f, stiffness = 680f),
+                label = "frostsoul-pager-dot-width",
+            )
+            val alpha by animateFloatAsState(
+                targetValue = if (selected) 1f else 0.36f,
+                animationSpec = tween(160),
+                label = "frostsoul-pager-dot-alpha",
+            )
             Box(
                 modifier =
                     Modifier
                         .height(3.dp)
-                        .width(if (index == selectedPage) 22.dp else 7.dp)
+                        .width(width)
+                        .graphicsLayer { this.alpha = alpha }
                         .clip(androidx.compose.foundation.shape.CircleShape)
-                        .background(
-                            if (index == selectedPage) FrostSoulCyanBright else FrostSoulOnSurfaceMuted.copy(alpha = 0.36f),
-                        ),
+                        .background(if (selected) FrostSoulCyanBright else FrostSoulOnSurfaceMuted),
             )
         }
     }
