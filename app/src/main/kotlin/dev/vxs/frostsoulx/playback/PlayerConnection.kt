@@ -115,6 +115,7 @@ class PlayerConnection(
     private var dismissedPlaybackError: PlaybackException? = null
     val waitingForNetworkConnection = service.waitingForNetworkConnection
     val queueRestoreCompleted = service.queueRestoreCompleted
+    val playbackCoreState = service.playbackCoreState
     val extractorAuthenticationEvents = service.extractorAuthenticationEvents
 
     private val canvasArtworkRefetchMutex = Mutex()
@@ -262,6 +263,40 @@ class PlayerConnection(
 
     fun addToQueue(items: List<MediaItem>) {
         service.addToQueue(items)
+    }
+
+    fun insertLater(items: List<MediaItem>) {
+        service.insertLater(items)
+    }
+
+    fun moveQueueItem(
+        fromIndex: Int,
+        toIndex: Int,
+    ) {
+        service.moveQueueItem(fromIndex, toIndex)
+    }
+
+    fun removeQueueItems(indices: Collection<Int>) {
+        service.removeQueueItems(indices)
+    }
+
+    fun undoQueueMutation() {
+        service.undoQueueMutation()
+    }
+
+    fun appendSmartQueue(items: List<MediaItem>) {
+        service.appendSmartQueue(items)
+    }
+
+    fun setPlaybackSpeed(
+        speed: Float,
+        preservePitch: Boolean = true,
+    ) {
+        service.setPlaybackSpeed(speed, preservePitch)
+    }
+
+    fun setPlaybackPitch(pitch: Float) {
+        service.setPlaybackPitch(pitch)
     }
 
     fun playFromVoiceSearch(query: String) {

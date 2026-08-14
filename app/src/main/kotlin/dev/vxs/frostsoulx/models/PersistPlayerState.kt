@@ -17,6 +17,8 @@ data class PersistPlayerState(
     val currentPosition: Long,
     val currentMediaItemIndex: Int,
     val playbackState: Int,
+    val playbackSpeed: Float = 1f,
+    val playbackPitch: Float = 1f,
     val timestamp: Long = System.currentTimeMillis(),
 ) : Serializable {
     companion object {

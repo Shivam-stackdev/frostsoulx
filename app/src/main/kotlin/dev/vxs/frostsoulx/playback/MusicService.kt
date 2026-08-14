@@ -232,6 +232,9 @@ import dev.vxs.frostsoulx.models.toMediaMetadata
 import dev.vxs.frostsoulx.moriextractor.ArchiveTuneExtractorException
 import dev.vxs.frostsoulx.moriextractor.InMemoryBearerTokenRepository
 import dev.vxs.frostsoulx.moriextractor.StreamingExtractionManager
+import dev.vxs.frostsoulx.playback.core.Media3PlaybackCore
+import dev.vxs.frostsoulx.playback.core.PlaybackCoreState
+import dev.vxs.frostsoulx.playback.core.PlaybackSnapshotRepository
 import dev.vxs.frostsoulx.playback.queues.EmptyQueue
 import dev.vxs.frostsoulx.playback.queues.ListQueue
 import dev.vxs.frostsoulx.playback.queues.Queue
@@ -311,6 +314,9 @@ class MusicService :
 
     @Inject
     lateinit var equalizerPlaybackController: EqualizerPlaybackController
+
+    @Inject
+    lateinit var playbackSnapshotRepository: PlaybackSnapshotRepository
 
     private lateinit var audioManager: AudioManager
     private var audioFocusRequest: AudioFocusRequest? = null
@@ -431,6 +437,9 @@ class MusicService :
     }
 
     private var currentQueue: Queue = EmptyQueue
+    private var playbackCore: Media3PlaybackCore? = null
+    val playbackCoreState: kotlinx.coroutines.flow.StateFlow<PlaybackCoreState>?
+        get() = playbackCore?.state
     var queueTitle: String? = null
     private var blockedArtistIds: Set<String> = emptySet()
     private var hideMusicVideos = false
@@ -1109,6 +1118,12 @@ private var lyricsNotificationHighlightEnabled = false
                     sleepTimer = SleepTimer(scope, this, this@MusicService)
                     addListener(sleepTimer)
                 }
+        playbackCore = Media3PlaybackCore(
+            player = player,
+            scope = scope,
+            snapshotRepository = playbackSnapshotRepository,
+            queueTitleProvider = { queueTitle },
+        )
         playerInitialized.value = true
         database
             .blockedArtistIds()
@@ -1528,6 +1543,11 @@ private var lyricsNotificationHighlightEnabled = false
                         }
                         persistedPlayerState?.let { playerState ->
                             restorePersistentPlayerState(playerState, restoredQueue)
+                        }
+                        if (!restoredQueue && persistedPlayerState == null) {
+                            withContext(Dispatchers.Main) {
+                                playbackCore?.restoreLatestSnapshot()
+                            }
                         }
                     } finally {
                         isRestoringPersistentState = false
@@ -2154,6 +2174,11 @@ private var lyricsNotificationHighlightEnabled = false
         withContext(Dispatchers.Main) {
             player.repeatMode = playerState.repeatMode
             player.shuffleModeEnabled = playerState.shuffleModeEnabled
+            player.playbackParameters =
+                androidx.media3.common.PlaybackParameters(
+                    playerState.playbackSpeed.takeIf { it in 0.25f..3f } ?: 1f,
+                    playerState.playbackPitch.takeIf { it in 0.5f..2f } ?: 1f,
+                )
             playerVolume.value = playerState.volume.coerceIn(0f, 1f)
 
             if (player.mediaItemCount > 0) {
@@ -4094,6 +4119,67 @@ private var lyricsNotificationHighlightEnabled = false
         player.addMediaItems(insertionIndex, allowedItems)
         playNextShuffleOrder?.let(localPlayer::setShuffleOrder)
         player.prepare()
+    }
+
+    fun insertLater(items: List<MediaItem>) {
+        if (items.isEmpty()) return
+        ensureScopesActive()
+        scope.launch(SilentHandler) {
+            playbackCore?.insertLater(
+                items
+                    .filterBlockedArtists(blockedArtistIds)
+                    .filterVideo(hideMusicVideos),
+            )
+        }
+    }
+
+    fun moveQueueItem(
+        fromIndex: Int,
+        toIndex: Int,
+    ) {
+        ensureScopesActive()
+        scope.launch(SilentHandler) {
+            playbackCore?.move(fromIndex, toIndex)
+        }
+    }
+
+    fun removeQueueItems(indices: Collection<Int>) {
+        if (indices.isEmpty()) return
+        ensureScopesActive()
+        scope.launch(SilentHandler) {
+            playbackCore?.remove(indices)
+        }
+    }
+
+    fun undoQueueMutation() {
+        ensureScopesActive()
+        scope.launch(SilentHandler) {
+            playbackCore?.undoLastQueueMutation()
+        }
+    }
+
+    fun appendSmartQueue(items: List<MediaItem>) {
+        if (items.isEmpty()) return
+        ensureScopesActive()
+        scope.launch(SilentHandler) {
+            playbackCore?.appendSmartQueue(
+                candidates =
+                    items
+                        .filterBlockedArtists(blockedArtistIds)
+                        .filterVideo(hideMusicVideos),
+            )
+        }
+    }
+
+    fun setPlaybackSpeed(
+        speed: Float,
+        preservePitch: Boolean = true,
+    ) {
+        playbackCore?.setPlaybackSpeed(speed, preservePitch)
+    }
+
+    fun setPlaybackPitch(pitch: Float) {
+        playbackCore?.setPitch(pitch)
     }
 
     fun addToQueue(items: List<MediaItem>) {
@@ -8148,6 +8234,8 @@ private var lyricsNotificationHighlightEnabled = false
                         currentPosition = currentPosition,
                         currentMediaItemIndex = currentMediaItemIndex,
                         playbackState = player.playbackState,
+                        playbackSpeed = player.playbackParameters.speed,
+                        playbackPitch = player.playbackParameters.pitch,
                     )
 
                 persistQueue to persistPlayerState
@@ -8199,6 +8287,8 @@ private var lyricsNotificationHighlightEnabled = false
     }
 
     override fun onDestroy() {
+        playbackCore?.close()
+        playbackCore = null
         stopLyricsSync()
         equalizerPlaybackController.detach(this)
         discordServiceStopping = true
