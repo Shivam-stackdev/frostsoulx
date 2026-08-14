@@ -19,7 +19,7 @@ object LyricsPreferences {
      * Whether the dark cyan overlay highlight on active lyric lines is enabled.
      */
     fun isDarkCyanHighlightEnabled(context: Context): Boolean {
-        return prefs(context).getBoolean(DARK_CYAN_HIGHLIGHT, false)
+        return prefs(context).getBoolean(DARK_CYAN_HIGHLIGHT, true)
     }
 
     /**

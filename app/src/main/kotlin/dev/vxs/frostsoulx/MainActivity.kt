@@ -1009,7 +1009,7 @@ class MainActivity : ComponentActivity() {
                     )
                     val playerDesignStyle by rememberEnumPreference(
                         key = PlayerDesignStyleKey,
-                        defaultValue = PlayerDesignStyle.V4,
+                        defaultValue = PlayerDesignStyle.FROSTSOUL,
                     )
 
                     val aodModeEnabled by remember(playerConnection) {
@@ -1394,7 +1394,8 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(navBackStackEntry) {
                         shouldShowTopBar =
                             !active && navBackStackEntry?.destination?.route in topLevelScreens &&
-                            navBackStackEntry?.destination?.route != "settings"
+                            navBackStackEntry?.destination?.route != "settings" &&
+                            navBackStackEntry?.destination?.route != Screens.Home.route
                     }
 
                     var sharedSong: SongItem? by remember {
@@ -2122,6 +2123,11 @@ class MainActivity : ComponentActivity() {
                                                 onSearchItemDoubleClick = {
                                                     searchSource = SearchSource.ONLINE
                                                     openSearch()
+                                                },
+                                                onCenterClick = {
+                                                    if (!playerBottomSheetState.isExpandedOrExpanding) {
+                                                        playerBottomSheetState.expandSoft()
+                                                    }
                                                 },
                                             )
                                         }

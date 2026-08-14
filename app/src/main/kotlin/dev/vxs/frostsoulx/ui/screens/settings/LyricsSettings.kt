@@ -201,7 +201,7 @@ fun LyricsSettings(
         }
     val (lyricsLineBlur, onLyricsLineBlurChange) = rememberPreference(LyricsLineBlurKey, defaultValue = true)
     val (lyricsDarkCyanHighlight, onLyricsDarkCyanHighlightChange) =
-    rememberPreference(LyricsDarkCyanHighlightKey, defaultValue = false)
+    rememberPreference(LyricsDarkCyanHighlightKey, defaultValue = true)
     val (lyricsRomanizeJapanese, onLyricsRomanizeJapaneseChange) = rememberPreference(LyricsRomanizeJapaneseKey, defaultValue = true)
     val (lyricsRomanizeKorean, onLyricsRomanizeKoreanChange) = rememberPreference(LyricsRomanizeKoreanKey, defaultValue = true)
     val (lyricsRomanizeChinese, onLyricsRomanizeChineseChange) = rememberPreference(LyricsRomanizeChineseKey, defaultValue = true)

@@ -149,7 +149,7 @@ fun AppearanceSettings(navController: NavController) {
     val (playerDesignStyle, onPlayerDesignStyleChange) =
         rememberEnumPreference(
             PlayerDesignStyleKey,
-            defaultValue = PlayerDesignStyle.V4,
+            defaultValue = PlayerDesignStyle.FROSTSOUL,
         )
     val (showPlayerVolumeBar, onShowPlayerVolumeBarChange) =
         rememberPreference(
@@ -649,6 +649,7 @@ fun AppearanceSettings(navController: NavController) {
                                 PlayerDesignStyle.V7 -> stringResource(R.string.player_design_v7)
                                 PlayerDesignStyle.V8 -> stringResource(R.string.player_design_v8)
                                 PlayerDesignStyle.V9 -> stringResource(R.string.player_design_v9)
+                                PlayerDesignStyle.FROSTSOUL -> stringResource(R.string.player_design_frostsoul)
                             }
                         },
                     )

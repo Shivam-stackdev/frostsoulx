@@ -191,7 +191,7 @@ fun Queue(
 
     val playerDesignStyle by rememberEnumPreference(
         key = PlayerDesignStyleKey,
-        defaultValue = PlayerDesignStyle.V4,
+        defaultValue = PlayerDesignStyle.FROSTSOUL,
     )
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -529,7 +529,7 @@ fun Queue(
                     )
                 }
 
-                PlayerDesignStyle.V4 -> {
+                PlayerDesignStyle.V4, PlayerDesignStyle.FROSTSOUL -> {
                     QueueCollapsedContentV4(
                         showCodecOnPlayer = showCodecOnPlayer,
                         currentFormat = currentFormat,

@@ -14,6 +14,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -545,6 +546,7 @@ fun FSNavigationBar(
     onItemClick: (FSNavigationItem, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     pairedWithMiniPlayer: Boolean = false,
+    onCenterClick: (() -> Unit)? = null,
 ) {
     val shape = if (pairedWithMiniPlayer) {
         androidx.compose.foundation.shape.RoundedCornerShape(12.dp, 12.dp, 28.dp, 28.dp)
@@ -577,7 +579,10 @@ fun FSNavigationBar(
                 }
                 .padding(horizontal = FrostSoulTheme.spacing.small, vertical = 7.dp),
     ) {
-        items.forEach { item ->
+        items.forEachIndexed { index, item ->
+            if (onCenterClick != null && index == 2) {
+                FrostSoulCenterNavigationAction(onClick = onCenterClick)
+            }
             val selected = selectedRoute == item.route
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -609,6 +614,36 @@ fun FSNavigationBar(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun FrostSoulCenterNavigationAction(onClick: () -> Unit) {
+    val transition = rememberInfiniteTransition(label = "frostsoul-center-navigation-glow")
+    val glowAlpha by transition.animateFloat(
+        initialValue = 0.16f,
+        targetValue = 0.34f,
+        animationSpec = infiniteRepeatable(tween(1_800, easing = LinearEasing), RepeatMode.Reverse),
+        label = "frostsoul-center-navigation-glow-alpha",
+    )
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .width(58.dp)
+            .fillMaxSize()
+            .padding(horizontal = 4.dp)
+            .clip(CircleShape)
+            .background(FrostSoulTheme.colors.accent.copy(alpha = glowAlpha), CircleShape)
+            .border(BorderStroke(1.dp, FrostSoulTheme.colors.accent.copy(alpha = 0.62f)), CircleShape)
+            .frostSoulGlow(FrostSoulTheme.colors.accentBright, alpha = glowAlpha)
+            .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }, onClick = onClick),
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.about_appbar),
+            contentDescription = "Open FrostSoul player",
+            tint = FrostSoulTheme.colors.accentBright,
+            modifier = Modifier.size(34.dp),
+        )
     }
 }
 

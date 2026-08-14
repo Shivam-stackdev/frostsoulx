@@ -38,6 +38,7 @@ fun MiniPlayer(
     modifier: Modifier = Modifier,
     pureBlack: Boolean,
     isPairedWithNavigation: Boolean = false,
+    onQueueClick: (() -> Unit)? = null,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val layoutDirection = LocalLayoutDirection.current
@@ -46,6 +47,7 @@ fun MiniPlayer(
     val swipeThumbnail by rememberPreference(dev.vxs.frostsoulx.constants.SwipeThumbnailKey, true)
     val mediaMetadata by playerConnection.mediaMetadata.collectAsStateWithLifecycle()
     val isPlaying by playerConnection.isPlaying.collectAsStateWithLifecycle()
+    val currentSong by playerConnection.currentSong.collectAsStateWithLifecycle(initialValue = null)
     val metadata = mediaMetadata ?: return
     val miniPlayerShape =
         if (isPairedWithNavigation) {
@@ -83,7 +85,12 @@ fun MiniPlayer(
                 positionMs = position,
                 durationMs = duration,
                 isPlaying = isPlaying,
+                isLiked = currentSong?.song?.liked == true,
                 onTogglePlayPause = { playerConnection.player.togglePlayPause() },
+                onSkipPrevious = playerConnection::seekToPrevious,
+                onSkipNext = playerConnection::seekToNext,
+                onToggleLike = playerConnection::toggleLike,
+                onQueueClick = onQueueClick,
             )
         }
     }

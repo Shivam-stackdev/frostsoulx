@@ -40,6 +40,7 @@ fun FloatingNavigationToolbar(
     isSelected: (Screens) -> Boolean,
     onItemClick: (Screens, Boolean) -> Unit,
     onSearchItemDoubleClick: (() -> Unit)? = null,
+    onCenterClick: (() -> Unit)? = null,
 ) {
     val navigationItems =
         items.map { screen ->
@@ -65,6 +66,7 @@ fun FloatingNavigationToolbar(
             selectedRoute = selectedRoute,
             pairedWithMiniPlayer = isPairedWithMiniPlayer,
             modifier = Modifier.widthIn(max = minOf(NavigationBarMaxWidth, NavigationItemsMaxWidth)).fillMaxWidth(),
+            onCenterClick = onCenterClick,
             onItemClick = { item, selected ->
                 items.firstOrNull { it.route == item.route }?.let { screen ->
                     val isSearchDoubleTap =

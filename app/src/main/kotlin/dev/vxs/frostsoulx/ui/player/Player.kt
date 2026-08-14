@@ -361,7 +361,7 @@ fun BottomSheetPlayer(
 
     val playerDesignStyle by rememberEnumPreference(
         key = PlayerDesignStyleKey,
-        defaultValue = PlayerDesignStyle.V4,
+        defaultValue = PlayerDesignStyle.FROSTSOUL,
     )
     val showPlayerVolumeBar by rememberPreference(
         key = ShowPlayerVolumeBarKey,
@@ -1003,6 +1003,7 @@ fun BottomSheetPlayer(
                 duration = duration,
                 pureBlack = pureBlack,
                 isPairedWithNavigation = isMiniPlayerPairedWithNavigation,
+                onQueueClick = openQueue,
             )
         },
     ) {

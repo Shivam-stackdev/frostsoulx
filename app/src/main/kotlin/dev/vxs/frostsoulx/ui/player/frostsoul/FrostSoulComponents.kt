@@ -374,9 +374,9 @@ internal fun FSTopBar(
             Text(
                 text =
                     when (currentPage) {
-                        FrostSoulPage.Album -> "ALBUM VIEW"
                         FrostSoulPage.Lyrics -> "SYNCHRONIZED LYRICS"
-                        FrostSoulPage.Info -> "TRACK DETAILS"
+                        FrostSoulPage.MainPlayer -> "MAIN PLAYER"
+                        FrostSoulPage.Recommendations -> "RECOMMENDATIONS"
                         FrostSoulPage.Queue -> "PLAYBACK QUEUE"
                     },
                 color = FrostSoulCyanBright.copy(alpha = 0.78f),

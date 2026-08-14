@@ -657,6 +657,7 @@ enum class PlayerDesignStyle {
     V7,
     V8,
     V9,
+    FROSTSOUL,
 }
 
 enum class PlayerBackgroundStyle {

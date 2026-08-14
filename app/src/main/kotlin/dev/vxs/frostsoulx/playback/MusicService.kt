@@ -549,7 +549,7 @@ class MusicService :
     private val lyricsHandler = Handler(Looper.getMainLooper())
     private var lyricsUpdateRunnable: Runnable? = null
         @Volatile
-private var lyricsNotificationHighlightEnabled = false
+private var lyricsNotificationHighlightEnabled = true
     private var lyricsDocumentMediaId: String? = null
     private var lyricsLoadRequestMediaId: String? = null
 
@@ -1069,7 +1069,7 @@ private var lyricsNotificationHighlightEnabled = false
         ensureScopesActive()
 
         dataStore.data
-            .map { it[LyricsDarkCyanHighlightKey] ?: false }
+            .map { it[LyricsDarkCyanHighlightKey] ?: true }
             .distinctUntilChanged()
             .collectLatest(ioScope) { lyricsNotificationHighlightEnabled = it }
 
