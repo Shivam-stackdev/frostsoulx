@@ -79,6 +79,7 @@ import androidx.compose.ui.window.Dialog
 import coil3.compose.AsyncImage
 import dev.vxs.frostsoulx.R
 import coil3.request.CachePolicy
+import coil3.size.Size
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlin.math.abs
@@ -210,6 +211,7 @@ fun FSAlbumArt(
             .data(artworkUrl)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.ENABLED)
+            .size(Size(768, 768))
             .crossfade(true)
             .build()
     }

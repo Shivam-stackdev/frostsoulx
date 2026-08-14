@@ -206,12 +206,14 @@ import dev.vxs.frostsoulx.utils.makeTimeString
 import dev.vxs.frostsoulx.utils.rememberEnumPreference
 import dev.vxs.frostsoulx.utils.rememberLowDataModeActive
 import dev.vxs.frostsoulx.utils.rememberPreference
+import java.util.LinkedHashMap
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 private const val SeekbarSettleToleranceMs = 1_500L
+private const val GradientCacheCapacity = 12
 private const val V7BackdropMinArtworkSizePx = 1_024
 private const val V7BackdropMaxArtworkSizePx = 2_048
 private const val V7BackdropBlurDp = 44
@@ -504,7 +506,13 @@ fun BottomSheetPlayer(
     var previousGradientColors by remember { mutableStateOf<List<Color>>(emptyList()) }
 
     // Cache for gradient colors to prevent re-extraction for same songs
-    val gradientColorsCache = remember { mutableMapOf<String, List<Color>>() }
+    val gradientColorsCache =
+        remember {
+            object : LinkedHashMap<String, List<Color>>(GradientCacheCapacity, 0.75f, true) {
+                protected override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<Color>>?): Boolean =
+                    size > GradientCacheCapacity
+            }
+        }
 
     // Default gradient colors for fallback
     val defaultGradientColors = listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.surfaceVariant)

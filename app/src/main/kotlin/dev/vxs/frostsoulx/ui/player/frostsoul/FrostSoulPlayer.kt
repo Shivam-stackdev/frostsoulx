@@ -63,6 +63,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
@@ -90,6 +91,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.LinkedHashMap
 
 @Composable
 internal fun FrostSoulPlayer(
@@ -1030,7 +1032,13 @@ private fun FrostSoulQueueRow(
 @Composable
 internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
     val context = LocalContext.current
-    val paletteCache = remember { mutableMapOf<String, FrostSoulPalette>() }
+    val paletteCache =
+        remember {
+            object : LinkedHashMap<String, FrostSoulPalette>(PaletteCacheCapacity, 0.75f, true) {
+                protected override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, FrostSoulPalette>?): Boolean =
+                    size > PaletteCacheCapacity
+            }
+        }
     var palette by remember(artworkUrl) { mutableStateOf(FrostSoulPalette.Default) }
 
     LaunchedEffect(artworkUrl) {
@@ -1084,6 +1092,8 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
     }
     return palette
 }
+
+private const val PaletteCacheCapacity = 24
 
 @Composable
 private fun FrostSoulDynamicBackground(
@@ -1142,4 +1152,15 @@ private fun FrostSoulDynamicBackground(
 }
 
 @Composable
-private fun rememberAsyncImagePainterCompat(model: String) = coil3.compose.rememberAsyncImagePainter(model = model)
+private fun rememberAsyncImagePainterCompat(model: String): Painter {
+    val context = LocalContext.current
+    val request =
+        remember(model, context) {
+            ImageRequest
+                .Builder(context)
+                .data(model)
+                .size(Size(768, 768))
+                .build()
+        }
+    return coil3.compose.rememberAsyncImagePainter(model = request)
+}

@@ -79,20 +79,20 @@ class RecommendationBehaviorTracker @Inject constructor(
     }
 
     private suspend fun persistSignals(signals: List<RecommendationSignalEntity>) {
-        signals.forEach { signal ->
-            runCatching {
-                database.insertRecommendationSignalIfSongExists(
-                    songId = signal.songId,
-                    type = signal.type,
-                    occurredAtMs = signal.occurredAtMs,
-                    positionMs = signal.positionMs,
-                    listenedMs = signal.listenedMs,
-                    sessionId = signal.sessionId,
-                    contextFlags = signal.contextFlags,
-                )
-            }.onFailure { error ->
-                Log.w(LogTag, "Skipping noncritical recommendation signal persistence", error)
+        if (signals.isEmpty()) return
+        runCatching {
+            val existingSongIds =
+                database
+                    .getSongsByIds(signals.mapTo(ArrayList(signals.size)) { it.songId })
+                    .asSequence()
+                    .map { it.id }
+                    .toHashSet()
+            val validSignals = signals.filter { it.songId in existingSongIds }
+            if (validSignals.isNotEmpty()) {
+                database.insertRecommendationSignals(validSignals)
             }
+        }.onFailure { error ->
+            Log.w(LogTag, "Skipping noncritical recommendation signal persistence", error)
         }
     }
 

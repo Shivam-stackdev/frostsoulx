@@ -58,12 +58,8 @@ internal fun FrostSoulPlayerAdapter(
                 .fromApplication(applicationContext, LyricsHelperEntryPoint::class.java)
                 .lyricsSynchronizationEngine()
         }
-    val lyricsDocument by lyricsSynchronizationEngine.documentState.collectAsState()
-    val lyricsSyncState by lyricsSynchronizationEngine.state.collectAsState()
-    val currentLyricLine =
-        remember(lyricsDocument, lyricsSyncState.currentLineIndex) {
-            lyricsDocument?.original?.lines?.getOrNull(lyricsSyncState.currentLineIndex)?.text
-        }
+    val currentLyricLine by lyricsSynchronizationEngine.currentLine.collectAsState()
+    val currentLyricText = currentLyricLine?.text
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
     val audioQualityBadge =
         remember(currentFormat) {
@@ -96,7 +92,7 @@ internal fun FrostSoulPlayerAdapter(
             queueTitle,
             queue,
             lyrics,
-            currentLyricLine,
+            currentLyricText,
             audioQualityBadge,
             palette,
         ) {
@@ -111,7 +107,7 @@ internal fun FrostSoulPlayerAdapter(
                 queueTitle = queueTitle,
                 queue = queue,
                 lyrics = lyrics,
-                currentLyricLine = currentLyricLine,
+                currentLyricLine = currentLyricText,
                 audioQualityBadge = audioQualityBadge,
                 palette = palette,
             )

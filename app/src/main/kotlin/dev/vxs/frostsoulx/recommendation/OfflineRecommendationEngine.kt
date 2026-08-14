@@ -51,10 +51,23 @@ class OfflineRecommendationEngine @Inject constructor(
                     val tracks = candidates.map { it.toMediaMetadata() }
                     val indexedFeatures = ensureFeatures(tracks)
                     val signals = database.recentRecommendationSignals(budget.maximumSignalsPerRefresh)
-                    val features = updateBehaviorScores(indexedFeatures, signals)
+                    val signalsBySong = signals.groupBy { it.songId }
+                    val contextSignalsBySong =
+                        signals
+                            .asSequence()
+                            .filter { signal -> signal.contextFlags == context.flags() }
+                            .groupBy { it.songId }
+                    val features = updateBehaviorScores(indexedFeatures, signalsBySong)
                     val profiles = updateTasteProfiles(features, signals)
                     val narrowedTracks = narrowCandidates(tracks, features, profiles)
-                    val recommendations = rank(narrowedTracks, features, signals, profiles, context)
+                    val recommendations =
+                        rank(
+                            narrowedTracks,
+                            features,
+                            signalsBySong,
+                            contextSignalsBySong,
+                            profiles,
+                        )
                     val mixes = buildMixes(recommendations)
                     topMixRepository.replaceTopMixes(mixes)
                     RecommendationRefreshState.Success(
@@ -103,18 +116,18 @@ class OfflineRecommendationEngine @Inject constructor(
 
     private suspend fun updateBehaviorScores(
         features: Map<String, RecommendationFeatureEntity>,
-        signals: List<RecommendationSignalEntity>,
+        signalsBySong: Map<String, List<RecommendationSignalEntity>>,
     ): Map<String, RecommendationFeatureEntity> {
-        val bySong = signals.groupBy { it.songId }
+        val updatedAtMs = System.currentTimeMillis()
         val updated =
             features.mapValues { (songId, feature) ->
-                val history = bySong[songId].orEmpty()
+                val history = signalsBySong[songId].orEmpty()
                 val positives = history.count { it.isPositive() }
                 val negatives = history.count { it.isNegative() }
                 feature.copy(
                     replayScore = RecommendationScoreMath.boundedProbability(positives, negatives),
                     skipScore = RecommendationScoreMath.boundedProbability(negatives, positives),
-                    updatedAtMs = System.currentTimeMillis(),
+                    updatedAtMs = updatedAtMs,
                 )
             }
         database.upsertRecommendationFeatures(updated.values.toList())
@@ -125,12 +138,12 @@ class OfflineRecommendationEngine @Inject constructor(
         features: Map<String, RecommendationFeatureEntity>,
         signals: List<RecommendationSignalEntity>,
     ): Map<TasteProfileKind, QuantizedVector> {
-        val bySong = signals.groupBy { it.songId }
+        val nowMs = System.currentTimeMillis()
         val profileSignals =
             mapOf(
                 TasteProfileKind.LongTerm to signals,
-                TasteProfileKind.Weekly to signals.filter { it.occurredAtMs >= System.currentTimeMillis() - WeekMs },
-                TasteProfileKind.Daily to signals.filter { it.occurredAtMs >= System.currentTimeMillis() - DayMs },
+                TasteProfileKind.Weekly to signals.filter { it.occurredAtMs >= nowMs - WeekMs },
+                TasteProfileKind.Daily to signals.filter { it.occurredAtMs >= nowMs - DayMs },
                 TasteProfileKind.Session to signals.take(120),
                 TasteProfileKind.Discovery to signals.filter { it.type == RecommendationSignalType.Complete.name },
                 TasteProfileKind.Context to signals.filter { it.contextFlags != 0 },
@@ -187,23 +200,17 @@ class OfflineRecommendationEngine @Inject constructor(
     private fun rank(
         tracks: List<MediaMetadata>,
         features: Map<String, RecommendationFeatureEntity>,
-        signals: List<RecommendationSignalEntity>,
+        signalsBySong: Map<String, List<RecommendationSignalEntity>>,
+        contextSignalsBySong: Map<String, List<RecommendationSignalEntity>>,
         profiles: Map<TasteProfileKind, QuantizedVector>,
-        context: RecommendationContext,
     ): List<OfflineRecommendation> {
         val profile = profiles[TasteProfileKind.Session] ?: profiles[TasteProfileKind.Weekly] ?: profiles[TasteProfileKind.LongTerm]
             ?: return emptyList()
-        val behaviorBySong = signals.groupBy { it.songId }
-        val currentContextSignals =
-            signals
-                .filter { signal -> signal.contextFlags == context.flags() }
-                .groupBy { it.songId }
-
         val ranked =
             tracks.mapNotNull { track ->
                 val feature = features[track.id] ?: return@mapNotNull null
-                val history = behaviorBySong[track.id].orEmpty()
-                val contextHistory = currentContextSignals[track.id].orEmpty()
+                val history = signalsBySong[track.id].orEmpty()
+                val contextHistory = contextSignalsBySong[track.id].orEmpty()
                 val positives = history.count { it.isPositive() }
                 val negatives = history.count { it.isNegative() }
                 val replayProbability =
@@ -302,20 +309,9 @@ class OfflineRecommendationEngine @Inject constructor(
             else -> 0.4f
         }
 
-    private fun RecommendationSignalEntity.isPositive(): Boolean =
-        type in setOf(
-            RecommendationSignalType.Play.name,
-            RecommendationSignalType.Resume.name,
-            RecommendationSignalType.Complete.name,
-            RecommendationSignalType.Replay.name,
-            RecommendationSignalType.Favorite.name,
-        )
+    private fun RecommendationSignalEntity.isPositive(): Boolean = type in PositiveSignalTypes
 
-    private fun RecommendationSignalEntity.isNegative(): Boolean =
-        type in setOf(
-            RecommendationSignalType.Skip.name,
-            RecommendationSignalType.Unlike.name,
-        )
+    private fun RecommendationSignalEntity.isNegative(): Boolean = type in NegativeSignalTypes
 
     private companion object {
         const val EmbeddingVersion = 1
@@ -323,6 +319,19 @@ class OfflineRecommendationEngine @Inject constructor(
         const val MaxTracksPerArtist = 2
         const val DayMs = 24L * 60L * 60L * 1000L
         const val WeekMs = 7L * DayMs
+        val PositiveSignalTypes =
+            setOf(
+                RecommendationSignalType.Play.name,
+                RecommendationSignalType.Resume.name,
+                RecommendationSignalType.Complete.name,
+                RecommendationSignalType.Replay.name,
+                RecommendationSignalType.Favorite.name,
+            )
+        val NegativeSignalTypes =
+            setOf(
+                RecommendationSignalType.Skip.name,
+                RecommendationSignalType.Unlike.name,
+            )
     }
 }
 

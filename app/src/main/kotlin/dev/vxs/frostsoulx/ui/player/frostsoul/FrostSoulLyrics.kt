@@ -116,11 +116,14 @@ internal fun FSLyrics(
             items = lines,
             key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
         ) { index, line ->
+            val isCurrent = index == currentIndex
             FrostSoulKaraokeLine(
                 line = line,
-                syncState = syncState,
-                isCurrent = index == currentIndex,
+                isCurrent = isCurrent,
                 isPast = currentIndex >= 0 && index < currentIndex,
+                currentWordIndex = if (isCurrent) syncState.currentWordIndex else -1,
+                wordProgress = if (isCurrent) syncState.wordProgress else 0f,
+                lineProgress = if (isCurrent) syncState.lineProgress else 0f,
                 onSeek = onSeek,
             )
         }
@@ -130,9 +133,11 @@ internal fun FSLyrics(
 @Composable
 private fun FrostSoulKaraokeLine(
     line: LyricsLine,
-    syncState: LyricsSyncState,
     isCurrent: Boolean,
     isPast: Boolean,
+    currentWordIndex: Int,
+    wordProgress: Float,
+    lineProgress: Float,
     onSeek: (Long) -> Unit,
 ) {
     val emphasis by animateFloatAsState(
@@ -152,12 +157,12 @@ private fun FrostSoulKaraokeLine(
             else -> FrostSoulOnSurfaceMuted.copy(alpha = 0.46f)
         }
     val annotatedText =
-        remember(line, syncState.currentWordIndex, syncState.wordProgress, syncState.lineProgress, isCurrent, lineColor, emphasis) {
+        remember(line, currentWordIndex, wordProgress, lineProgress, isCurrent, lineColor, emphasis) {
             line.asKaraokeAnnotatedText(
                 activeLine = isCurrent,
-                currentWordIndex = syncState.currentWordIndex,
-                wordProgress = syncState.wordProgress,
-                lineProgress = syncState.lineProgress,
+                currentWordIndex = currentWordIndex,
+                wordProgress = wordProgress,
+                lineProgress = lineProgress,
                 inactiveColor = lineColor,
                 activeColor = FrostSoulCyan,
                 glowStrength = emphasis,

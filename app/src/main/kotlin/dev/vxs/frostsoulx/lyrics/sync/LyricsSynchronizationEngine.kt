@@ -21,15 +21,23 @@ import javax.inject.Singleton
 class LyricsSynchronizationEngine @Inject constructor() {
     private val _state = MutableStateFlow(LyricsSyncState())
     private val _document = MutableStateFlow<LyricsDocument?>(null)
+    private val _currentLine = MutableStateFlow<LyricsLine?>(null)
     private var document: LyricsDocument? = null
 
     val state: StateFlow<LyricsSyncState> = _state.asStateFlow()
     val documentState: StateFlow<LyricsDocument?> = _document.asStateFlow()
+    val currentLine: StateFlow<LyricsLine?> = _currentLine.asStateFlow()
 
     fun setDocument(document: LyricsDocument?) {
         this.document = document
         _document.value = document
-        _state.value = if (document == null || document.original.lines.isEmpty()) LyricsSyncState() else resolve(0L, 0L, false, false)
+        publishState(
+            if (document == null || document.original.lines.isEmpty()) {
+                LyricsSyncState()
+            } else {
+                resolve(0L, 0L, false, false)
+            },
+        )
     }
 
     fun setOffset(offsetMs: Long) {
@@ -37,7 +45,7 @@ class LyricsSynchronizationEngine @Inject constructor() {
         document = current.withOffset(offsetMs)
         _document.value = document
         val state = _state.value
-        _state.value = resolve(state.timestampMs, durationMs = 0L, isPlaying = state.status == LyricsSyncStatus.Playing, isSeeking = false)
+        publishState(resolve(state.timestampMs, durationMs = 0L, isPlaying = state.status == LyricsSyncStatus.Playing, isSeeking = false))
     }
 
     fun update(
@@ -47,10 +55,17 @@ class LyricsSynchronizationEngine @Inject constructor() {
         isSeeking: Boolean = false,
     ) {
         if (document == null) {
-            _state.value = LyricsSyncState(timestampMs = playbackPositionMs.coerceAtLeast(0L))
+            publishState(LyricsSyncState(timestampMs = playbackPositionMs.coerceAtLeast(0L)))
             return
         }
-        _state.value = resolve(playbackPositionMs, durationMs, isPlaying, isSeeking)
+        publishState(resolve(playbackPositionMs, durationMs, isPlaying, isSeeking))
+    }
+
+    private fun publishState(nextState: LyricsSyncState) {
+        _state.value = nextState
+        if (_currentLine.value != nextState.currentLine) {
+            _currentLine.value = nextState.currentLine
+        }
     }
 
     private fun resolve(

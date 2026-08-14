@@ -57,6 +57,18 @@ class LyricsSynchronizationEngineTest {
     }
 
     @Test
+    fun `line-only flow follows current line boundaries`() {
+        val engine = LyricsSynchronizationEngine()
+        engine.setDocument(document(lines = listOf(line(0L, 1_000L, "one"), line(1_000L, 2_000L, "two"))))
+
+        engine.update(playbackPositionMs = 250L, durationMs = 2_000L, isPlaying = true)
+        assertEquals("one", engine.currentLine.value?.text)
+
+        engine.update(playbackPositionMs = 1_250L, durationMs = 2_000L, isPlaying = true)
+        assertEquals("two", engine.currentLine.value?.text)
+    }
+
+    @Test
     fun `document offset is applied exactly once to synchronization timestamp`() {
         val engine = LyricsSynchronizationEngine()
         engine.setDocument(document(offsetMs = 250L, lines = listOf(line(1_000L, 2_000L, "offset"))))
