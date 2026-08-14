@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulDesignSystem
 import androidx.palette.graphics.Palette
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamicColorScheme
@@ -191,7 +192,9 @@ fun ArchiveTuneTheme(
             motionScheme = motionScheme,
             typography = typography,
             shapes = expressiveShapes,
-            content = content,
+            content = {
+                FrostSoulDesignSystem(content)
+            },
         )
     }
 }

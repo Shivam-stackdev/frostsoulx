@@ -1,0 +1,285 @@
+/*
+ * ArchiveTune (2026)
+ * © Rukamori — github.com/rukamori
+ * GPL-3.0 License | Contributors: see git history
+ * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
+ */
+
+package dev.vxs.frostsoulx.ui.frostsoul
+
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+@Immutable
+data class FrostSoulColors(
+    val background: Color,
+    val surface: Color,
+    val surfaceRaised: Color,
+    val surfaceGlass: Color,
+    val surfaceGlassStrong: Color,
+    val accent: Color,
+    val accentBright: Color,
+    val accentMuted: Color,
+    val onBackground: Color,
+    val onSurface: Color,
+    val onSurfaceMuted: Color,
+    val outline: Color,
+    val error: Color,
+    val scrim: Color,
+)
+
+@Immutable
+data class FrostSoulTypography(
+    val display: TextStyle,
+    val title: TextStyle,
+    val sectionTitle: TextStyle,
+    val body: TextStyle,
+    val bodyMuted: TextStyle,
+    val label: TextStyle,
+    val overline: TextStyle,
+)
+
+@Immutable
+data class FrostSoulShapes(
+    val tiny: Shape,
+    val small: Shape,
+    val medium: Shape,
+    val large: Shape,
+    val extraLarge: Shape,
+    val pill: Shape,
+)
+
+@Immutable
+data class FrostSoulElevation(
+    val none: Dp = 0.dp,
+    val low: Dp = 2.dp,
+    val medium: Dp = 8.dp,
+    val high: Dp = 18.dp,
+)
+
+@Immutable
+data class FrostSoulEffects(
+    val glassBlurRadius: Dp = 24.dp,
+    val backdropBlurRadius: Dp = 48.dp,
+    val activeGlowAlpha: Float = 0.24f,
+    val ambientGlowAlpha: Float = 0.10f,
+)
+
+@Immutable
+data class FrostSoulSpacing(
+    val micro: Dp = 4.dp,
+    val small: Dp = 8.dp,
+    val medium: Dp = 12.dp,
+    val large: Dp = 16.dp,
+    val section: Dp = 24.dp,
+    val page: Dp = 20.dp,
+    val hero: Dp = 32.dp,
+)
+
+@Immutable
+data class FrostSoulMotion(
+    val quick: Int = 120,
+    val standard: Int = 220,
+    val expressive: Int = 420,
+    val slow: Int = 650,
+    val contentSpring: AnimationSpec<Float> = spring(
+        dampingRatio = 0.82f,
+        stiffness = Spring.StiffnessMediumLow,
+    ),
+    val controlSpring: AnimationSpec<Float> = spring(
+        dampingRatio = 0.74f,
+        stiffness = Spring.StiffnessMedium,
+    ),
+) {
+    fun <T> quickTween(): AnimationSpec<T> = tween(durationMillis = quick)
+
+    fun <T> standardTween(): AnimationSpec<T> = tween(durationMillis = standard)
+
+    fun <T> expressiveTween(): AnimationSpec<T> = tween(durationMillis = expressive)
+}
+
+@Immutable
+data class FrostSoulDesignTokens(
+    val colors: FrostSoulColors,
+    val typography: FrostSoulTypography,
+    val shapes: FrostSoulShapes,
+    val elevation: FrostSoulElevation,
+    val effects: FrostSoulEffects,
+    val spacing: FrostSoulSpacing,
+    val motion: FrostSoulMotion,
+)
+
+private val DefaultFrostSoulTokens = FrostSoulDesignTokens(
+    colors = FrostSoulColors(
+        background = Color.Black,
+        surface = Color(0xFF050A0C),
+        surfaceRaised = Color(0xFF0B1518),
+        surfaceGlass = Color(0xB30F1D21),
+        surfaceGlassStrong = Color(0xDB14272C),
+        accent = Color(0xFF00B7C7),
+        accentBright = Color(0xFF72F3FF),
+        accentMuted = Color(0xFF15545C),
+        onBackground = Color(0xFFF4FCFD),
+        onSurface = Color(0xFFF4FCFD),
+        onSurfaceMuted = Color(0xFFA7BEC3),
+        outline = Color(0xFF2A464C),
+        error = Color(0xFFFF7C8F),
+        scrim = Color.Black.copy(alpha = 0.72f),
+    ),
+    typography = FrostSoulTypography(
+        display = TextStyle(fontWeight = FontWeight.SemiBold),
+        title = TextStyle(fontWeight = FontWeight.SemiBold),
+        sectionTitle = TextStyle(fontWeight = FontWeight.SemiBold),
+        body = TextStyle(fontWeight = FontWeight.Normal),
+        bodyMuted = TextStyle(fontWeight = FontWeight.Normal),
+        label = TextStyle(fontWeight = FontWeight.Medium),
+        overline = TextStyle(fontWeight = FontWeight.SemiBold, letterSpacing = androidx.compose.ui.unit.TextUnit.Unspecified),
+    ),
+    shapes = FrostSoulShapes(
+        tiny = RoundedCornerShape(10.dp),
+        small = RoundedCornerShape(14.dp),
+        medium = RoundedCornerShape(20.dp),
+        large = RoundedCornerShape(28.dp),
+        extraLarge = RoundedCornerShape(36.dp),
+        pill = RoundedCornerShape(50),
+    ),
+    elevation = FrostSoulElevation(),
+    effects = FrostSoulEffects(),
+    spacing = FrostSoulSpacing(),
+    motion = FrostSoulMotion(),
+)
+
+val LocalFrostSoulTokens: ProvidableCompositionLocal<FrostSoulDesignTokens> =
+    compositionLocalOf { DefaultFrostSoulTokens }
+
+object FrostSoulTheme {
+    val colors: FrostSoulColors
+        @Composable get() = LocalFrostSoulTokens.current.colors
+
+    val typography: FrostSoulTypography
+        @Composable get() = LocalFrostSoulTokens.current.typography
+
+    val shapes: FrostSoulShapes
+        @Composable get() = LocalFrostSoulTokens.current.shapes
+
+    val elevation: FrostSoulElevation
+        @Composable get() = LocalFrostSoulTokens.current.elevation
+
+    val effects: FrostSoulEffects
+        @Composable get() = LocalFrostSoulTokens.current.effects
+
+    val spacing: FrostSoulSpacing
+        @Composable get() = LocalFrostSoulTokens.current.spacing
+
+    val motion: FrostSoulMotion
+        @Composable get() = LocalFrostSoulTokens.current.motion
+}
+
+@Composable
+fun FrostSoulDesignSystem(content: @Composable () -> Unit) {
+    val materialColors = MaterialTheme.colorScheme
+    val materialTypography = MaterialTheme.typography
+    val tokens = remember(materialColors, materialTypography) {
+        DefaultFrostSoulTokens.copy(
+            colors = DefaultFrostSoulTokens.colors.copy(
+                accent = Color(0xFF00B7C7),
+                accentBright = Color(0xFF72F3FF),
+                accentMuted = Color(0xFF15545C),
+                onBackground = materialColors.onSurface.copy(alpha = 0.96f),
+                onSurface = materialColors.onSurface.copy(alpha = 0.96f),
+                onSurfaceMuted = materialColors.onSurfaceVariant.copy(alpha = 0.82f),
+                error = materialColors.error,
+            ),
+            typography = DefaultFrostSoulTokens.typography.copy(
+                display = materialTypography.headlineLarge.copy(fontWeight = FontWeight.SemiBold),
+                title = materialTypography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+                sectionTitle = materialTypography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                body = materialTypography.bodyMedium,
+                bodyMuted = materialTypography.bodyMedium,
+                label = materialTypography.labelLarge.copy(fontWeight = FontWeight.Medium),
+                overline = materialTypography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+            ),
+        )
+    }
+    androidx.compose.runtime.CompositionLocalProvider(LocalFrostSoulTokens provides tokens, content = content)
+}
+
+@Composable
+fun Modifier.frostSoulGlass(shape: Shape = FrostSoulTheme.shapes.large): Modifier {
+    val colors = FrostSoulTheme.colors
+    return this
+        .shadow(
+            elevation = FrostSoulTheme.elevation.medium,
+            shape = shape,
+            ambientColor = Color.Black.copy(alpha = 0.72f),
+            spotColor = Color.Black.copy(alpha = 0.80f),
+        ).background(
+            brush = Brush.verticalGradient(
+                listOf(
+                    colors.surfaceGlassStrong,
+                    colors.surfaceGlass,
+                ),
+            ),
+            shape = shape,
+        )
+        .drawBehind {
+            drawLine(
+                color = Color.White.copy(alpha = 0.09f),
+                start = Offset(0f, 0.5.dp.toPx()),
+                end = Offset(size.width, 0.5.dp.toPx()),
+                strokeWidth = 1.dp.toPx(),
+            )
+        }
+}
+
+@Composable
+fun Modifier.frostSoulGlow(
+    color: Color = FrostSoulTheme.colors.accent,
+    alpha: Float = FrostSoulTheme.effects.activeGlowAlpha,
+): Modifier =
+    drawBehind {
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(color.copy(alpha = alpha), Color.Transparent),
+                center = center,
+                radius = size.maxDimension * 0.72f,
+            ),
+            radius = size.maxDimension * 0.72f,
+        )
+    }
+
+@Composable
+fun Modifier.frostSoulScreenBackground(): Modifier =
+    background(FrostSoulTheme.colors.background)
+        .drawBehind {
+            drawRect(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        FrostSoulTheme.colors.accent.copy(alpha = 0.09f),
+                        Color.Transparent,
+                    ),
+                    endY = size.height * 0.42f,
+                ),
+            )
+        }
