@@ -19,4 +19,9 @@
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:colorAccent">@android:color/white</item>
     </style>
+
+    <!-- Existing manifests reference the legacy ArchiveTune naming; preserve a single visual source of truth. -->
+    <style name="Theme.ArchiveTune" parent="Theme.FrostSoulX" />
+
+    <style name="Theme.ArchiveTune.Transparent" parent="Theme.FrostSoulX.Transparent" />
 </resources>
