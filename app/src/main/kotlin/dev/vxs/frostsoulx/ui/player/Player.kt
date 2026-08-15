@@ -171,6 +171,9 @@ import dev.vxs.frostsoulx.constants.PlayerButtonsStyle
 import dev.vxs.frostsoulx.constants.PlayerButtonsStyleKey
 import dev.vxs.frostsoulx.constants.PlayerCustomBlurKey
 import dev.vxs.frostsoulx.constants.PlayerCustomBrightnessKey
+import dev.vxs.frostsoulx.constants.PlayerCustomSaturationKey
+import dev.vxs.frostsoulx.constants.PlayerCustomVignetteKey
+import dev.vxs.frostsoulx.constants.PlayerCustomWarmthKey
 import dev.vxs.frostsoulx.constants.PlayerCustomContrastKey
 import dev.vxs.frostsoulx.constants.PlayerCustomImageUriKey
 import dev.vxs.frostsoulx.constants.PlayerDesignStyle
@@ -382,6 +385,9 @@ fun BottomSheetPlayer(
     val (playerCustomBlur) = rememberPreference(PlayerCustomBlurKey, 0f)
     val (playerCustomContrast) = rememberPreference(PlayerCustomContrastKey, 1f)
     val (playerCustomBrightness) = rememberPreference(PlayerCustomBrightnessKey, 1f)
+    val (playerCustomSaturation) = rememberPreference(PlayerCustomSaturationKey, 1f)
+    val (playerCustomWarmth) = rememberPreference(PlayerCustomWarmthKey, 0f)
+    val (playerCustomVignette) = rememberPreference(PlayerCustomVignetteKey, 0f)
 
     val (disableBlur) = rememberPreference(DisableBlurKey, false)
     val (blurRadius) = rememberPreference(BlurRadiusKey, 48f)
@@ -1229,6 +1235,9 @@ fun BottomSheetPlayer(
                 playerCustomBlur = playerCustomBlur,
                 playerCustomContrast = playerCustomContrast,
                 playerCustomBrightness = playerCustomBrightness,
+                playerCustomSaturation = playerCustomSaturation,
+                playerCustomWarmth = playerCustomWarmth,
+                playerCustomVignette = playerCustomVignette,
             )
         }
 

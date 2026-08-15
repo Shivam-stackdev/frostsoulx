@@ -8,6 +8,7 @@
 package dev.vxs.frostsoulx.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import android.graphics.Color as AndroidColor
@@ -36,6 +37,49 @@ object PlayerBackgroundColorUtils {
         val hsv = color.toHsv()
         hsv[2] = (hsv[2] * factor).coerceAtLeast(0f)
         return hsv.toColor()
+    }
+
+    fun buildCustomColorMatrix(
+        contrast: Float,
+        brightness: Float,
+        saturation: Float,
+        warmth: Float,
+    ): ColorMatrix {
+        val safeContrast = contrast.coerceIn(0.5f, 2f)
+        val safeBrightness = brightness.coerceIn(0.5f, 2f)
+        val safeSaturation = saturation.coerceIn(0f, 2f)
+        val safeWarmth = warmth.coerceIn(-1f, 1f)
+        val inverseSaturation = 1f - safeSaturation
+        val luminanceRed = 0.213f * inverseSaturation
+        val luminanceGreen = 0.715f * inverseSaturation
+        val luminanceBlue = 0.072f * inverseSaturation
+        val translation = (1f - safeContrast) * 128f + (safeBrightness - 1f) * 255f
+        val warmthOffset = safeWarmth * 24f
+
+        return ColorMatrix(
+            floatArrayOf(
+                safeContrast * (luminanceRed + safeSaturation),
+                safeContrast * luminanceGreen,
+                safeContrast * luminanceBlue,
+                0f,
+                translation + warmthOffset,
+                safeContrast * luminanceRed,
+                safeContrast * (luminanceGreen + safeSaturation),
+                safeContrast * luminanceBlue,
+                0f,
+                translation,
+                safeContrast * luminanceRed,
+                safeContrast * luminanceGreen,
+                safeContrast * (luminanceBlue + safeSaturation),
+                0f,
+                translation - warmthOffset,
+                0f,
+                0f,
+                0f,
+                1f,
+                0f,
+            ),
+        )
     }
 
     fun buildColoringStops(baseColor: Color): Array<Pair<Float, Color>> {

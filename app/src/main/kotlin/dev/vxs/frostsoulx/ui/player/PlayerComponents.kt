@@ -76,7 +76,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -3772,6 +3771,9 @@ fun PlayerBackground(
     playerCustomBlur: Float,
     playerCustomContrast: Float,
     playerCustomBrightness: Float,
+    playerCustomSaturation: Float,
+    playerCustomWarmth: Float,
+    playerCustomVignette: Float,
 ) {
     val effectiveBlurRadius = blurRadius.coerceIn(0f, PlayerBackgroundMaxBlurRadius)
     val shouldApplyBlur = !disableBlur && effectiveBlurRadius > 0f
@@ -3945,36 +3947,14 @@ fun PlayerBackground(
                 ) { uri ->
                     if (uri.isNotBlank()) {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            val blurPx = playerCustomBlur
-                            val contrastVal = playerCustomContrast
-                            val brightnessVal = playerCustomBrightness
-
-                            val t = (1f - contrastVal) * 128f + (brightnessVal - 1f) * 255f
-                            val matrix =
-                                floatArrayOf(
-                                    contrastVal,
-                                    0f,
-                                    0f,
-                                    0f,
-                                    t,
-                                    0f,
-                                    contrastVal,
-                                    0f,
-                                    0f,
-                                    t,
-                                    0f,
-                                    0f,
-                                    contrastVal,
-                                    0f,
-                                    t,
-                                    0f,
-                                    0f,
-                                    0f,
-                                    1f,
-                                    0f,
+                            val blurPx = playerCustomBlur.coerceIn(0f, PlayerBackgroundMaxBlurRadius)
+                            val cm =
+                                PlayerBackgroundColorUtils.buildCustomColorMatrix(
+                                    contrast = playerCustomContrast,
+                                    brightness = playerCustomBrightness,
+                                    saturation = playerCustomSaturation,
+                                    warmth = playerCustomWarmth,
                                 )
-
-                            val cm = ColorMatrix(matrix)
 
                             AsyncImage(
                                 model = Uri.parse(uri),
@@ -3991,6 +3971,22 @@ fun PlayerBackground(
                                     Modifier
                                         .fillMaxSize()
                                         .background(Color.Black.copy(alpha = 0.4f)),
+                            )
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            Brush.radialGradient(
+                                                colors =
+                                                    listOf(
+                                                        Color.Transparent,
+                                                        Color.Black.copy(
+                                                            alpha = playerCustomVignette.coerceIn(0f, 0.65f),
+                                                        ),
+                                                    ),
+                                            ),
+                                        ),
                             )
                         }
                     }

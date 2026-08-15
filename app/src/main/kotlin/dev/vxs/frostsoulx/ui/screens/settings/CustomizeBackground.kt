@@ -62,9 +62,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -81,16 +81,26 @@ import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.constants.PlayerCustomBlurKey
 import dev.vxs.frostsoulx.constants.PlayerCustomBrightnessKey
+import dev.vxs.frostsoulx.constants.PlayerCustomSaturationKey
+import dev.vxs.frostsoulx.constants.PlayerCustomVignetteKey
+import dev.vxs.frostsoulx.constants.PlayerCustomWarmthKey
 import dev.vxs.frostsoulx.constants.PlayerCustomContrastKey
 import dev.vxs.frostsoulx.constants.PlayerCustomImageUriKey
+import dev.vxs.frostsoulx.ui.theme.PlayerBackgroundColorUtils
 import dev.vxs.frostsoulx.utils.rememberPreference
 import kotlin.math.roundToInt
 
 private const val DEFAULT_BLUR = 0f
 private const val DEFAULT_CONTRAST = 1f
 private const val DEFAULT_BRIGHTNESS = 1f
+private const val DEFAULT_SATURATION = 1f
+private const val DEFAULT_WARMTH = 0f
+private const val DEFAULT_VIGNETTE = 0f
 private val BLUR_RANGE = 0f..50f
 private val TONE_RANGE = 0.5f..2f
+private val SATURATION_RANGE = 0f..2f
+private val WARMTH_RANGE = -1f..1f
+private val VIGNETTE_RANGE = 0f..0.65f
 private val EXPANDED_CONTENT_BREAKPOINT = 840.dp
 private val CONTENT_MAX_WIDTH = 1200.dp
 private const val PLAYER_PREVIEW_ASPECT_RATIO = 718f / 1518f
@@ -109,6 +119,12 @@ fun CustomizeBackground(navController: NavController) {
     val (contrast, onContrastChange) = rememberPreference(PlayerCustomContrastKey, DEFAULT_CONTRAST)
     val (brightness, onBrightnessChange) =
         rememberPreference(PlayerCustomBrightnessKey, DEFAULT_BRIGHTNESS)
+    val (saturation, onSaturationChange) =
+        rememberPreference(PlayerCustomSaturationKey, DEFAULT_SATURATION)
+    val (warmth, onWarmthChange) =
+        rememberPreference(PlayerCustomWarmthKey, DEFAULT_WARMTH)
+    val (vignette, onVignetteChange) =
+        rememberPreference(PlayerCustomVignetteKey, DEFAULT_VIGNETTE)
 
     val permissionErrorMessage = stringResource(R.string.custom_background_permission_error)
     val permissionCleanupErrorMessage =
@@ -197,6 +213,9 @@ fun CustomizeBackground(navController: NavController) {
                 blur = blur.coerceIn(BLUR_RANGE),
                 contrast = contrast.coerceIn(TONE_RANGE),
                 brightness = brightness.coerceIn(TONE_RANGE),
+                saturation = saturation.coerceIn(SATURATION_RANGE),
+                warmth = warmth.coerceIn(WARMTH_RANGE),
+                vignette = vignette.coerceIn(VIGNETTE_RANGE),
                 onChooseImage = { launcher.launch(arrayOf("image/*")) },
                 onRemoveImage = {
                     val permissionReleased = releaseBackgroundImagePermission(context, imageUri)
@@ -210,15 +229,24 @@ fun CustomizeBackground(navController: NavController) {
                 onBlurChange = onBlurChange,
                 onContrastChange = onContrastChange,
                 onBrightnessChange = onBrightnessChange,
+                onSaturationChange = onSaturationChange,
+                onWarmthChange = onWarmthChange,
+                onVignetteChange = onVignetteChange,
                 onResetAdjustments = {
                     onBlurChange(DEFAULT_BLUR)
                     onContrastChange(DEFAULT_CONTRAST)
                     onBrightnessChange(DEFAULT_BRIGHTNESS)
+                    onSaturationChange(DEFAULT_SATURATION)
+                    onWarmthChange(DEFAULT_WARMTH)
+                    onVignetteChange(DEFAULT_VIGNETTE)
                 },
                 onSave = {
                     onBlurChange(blur.coerceIn(BLUR_RANGE))
                     onContrastChange(contrast.coerceIn(TONE_RANGE))
                     onBrightnessChange(brightness.coerceIn(TONE_RANGE))
+                    onSaturationChange(saturation.coerceIn(SATURATION_RANGE))
+                    onWarmthChange(warmth.coerceIn(WARMTH_RANGE))
+                    onVignetteChange(vignette.coerceIn(VIGNETTE_RANGE))
                     navController.navigateUp()
                 },
                 modifier =
@@ -236,18 +264,29 @@ private fun CustomizeBackgroundContent(
     blur: Float,
     contrast: Float,
     brightness: Float,
+    saturation: Float,
+    warmth: Float,
+    vignette: Float,
     onChooseImage: () -> Unit,
     onRemoveImage: () -> Unit,
     onBlurChange: (Float) -> Unit,
     onContrastChange: (Float) -> Unit,
     onBrightnessChange: (Float) -> Unit,
+    onSaturationChange: (Float) -> Unit,
+    onWarmthChange: (Float) -> Unit,
+    onVignetteChange: (Float) -> Unit,
     onResetAdjustments: () -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hasImage = imageUri.isNotBlank()
     val resetEnabled =
-        blur != DEFAULT_BLUR || contrast != DEFAULT_CONTRAST || brightness != DEFAULT_BRIGHTNESS
+        blur != DEFAULT_BLUR ||
+            contrast != DEFAULT_CONTRAST ||
+            brightness != DEFAULT_BRIGHTNESS ||
+            saturation != DEFAULT_SATURATION ||
+            warmth != DEFAULT_WARMTH ||
+            vignette != DEFAULT_VIGNETTE
 
     BoxWithConstraints(modifier = modifier) {
         if (maxWidth >= EXPANDED_CONTENT_BREAKPOINT) {
@@ -264,6 +303,9 @@ private fun CustomizeBackgroundContent(
                         blur = blur,
                         contrast = contrast,
                         brightness = brightness,
+                        saturation = saturation,
+                        warmth = warmth,
+                        vignette = vignette,
                     )
                     BackgroundImageActions(
                         hasImage = hasImage,
@@ -280,10 +322,16 @@ private fun CustomizeBackgroundContent(
                         blur = blur,
                         contrast = contrast,
                         brightness = brightness,
+                        saturation = saturation,
+                        warmth = warmth,
+                        vignette = vignette,
                         resetEnabled = resetEnabled,
                         onBlurChange = onBlurChange,
                         onContrastChange = onContrastChange,
                         onBrightnessChange = onBrightnessChange,
+                        onSaturationChange = onSaturationChange,
+                        onWarmthChange = onWarmthChange,
+                        onVignetteChange = onVignetteChange,
                         onReset = onResetAdjustments,
                     )
                     SaveBackgroundButton(onClick = onSave)
@@ -296,6 +344,9 @@ private fun CustomizeBackgroundContent(
                     blur = blur,
                     contrast = contrast,
                     brightness = brightness,
+                    saturation = saturation,
+                    warmth = warmth,
+                    vignette = vignette,
                 )
                 BackgroundImageActions(
                     hasImage = hasImage,
@@ -306,10 +357,16 @@ private fun CustomizeBackgroundContent(
                     blur = blur,
                     contrast = contrast,
                     brightness = brightness,
+                    saturation = saturation,
+                    warmth = warmth,
+                    vignette = vignette,
                     resetEnabled = resetEnabled,
                     onBlurChange = onBlurChange,
                     onContrastChange = onContrastChange,
                     onBrightnessChange = onBrightnessChange,
+                    onSaturationChange = onSaturationChange,
+                    onWarmthChange = onWarmthChange,
+                    onVignetteChange = onVignetteChange,
                     onReset = onResetAdjustments,
                 )
                 SaveBackgroundButton(onClick = onSave)
@@ -324,12 +381,22 @@ private fun BackgroundPreviewSection(
     blur: Float,
     contrast: Float,
     brightness: Float,
+    saturation: Float,
+    warmth: Float,
+    vignette: Float,
     modifier: Modifier = Modifier,
 ) {
     val parsedUri = remember(imageUri) { imageUri.takeIf { it.isNotBlank() }?.let(Uri::parse) }
     val colorFilter =
-        remember(contrast, brightness) {
-            ColorFilter.colorMatrix(backgroundColorMatrix(contrast, brightness))
+        remember(contrast, brightness, saturation, warmth) {
+            ColorFilter.colorMatrix(
+                PlayerBackgroundColorUtils.buildCustomColorMatrix(
+                    contrast = contrast,
+                    brightness = brightness,
+                    saturation = saturation,
+                    warmth = warmth,
+                ),
+            )
         }
 
     Card(
@@ -361,6 +428,7 @@ private fun BackgroundPreviewSection(
                     imageUri = parsedUri,
                     blur = blur,
                     colorFilter = colorFilter,
+                    vignette = vignette,
                     modifier = Modifier.weight(1f),
                 )
                 BackgroundPreviewPane(
@@ -370,6 +438,7 @@ private fun BackgroundPreviewSection(
                     imageUri = parsedUri,
                     blur = blur,
                     colorFilter = colorFilter,
+                    vignette = vignette,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -392,6 +461,7 @@ private fun BackgroundPreviewPane(
     imageUri: Uri?,
     blur: Float,
     colorFilter: ColorFilter,
+    vignette: Float,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -441,6 +511,20 @@ private fun BackgroundPreviewPane(
                     contentDescription = null,
                     modifier = Modifier.matchParentSize(),
                     contentScale = ContentScale.FillBounds,
+                )
+                Box(
+                    modifier =
+                        Modifier
+                            .matchParentSize()
+                            .background(
+                                Brush.radialGradient(
+                                    colors =
+                                        listOf(
+                                            Color.Transparent,
+                                            Color.Black.copy(alpha = vignette.coerceIn(0f, 0.65f)),
+                                        ),
+                                ),
+                            ),
                 )
             }
         }
@@ -499,10 +583,16 @@ private fun BackgroundAdjustmentSection(
     blur: Float,
     contrast: Float,
     brightness: Float,
+    saturation: Float,
+    warmth: Float,
+    vignette: Float,
     resetEnabled: Boolean,
     onBlurChange: (Float) -> Unit,
     onContrastChange: (Float) -> Unit,
     onBrightnessChange: (Float) -> Unit,
+    onSaturationChange: (Float) -> Unit,
+    onWarmthChange: (Float) -> Unit,
+    onVignetteChange: (Float) -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -570,6 +660,51 @@ private fun BackgroundAdjustmentSection(
                 value = brightness,
                 valueRange = TONE_RANGE,
                 onValueChange = onBrightnessChange,
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            BackgroundAdjustmentSlider(
+                label = stringResource(R.string.saturation),
+                valueLabel =
+                    stringResource(
+                        R.string.custom_background_scale_value,
+                        (saturation * 100f).roundToInt(),
+                    ),
+                value = saturation,
+                valueRange = SATURATION_RANGE,
+                onValueChange = onSaturationChange,
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            BackgroundAdjustmentSlider(
+                label = stringResource(R.string.color_warmth),
+                valueLabel =
+                    stringResource(
+                        R.string.custom_background_signed_value,
+                        (warmth * 100f).roundToInt(),
+                    ),
+                value = warmth,
+                valueRange = WARMTH_RANGE,
+                onValueChange = onWarmthChange,
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            BackgroundAdjustmentSlider(
+                label = stringResource(R.string.vignette),
+                valueLabel =
+                    stringResource(
+                        R.string.custom_background_scale_value,
+                        (vignette * 100f).roundToInt(),
+                    ),
+                value = vignette,
+                valueRange = VIGNETTE_RANGE,
+                onValueChange = onVignetteChange,
             )
         }
         OutlinedButton(
@@ -642,36 +777,6 @@ private fun SaveBackgroundButton(
     }
 }
 
-private fun backgroundColorMatrix(
-    contrast: Float,
-    brightness: Float,
-): ColorMatrix {
-    val translation = (1f - contrast) * 128f + (brightness - 1f) * 255f
-    return ColorMatrix(
-        floatArrayOf(
-            contrast,
-            0f,
-            0f,
-            0f,
-            translation,
-            0f,
-            contrast,
-            0f,
-            0f,
-            translation,
-            0f,
-            0f,
-            contrast,
-            0f,
-            translation,
-            0f,
-            0f,
-            0f,
-            1f,
-            0f,
-        ),
-    )
-}
 
 private fun persistBackgroundImagePermission(
     context: Context,

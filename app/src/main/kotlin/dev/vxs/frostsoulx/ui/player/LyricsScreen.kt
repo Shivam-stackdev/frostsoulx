@@ -109,6 +109,9 @@ import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
 import dev.vxs.frostsoulx.constants.PlayerBackgroundStyleKey
 import dev.vxs.frostsoulx.constants.PlayerCustomBlurKey
 import dev.vxs.frostsoulx.constants.PlayerCustomBrightnessKey
+import dev.vxs.frostsoulx.constants.PlayerCustomSaturationKey
+import dev.vxs.frostsoulx.constants.PlayerCustomVignetteKey
+import dev.vxs.frostsoulx.constants.PlayerCustomWarmthKey
 import dev.vxs.frostsoulx.constants.PlayerCustomContrastKey
 import dev.vxs.frostsoulx.constants.PlayerCustomImageUriKey
 import dev.vxs.frostsoulx.constants.ShowLyricsPlayerControlsKey
@@ -173,6 +176,9 @@ fun LyricsScreen(
     val playerCustomBlur by rememberPreference(PlayerCustomBlurKey, 0f)
     val playerCustomContrast by rememberPreference(PlayerCustomContrastKey, 1f)
     val playerCustomBrightness by rememberPreference(PlayerCustomBrightnessKey, 1f)
+    val playerCustomSaturation by rememberPreference(PlayerCustomSaturationKey, 1f)
+    val playerCustomWarmth by rememberPreference(PlayerCustomWarmthKey, 0f)
+    val playerCustomVignette by rememberPreference(PlayerCustomVignetteKey, 0f)
     val foregroundColor =
         if (lyricsBackground == LyricsBackgroundStyle.FOLLOW_THEME) {
             MaterialTheme.colorScheme.onSurface
@@ -351,6 +357,9 @@ fun LyricsScreen(
             playerCustomBlur = playerCustomBlur,
             playerCustomContrast = playerCustomContrast,
             playerCustomBrightness = playerCustomBrightness,
+            playerCustomSaturation = playerCustomSaturation,
+            playerCustomWarmth = playerCustomWarmth,
+            playerCustomVignette = playerCustomVignette,
         )
 
         Box(
@@ -503,6 +512,9 @@ private fun LyricsScreenBackground(
     playerCustomBlur: Float,
     playerCustomContrast: Float,
     playerCustomBrightness: Float,
+    playerCustomSaturation: Float,
+    playerCustomWarmth: Float,
+    playerCustomVignette: Float,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -545,6 +557,9 @@ private fun LyricsScreenBackground(
                     playerCustomBlur = playerCustomBlur,
                     playerCustomContrast = playerCustomContrast,
                     playerCustomBrightness = playerCustomBrightness,
+                    playerCustomSaturation = playerCustomSaturation,
+                    playerCustomWarmth = playerCustomWarmth,
+                    playerCustomVignette = playerCustomVignette,
                 )
             }
         }

@@ -695,6 +695,9 @@ val PlayerCustomImageUriKey = stringPreferencesKey("playerCustomImageUri")
 val PlayerCustomBlurKey = floatPreferencesKey("playerCustomBlur")
 val PlayerCustomContrastKey = floatPreferencesKey("playerCustomContrast")
 val PlayerCustomBrightnessKey = floatPreferencesKey("playerCustomBrightness")
+val PlayerCustomSaturationKey = floatPreferencesKey("playerCustomSaturation")
+val PlayerCustomWarmthKey = floatPreferencesKey("playerCustomWarmth")
+val PlayerCustomVignetteKey = floatPreferencesKey("playerCustomVignette")
 
 val LyricsAnimationStyleKey = stringPreferencesKey("lyricsAnimationStyle")
 
