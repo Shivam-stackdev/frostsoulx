@@ -73,7 +73,7 @@ class ArchiveTuneMediaNotificationProvider(
             NotificationCompat.Builder(context, original)
                 .setContentText(lastLyricPrimary)
                 .setSubText(lastLyricSecondary)
-                .setStyle(NotificationCompat.DecoratedMediaCustomViewStyle())
+                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(smallRemoteViews.apply {
                     setTextViewText(R.id.notification_lyrics, lastLyricPrimary)
                 })
