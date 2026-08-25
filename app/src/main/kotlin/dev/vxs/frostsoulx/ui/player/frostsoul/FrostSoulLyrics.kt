@@ -126,7 +126,7 @@ internal fun FSLyrics(
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
-            contentPadding = PaddingValues(top = 88.dp, bottom = 156.dp, horizontal = 28.dp),
+            contentPadding = PaddingValues(start = 28.dp, top = 88.dp, end = 28.dp, bottom = 156.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize(),
         ) {

@@ -27,6 +27,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -88,6 +89,7 @@ import coil3.size.Size
 import coil3.toBitmap
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
+import dev.vxs.frostsoulx.ui.frostsoul.FSChip
 import dev.vxs.frostsoulx.ui.player.rememberDeviceMusicVolumeController
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
@@ -627,8 +629,6 @@ private fun FrostSoulAlbumPage(
             Spacer(Modifier.height(2.dp))
             FSGlassCard(
                 accent = uiState.palette.accent,
-                shape = RoundedCornerShape(22.dp),
-                contentPadding = PaddingValues(10.dp),
                 modifier = Modifier.fillMaxWidth(0.90f).aspectRatio(1f),
             ) {
                 FSAlbumArt(
@@ -1219,8 +1219,8 @@ private fun FrostSoulSongDetailsPage(
             }
         }
         item {
-            FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(16.dp)) {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(16.dp)) {
                     Text("TRACK CREDITS", color = FrostSoulCyanBright, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
                     FrostSoulDetailRow("Artist", track.artist)
                     FrostSoulDetailRow("Album", track.album.ifBlank { "Single release" })
@@ -1238,12 +1238,9 @@ private fun FrostSoulSongDetailsPage(
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(related, key = { "related_${it.id}" }) { item ->
                         FSGlassCard(
-                            modifier = Modifier.width(142.dp).height(174.dp),
-                            shape = RoundedCornerShape(20.dp),
-                            contentPadding = PaddingValues(10.dp),
-                            onClick = { actions.onSelectQueueItem(item.index) },
+                            modifier = Modifier.width(142.dp).height(174.dp).clickable { actions.onSelectQueueItem(item.index) },
                         ) {
-                            Column {
+                            Column(modifier = Modifier.padding(10.dp)) {
                                 AsyncImage(model = item.artworkUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxWidth().height(112.dp).clip(RoundedCornerShape(14.dp)))
                                 Text(item.title, color = FrostSoulOnSurface, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 8.dp))
                                 Text(item.artist, color = FrostSoulOnSurfaceMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 3.dp))
@@ -1254,8 +1251,8 @@ private fun FrostSoulSongDetailsPage(
             }
         }
         item {
-            FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(16.dp)) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
                     Text("FEATURED VIDEOS", color = FrostSoulCyanBright, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
                     Text("Video highlights will appear here when available for this track.", color = FrostSoulOnSurfaceMuted, fontSize = 13.sp, lineHeight = 19.sp)
                 }

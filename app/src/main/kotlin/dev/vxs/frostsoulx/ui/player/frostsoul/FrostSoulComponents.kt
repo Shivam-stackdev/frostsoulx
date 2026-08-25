@@ -56,6 +56,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -254,7 +256,7 @@ internal fun FSAlbumArt(
                 val pivot = Offset(size.width * 0.77f, size.height * 0.15f)
                 val armLength = size.minDimension * 0.38f
                 val armEnd = Offset(pivot.x - armLength * 0.74f, pivot.y + armLength * 0.68f)
-                androidx.compose.ui.graphics.drawscope.withTransform({ rotate(tonearmAngle, pivot) }) {
+                withTransform({ rotate(tonearmAngle, pivot) }) {
                     drawCircle(color = Color(0xFF1B2A2E), radius = size.minDimension * 0.065f, center = pivot)
                     drawLine(
                         color = Color(0xFFB9D1D5),

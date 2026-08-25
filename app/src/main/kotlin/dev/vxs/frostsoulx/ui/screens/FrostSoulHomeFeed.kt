@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
