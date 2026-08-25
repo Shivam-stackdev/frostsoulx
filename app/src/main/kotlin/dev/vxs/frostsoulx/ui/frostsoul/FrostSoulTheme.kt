@@ -132,18 +132,18 @@ data class FrostSoulDesignTokens(
 
 private val DefaultFrostSoulTokens = FrostSoulDesignTokens(
     colors = FrostSoulColors(
-        background = Color.Black,
-        surface = Color(0xFF050A0C),
-        surfaceRaised = Color(0xFF0B1518),
-        surfaceGlass = Color(0xB30F1D21),
-        surfaceGlassStrong = Color(0xDB14272C),
-        accent = Color(0xFF00B7C7),
-        accentBright = Color(0xFF72F3FF),
-        accentMuted = Color(0xFF15545C),
-        onBackground = Color(0xFFF4FCFD),
-        onSurface = Color(0xFFF4FCFD),
-        onSurfaceMuted = Color(0xFFA7BEC3),
-        outline = Color(0xFF2A464C),
+        background = Color(0xFF0C0C0C),
+        surface = Color(0xFF1E1E1E),
+        surfaceRaised = Color(0xFF282828),
+        surfaceGlass = Color(0xFF1E1E1E),
+        surfaceGlassStrong = Color(0xFF242424),
+        accent = Color(0xFF00E676),
+        accentBright = Color(0xFF00E676),
+        accentMuted = Color(0xFF008542),
+        onBackground = Color(0xFFFDFDFD),
+        onSurface = Color(0xFFFDFDFD),
+        onSurfaceMuted = Color(0xFFA5A5A5),
+        outline = Color.Transparent,
         error = Color(0xFFFF7C8F),
         scrim = Color.Black.copy(alpha = 0.72f),
     ),
@@ -203,9 +203,9 @@ fun FrostSoulDesignSystem(content: @Composable () -> Unit) {
     val tokens = remember(materialColors, materialTypography) {
         DefaultFrostSoulTokens.copy(
             colors = DefaultFrostSoulTokens.colors.copy(
-                accent = Color(0xFF00B7C7),
-                accentBright = Color(0xFF72F3FF),
-                accentMuted = Color(0xFF15545C),
+                accent = Color(0xFF00E676),
+                accentBright = Color(0xFF00E676),
+                accentMuted = Color(0xFF008542),
                 onBackground = materialColors.onSurface.copy(alpha = 0.96f),
                 onSurface = materialColors.onSurface.copy(alpha = 0.96f),
                 onSurfaceMuted = materialColors.onSurfaceVariant.copy(alpha = 0.82f),
@@ -228,29 +228,7 @@ fun FrostSoulDesignSystem(content: @Composable () -> Unit) {
 @Composable
 fun Modifier.frostSoulGlass(shape: Shape = FrostSoulTheme.shapes.large): Modifier {
     val colors = FrostSoulTheme.colors
-    return this
-        .shadow(
-            elevation = FrostSoulTheme.elevation.medium,
-            shape = shape,
-            ambientColor = Color.Black.copy(alpha = 0.72f),
-            spotColor = Color.Black.copy(alpha = 0.80f),
-        ).background(
-            brush = Brush.verticalGradient(
-                listOf(
-                    colors.surfaceGlassStrong,
-                    colors.surfaceGlass,
-                ),
-            ),
-            shape = shape,
-        )
-        .drawBehind {
-            drawLine(
-                color = Color.White.copy(alpha = 0.09f),
-                start = Offset(0f, 0.5.dp.toPx()),
-                end = Offset(size.width, 0.5.dp.toPx()),
-                strokeWidth = 1.dp.toPx(),
-            )
-        }
+    return this.background(colors.surfaceGlass, shape)
 }
 
 @Composable

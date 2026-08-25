@@ -2129,11 +2129,6 @@ class MainActivity : ComponentActivity() {
                                                     searchSource = SearchSource.ONLINE
                                                     openSearch()
                                                 },
-                                                onCenterClick = {
-                                                    if (!playerBottomSheetState.isExpandedOrExpanding) {
-                                                        playerBottomSheetState.expandSoft()
-                                                    }
-                                                },
                                             )
                                         }
 

@@ -41,7 +41,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -54,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -99,10 +102,11 @@ internal fun FrostSoulPlayer(
     actions: FrostSoulPlayerActions,
     modifier: Modifier = Modifier,
 ) {
-    val pages = remember { listOf(FrostSoulPage.Recommendations, FrostSoulPage.MainPlayer, FrostSoulPage.Lyrics) }
+    val pages = remember { listOf(FrostSoulPage.Recommendations, FrostSoulPage.MainPlayer, FrostSoulPage.Details, FrostSoulPage.Lyrics) }
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     var queueVisible by remember { mutableStateOf(false) }
+    var optionsVisible by remember { mutableStateOf(false) }
     var downwardDragDistance by remember { mutableFloatStateOf(0f) }
     val settledDragOffset by animateFloatAsState(
         targetValue = downwardDragDistance,
@@ -189,6 +193,10 @@ internal fun FrostSoulPlayer(
                                 positionMs = uiState.positionMs,
                                 durationMs = uiState.safeDurationMs,
                                 onSeek = actions.onSeek,
+                                onTogglePlayPause = actions.onTogglePlayPause,
+                                onToggleLike = actions.onToggleLike,
+                                onOpenAudioOutput = actions.onOpenAudioOutput,
+                                onOpenOptions = { optionsVisible = true },
                             )
 
                         FrostSoulPage.MainPlayer ->
@@ -199,8 +207,10 @@ internal fun FrostSoulPlayer(
                                     scope.launch { pagerState.animateScrollToPage(pages.indexOf(FrostSoulPage.Lyrics)) }
                                 },
                                 onOpenQueue = { queueVisible = true },
+                                onOpenOptions = { optionsVisible = true },
                             )
                         FrostSoulPage.Recommendations -> FrostSoulRecommendationsPage(uiState = uiState, actions = actions)
+                        FrostSoulPage.Details -> FrostSoulSongDetailsPage(uiState = uiState, actions = actions)
                         FrostSoulPage.Queue -> Unit
                     }
                 }
@@ -265,6 +275,18 @@ internal fun FrostSoulPlayer(
                     )
                 }
             }
+        }
+        AnimatedVisibility(
+            visible = optionsVisible,
+            enter = fadeIn(tween(160)) + slideInVertically(tween(280)) { it },
+            exit = fadeOut(tween(140)) + slideOutVertically(tween(240)) { it },
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+        ) {
+            FrostSoulPlayerOptionsSheet(
+                accent = uiState.palette.accent,
+                onDismiss = { optionsVisible = false },
+                onOpenAudioOutput = actions.onOpenAudioOutput,
+            )
         }
     }
 }
@@ -573,24 +595,24 @@ private fun FrostSoulAlbumPage(
     actions: FrostSoulPlayerActions,
     onOpenLyrics: () -> Unit,
     onOpenQueue: () -> Unit,
+    onOpenOptions: () -> Unit,
 ) {
     val volumeController = rememberDeviceMusicVolumeController()
     var lastAudibleVolume by remember { mutableFloatStateOf(0.55f) }
     var upwardDragDistance by remember { mutableFloatStateOf(0f) }
-    var optionsVisible by remember { mutableStateOf(false) }
     val volumeFraction = volumeController.volumeFraction.coerceIn(0f, 1f)
 
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
-                .pointerInput(optionsVisible) {
+                .pointerInput(Unit) {
                     detectVerticalDragGestures(
                         onVerticalDrag = { _, dragAmount ->
                             upwardDragDistance += dragAmount
                         },
                         onDragEnd = {
-                            if (upwardDragDistance <= -72f) optionsVisible = true
+                            if (upwardDragDistance <= -72f) onOpenOptions()
                             upwardDragDistance = 0f
                         },
                         onDragCancel = { upwardDragDistance = 0f },
@@ -603,13 +625,20 @@ private fun FrostSoulAlbumPage(
             modifier = Modifier.fillMaxSize().padding(bottom = 12.dp),
         ) {
             Spacer(Modifier.height(2.dp))
-            FSAlbumArt(
-                artworkUrl = uiState.track.artworkUrl,
-                title = uiState.track.title,
-                isPlaying = uiState.isPlaying,
-                palette = uiState.palette,
-                modifier = Modifier.fillMaxWidth(0.84f),
-            )
+            FSGlassCard(
+                accent = uiState.palette.accent,
+                shape = RoundedCornerShape(22.dp),
+                contentPadding = PaddingValues(10.dp),
+                modifier = Modifier.fillMaxWidth(0.90f).aspectRatio(1f),
+            ) {
+                FSAlbumArt(
+                    artworkUrl = uiState.track.artworkUrl,
+                    title = uiState.track.title,
+                    isPlaying = uiState.isPlaying,
+                    palette = uiState.palette,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
@@ -624,12 +653,16 @@ private fun FrostSoulAlbumPage(
                 )
                 Text(
                     text = uiState.track.artist,
-                    color = FrostSoulCyanBright,
+                    color = FrostSoulOnSurface,
                     fontSize = 14.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 3.dp),
                 )
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 7.dp)) {
+                    FSChip(label = uiState.audioQualityBadge ?: "STANDARD", selected = false, onClick = {})
+                    FSChip(label = "${uiState.queue.size} IN QUEUE", selected = false, onClick = {})
+                }
                 AnimatedContent(
                     targetState = uiState.currentLyricLine?.takeIf { it.isNotBlank() } ?: "Lyrics unavailable",
                     transitionSpec = {
@@ -724,18 +757,6 @@ private fun FrostSoulAlbumPage(
                 )
             }
         }
-        AnimatedVisibility(
-            visible = optionsVisible,
-            enter = fadeIn(tween(160)) + slideInVertically(tween(280)) { it },
-            exit = fadeOut(tween(140)) + slideOutVertically(tween(240)) { it },
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
-        ) {
-            FrostSoulPlayerOptionsSheet(
-                accent = uiState.palette.accent,
-                onDismiss = { optionsVisible = false },
-                onOpenAudioOutput = actions.onOpenAudioOutput,
-            )
-        }
     }
 }
 
@@ -747,14 +768,18 @@ private fun FrostSoulPlayerOptionsSheet(
 ) {
     val options =
         listOf(
-            Triple(R.drawable.tune, "DSP", "Signal processing"),
-            Triple(R.drawable.equalizer, "Equalizer", "Tone shaping"),
-            Triple(R.drawable.speed, "Playback Speed", "Tempo control"),
-            Triple(R.drawable.timer, "Sleep Timer", "Automatic stop"),
-            Triple(R.drawable.bluetooth, "Cast", "Audio output"),
-            Triple(R.drawable.info, "Audio Info", "Stream details"),
-            Triple(R.drawable.replay, "ReplayGain", "Loudness balance"),
-            Triple(R.drawable.settings, "Advanced Settings", "Player preferences"),
+            Triple(R.drawable.style, "Music Therapy", false),
+            Triple(R.drawable.lyrics, "View Score", false),
+            Triple(R.drawable.tune, "Driving Mode", false),
+            Triple(R.drawable.info, "Production Team", false),
+            Triple(R.drawable.graphic_eq, "Workout Mode", false),
+            Triple(R.drawable.graphic_eq, "Game Mode", false),
+            Triple(R.drawable.settings, "Theme Center", false),
+            Triple(R.drawable.favorite, "Listen Together", false),
+            Triple(R.drawable.share, "Lyrics Poster", false),
+            Triple(R.drawable.mic, "Sing This Song", false),
+            Triple(R.drawable.tune, "Dislike", false),
+            Triple(R.drawable.info, "Report", false),
         )
     FSGlassCard(
         accent = accent,
@@ -762,7 +787,7 @@ private fun FrostSoulPlayerOptionsSheet(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp, vertical = 14.dp)
-                .height(392.dp)
+                .height(610.dp)
                 .graphicsLayer {
                     shadowElevation = 28.dp.toPx()
                     shape = RoundedCornerShape(30.dp)
@@ -794,7 +819,7 @@ private fun FrostSoulPlayerOptionsSheet(
                         letterSpacing = 1.7.sp,
                     )
                     Text(
-                        text = "Shape the listening session",
+                        text = "QQ-style listening tools",
                         color = FrostSoulOnSurfaceMuted,
                         fontSize = 13.sp,
                         modifier = Modifier.padding(top = 3.dp),
@@ -807,55 +832,41 @@ private fun FrostSoulPlayerOptionsSheet(
                     compact = true,
                 )
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
-                options.chunked(2).forEach { rowOptions ->
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
+            ) {
+                options.forEach { (icon, label, actionable) ->
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth().weight(1f),
-                    ) {
-                        rowOptions.forEach { (icon, label, description) ->
-                            val actionable = label == "Cast"
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier =
-                                    Modifier
-                                        .weight(1f)
-                                        .fillMaxSize()
-                                        .clip(RoundedCornerShape(18.dp))
-                                        .background(Color.White.copy(alpha = 0.045f))
-                                        .border(1.dp, accent.copy(alpha = 0.18f), RoundedCornerShape(18.dp))
-                                        .clickable(enabled = actionable) {
-                                            if (actionable) onOpenAudioOutput()
-                                        }
-                                        .padding(horizontal = 10.dp),
-                            ) {
-                                Icon(
-                                    painter = painterResource(icon),
-                                    contentDescription = null,
-                                    tint = if (actionable) FrostSoulCyanBright else FrostSoulOnSurface,
-                                    modifier = Modifier.size(22.dp),
-                                )
-                                Column(modifier = Modifier.padding(start = 9.dp)) {
-                                    Text(
-                                        text = label,
-                                        color = FrostSoulOnSurface,
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    Text(
-                                        text = description,
-                                        color = FrostSoulOnSurfaceMuted.copy(alpha = 0.72f),
-                                        fontSize = 10.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.padding(top = 2.dp),
-                                    )
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(43.dp)
+                                .clickable(enabled = actionable) {
+                                    if (actionable) {
+                                        onOpenAudioOutput()
+                                        onDismiss()
+                                    }
                                 }
-                            }
+                                .padding(horizontal = 14.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(icon),
+                            contentDescription = null,
+                            tint = if (actionable) FrostSoulCyanBright else FrostSoulOnSurface,
+                            modifier = Modifier.size(22.dp),
+                        )
+                        Column(modifier = Modifier.padding(start = 12.dp)) {
+                            Text(
+                                text = label,
+                                color = FrostSoulOnSurface,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
                         }
-                        if (rowOptions.size == 1) Spacer(Modifier.weight(1f).fillMaxSize())
                     }
                 }
             }
@@ -1120,7 +1131,7 @@ private fun FrostSoulDynamicBackground(
                             scaleY = 1.18f
                             translationX = pageOffset * 28f
                         }.blur(52.dp)
-                        .alpha(0.20f),
+                        .alpha(0.10f),
             )
         }
     }
@@ -1142,10 +1153,18 @@ private fun FrostSoulDynamicBackground(
                             radius = size.width * 0.80f,
                         )
                     onDrawBehind {
-                        drawRect(Color.Black)
+                        drawRect(Color(0xFF1E1E1E))
                         drawRect(primaryGlow)
                         drawRect(cyanGlow)
-                        drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.86f))))
+                        drawRect(
+                            Brush.verticalGradient(
+                                colorStops = arrayOf(
+                                    0f to Color.Transparent,
+                                    0.68f to Color.Transparent,
+                                    1f to palette.artworkSecondary.copy(alpha = 0.86f),
+                                ),
+                            ),
+                        )
                     }
                 },
     )
@@ -1163,4 +1182,92 @@ private fun rememberAsyncImagePainterCompat(model: String): Painter {
                 .build()
         }
     return coil3.compose.rememberAsyncImagePainter(model = request)
+}
+
+
+@Composable
+private fun FrostSoulSongDetailsPage(
+    uiState: FrostSoulPlayerUiState,
+    actions: FrostSoulPlayerActions,
+) {
+    val track = uiState.track
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 18.dp),
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        item {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                AsyncImage(
+                    model = track.artworkUrl,
+                    contentDescription = "Album artwork for ${track.title}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(104.dp).clip(RoundedCornerShape(22.dp)),
+                )
+                Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
+                    Text(track.title, color = FrostSoulOnSurface, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(track.artist, color = FrostSoulCyanBright, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
+                    Text(track.album.ifBlank { "Single release" }, color = FrostSoulOnSurfaceMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+                }
+            }
+        }
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                FSChip(label = uiState.audioQualityBadge ?: "HQ", selected = true, onClick = {})
+                FSChip(label = track.durationMs.asFrostSoulTime(), selected = false, onClick = {})
+                FSChip(label = "ON DEVICE", selected = false, onClick = {})
+            }
+        }
+        item {
+            FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(16.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("TRACK CREDITS", color = FrostSoulCyanBright, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+                    FrostSoulDetailRow("Artist", track.artist)
+                    FrostSoulDetailRow("Album", track.album.ifBlank { "Single release" })
+                    FrostSoulDetailRow("Duration", track.durationMs.asFrostSoulTime())
+                    FrostSoulDetailRow("Playback", if (uiState.isPlaying) "Now playing" else "Paused")
+                }
+            }
+        }
+        val related = uiState.queue.filterNot { it.isCurrent }.take(8)
+        if (related.isNotEmpty()) {
+            item {
+                Text("PEOPLE WHO LIKE THIS ALSO LIKE", color = FrostSoulCyanBright, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+            }
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(related, key = { "related_${it.id}" }) { item ->
+                        FSGlassCard(
+                            modifier = Modifier.width(142.dp).height(174.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            contentPadding = PaddingValues(10.dp),
+                            onClick = { actions.onSelectQueueItem(item.index) },
+                        ) {
+                            Column {
+                                AsyncImage(model = item.artworkUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxWidth().height(112.dp).clip(RoundedCornerShape(14.dp)))
+                                Text(item.title, color = FrostSoulOnSurface, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 8.dp))
+                                Text(item.artist, color = FrostSoulOnSurfaceMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 3.dp))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        item {
+            FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(16.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("FEATURED VIDEOS", color = FrostSoulCyanBright, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+                    Text("Video highlights will appear here when available for this track.", color = FrostSoulOnSurfaceMuted, fontSize = 13.sp, lineHeight = 19.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FrostSoulDetailRow(label: String, value: String) {
+    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+        Text(label, color = FrostSoulOnSurfaceMuted, fontSize = 12.sp)
+        Text(value, color = FrostSoulOnSurface, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 16.dp))
+    }
 }

@@ -11,12 +11,12 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import dev.vxs.frostsoulx.models.MediaMetadata
 
-internal val FrostSoulCyan = Color(0xFF00B7C7)
-internal val FrostSoulCyanBright = Color(0xFF72F3FF)
-internal val FrostSoulSurface = Color(0xFF071013)
-internal val FrostSoulSurfaceElevated = Color(0xFF0B191D)
-internal val FrostSoulOnSurface = Color(0xFFF4FCFD)
-internal val FrostSoulOnSurfaceMuted = Color(0xFFA7BEC3)
+internal val FrostSoulCyan = Color(0xFF00E676)
+internal val FrostSoulCyanBright = Color(0xFF00E676)
+internal val FrostSoulSurface = Color(0xFF1E1E1E)
+internal val FrostSoulSurfaceElevated = Color(0xFF242424)
+internal val FrostSoulOnSurface = Color(0xFFFDFDFD)
+internal val FrostSoulOnSurfaceMuted = Color(0xFFA5A5A5)
 
 @Immutable
 internal data class FrostSoulPalette(
@@ -107,6 +107,7 @@ internal enum class FrostSoulPage {
     Lyrics,
     MainPlayer,
     Recommendations,
+    Details,
     Queue,
 }
 

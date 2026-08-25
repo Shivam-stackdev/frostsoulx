@@ -9,29 +9,36 @@ package dev.vxs.frostsoulx.ui.player.frostsoul
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -40,9 +47,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dagger.hilt.android.EntryPointAccessors
+import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.LyricsTemplateTooltipDismissedKey
 import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
 import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 import dev.vxs.frostsoulx.lyrics.core.LyricsSyncState
+import dev.vxs.frostsoulx.utils.rememberPreference
 
 /**
  * Renders karaoke directly from the singleton lyrics synchronization engine.
@@ -57,6 +67,10 @@ internal fun FSLyrics(
     positionMs: Long,
     durationMs: Long,
     onSeek: (Long) -> Unit,
+    onTogglePlayPause: () -> Unit = {},
+    onToggleLike: () -> Unit = {},
+    onOpenAudioOutput: () -> Unit = {},
+    onOpenOptions: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val applicationContext = LocalContext.current.applicationContext
@@ -106,26 +120,75 @@ internal fun FSLyrics(
         return
     }
 
-    LazyColumn(
-        state = listState,
-        contentPadding = PaddingValues(vertical = 88.dp, horizontal = 28.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        modifier = modifier.fillMaxSize(),
-    ) {
-        itemsIndexed(
-            items = lines,
-            key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
-        ) { index, line ->
-            val isCurrent = index == currentIndex
-            FrostSoulKaraokeLine(
-                line = line,
-                isCurrent = isCurrent,
-                isPast = currentIndex >= 0 && index < currentIndex,
-                currentWordIndex = if (isCurrent) syncState.currentWordIndex else -1,
-                wordProgress = if (isCurrent) syncState.wordProgress else 0f,
-                lineProgress = if (isCurrent) syncState.lineProgress else 0f,
-                onSeek = onSeek,
+    val tooltipState = rememberPreference(LyricsTemplateTooltipDismissedKey, false)
+    val tooltipDismissed by tooltipState
+
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(top = 88.dp, bottom = 156.dp, horizontal = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            itemsIndexed(
+                items = lines,
+                key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
+            ) { index, line ->
+                val isCurrent = index == currentIndex
+                FrostSoulKaraokeLine(
+                    line = line,
+                    isCurrent = isCurrent,
+                    isPast = currentIndex >= 0 && index < currentIndex,
+                    currentWordIndex = if (isCurrent) syncState.currentWordIndex else -1,
+                    wordProgress = if (isCurrent) syncState.wordProgress else 0f,
+                    lineProgress = if (isCurrent) syncState.lineProgress else 0f,
+                    onSeek = onSeek,
+                )
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 14.dp)
+                    .background(Color.Black.copy(alpha = 0.76f), RoundedCornerShape(28.dp))
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+        ) {
+            FSIconButton(painterResource(R.drawable.timer), "Sleep timer", onOpenOptions, compact = true)
+            FSIconButton(painterResource(R.drawable.bluetooth), "Audio output", onOpenAudioOutput, compact = true)
+            FSIconButton(painterResource(R.drawable.settings), "Lyrics settings", onOpenOptions, compact = true)
+            FSIconButton(painterResource(R.drawable.share), "Lyrics poster", onOpenOptions, compact = true)
+            FSIconButton(painterResource(R.drawable.favorite_border), "Like this song", onToggleLike, compact = true)
+            FSIconButton(
+                painterResource(R.drawable.play),
+                "Play or pause",
+                onTogglePlayPause,
+                active = true,
+                compact = true,
             )
+        }
+
+        if (!tooltipDismissed) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 86.dp)
+                        .background(Color.Black.copy(alpha = 0.86f), RoundedCornerShape(18.dp))
+                        .padding(start = 14.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+            ) {
+                Text("Lyrics template updated", color = FrostSoulOnSurface, fontSize = 12.sp)
+                FSIconButton(
+                    painter = painterResource(R.drawable.close),
+                    contentDescription = "Dismiss lyrics update",
+                    onClick = { tooltipState.value = true },
+                    compact = true,
+                )
+            }
         }
     }
 }
@@ -146,16 +209,11 @@ private fun FrostSoulKaraokeLine(
         label = "fs-karaoke-line-emphasis",
     )
     val scale by animateFloatAsState(
-        targetValue = if (isCurrent) 1f else 0.94f,
+        targetValue = 1f,
         animationSpec = spring(dampingRatio = 0.84f, stiffness = 420f),
         label = "fs-karaoke-line-scale",
     )
-    val lineColor =
-        when {
-            isCurrent -> FrostSoulOnSurface
-            isPast -> FrostSoulOnSurfaceMuted.copy(alpha = 0.72f)
-            else -> FrostSoulOnSurfaceMuted.copy(alpha = 0.46f)
-        }
+    val lineColor = if (isCurrent) FrostSoulOnSurface else FrostSoulOnSurfaceMuted
     val annotatedText =
         remember(line, currentWordIndex, wordProgress, lineProgress, isCurrent, lineColor, emphasis) {
             line.asKaraokeAnnotatedText(
@@ -176,7 +234,7 @@ private fun FrostSoulKaraokeLine(
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
-                    alpha = 0.56f + (emphasis * 0.44f)
+                    alpha = 1f
                 }.clickable(
                     enabled = line.startMs >= 0L,
                     interactionSource = remember { MutableInteractionSource() },
@@ -187,8 +245,8 @@ private fun FrostSoulKaraokeLine(
         Text(
             text = annotatedText,
             color = lineColor,
-            fontSize = if (isCurrent) 27.sp else 23.sp,
-            lineHeight = if (isCurrent) 36.sp else 31.sp,
+            fontSize = 27.sp,
+            lineHeight = 36.sp,
             fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Medium,
             maxLines = 4,
             overflow = TextOverflow.Ellipsis,
@@ -196,23 +254,23 @@ private fun FrostSoulKaraokeLine(
         line.translation?.takeIf { it.isNotBlank() }?.let { translation ->
             Text(
                 text = translation,
-                color = FrostSoulOnSurfaceMuted.copy(alpha = if (isCurrent) 0.84f else 0.48f),
-                fontSize = if (isCurrent) 16.sp else 14.sp,
+                color = if (isCurrent) FrostSoulOnSurface else FrostSoulOnSurfaceMuted,
+                fontSize = 20.sp,
                 lineHeight = 22.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 4.dp),
+                modifier = Modifier.padding(top = 6.dp),
             )
         }
         line.romanization?.takeIf { it.isNotBlank() }?.let { romanization ->
             Text(
                 text = romanization,
-                color = FrostSoulOnSurfaceMuted.copy(alpha = if (isCurrent) 0.70f else 0.40f),
-                fontSize = 13.sp,
+                color = if (isCurrent) FrostSoulOnSurface else FrostSoulOnSurfaceMuted,
+                fontSize = 16.sp,
                 lineHeight = 19.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 2.dp),
+                modifier = Modifier.padding(top = 1.dp),
             )
         }
     }

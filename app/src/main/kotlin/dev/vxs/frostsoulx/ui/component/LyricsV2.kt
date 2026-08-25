@@ -599,9 +599,9 @@ fun LyricsV2(
                                         if (index == 0 || (index == 1 && entriesWithWords[0] == HEAD_LYRICS_ENTRY)) {
                                             0.dp
                                         } else {
-                                            (lyricsLineSpacing * 8).dp
+                                            (lyricsLineSpacing * 4).dp
                                         },
-                                    bottom = (lyricsLineSpacing * 8).dp,
+                                    bottom = (lyricsLineSpacing * 4).dp,
                                 ).then(
                                     if (lyricsLineBlur) {
                                         Modifier.blur(
@@ -787,9 +787,9 @@ fun LyricsV2(
                                         ) {
                                             0.dp
                                         } else {
-                                            (lyricsLineSpacing * 8).dp
+                                            (lyricsLineSpacing * 4).dp
                                         },
-                                    bottom = (lyricsLineSpacing * 8).dp,
+                                    bottom = (lyricsLineSpacing * 4).dp,
                                 ).then(
                                     if (lyricsLineBlur) {
                                         Modifier.blur(
@@ -870,7 +870,7 @@ fun LyricsV2(
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
-                                        .padding(bottom = (lyricsTextSize * 0.18f).dp),
+                                        .padding(bottom = (lyricsTextSize * 0.08f).dp),
                             )
                         }
 
@@ -930,7 +930,7 @@ fun LyricsV2(
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
-                                        .padding(top = (lyricsTextSize * 0.3f).dp),
+                                        .padding(top = (lyricsTextSize * 0.12f).dp),
                             )
                         }
                     }

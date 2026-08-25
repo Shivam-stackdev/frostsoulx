@@ -405,6 +405,11 @@ private fun KaraokeWord(
 @RequiresApi(Build.VERSION_CODES.M)
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnusedBoxWithConstraintsScope", "StringFormatInvalid")
+/**
+ * Legacy lyrics renderer. Runtime selection is handled by LyricsScreen via LyricsV2/LyricsEnhanced.
+ * Keep this implementation available for compatibility, but do not add new UI work here.
+ */
+@Deprecated("Use LyricsV2 or LyricsEnhanced through LyricsScreen instead.")
 @Composable
 fun Lyrics(
     sliderPositionProvider: () -> Long?,

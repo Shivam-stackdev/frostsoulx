@@ -561,7 +561,7 @@ fun FSNavigationBar(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
             modifier
-                .height(68.dp)
+                .height(60.dp)
                 .clip(shape)
                 .frostSoulGlass(shape)
                 .pointerInput(items, selectedRoute) {
@@ -579,7 +579,7 @@ fun FSNavigationBar(
                         onDragCancel = { swipeDistance = 0f },
                     )
                 }
-                .padding(horizontal = FrostSoulTheme.spacing.small, vertical = 7.dp),
+                .padding(horizontal = FrostSoulTheme.spacing.small, vertical = 4.dp),
     ) {
         items.forEachIndexed { index, item ->
             if (onCenterClick != null && index == 2) {

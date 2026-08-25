@@ -39,6 +39,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
@@ -130,6 +132,35 @@ internal fun FrostSoulHomeFeed(
             FrostSoulQuickSearch(onOpenSearch = { navController.navigate(Screens.Search.route) })
         }
 
+        uiState.homePage?.chips.orEmpty().takeIf { it.isNotEmpty() }?.let { sourceChips ->
+            val categoryLabels = listOf("For You", "Quick Picks", "Albums", "Artists", "Discover")
+            val displayChips = sourceChips.take(categoryLabels.size).mapIndexed { index, chip ->
+                chip.copy(title = categoryLabels[index])
+            }
+            item(key = "frostsoul_home_tabs") {
+                FrostSoulHomeTabs(
+                    chips = displayChips,
+                    selectedChip = displayChips.firstOrNull { display ->
+                        display.endpoint == uiState.selectedChip?.endpoint
+                    },
+                    onChipSelected = { displayChip ->
+                        val sourceChip = sourceChips.firstOrNull { it.endpoint == displayChip.endpoint }
+                        onAction(HomeAction.SelectChip(sourceChip))
+                    },
+                )
+            }
+        }
+
+        if (uiState.quickPicks.isNotEmpty()) {
+            item(key = "frostsoul_home_banner_carousel") {
+                FrostSoulBannerCarousel(
+                    songs = uiState.quickPicks.take(5),
+                    mediaMetadata = mediaMetadata,
+                    playerConnection = playerConnection,
+                )
+            }
+        }
+
         item(key = "frostsoul_home_hero") {
             FrostSoulHomeHero(
                 track = mediaMetadata,
@@ -170,6 +201,13 @@ internal fun FrostSoulHomeFeed(
                     playerConnection = playerConnection,
                     badge = "PLAY",
                     spotlight = false,
+                )
+            }
+            item(key = "frostsoul_recommendation_list") {
+                FrostSoulRecommendationList(
+                    songs = uiState.quickPicks.take(5),
+                    mediaMetadata = mediaMetadata,
+                    playerConnection = playerConnection,
                 )
             }
         }
@@ -337,45 +375,132 @@ internal fun FrostSoulHomeFeed(
 }
 
 @Composable
+private fun FrostSoulBannerCarousel(
+    songs: List<Song>,
+    mediaMetadata: MediaMetadata?,
+    playerConnection: PlayerConnection,
+) {
+    LazyRow(
+        contentPadding = FrostSoulShelfItemPadding,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        items(songs, key = { "banner_${it.id}" }) { song ->
+            FSGlassCard(
+                modifier = Modifier.width(185.dp).height(123.dp),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
+                contentPadding = PaddingValues(0.dp),
+                onClick = {
+                    if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
+                    else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
+                },
+            ) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AsyncImage(
+                        model = song.song.thumbnailUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxSize().background(
+                            Brush.horizontalGradient(
+                                listOf(Color.Black.copy(alpha = 0.92f), Color.Transparent),
+                            ),
+                        ),
+                    )
+                    Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+                        Text("FEATURED FOR YOU", color = FrostSoulTheme.colors.accentBright, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+                        Spacer(Modifier.weight(1f))
+                        Text(song.title, color = FrostSoulTheme.colors.onSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(song.artists.joinToString(" • ") { it.name }, color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 3.dp))
+                    }
+                    FSIconButton(
+                        onClick = {
+                            if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
+                            else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
+                        },
+                        highlighted = true,
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
+                    ) {
+                        androidx.compose.material3.Icon(painterResource(if (song.id == mediaMetadata?.id && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play), contentDescription = "Play ${song.title}", tint = FrostSoulTheme.colors.accentBright)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FrostSoulRecommendationList(
+    songs: List<Song>,
+    mediaMetadata: MediaMetadata?,
+    playerConnection: PlayerConnection,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
+    ) {
+        songs.forEachIndexed { index, song ->
+            FSGlassCard(
+                modifier = Modifier.fillMaxWidth().height(70.dp),
+                shape = FrostSoulTheme.shapes.large,
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp),
+                onClick = {
+                    if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
+                    else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
+                },
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    AsyncImage(model = song.song.thumbnailUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(52.dp).clip(FrostSoulTheme.shapes.medium))
+                    Column(modifier = Modifier.weight(1f).padding(horizontal = 12.dp)) {
+                        Text(song.title, color = FrostSoulTheme.colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
+                            FSChip(label = if (index == 0) "TRENDING" else "MIX", selected = false, onClick = {})
+                            Text("  ${song.artists.firstOrNull()?.name.orEmpty()}", color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
+                    androidx.compose.material3.Icon(painterResource(R.drawable.favorite_border), contentDescription = "Like ${song.title}", tint = FrostSoulTheme.colors.onSurfaceMuted, modifier = Modifier.size(20.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page, vertical = 2.dp),
     ) {
-        FSGlassCard(
-            modifier = Modifier.weight(1f).height(52.dp),
-            shape = FrostSoulTheme.shapes.pill,
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            onClick = onOpenSearch,
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                androidx.compose.material3.Icon(
-                    painter = painterResource(R.drawable.search),
-                    contentDescription = "Search",
-                    tint = FrostSoulTheme.colors.onSurfaceMuted,
-                    modifier = Modifier.width(21.dp),
-                )
-                androidx.compose.material3.Text(
-                    text = "Search songs, albums, artists...",
-                    color = FrostSoulTheme.colors.onSurfaceMuted,
-                    style = FrostSoulTheme.typography.body,
-                    modifier = Modifier.padding(start = 12.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-        FSIconButton(
-            onClick = onOpenSearch,
-            contentDescription = "Filter search",
-            highlighted = false,
-            modifier = Modifier.size(52.dp),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f).height(32.dp).clip(FrostSoulTheme.shapes.pill).background(Color(0xFF1E1E1E)).clickable(onClick = onOpenSearch).padding(horizontal = 12.dp),
         ) {
             androidx.compose.material3.Icon(
-                painter = painterResource(R.drawable.tune),
-                contentDescription = null,
-                tint = FrostSoulTheme.colors.onSurface,
+                painter = painterResource(R.drawable.search),
+                contentDescription = "Search",
+                tint = FrostSoulTheme.colors.onSurfaceMuted,
+                modifier = Modifier.size(16.dp),
+            )
+            androidx.compose.material3.Text(
+                text = "Search songs, albums, artists...",
+                color = FrostSoulTheme.colors.onSurfaceMuted,
+                style = FrostSoulTheme.typography.body,
+                modifier = Modifier.padding(start = 8.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF1E1E1E)).clickable(onClick = onOpenSearch),
+        ) {
+            androidx.compose.material3.Icon(
+                painter = painterResource(R.drawable.mic),
+                contentDescription = "Voice search",
+                tint = FrostSoulTheme.colors.accentBright,
+                modifier = Modifier.size(16.dp),
             )
         }
     }

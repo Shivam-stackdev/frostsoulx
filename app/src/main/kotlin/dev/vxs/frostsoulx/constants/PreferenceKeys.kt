@@ -738,6 +738,7 @@ val LyricsRomanizeOtherLanguagesKey = booleanPreferencesKey("lyricsRomanizeOther
 val TranslateLyricsKey = booleanPreferencesKey("translateLyrics")
 val UseLyricsV2Key = booleanPreferencesKey("useLyricsV2")
 val LyricsModeKey = stringPreferencesKey("lyricsMode")
+val LyricsTemplateTooltipDismissedKey = booleanPreferencesKey("lyricsTemplateTooltipDismissed")
 
 enum class LyricsMode {
     V2,

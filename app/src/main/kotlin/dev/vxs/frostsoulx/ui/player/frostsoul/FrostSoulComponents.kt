@@ -8,6 +8,7 @@
 package dev.vxs.frostsoulx.ui.player.frostsoul
 
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -165,6 +166,11 @@ internal fun FSAlbumArt(
         if (!isPlaying) pausedRotation = rotation
     }
     val displayedRotation = if (isPlaying) rotation else pausedRotation
+    val tonearmAngle by animateFloatAsState(
+        targetValue = if (isPlaying) -5f else -25f,
+        animationSpec = tween(durationMillis = 420),
+        label = "fs-tonearm-angle",
+    )
     val artShape = if (compact) RoundedCornerShape(16.dp) else CircleShape
 
     Box(
@@ -184,13 +190,36 @@ internal fun FSAlbumArt(
                         radius = radius,
                         center = center,
                     )
-                }.padding(if (compact) 2.dp else 14.dp),
+                }.padding(if (compact) 2.dp else 0.dp),
     ) {
+        if (!compact) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val vinylRadius = size.minDimension * 0.47f
+                drawCircle(color = Color(0xFF020506), radius = vinylRadius, center = center)
+                for (ringIndex in 1..7) {
+                    val ringRadius = vinylRadius * (0.22f + ringIndex * 0.095f)
+                    drawCircle(
+                        color = Color.White.copy(alpha = 0.035f + ringIndex * 0.006f),
+                        radius = ringRadius,
+                        center = center,
+                        style = Stroke(width = (1f + ringIndex * 0.18f).dp.toPx()),
+                    )
+                }
+                drawCircle(
+                    color = palette.accent.copy(alpha = 0.22f),
+                    radius = vinylRadius,
+                    center = center,
+                    style = Stroke(width = 1.5.dp.toPx()),
+                )
+            }
+        }
+
         Box(
             contentAlignment = Alignment.Center,
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .padding(if (compact) 0.dp else 22.dp)
                     .graphicsLayer { rotationZ = displayedRotation }
                     .clip(artShape)
                     .background(FrostSoulSurfaceElevated)
@@ -213,55 +242,36 @@ internal fun FSAlbumArt(
             if (!compact) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val discRadius = size.minDimension * 0.14f
-                    drawCircle(
-                        color = Color.Black.copy(alpha = 0.72f),
-                        radius = discRadius,
-                        center = center,
-                    )
-                    drawCircle(
-                        color = palette.accent.copy(alpha = 0.78f),
-                        radius = discRadius * 0.34f,
-                        center = center,
-                    )
-                    drawCircle(
-                        color = Color.Black.copy(alpha = 0.9f),
-                        radius = discRadius * 0.11f,
-                        center = center,
-                    )
-                    drawCircle(
-                        color = Color.White.copy(alpha = 0.15f),
-                        radius = size.minDimension * 0.44f,
-                        center = center,
-                        style = Stroke(width = 1.dp.toPx()),
-                    )
+                    drawCircle(color = Color.Black.copy(alpha = 0.72f), radius = discRadius, center = center)
+                    drawCircle(color = palette.accent.copy(alpha = 0.78f), radius = discRadius * 0.34f, center = center)
+                    drawCircle(color = Color.Black.copy(alpha = 0.9f), radius = discRadius * 0.11f, center = center)
                 }
             }
         }
+
         if (!compact) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val pivot = Offset(size.width * 0.77f, size.height * 0.15f)
-                val needle =
-                    if (isPlaying) {
-                        Offset(size.width * 0.57f, size.height * 0.51f)
-                    } else {
-                        Offset(size.width * 0.66f, size.height * 0.33f)
-                    }
-                drawCircle(color = Color(0xFF1B2A2E), radius = size.minDimension * 0.065f, center = pivot)
-                drawLine(
-                    color = Color(0xFFB9D1D5),
-                    start = pivot,
-                    end = needle,
-                    strokeWidth = size.minDimension * 0.022f,
-                    cap = StrokeCap.Round,
-                )
-                drawLine(
-                    color = palette.accent.copy(alpha = 0.72f),
-                    start = pivot,
-                    end = needle,
-                    strokeWidth = size.minDimension * 0.007f,
-                    cap = StrokeCap.Round,
-                )
-                drawCircle(color = Color(0xFFD5F2F5), radius = size.minDimension * 0.024f, center = needle)
+                val armLength = size.minDimension * 0.38f
+                val armEnd = Offset(pivot.x - armLength * 0.74f, pivot.y + armLength * 0.68f)
+                androidx.compose.ui.graphics.drawscope.withTransform({ rotate(tonearmAngle, pivot) }) {
+                    drawCircle(color = Color(0xFF1B2A2E), radius = size.minDimension * 0.065f, center = pivot)
+                    drawLine(
+                        color = Color(0xFFB9D1D5),
+                        start = pivot,
+                        end = armEnd,
+                        strokeWidth = size.minDimension * 0.022f,
+                        cap = StrokeCap.Round,
+                    )
+                    drawLine(
+                        color = palette.accent.copy(alpha = 0.72f),
+                        start = pivot,
+                        end = armEnd,
+                        strokeWidth = size.minDimension * 0.007f,
+                        cap = StrokeCap.Round,
+                    )
+                    drawCircle(color = Color(0xFFD5F2F5), radius = size.minDimension * 0.024f, center = armEnd)
+                }
             }
         }
     }
