@@ -36,8 +36,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -72,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.frostsoul.FSIcon
 
 @Composable
 internal fun FSGlassCard(
@@ -133,7 +132,7 @@ internal fun FSIconButton(
                     onClick = onClick,
                 ).semantics { this.contentDescription = contentDescription },
     ) {
-        Icon(
+        FSIcon(
             painter = painter,
             contentDescription = null,
             tint = iconTint,
@@ -229,7 +228,7 @@ internal fun FSAlbumArt(
                 modifier = Modifier.fillMaxSize(),
             )
             if (artworkUrl.isNullOrBlank()) {
-                Icon(
+                FSIcon(
                     painter = painterResource(R.drawable.music_note),
                     contentDescription = null,
                     tint = FrostSoulOnSurfaceMuted,
@@ -382,11 +381,19 @@ internal fun FSTopBar(
                 onPageSelected = onPageSelected,
             )
         }
-        FSIconButton(
-            painter = painterResource(R.drawable.more_vert),
-            contentDescription = "Open player options",
-            onClick = onOpenOptions,
-            compact = true,
-        )
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            FSIconButton(
+                painter = painterResource(R.drawable.style),
+                contentDescription = "Player appearance",
+                onClick = onOpenOptions,
+                compact = true,
+            )
+            FSIconButton(
+                painter = painterResource(R.drawable.share),
+                contentDescription = "Share track",
+                onClick = onOpenOptions,
+                compact = true,
+            )
+        }
     }
 }

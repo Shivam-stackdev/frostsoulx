@@ -50,7 +50,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Text
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
@@ -72,6 +71,8 @@ import dev.vxs.frostsoulx.playback.PlayerConnection
 import dev.vxs.frostsoulx.playback.queues.ListQueue
 import dev.vxs.frostsoulx.ui.component.MenuState
 import dev.vxs.frostsoulx.ui.frostsoul.FSAlbumCard
+import dev.vxs.frostsoulx.ui.frostsoul.FSIcon
+import dev.vxs.frostsoulx.ui.frostsoul.FSText
 import dev.vxs.frostsoulx.ui.frostsoul.FSArtistCard
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSChip
@@ -159,6 +160,16 @@ internal fun FrostSoulHomeFeed(
                     mediaMetadata = mediaMetadata,
                     playerConnection = playerConnection,
                 )
+            }
+            item(key = "frostsoul_everyone_listening") {
+                FrostSoulEveryoneListening(
+                    songs = uiState.quickPicks.take(3),
+                    mediaMetadata = mediaMetadata,
+                    playerConnection = playerConnection,
+                )
+            }
+            item(key = "frostsoul_preference_prompt") {
+                FrostSoulPreferencePrompt(onClick = { navController.navigate("settings") })
             }
         }
 
@@ -423,10 +434,54 @@ private fun FrostSoulBannerCarousel(
                         highlighted = true,
                         modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
                     ) {
-                        androidx.compose.material3.Icon(painterResource(if (song.id == mediaMetadata?.id && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play), contentDescription = "Play ${song.title}", tint = FrostSoulTheme.colors.accentBright)
+                        FSIcon(painterResource(if (song.id == mediaMetadata?.id && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play), contentDescription = "Play ${song.title}", tint = FrostSoulTheme.colors.accentBright)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FrostSoulEveryoneListening(
+    songs: List<Song>,
+    mediaMetadata: MediaMetadata?,
+    playerConnection: PlayerConnection,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
+    ) {
+        FSSectionHeader(title = "Everyone is listening", actionLabel = "Play all", onAction = {
+            playerConnection.playQueue(ListQueue(items = songs.map { it.toMediaItem() }))
+        })
+        songs.forEach { song ->
+            FSListItem(
+                title = song.title,
+                subtitle = song.artists.joinToString(" • ") { it.name },
+                artworkUrl = song.song.thumbnailUrl,
+                isActive = song.id == mediaMetadata?.id && playerConnection.player.isPlaying,
+                onClick = {
+                    if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
+                    else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun FrostSoulPreferencePrompt(onClick: () -> Unit) {
+    FSGlassCard(
+        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page).fillMaxWidth(),
+        shape = FrostSoulTheme.shapes.large,
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
+        onClick = onClick,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            FSText("Tell us your music taste", color = FrostSoulTheme.colors.onSurface, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            FSText("Get recommendations tuned to your listening.", color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 13.sp)
+            FSButton(label = "Set preferences", onClick = onClick, modifier = Modifier.padding(top = 8.dp), emphasized = true)
         }
     }
 }
@@ -475,7 +530,7 @@ private fun FrostSoulRecommendationList(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 3.dp),
                 )
-                androidx.compose.material3.Icon(
+                FSIcon(
                     painter = painterResource(if (isCurrent && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play),
                     contentDescription = if (isCurrent) "Pause ${song.title}" else "Play ${song.title}",
                     tint = FrostSoulTheme.colors.onSurface,
@@ -497,13 +552,13 @@ private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f).height(32.dp).clip(FrostSoulTheme.shapes.pill).background(Color(0xFF1E1E1E)).clickable(onClick = onOpenSearch).padding(horizontal = 12.dp),
         ) {
-            androidx.compose.material3.Icon(
+            FSIcon(
                 painter = painterResource(R.drawable.search),
                 contentDescription = "Search",
                 tint = FrostSoulTheme.colors.onSurfaceMuted,
                 modifier = Modifier.size(16.dp),
             )
-            androidx.compose.material3.Text(
+            FSText(
                 text = "Search songs, albums, artists...",
                 color = FrostSoulTheme.colors.onSurfaceMuted,
                 style = FrostSoulTheme.typography.body,
@@ -516,7 +571,7 @@ private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
             contentAlignment = Alignment.Center,
             modifier = Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF1E1E1E)).clickable(onClick = onOpenSearch),
         ) {
-            androidx.compose.material3.Icon(
+            FSIcon(
                 painter = painterResource(R.drawable.mic),
                 contentDescription = "Voice search",
                 tint = FrostSoulTheme.colors.accentBright,
@@ -547,13 +602,13 @@ private fun FrostSoulHomeHeader(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                androidx.compose.material3.Icon(
+                FSIcon(
                     painter = painterResource(R.drawable.about_appbar),
                     contentDescription = "FrostSoul",
                     tint = FrostSoulTheme.colors.accentBright,
                     modifier = Modifier.size(30.dp),
                 )
-                androidx.compose.material3.Text(
+                FSText(
                     text = "F R O S T S O U L",
                     color = FrostSoulTheme.colors.accentBright,
                     fontSize = 12.sp,
@@ -568,7 +623,7 @@ private fun FrostSoulHomeHeader(
                     contentDescription = "Notifications",
                     modifier = Modifier.size(44.dp),
                 ) {
-                    androidx.compose.material3.Icon(
+                    FSIcon(
                         painter = painterResource(R.drawable.newspaper),
                         contentDescription = null,
                         tint = FrostSoulTheme.colors.onSurface,
@@ -582,7 +637,7 @@ private fun FrostSoulHomeHeader(
                 )
             }
         }
-        androidx.compose.material3.Text(
+        FSText(
             text = if (firstName == null) timeOfDay else "$timeOfDay, $firstName",
             color = FrostSoulTheme.colors.onSurface,
             style = FrostSoulTheme.typography.display,
@@ -621,7 +676,7 @@ private fun FrostSoulHomeTabs(
                         .clickable { onChipSelected(chip) }
                         .padding(vertical = 8.dp),
             ) {
-                androidx.compose.material3.Text(
+                FSText(
                     text = chip.title,
                     color = if (selected) FrostSoulTheme.colors.onSurface else FrostSoulTheme.colors.onSurfaceMuted,
                     style = FrostSoulTheme.typography.label,
@@ -679,7 +734,7 @@ private fun FrostSoulHomeHero(
                 ),
             )
             Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
-                androidx.compose.material3.Text(
+                FSText(
                     text = "NOW PLAYING",
                     color = FrostSoulTheme.colors.accentBright,
                     fontSize = 10.sp,
@@ -687,7 +742,7 @@ private fun FrostSoulHomeHero(
                     letterSpacing = 1.4.sp,
                 )
                 Spacer(Modifier.height(10.dp))
-                androidx.compose.material3.Text(
+                FSText(
                     text = track?.title ?: "Nothing playing",
                     color = FrostSoulTheme.colors.onSurface,
                     fontSize = 23.sp,
@@ -695,7 +750,7 @@ private fun FrostSoulHomeHero(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                androidx.compose.material3.Text(
+                FSText(
                     text = track?.artists?.joinToString(separator = " • ") { it.name } ?: "Choose a song to begin",
                     color = FrostSoulTheme.colors.onSurfaceMuted,
                     fontSize = 15.sp,
@@ -704,7 +759,7 @@ private fun FrostSoulHomeHero(
                     modifier = Modifier.padding(top = 3.dp),
                 )
                 if (track != null) {
-                    androidx.compose.material3.Text(
+                    FSText(
                         text = "FLAC",
                         color = FrostSoulTheme.colors.accentBright,
                         fontSize = 10.sp,
@@ -724,8 +779,8 @@ private fun FrostSoulHomeHero(
                             )
                         }
                         Row(modifier = Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                            androidx.compose.material3.Text(positionMs.asFrostSoulTime(), color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 11.sp)
-                            androidx.compose.material3.Text(durationMs.asFrostSoulTime(), color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 11.sp)
+                            FSText(positionMs.asFrostSoulTime(), color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 11.sp)
+                            FSText(durationMs.asFrostSoulTime(), color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 11.sp)
                         }
                     }
                     FSIconButton(
@@ -733,7 +788,7 @@ private fun FrostSoulHomeHero(
                         highlighted = true,
                         modifier = Modifier.padding(start = 16.dp),
                     ) {
-                        androidx.compose.material3.Icon(
+                        FSIcon(
                             painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
                             contentDescription = if (isPlaying) "Pause" else "Play",
                             tint = FrostSoulTheme.colors.accentBright,
@@ -801,14 +856,14 @@ private fun FrostSoulOfflineMixShelf(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.weight(1f)) {
-                        androidx.compose.material3.Text(
+                        FSText(
                             text = mix.title,
                             color = FrostSoulTheme.colors.onSurface,
                             style = FrostSoulTheme.typography.label,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
-                        androidx.compose.material3.Text(
+                        FSText(
                             text = mix.description.ifBlank { "For today" },
                             color = FrostSoulTheme.colors.onSurfaceMuted,
                             fontSize = 12.sp,
@@ -830,7 +885,7 @@ private fun FrostSoulOfflineMixShelf(
                         highlighted = false,
                         modifier = Modifier.size(38.dp),
                     ) {
-                        androidx.compose.material3.Icon(
+                        FSIcon(
                             painter = painterResource(R.drawable.play),
                             contentDescription = "Play ${mix.title}",
                             tint = FrostSoulTheme.colors.accentBright,

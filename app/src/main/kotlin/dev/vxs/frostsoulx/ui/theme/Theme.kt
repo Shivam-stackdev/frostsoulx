@@ -187,14 +187,9 @@ fun ArchiveTuneTheme(
         LocalArchiveTuneFontPreference provides fontPreference,
         LocalArchiveTuneFontFamily provides resolvedFontFamily,
     ) {
-        MaterialExpressiveTheme(
-            colorScheme = animatedColorScheme,
-            motionScheme = motionScheme,
-            typography = typography,
-            shapes = expressiveShapes,
-            content = {
-                FrostSoulDesignSystem(content)
-            },
+        FrostSoulDesignSystem(
+            darkTheme = darkTheme,
+            content = content,
         )
     }
 }

@@ -362,23 +362,11 @@ fun BottomSheetPlayer(
             }
         }
 
-    val playerDesignStyle by rememberEnumPreference(
-        key = PlayerDesignStyleKey,
-        defaultValue = PlayerDesignStyle.FROSTSOUL,
-    )
-    val showPlayerVolumeBar by rememberPreference(
-        key = ShowPlayerVolumeBarKey,
-        defaultValue = true,
-    )
-
-    val storedPlayerBackground by rememberEnumPreference(
-        key = PlayerBackgroundStyleKey,
-        defaultValue = PlayerBackgroundStyle.DEFAULT,
-    )
-    val playerUsesFixedBackground =
-        playerDesignStyle == PlayerDesignStyle.V8 || playerDesignStyle == PlayerDesignStyle.V9
-    val playerBackground =
-        if (playerUsesFixedBackground) PlayerBackgroundStyle.DEFAULT else storedPlayerBackground
+    // FrostSoul is the single supported player surface. Legacy style preferences remain readable
+    // by older backup files, but they no longer change the active player implementation.
+    val playerDesignStyle = PlayerDesignStyle.FROSTSOUL
+    val showPlayerVolumeBar = true
+    val playerBackground = PlayerBackgroundStyle.DEFAULT
 
     // Custom background preferences (image + effects)
     val (playerCustomImageUri) = rememberPreference(PlayerCustomImageUriKey, "")
@@ -395,10 +383,7 @@ fun BottomSheetPlayer(
     var keyboardSkipMultiplier by remember { mutableStateOf(1) }
     var lastKeyboardTapTime by remember { mutableLongStateOf(0L) }
 
-    val playerButtonsStyle by rememberEnumPreference(
-        key = PlayerButtonsStyleKey,
-        defaultValue = PlayerButtonsStyle.DEFAULT,
-    )
+    val playerButtonsStyle = PlayerButtonsStyle.DEFAULT
 
     val isSystemInDarkTheme = isSystemInDarkTheme()
     val darkTheme by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
@@ -472,7 +457,7 @@ fun BottomSheetPlayer(
             defaultValue = 256,
         )
 
-    val sliderStyle by rememberEnumPreference(SliderStyleKey, SliderStyle.Standard)
+    val sliderStyle = SliderStyle.Standard
 
     LaunchedEffect(maxCanvasCacheSize) {
         CanvasArtworkPlaybackCache.setMaxSize(maxCanvasCacheSize)

@@ -50,7 +50,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -126,7 +125,7 @@ fun FSButton(
                 ).padding(horizontal = FrostSoulTheme.spacing.large, vertical = FrostSoulTheme.spacing.medium),
     ) {
         leading?.invoke()
-        androidx.compose.material3.Text(
+        FSText(
             text = label,
             style = FrostSoulTheme.typography.label,
             color = if (emphasized) Color(0xFF001416) else colors.onSurface,
@@ -274,7 +273,7 @@ fun FSListItem(
             modifier = Modifier.size(54.dp),
         )
         Column(modifier = Modifier.weight(1f)) {
-            androidx.compose.material3.Text(
+            FSText(
                 text = title,
                 color = if (isActive) colors.accentBright else colors.onSurface,
                 style = FrostSoulTheme.typography.body,
@@ -282,7 +281,7 @@ fun FSListItem(
                 overflow = TextOverflow.Ellipsis,
             )
             subtitle?.takeIf { it.isNotBlank() }?.let {
-                androidx.compose.material3.Text(
+                FSText(
                     text = it,
                     color = colors.onSurfaceMuted,
                     style = FrostSoulTheme.typography.bodyMuted,
@@ -332,7 +331,7 @@ fun FSAlbumCard(
                             .clip(CircleShape)
                             .background(FrostSoulTheme.colors.accentBright.copy(alpha = 0.92f)),
                 ) {
-                    Icon(
+                    FSIcon(
                         painter = painterResource(R.drawable.play),
                         contentDescription = "Play $title",
                         tint = Color(0xFF001416),
@@ -341,7 +340,7 @@ fun FSAlbumCard(
                 }
             }
             badge?.let {
-                androidx.compose.material3.Text(
+                FSText(
                     text = it,
                     color = Color(0xFF001416),
                     style = FrostSoulTheme.typography.overline,
@@ -355,7 +354,7 @@ fun FSAlbumCard(
                 )
             }
         }
-        androidx.compose.material3.Text(
+        FSText(
             text = title,
             color = FrostSoulTheme.colors.onSurface,
             style = FrostSoulTheme.typography.label,
@@ -363,7 +362,7 @@ fun FSAlbumCard(
             overflow = TextOverflow.Ellipsis,
         )
         subtitle?.let {
-            androidx.compose.material3.Text(
+            FSText(
                 text = it,
                 color = FrostSoulTheme.colors.onSurfaceMuted,
                 style = FrostSoulTheme.typography.bodyMuted,
@@ -398,7 +397,7 @@ fun FSArtistCard(
             showGlow = true,
             modifier = Modifier.size(112.dp),
         )
-        androidx.compose.material3.Text(
+        FSText(
             text = name,
             color = FrostSoulTheme.colors.onSurface,
             style = FrostSoulTheme.typography.label,
@@ -407,7 +406,7 @@ fun FSArtistCard(
             textAlign = TextAlign.Center,
         )
         subtitle?.let {
-            androidx.compose.material3.Text(
+            FSText(
                 text = it,
                 color = FrostSoulTheme.colors.onSurfaceMuted,
                 style = FrostSoulTheme.typography.bodyMuted,
@@ -434,7 +433,7 @@ fun FSSectionHeader(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             eyebrow?.let {
-                androidx.compose.material3.Text(
+                FSText(
                     text = it.uppercase(),
                     color = FrostSoulTheme.colors.accent,
                     style = FrostSoulTheme.typography.overline,
@@ -442,7 +441,7 @@ fun FSSectionHeader(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            androidx.compose.material3.Text(
+            FSText(
                 text = title,
                 color = FrostSoulTheme.colors.onSurface,
                 style = FrostSoulTheme.typography.sectionTitle,
@@ -451,7 +450,7 @@ fun FSSectionHeader(
             )
         }
         if (actionLabel != null && onAction != null) {
-            androidx.compose.material3.Text(
+            FSText(
                 text = actionLabel,
                 color = FrostSoulTheme.colors.accentBright,
                 style = FrostSoulTheme.typography.label,
@@ -473,9 +472,7 @@ fun FSChip(
     modifier: Modifier = Modifier,
 ) {
     val colors = FrostSoulTheme.colors
-    val shape = FrostSoulTheme.shapes.pill
-    androidx.compose.material3.Text(
-        text = label,
+    val shape = FrostSoulTheme.shapes.p        text = label,
         style = FrostSoulTheme.typography.label,
         color = if (selected) Color(0xFF001416) else colors.onSurfaceMuted,
         maxLines = 1,
@@ -601,14 +598,14 @@ fun FSNavigationBar(
                         ) { onItemClick(item, selected) }
                         .padding(vertical = 4.dp),
             ) {
-                androidx.compose.material3.Icon(
+                FSIcon(
                     painter = painterResource(if (selected) item.activeIcon else item.inactiveIcon),
                     contentDescription = item.label,
                     tint = if (selected) FrostSoulTheme.colors.accentBright else FrostSoulTheme.colors.onSurfaceMuted,
                     modifier = Modifier.size(22.dp),
                 )
                 Spacer(Modifier.height(2.dp))
-                androidx.compose.material3.Text(
+                FSText(
                     text = item.label,
                     color = if (selected) FrostSoulTheme.colors.accentBright else FrostSoulTheme.colors.onSurfaceMuted,
                     style = FrostSoulTheme.typography.overline,
@@ -640,7 +637,7 @@ private fun FrostSoulCenterNavigationAction(onClick: () -> Unit) {
             .frostSoulGlow(FrostSoulTheme.colors.accentBright, alpha = glowAlpha)
             .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }, onClick = onClick),
     ) {
-        Icon(
+        FSIcon(
             painter = painterResource(R.drawable.about_appbar),
             contentDescription = "Open FrostSoul player",
             tint = FrostSoulTheme.colors.accentBright,
@@ -680,7 +677,7 @@ fun FSTextField(
                 leading?.invoke()
                 Box(modifier = Modifier.weight(1f)) {
                     if (value.isBlank()) {
-                        androidx.compose.material3.Text(
+                        FSText(
                             text = placeholder,
                             color = colors.onSurfaceMuted,
                             style = FrostSoulTheme.typography.body,
@@ -711,9 +708,9 @@ fun FSDialog(
             modifier = modifier.widthIn(max = 420.dp),
             shape = FrostSoulTheme.shapes.extraLarge,
         ) {
-            androidx.compose.material3.Text(title, style = FrostSoulTheme.typography.title, color = FrostSoulTheme.colors.onSurface)
+            FSText(title, style = FrostSoulTheme.typography.title, color = FrostSoulTheme.colors.onSurface)
             Spacer(Modifier.height(FrostSoulTheme.spacing.small))
-            androidx.compose.material3.Text(message, style = FrostSoulTheme.typography.body, color = FrostSoulTheme.colors.onSurfaceMuted)
+            FSText(message, style = FrostSoulTheme.typography.body, color = FrostSoulTheme.colors.onSurfaceMuted)
             Spacer(Modifier.height(FrostSoulTheme.spacing.section))
             Row(horizontalArrangement = Arrangement.spacedBy(FrostSoulTheme.spacing.small), modifier = Modifier.fillMaxWidth()) {
                 if (dismissLabel != null) {
@@ -747,7 +744,7 @@ fun FSSnackbar(
         contentPadding = PaddingValues(horizontal = FrostSoulTheme.spacing.large, vertical = FrostSoulTheme.spacing.medium),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            androidx.compose.material3.Text(
+            FSText(
                 text = message,
                 style = FrostSoulTheme.typography.body,
                 color = FrostSoulTheme.colors.onSurface,
@@ -803,9 +800,9 @@ fun FSEmptyState(
             modifier = Modifier.size(88.dp).clip(CircleShape).background(FrostSoulTheme.colors.accent.copy(alpha = 0.12f)).frostSoulGlow(),
         ) { icon?.invoke() }
         Spacer(Modifier.height(FrostSoulTheme.spacing.large))
-        androidx.compose.material3.Text(title, color = FrostSoulTheme.colors.onSurface, style = FrostSoulTheme.typography.title)
+        FSText(title, color = FrostSoulTheme.colors.onSurface, style = FrostSoulTheme.typography.title)
         Spacer(Modifier.height(FrostSoulTheme.spacing.small))
-        androidx.compose.material3.Text(
+        FSText(
             text = message,
             color = FrostSoulTheme.colors.onSurfaceMuted,
             style = FrostSoulTheme.typography.body,

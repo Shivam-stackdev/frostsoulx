@@ -51,8 +51,8 @@ import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import dev.vxs.frostsoulx.ui.frostsoul.FSIcon as Icon
+import dev.vxs.frostsoulx.ui.frostsoul.FSText as Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -670,10 +670,42 @@ private fun FrostSoulAlbumPage(
                     )
                 }
             }
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            ) {
+                FSIconButton(
+                    painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
+                    contentDescription = if (uiState.track.isLiked) "Remove like" else "Like track",
+                    onClick = actions.onToggleLike,
+                    active = uiState.track.isLiked,
+                    compact = true,
+                )
+                FSIconButton(
+                    painter = painterResource(R.drawable.lyrics),
+                    contentDescription = "Open synchronized lyrics",
+                    onClick = onOpenLyrics,
+                    active = uiState.currentLyricLine != null,
+                    compact = true,
+                )
+                FSIconButton(
+                    painter = painterResource(R.drawable.bluetooth),
+                    contentDescription = "Open audio output",
+                    onClick = actions.onOpenAudioOutput,
+                    compact = true,
+                )
+                FSIconButton(
+                    painter = painterResource(R.drawable.more_vert),
+                    contentDescription = "Open player options",
+                    onClick = onOpenOptions,
+                    compact = true,
+                )
+            }
             FSPlayerControls(
                 state = uiState,
                 actions = actions,
-                modifier = Modifier.padding(top = 6.dp),
+                modifier = Modifier.padding(top = 2.dp),
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -282,6 +282,7 @@ import dev.vxs.frostsoulx.ui.screens.search.onlineSearchResultRoute
 import dev.vxs.frostsoulx.ui.screens.settings.DarkMode
 import dev.vxs.frostsoulx.ui.screens.settings.NavigationTab
 import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
+import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 import dev.vxs.frostsoulx.ui.theme.ColorSaver
 import dev.vxs.frostsoulx.ui.theme.DefaultThemeColor
 import dev.vxs.frostsoulx.ui.theme.extractThemeColor
@@ -826,7 +827,7 @@ class MainActivity : ComponentActivity() {
                         Modifier
                             .fillMaxSize()
                             .background(
-                                if (pureBlack) Color.Black else MaterialTheme.colorScheme.surface,
+                                if (pureBlack) Color.Black else FrostSoulTheme.colors.background,
                             ),
                 ) {
                     val focusManager = LocalFocusManager.current

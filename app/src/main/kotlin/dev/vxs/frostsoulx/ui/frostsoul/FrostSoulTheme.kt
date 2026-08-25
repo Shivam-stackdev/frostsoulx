@@ -13,7 +13,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ProvidableCompositionLocal
@@ -197,30 +196,32 @@ object FrostSoulTheme {
 }
 
 @Composable
-fun FrostSoulDesignSystem(content: @Composable () -> Unit) {
-    val materialColors = MaterialTheme.colorScheme
-    val materialTypography = MaterialTheme.typography
-    val tokens = remember(materialColors, materialTypography) {
-        DefaultFrostSoulTokens.copy(
-            colors = DefaultFrostSoulTokens.colors.copy(
-                accent = Color(0xFF00E676),
-                accentBright = Color(0xFF00E676),
-                accentMuted = Color(0xFF008542),
-                onBackground = materialColors.onSurface.copy(alpha = 0.96f),
-                onSurface = materialColors.onSurface.copy(alpha = 0.96f),
-                onSurfaceMuted = materialColors.onSurfaceVariant.copy(alpha = 0.82f),
-                error = materialColors.error,
-            ),
-            typography = DefaultFrostSoulTokens.typography.copy(
-                display = materialTypography.headlineLarge.copy(fontWeight = FontWeight.SemiBold),
-                title = materialTypography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
-                sectionTitle = materialTypography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                body = materialTypography.bodyMedium,
-                bodyMuted = materialTypography.bodyMedium,
-                label = materialTypography.labelLarge.copy(fontWeight = FontWeight.Medium),
-                overline = materialTypography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
-            ),
-        )
+fun FrostSoulDesignSystem(
+    darkTheme: Boolean = true,
+    content: @Composable () -> Unit,
+) {
+    val tokens = remember(darkTheme) {
+        if (darkTheme) {
+            DefaultFrostSoulTokens
+        } else {
+            DefaultFrostSoulTokens.copy(
+                colors = DefaultFrostSoulTokens.colors.copy(
+                    background = Color(0xFFF3F5F8),
+                    surface = Color.White,
+                    surfaceRaised = Color(0xFFF8F9FB),
+                    surfaceGlass = Color.White.copy(alpha = 0.96f),
+                    surfaceGlassStrong = Color.White,
+                    accent = Color(0xFF121417),
+                    accentBright = Color(0xFF121417),
+                    accentMuted = Color(0xFF5E636A),
+                    onBackground = Color(0xFF101216),
+                    onSurface = Color(0xFF101216),
+                    onSurfaceMuted = Color(0xFF656B73),
+                    outline = Color(0x1A101216),
+                    scrim = Color.Black.copy(alpha = 0.48f),
+                ),
+            )
+        }
     }
     androidx.compose.runtime.CompositionLocalProvider(LocalFrostSoulTokens provides tokens, content = content)
 }
