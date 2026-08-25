@@ -472,7 +472,9 @@ fun FSChip(
     modifier: Modifier = Modifier,
 ) {
     val colors = FrostSoulTheme.colors
-    val shape = FrostSoulTheme.shapes.p        text = label,
+    val shape = FrostSoulTheme.shapes.pill
+    FSText(
+        text = label,
         style = FrostSoulTheme.typography.label,
         color = if (selected) Color(0xFF001416) else colors.onSurfaceMuted,
         maxLines = 1,

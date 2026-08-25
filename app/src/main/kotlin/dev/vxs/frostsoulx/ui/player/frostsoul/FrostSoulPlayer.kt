@@ -70,6 +70,7 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
@@ -90,6 +91,7 @@ import coil3.toBitmap
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSChip
+import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 import dev.vxs.frostsoulx.ui.player.rememberDeviceMusicVolumeController
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
@@ -321,7 +323,11 @@ internal fun FSMiniPlayer(
         animationSpec = tween(220),
         label = "frostsoul-mini-player-progress",
     )
-    val backgroundColor = FrostSoulSurface
+    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
+    val backgroundColor = FrostSoulTheme.colors.surface
+    val primaryTextColor = if (isLightTheme) FrostSoulTheme.colors.onSurface else FrostSoulOnSurface
+    val mutedTextColor = if (isLightTheme) FrostSoulTheme.colors.onSurfaceMuted else FrostSoulOnSurfaceMuted
+    val progressColor = if (isLightTheme) FrostSoulTheme.colors.accentBright else palette.accent
 
     Box(
         modifier =
@@ -361,7 +367,7 @@ internal fun FSMiniPlayer(
                     Icon(
                         painter = painterResource(R.drawable.music_note),
                         contentDescription = null,
-                        tint = FrostSoulOnSurfaceMuted,
+                        tint = mutedTextColor,
                         modifier = Modifier.size(26.dp),
                     )
                 }
@@ -373,7 +379,7 @@ internal fun FSMiniPlayer(
             ) {
                 Text(
                     text = track.title,
-                    color = FrostSoulOnSurface,
+                    color = primaryTextColor,
                     fontSize = if (peeked) 15.sp else 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -381,7 +387,7 @@ internal fun FSMiniPlayer(
                 )
                 Text(
                     text = track.artist,
-                    color = FrostSoulOnSurfaceMuted,
+                    color = mutedTextColor,
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -390,7 +396,7 @@ internal fun FSMiniPlayer(
                 if (peeked && track.album.isNotBlank()) {
                     Text(
                         text = track.album,
-                        color = palette.accent.copy(alpha = 0.86f),
+                        color = progressColor.copy(alpha = 0.86f),
                         fontSize = 10.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -422,7 +428,7 @@ internal fun FSMiniPlayer(
                     .align(Alignment.BottomStart)
                     .fillMaxWidth(progress)
                     .height(if (peeked) 3.dp else 2.dp)
-                    .background(palette.accent),
+                    .background(progressColor),
         )
     }
 }
@@ -1130,20 +1136,21 @@ private fun FrostSoulDynamicBackground(
             Modifier
                 .fillMaxSize()
                 .drawWithCache {
-                    val topSurface = Color(0xFF101012)
+                    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
+                    val topSurface = if (isLightTheme) Color(0xFFF1F3F6) else Color(0xFF101012)
                     val lowerGlow =
                         Brush.verticalGradient(
                             colorStops = arrayOf(
                                 0f to topSurface,
                                 0.44f to topSurface,
-                                0.62f to palette.artworkSecondary.copy(alpha = 0.20f),
-                                0.80f to palette.artworkPrimary.copy(alpha = 0.58f),
-                                1f to palette.artworkPrimary.copy(alpha = 0.90f),
+                                0.62f to palette.artworkSecondary.copy(alpha = if (isLightTheme) 0.10f else 0.20f),
+                                0.80f to palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.24f else 0.58f),
+                                1f to palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.38f else 0.90f),
                             ),
                         )
                     val edgeGlow =
                         Brush.radialGradient(
-                            listOf(palette.artworkPrimary.copy(alpha = 0.20f), Color.Transparent),
+                            listOf(palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.10f else 0.20f), Color.Transparent),
                             center = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.86f),
                             radius = size.width * 0.88f,
                         )

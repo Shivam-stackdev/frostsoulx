@@ -52,6 +52,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -71,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.ui.frostsoul.FSIcon
+import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 
 @Composable
 internal fun FSGlassCard(
@@ -103,16 +105,14 @@ internal fun FSIconButton(
     enabled: Boolean = true,
     compact: Boolean = false,
 ) {
-    val iconTint =
-        when {
-            !enabled -> FrostSoulOnSurface.copy(alpha = 0.28f)
-            active -> Color.White
-            else -> FrostSoulOnSurface
-        }
+    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
+    val baseTint = if (isLightTheme) FrostSoulTheme.colors.onSurface else Color.White
+    val iconTint = if (enabled) baseTint else baseTint.copy(alpha = 0.28f)
     val background =
-        when {
-            active -> Color.White.copy(alpha = 0.14f)
-            else -> Color.White.copy(alpha = 0.08f)
+        if (active) {
+            baseTint.copy(alpha = if (isLightTheme) 0.10f else 0.14f)
+        } else {
+            if (isLightTheme) FrostSoulTheme.colors.surfaceRaised else Color.White.copy(alpha = 0.08f)
         }
     val buttonSize = if (compact) 42.dp else 50.dp
 

@@ -73,6 +73,7 @@ import dev.vxs.frostsoulx.ui.component.MenuState
 import dev.vxs.frostsoulx.ui.frostsoul.FSAlbumCard
 import dev.vxs.frostsoulx.ui.frostsoul.FSIcon
 import dev.vxs.frostsoulx.ui.frostsoul.FSText
+import dev.vxs.frostsoulx.ui.frostsoul.FSText as Text
 import dev.vxs.frostsoulx.ui.frostsoul.FSArtistCard
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSChip
