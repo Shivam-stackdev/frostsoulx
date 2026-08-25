@@ -42,6 +42,9 @@ class ArchiveTuneMediaNotificationProvider(
             setSmallIcon(smallIconResId)
         }
 
+    private val smallRemoteViews by lazy {
+        RemoteViews(context.packageName, R.layout.notification_player_small)
+    }
     private val bigRemoteViews by lazy {
         RemoteViews(context.packageName, R.layout.notification_player_big)
     }
@@ -70,6 +73,10 @@ class ArchiveTuneMediaNotificationProvider(
             NotificationCompat.Builder(context, original)
                 .setContentText(lastLyricPrimary)
                 .setSubText(lastLyricSecondary)
+                .setStyle(NotificationCompat.DecoratedMediaCustomViewStyle())
+                .setCustomContentView(smallRemoteViews.apply {
+                    setTextViewText(R.id.notification_lyrics, lastLyricPrimary)
+                })
                 .setCustomBigContentView(bigRemoteViews.apply {
                     setTextViewText(R.id.notification_lyrics, lastLyricLine)
                 })
@@ -172,6 +179,7 @@ class ArchiveTuneMediaNotificationProvider(
         lastLyricPrimary = current
         lastLyricSecondary = normalizedNext
         lastLyricLine = combined
+        smallRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricPrimary)
         bigRemoteViews.setTextViewText(R.id.notification_lyrics, lastLyricLine)
         return true
     }
