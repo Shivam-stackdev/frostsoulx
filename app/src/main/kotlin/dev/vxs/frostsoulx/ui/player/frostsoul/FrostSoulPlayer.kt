@@ -1131,12 +1131,13 @@ private const val PaletteCacheCapacity = 24
 private fun FrostSoulDynamicBackground(
     palette: FrostSoulPalette,
 ) {
+    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .drawWithCache {
-                    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
+
                     val topSurface = if (isLightTheme) Color(0xFFF1F3F6) else Color(0xFF101012)
                     val lowerGlow =
                         Brush.verticalGradient(
