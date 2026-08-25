@@ -66,8 +66,6 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import dev.vxs.frostsoulx.extensions.togglePlayPause
 import dev.vxs.frostsoulx.ui.player.frostsoul.FSGlassCard
 import dev.vxs.frostsoulx.ui.player.frostsoul.FSIconButton
-import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulCyan
-import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulCyanBright
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulOnSurface
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulOnSurfaceMuted
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulPage
@@ -94,7 +92,6 @@ fun MiniPlayer(
     position: Long,
     duration: Long,
     modifier: Modifier = Modifier,
-    pureBlack: Boolean,
     isPairedWithNavigation: Boolean = false,
     onQueueClick: (() -> Unit)? = null,
     onOpenFullPlayer: () -> Unit = {},
@@ -254,14 +251,12 @@ fun MiniPlayer(
             positionMs = position,
             durationMs = duration,
             isPlaying = isPlaying,
-            isLiked = currentSong?.song?.liked == true,
             palette = palette,
             height = animatedHeight,
             artworkSize = animatedArtworkSize,
             peeked = peeked,
             shape = shape,
             interactionSource = interactionSource,
-            pureBlack = pureBlack,
             onCardClick = {
                 onSmartPeekChanged(false)
                 onOpenFullPlayer()
@@ -287,7 +282,7 @@ fun MiniPlayer(
                 ) {
                     Text(
                         text = "QUICK MENU",
-                        color = FrostSoulCyanBright,
+                        color = Color.White,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 1.4.sp,

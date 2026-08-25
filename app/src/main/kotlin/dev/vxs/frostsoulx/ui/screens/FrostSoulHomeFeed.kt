@@ -437,31 +437,50 @@ private fun FrostSoulRecommendationList(
     mediaMetadata: MediaMetadata?,
     playerConnection: PlayerConnection,
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
+    LazyRow(
+        contentPadding = FrostSoulShelfItemPadding,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        songs.forEachIndexed { index, song ->
+        items(songs, key = { "quick_card_${it.id}" }) { song ->
+            val isCurrent = song.id == mediaMetadata?.id
             FSGlassCard(
-                modifier = Modifier.fillMaxWidth().height(70.dp),
-                shape = FrostSoulTheme.shapes.large,
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp),
+                modifier = Modifier.width(148.dp).height(184.dp),
+                shape = FrostSoulTheme.shapes.medium,
+                contentPadding = PaddingValues(10.dp),
                 onClick = {
-                    if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
+                    if (isCurrent) playerConnection.player.togglePlayPause()
                     else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
                 },
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    AsyncImage(model = song.song.thumbnailUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(52.dp).clip(FrostSoulTheme.shapes.medium))
-                    Column(modifier = Modifier.weight(1f).padding(horizontal = 12.dp)) {
-                        Text(song.title, color = FrostSoulTheme.colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
-                            FSChip(label = if (index == 0) "TRENDING" else "MIX", selected = false, onClick = {})
-                            Text("  ${song.artists.firstOrNull()?.name.orEmpty()}", color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-                    }
-                    androidx.compose.material3.Icon(painterResource(R.drawable.favorite_border), contentDescription = "Like ${song.title}", tint = FrostSoulTheme.colors.onSurfaceMuted, modifier = Modifier.size(20.dp))
-                }
+                AsyncImage(
+                    model = song.song.thumbnailUrl,
+                    contentDescription = "Artwork for ${song.title}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxWidth().height(108.dp).clip(FrostSoulTheme.shapes.small),
+                )
+                Text(
+                    text = song.title,
+                    color = FrostSoulTheme.colors.onSurface,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                Text(
+                    text = song.artists.firstOrNull()?.name.orEmpty(),
+                    color = FrostSoulTheme.colors.onSurfaceMuted,
+                    fontSize = 11.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 3.dp),
+                )
+                androidx.compose.material3.Icon(
+                    painter = painterResource(if (isCurrent && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play),
+                    contentDescription = if (isCurrent) "Pause ${song.title}" else "Play ${song.title}",
+                    tint = FrostSoulTheme.colors.onSurface,
+                    modifier = Modifier.size(18.dp).padding(top = 3.dp),
+                )
             }
         }
     }

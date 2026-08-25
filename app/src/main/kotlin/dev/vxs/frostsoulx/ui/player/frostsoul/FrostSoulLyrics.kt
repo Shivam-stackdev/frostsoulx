@@ -222,7 +222,7 @@ private fun FrostSoulKaraokeLine(
                 wordProgress = wordProgress,
                 lineProgress = lineProgress,
                 inactiveColor = lineColor,
-                activeColor = FrostSoulCyan,
+                activeColor = Color.White,
                 glowStrength = emphasis,
             )
         }

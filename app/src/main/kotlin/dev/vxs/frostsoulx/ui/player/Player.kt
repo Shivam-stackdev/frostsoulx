@@ -1010,7 +1010,6 @@ fun BottomSheetPlayer(
             MiniPlayer(
                 position = position,
                 duration = duration,
-                pureBlack = pureBlack,
                 isPairedWithNavigation = isMiniPlayerPairedWithNavigation,
                 onQueueClick = openQueue,
                 onOpenFullPlayer = state::expandSoft,

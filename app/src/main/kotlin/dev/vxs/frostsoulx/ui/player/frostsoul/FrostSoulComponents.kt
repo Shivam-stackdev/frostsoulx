@@ -76,24 +76,19 @@ import dev.vxs.frostsoulx.R
 @Composable
 internal fun FSGlassCard(
     modifier: Modifier = Modifier,
-    accent: Color = FrostSoulCyan,
+    accent: Color = Color.White,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    val shape = RoundedCornerShape(28.dp)
     Box(
         modifier =
             modifier
-                .clip(RoundedCornerShape(28.dp))
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.105f),
-                            FrostSoulSurfaceElevated.copy(alpha = 0.88f),
-                        ),
-                    ),
-                ).border(
+                .clip(shape)
+                .background(FrostSoulSurface.copy(alpha = 0.98f))
+                .border(
                     width = 1.dp,
-                    color = accent.copy(alpha = 0.26f),
-                    shape = RoundedCornerShape(28.dp),
+                    color = accent.copy(alpha = 0.16f),
+                    shape = shape,
                 ),
         content = content,
     )
@@ -112,12 +107,12 @@ internal fun FSIconButton(
     val iconTint =
         when {
             !enabled -> FrostSoulOnSurface.copy(alpha = 0.28f)
-            active -> FrostSoulCyanBright
+            active -> Color.White
             else -> FrostSoulOnSurface
         }
     val background =
         when {
-            active -> FrostSoulCyan.copy(alpha = 0.20f)
+            active -> Color.White.copy(alpha = 0.14f)
             else -> Color.White.copy(alpha = 0.08f)
         }
     val buttonSize = if (compact) 42.dp else 50.dp
@@ -245,7 +240,8 @@ internal fun FSAlbumArt(
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val discRadius = size.minDimension * 0.14f
                     drawCircle(color = Color.Black.copy(alpha = 0.72f), radius = discRadius, center = center)
-                    drawCircle(color = palette.accent.copy(alpha = 0.78f), radius = discRadius * 0.34f, center = center)
+                    drawCircle(color = Color.White.copy(alpha = 0.14f),
+ radius = discRadius * 0.34f, center = center)
                     drawCircle(color = Color.Black.copy(alpha = 0.9f), radius = discRadius * 0.11f, center = center)
                 }
             }
@@ -266,7 +262,7 @@ internal fun FSAlbumArt(
                         cap = StrokeCap.Round,
                     )
                     drawLine(
-                        color = palette.accent.copy(alpha = 0.72f),
+                        color = Color.White.copy(alpha = 0.28f),
                         start = pivot,
                         end = armEnd,
                         strokeWidth = size.minDimension * 0.007f,
@@ -285,7 +281,7 @@ internal fun FSSeekbar(
     durationMs: Long,
     onSeek: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    accent: Color = FrostSoulCyan,
+    accent: Color = Color.White,
     isEnabled: Boolean = durationMs > 0L,
 ) {
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
@@ -346,7 +342,7 @@ internal fun FSSeekbar(
                 cap = StrokeCap.Round,
             )
             drawCircle(
-                color = FrostSoulCyanBright,
+                color = Color.White,
                 radius = if (isDragging) 7.dp.toPx() else 5.dp.toPx(),
                 center = activeEnd,
             )
@@ -361,7 +357,7 @@ internal fun FSTopBar(
     pageCount: Int,
     onPageSelected: (Int) -> Unit,
     onDismiss: () -> Unit,
-    onOpenQueue: () -> Unit,
+    onOpenOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -387,9 +383,9 @@ internal fun FSTopBar(
             )
         }
         FSIconButton(
-            painter = painterResource(R.drawable.queue_music),
-            contentDescription = "Open playback queue",
-            onClick = onOpenQueue,
+            painter = painterResource(R.drawable.more_vert),
+            contentDescription = "Open player options",
+            onClick = onOpenOptions,
             compact = true,
         )
     }

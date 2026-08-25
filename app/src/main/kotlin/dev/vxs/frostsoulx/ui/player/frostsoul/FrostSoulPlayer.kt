@@ -20,7 +20,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.border
@@ -46,6 +45,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,11 +65,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
@@ -145,9 +145,7 @@ internal fun FrostSoulPlayer(
                 },
     ) {
         FrostSoulDynamicBackground(
-            artworkUrl = uiState.track.artworkUrl,
             palette = uiState.palette,
-            pageOffset = pagerState.currentPageOffsetFraction,
         )
         Column(
             modifier =
@@ -164,7 +162,7 @@ internal fun FrostSoulPlayer(
                     scope.launch { pagerState.animateScrollToPage(targetPage) }
                 },
                 onDismiss = actions.onDismiss,
-                onOpenQueue = { queueVisible = true },
+                onOpenOptions = { optionsVisible = true },
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
             )
             HorizontalPager(
@@ -300,14 +298,12 @@ internal fun FSMiniPlayer(
     positionMs: Long,
     durationMs: Long,
     isPlaying: Boolean,
-    isLiked: Boolean,
     palette: FrostSoulPalette,
     height: androidx.compose.ui.unit.Dp,
     artworkSize: androidx.compose.ui.unit.Dp,
     peeked: Boolean,
     shape: RoundedCornerShape,
     interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource,
-    pureBlack: Boolean,
     onCardClick: () -> Unit,
     onLongPress: () -> Unit,
     onTogglePlayPause: () -> Unit,
@@ -325,7 +321,7 @@ internal fun FSMiniPlayer(
         animationSpec = tween(220),
         label = "frostsoul-mini-player-progress",
     )
-    val backgroundColor = if (pureBlack) Color.Black else FrostSoulSurfaceElevated
+    val backgroundColor = FrostSoulSurface
 
     Box(
         modifier =
@@ -347,24 +343,6 @@ internal fun FSMiniPlayer(
                     onLongClick = onLongPress,
                 ),
     ) {
-        if (!track.artworkUrl.isNullOrBlank()) {
-            AsyncImage(
-                model = track.artworkUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = 1.14f; scaleY = 1.14f }.blur(26.dp).alpha(0.32f),
-            )
-        }
-        Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(Color.Black.copy(alpha = 0.76f), backgroundColor.copy(alpha = 0.94f)),
-                        ),
-                    ),
-        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxSize().padding(horizontal = 9.dp, vertical = 6.dp),
@@ -484,7 +462,7 @@ internal fun FSPlayerControls(
             ) {
                 Text(
                     text = badge,
-                    color = FrostSoulCyanBright,
+                    color = Color.White,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.2.sp,
@@ -541,7 +519,7 @@ private fun FSPlayButton(
                 }.clip(androidx.compose.foundation.shape.CircleShape)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(FrostSoulCyanBright, accent, Color(0xFF00636E)),
+                        colors = listOf(Color.White, Color(0xFFE2E2E2), Color(0xFF777777)),
                     ),
                 ).clickable(onClick = onClick),
     ) {
@@ -584,7 +562,7 @@ internal fun FrostSoulPagerDots(
                             shadowElevation = 10.dp.toPx() * selection
                         }
                         .clip(androidx.compose.foundation.shape.CircleShape)
-                        .background(if (selection > 0.5f) FrostSoulCyanBright else FrostSoulOnSurfaceMuted)
+                        .background(if (selection > 0.5f) Color.White else Color.White.copy(alpha = 0.34f))
                         .clickable { onPageSelected(index) },
             )
         }
@@ -813,7 +791,7 @@ private fun FrostSoulPlayerOptionsSheet(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "PLAYER OPTIONS",
-                        color = FrostSoulCyanBright,
+                        color = Color.White,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 1.7.sp,
@@ -854,7 +832,7 @@ private fun FrostSoulPlayerOptionsSheet(
                         Icon(
                             painter = painterResource(icon),
                             contentDescription = null,
-                            tint = if (actionable) FrostSoulCyanBright else FrostSoulOnSurface,
+                            tint = if (actionable) Color.White else FrostSoulOnSurface,
                             modifier = Modifier.size(22.dp),
                         )
                         Column(modifier = Modifier.padding(start = 12.dp)) {
@@ -886,10 +864,10 @@ private fun FrostSoulRecommendationsPage(
     ) {
         Text(
             text = "RECOMMENDATIONS",
-            color = FrostSoulCyanBright,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.5.sp,
+                    color = Color.White.copy(alpha = 0.78f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 1.5.sp,
         )
         Text(
             text = "Continue with your listening queue",
@@ -903,41 +881,46 @@ private fun FrostSoulRecommendationsPage(
             fontSize = 13.sp,
             lineHeight = 19.sp,
         )
-        FSGlassCard(
-            accent = uiState.palette.accent,
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth().weight(1f),
         ) {
-            FSQueue(
-                title = "",
-                queue = recommendationQueue,
-                onSelect = { compactIndex ->
-                    recommendationQueue.getOrNull(compactIndex)?.let { actions.onSelectQueueItem(it.index) }
-                },
-                modifier = Modifier.fillMaxSize(),
-            )
+            gridItems(recommendationQueue, key = { "recommendation_${it.index}_${it.id}" }) { item ->
+                FSGlassCard(
+                    accent = Color.White.copy(alpha = 0.12f),
+                    modifier = Modifier.fillMaxWidth().height(184.dp).clickable { actions.onSelectQueueItem(item.index) },
+                ) {
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        AsyncImage(
+                            model = item.artworkUrl,
+                            contentDescription = "Artwork for ${item.title}",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxWidth().height(112.dp).clip(RoundedCornerShape(18.dp)),
+                        )
+                        Text(
+                            text = item.title,
+                            color = FrostSoulOnSurface,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
+                        Text(
+                            text = item.artist,
+                            color = FrostSoulOnSurfaceMuted,
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 3.dp),
+                        )
+                    }
+                }
+            }
         }
-    }
-}
-
-@Composable
-private fun FrostSoulInfoRow(
-    label: String,
-    value: String,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-        Text(
-            text = label.uppercase(),
-            color = FrostSoulOnSurfaceMuted,
-            fontSize = 10.sp,
-            letterSpacing = 1.2.sp,
-        )
-        Text(
-            text = value,
-            color = FrostSoulOnSurface,
-            fontSize = 16.sp,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
     }
 }
 
@@ -956,7 +939,7 @@ internal fun FSQueue(
             item {
                 Text(
                     text = title.uppercase(),
-                    color = FrostSoulCyanBright,
+                    color = Color.White,
                     fontSize = 12.sp,
                     letterSpacing = 1.7.sp,
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 14.dp),
@@ -985,7 +968,7 @@ private fun FrostSoulQueueRow(
     onClick: () -> Unit,
 ) {
     FSGlassCard(
-        accent = if (item.isCurrent) FrostSoulCyanBright else FrostSoulCyan,
+        accent = if (item.isCurrent) Color.White else Color.White,
         modifier =
             Modifier
                 .fillMaxWidth()
@@ -1001,11 +984,11 @@ private fun FrostSoulQueueRow(
                     Modifier
                         .size(30.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(if (item.isCurrent) FrostSoulCyan.copy(alpha = 0.26f) else Color.White.copy(alpha = 0.06f)),
+                        .background(if (item.isCurrent) Color.White.copy(alpha = 0.26f) else Color.White.copy(alpha = 0.06f)),
             ) {
                 Text(
                     text = if (item.isCurrent) "•" else (item.index + 1).toString(),
-                    color = if (item.isCurrent) FrostSoulCyanBright else FrostSoulOnSurfaceMuted,
+                    color = if (item.isCurrent) Color.White else FrostSoulOnSurfaceMuted,
                     fontSize = if (item.isCurrent) 24.sp else 12.sp,
                     fontWeight = FontWeight.Bold,
                 )
@@ -1088,9 +1071,9 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
                             PlayerColorExtractor.extractGradientColors(nativePalette, Color.Black.toArgb())
                         }
                     FrostSoulPalette(
-                        artworkPrimary = colors.firstOrNull() ?: FrostSoulCyan,
+                        artworkPrimary = colors.firstOrNull() ?: Color.White,
                         artworkSecondary = colors.getOrElse(1) { FrostSoulSurfaceElevated },
-                        accent = FrostSoulCyan,
+                        accent = Color.White,
                     )
                 }
             } catch (error: CancellationException) {
@@ -1108,80 +1091,37 @@ private const val PaletteCacheCapacity = 24
 
 @Composable
 private fun FrostSoulDynamicBackground(
-    artworkUrl: String?,
     palette: FrostSoulPalette,
-    pageOffset: Float,
 ) {
-    AnimatedContent(
-        targetState = artworkUrl,
-        transitionSpec = { fadeIn() togetherWith fadeOut() },
-        label = "fs-background-artwork",
-        modifier = Modifier.fillMaxSize(),
-    ) { art ->
-        if (!art.isNullOrBlank()) {
-            Image(
-                painter = rememberAsyncImagePainterCompat(art),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            scaleX = 1.18f
-                            scaleY = 1.18f
-                            translationX = pageOffset * 28f
-                        }.blur(52.dp)
-                        .alpha(0.10f),
-            )
-        }
-    }
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .drawWithCache {
-                    val primaryGlow =
-                        Brush.radialGradient(
-                            listOf(palette.artworkPrimary.copy(alpha = 0.36f), Color.Transparent),
-                            center = androidx.compose.ui.geometry.Offset(size.width * 0.16f, size.height * 0.20f),
-                            radius = size.width * 0.92f,
-                        )
-                    val cyanGlow =
-                        Brush.radialGradient(
-                            listOf(FrostSoulCyan.copy(alpha = 0.23f), Color.Transparent),
-                            center = androidx.compose.ui.geometry.Offset(size.width * 0.88f, size.height * 0.68f),
-                            radius = size.width * 0.80f,
-                        )
-                    onDrawBehind {
-                        drawRect(Color(0xFF1E1E1E))
-                        drawRect(primaryGlow)
-                        drawRect(cyanGlow)
-                        drawRect(
-                            Brush.verticalGradient(
-                                colorStops = arrayOf(
-                                    0f to Color.Transparent,
-                                    0.68f to Color.Transparent,
-                                    1f to palette.artworkSecondary.copy(alpha = 0.86f),
-                                ),
+                    val topSurface = Color(0xFF101012)
+                    val lowerGlow =
+                        Brush.verticalGradient(
+                            colorStops = arrayOf(
+                                0f to topSurface,
+                                0.44f to topSurface,
+                                0.62f to palette.artworkSecondary.copy(alpha = 0.20f),
+                                0.80f to palette.artworkPrimary.copy(alpha = 0.58f),
+                                1f to palette.artworkPrimary.copy(alpha = 0.90f),
                             ),
                         )
+                    val edgeGlow =
+                        Brush.radialGradient(
+                            listOf(palette.artworkPrimary.copy(alpha = 0.20f), Color.Transparent),
+                            center = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.86f),
+                            radius = size.width * 0.88f,
+                        )
+                    onDrawBehind {
+                        drawRect(topSurface)
+                        drawRect(lowerGlow)
+                        drawRect(edgeGlow)
                     }
                 },
     )
-}
-
-@Composable
-private fun rememberAsyncImagePainterCompat(model: String): Painter {
-    val context = LocalContext.current
-    val request =
-        remember(model, context) {
-            ImageRequest
-                .Builder(context)
-                .data(model)
-                .size(Size(768, 768))
-                .build()
-        }
-    return coil3.compose.rememberAsyncImagePainter(model = request)
 }
 
 
@@ -1206,7 +1146,7 @@ private fun FrostSoulSongDetailsPage(
                 )
                 Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
                     Text(track.title, color = FrostSoulOnSurface, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Text(track.artist, color = FrostSoulCyanBright, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
+                    Text(track.artist, color = Color.White, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
                     Text(track.album.ifBlank { "Single release" }, color = FrostSoulOnSurfaceMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
                 }
             }
@@ -1221,7 +1161,7 @@ private fun FrostSoulSongDetailsPage(
         item {
             FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(16.dp)) {
-                    Text("TRACK CREDITS", color = FrostSoulCyanBright, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+                    Text("TRACK CREDITS", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
                     FrostSoulDetailRow("Artist", track.artist)
                     FrostSoulDetailRow("Album", track.album.ifBlank { "Single release" })
                     FrostSoulDetailRow("Duration", track.durationMs.asFrostSoulTime())
@@ -1232,7 +1172,7 @@ private fun FrostSoulSongDetailsPage(
         val related = uiState.queue.filterNot { it.isCurrent }.take(8)
         if (related.isNotEmpty()) {
             item {
-                Text("PEOPLE WHO LIKE THIS ALSO LIKE", color = FrostSoulCyanBright, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+                Text("PEOPLE WHO LIKE THIS ALSO LIKE", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
             }
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -1253,7 +1193,7 @@ private fun FrostSoulSongDetailsPage(
         item {
             FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
-                    Text("FEATURED VIDEOS", color = FrostSoulCyanBright, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+                    Text("FEATURED VIDEOS", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
                     Text("Video highlights will appear here when available for this track.", color = FrostSoulOnSurfaceMuted, fontSize = 13.sp, lineHeight = 19.sp)
                 }
             }

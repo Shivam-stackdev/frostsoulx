@@ -11,8 +11,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import dev.vxs.frostsoulx.models.MediaMetadata
 
-internal val FrostSoulCyan = Color(0xFF00E676)
-internal val FrostSoulCyanBright = Color(0xFF00E676)
 internal val FrostSoulSurface = Color(0xFF1E1E1E)
 internal val FrostSoulSurfaceElevated = Color(0xFF242424)
 internal val FrostSoulOnSurface = Color(0xFFFDFDFD)
@@ -20,9 +18,9 @@ internal val FrostSoulOnSurfaceMuted = Color(0xFFA5A5A5)
 
 @Immutable
 internal data class FrostSoulPalette(
-    val artworkPrimary: Color = FrostSoulCyan,
-    val artworkSecondary: Color = Color(0xFF12494F),
-    val accent: Color = FrostSoulCyan,
+    val artworkPrimary: Color = Color(0xFF8A8A8A),
+    val artworkSecondary: Color = Color(0xFF30262B),
+    val accent: Color = Color.White,
 ) {
     companion object {
         val Default = FrostSoulPalette()
