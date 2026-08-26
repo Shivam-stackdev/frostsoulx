@@ -26,6 +26,7 @@ import dev.vxs.frostsoulx.extensions.metadata
 import dev.vxs.frostsoulx.extensions.togglePlayPause
 import dev.vxs.frostsoulx.extensions.toggleRepeatMode
 import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.constants.PlayerDesignStyle
 import dev.vxs.frostsoulx.playback.PlayerConnection
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulPlayer
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulPlayerActions
@@ -37,6 +38,7 @@ import dev.vxs.frostsoulx.ui.player.frostsoul.rememberFrostSoulPalette
 @Composable
 internal fun FrostSoulPlayerAdapter(
     mediaMetadata: MediaMetadata,
+    playerDesignStyle: PlayerDesignStyle = PlayerDesignStyle.FROSTSOUL,
     positionMs: Long,
     durationMs: Long,
     isPlaying: Boolean,
@@ -157,6 +159,7 @@ internal fun FrostSoulPlayerAdapter(
     FrostSoulPlayer(
         uiState = uiState,
         actions = actions,
+        playerDesignStyle = playerDesignStyle,
         modifier = modifier,
     )
 }

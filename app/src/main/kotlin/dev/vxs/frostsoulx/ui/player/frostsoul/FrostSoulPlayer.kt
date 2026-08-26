@@ -110,6 +110,7 @@ import java.util.LinkedHashMap
 internal fun FrostSoulPlayer(
     uiState: FrostSoulPlayerUiState,
     actions: FrostSoulPlayerActions,
+    playerDesignStyle: dev.vxs.frostsoulx.constants.PlayerDesignStyle = dev.vxs.frostsoulx.constants.PlayerDesignStyle.FROSTSOUL,
     modifier: Modifier = Modifier,
 ) {
     // QQ-style pager: Recommendations stay on the left, Main Player in the center, Lyrics on the right.
@@ -219,12 +220,21 @@ internal fun FrostSoulPlayer(
                             )
 
                         FrostSoulPage.MainPlayer ->
-                            FrostSoulAlbumPage(
-                                uiState = uiState,
-                                actions = actions,
-                                onOpenQueue = { queueVisible = true },
-                                onOpenOptions = actions.onOpenOptions,
-                            )
+                            if (playerDesignStyle == dev.vxs.frostsoulx.constants.PlayerDesignStyle.ARTWORK_BLUR) {
+                                FrostSoulArtworkBlurAlbumPage(
+                                    uiState = uiState,
+                                    actions = actions,
+                                    onOpenQueue = { queueVisible = true },
+                                    onOpenOptions = actions.onOpenOptions,
+                                )
+                            } else {
+                                FrostSoulAlbumPage(
+                                    uiState = uiState,
+                                    actions = actions,
+                                    onOpenQueue = { queueVisible = true },
+                                    onOpenOptions = actions.onOpenOptions,
+                                )
+                            }
                         FrostSoulPage.Recommendations -> FrostSoulRecommendationsPage(uiState = uiState, actions = actions)
                     }
                 }
@@ -684,6 +694,143 @@ private fun FrostSoulAlbumPage(
                     modifier = Modifier.padding(top = 2.dp),
             )
         }
+    }
+}
+
+@Composable
+private fun FrostSoulArtworkBlurAlbumPage(
+    uiState: FrostSoulPlayerUiState,
+    actions: FrostSoulPlayerActions,
+    onOpenQueue: () -> Unit,
+    onOpenOptions: () -> Unit,
+) {
+    val artworkShape = RoundedCornerShape(24.dp)
+    Column(
+        modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier.fillMaxWidth().height(332.dp).clip(artworkShape),
+            ) {
+                if (!uiState.track.artworkUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = uiState.track.artworkUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().blur(48.dp).alpha(0.82f),
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxSize().background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    uiState.palette.artworkPrimary.copy(alpha = 0.30f),
+                                    uiState.palette.artworkSecondary.copy(alpha = 0.74f),
+                                ),
+                            ),
+                        ),
+                    )
+                    AsyncImage(
+                        model = uiState.track.artworkUrl,
+                        contentDescription = "Album artwork",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(310.dp)
+                            .align(Alignment.Center)
+                            .clip(RoundedCornerShape(18.dp)),
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxSize().background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.06f),
+                                    Color.Black.copy(alpha = 0.76f),
+                                ),
+                            ),
+                        ),
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize().background(
+                            Brush.verticalGradient(
+                                colors = listOf(uiState.palette.artworkPrimary, uiState.palette.artworkSecondary),
+                            ),
+                        ),
+                    )
+                }
+                Text(
+                    text = uiState.track.album.ifBlank { "Now playing" },
+                    color = Color.White.copy(alpha = 0.82f),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 1.3.sp,
+                    modifier = Modifier.align(Alignment.BottomStart).padding(18.dp),
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 16.dp),
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = uiState.track.title,
+                        color = FrostSoulOnSurface,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = uiState.track.artist,
+                        color = FrostSoulOnSurfaceMuted,
+                        fontSize = 15.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+                FSIconButton(
+                    painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
+                    contentDescription = if (uiState.track.isLiked) "Remove from favorites" else "Add to favorites",
+                    onClick = actions.onToggleLike,
+                    active = uiState.track.isLiked,
+                    compact = true,
+                    modifier = Modifier.padding(start = 4.dp),
+                )
+                FrostSoulOutputDeviceButton(
+                    device = uiState.outputDevice,
+                    onClick = actions.onOpenAudioOutput,
+                )
+                FSIconButton(
+                    painter = painterResource(R.drawable.more_vert),
+                    contentDescription = "Open player options",
+                    onClick = onOpenOptions,
+                    compact = true,
+                    modifier = Modifier.padding(start = 4.dp),
+                )
+            }
+
+            uiState.currentLyricLine?.takeIf { it.isNotBlank() }?.let { lyric ->
+                Text(
+                    text = lyric,
+                    color = FrostSoulOnSurfaceMuted,
+                    fontSize = 16.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                )
+            }
+        }
+
+        FSPlayerControls(
+            state = uiState,
+            actions = actions,
+            onOpenQueue = onOpenQueue,
+            modifier = Modifier.padding(top = 18.dp),
+        )
     }
 }
 

@@ -654,6 +654,7 @@ enum class PlayerDesignStyle {
     V8,
     V9,
     FROSTSOUL,
+    ARTWORK_BLUR,
 }
 
 enum class PlayerBackgroundStyle {

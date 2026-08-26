@@ -529,7 +529,7 @@ fun Queue(
                     )
                 }
 
-                PlayerDesignStyle.V4, PlayerDesignStyle.FROSTSOUL -> {
+                PlayerDesignStyle.V4, PlayerDesignStyle.FROSTSOUL, PlayerDesignStyle.ARTWORK_BLUR -> {
                     QueueCollapsedContentV4(
                         showCodecOnPlayer = showCodecOnPlayer,
                         currentFormat = currentFormat,

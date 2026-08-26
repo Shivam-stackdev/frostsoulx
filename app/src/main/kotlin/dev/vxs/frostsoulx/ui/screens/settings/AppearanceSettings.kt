@@ -77,6 +77,8 @@ import dev.vxs.frostsoulx.constants.ForceHighRefreshRateKey
 import dev.vxs.frostsoulx.constants.GridItemSize
 import dev.vxs.frostsoulx.constants.GridItemsSizeKey
 import dev.vxs.frostsoulx.constants.HidePlayerThumbnailKey
+import dev.vxs.frostsoulx.constants.PlayerDesignStyle
+import dev.vxs.frostsoulx.constants.PlayerDesignStyleKey
 import dev.vxs.frostsoulx.constants.LibraryFilter
 import dev.vxs.frostsoulx.constants.LyricsBackgroundStyle
 import dev.vxs.frostsoulx.constants.LyricsBackgroundStyleKey
@@ -120,6 +122,11 @@ fun AppearanceSettings(navController: NavController) {
         rememberPreference(
             ShowPlayerVolumeBarKey,
             defaultValue = true,
+        )
+    val (playerDesignStyle, onPlayerDesignStyleChange) =
+        rememberEnumPreference(
+            PlayerDesignStyleKey,
+            defaultValue = PlayerDesignStyle.FROSTSOUL,
         )
     val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
         rememberPreference(
@@ -262,6 +269,13 @@ fun AppearanceSettings(navController: NavController) {
             )
         }
     val lyricsBackground = configuredLyricsBackground
+    val availablePlayerDesignStyles =
+        remember {
+            listOf(
+                PlayerDesignStyle.FROSTSOUL,
+                PlayerDesignStyle.ARTWORK_BLUR,
+            )
+        }
     val isVolumeBarSupported = true
 
     val (defaultChip, onDefaultChipChange) =
@@ -447,6 +461,25 @@ fun AppearanceSettings(navController: NavController) {
             }
 
             PreferenceGroup(title = stringResource(R.string.player)) {
+                item {
+                    ListPreference(
+                        title = { Text("Player style") },
+                        description = "Choose the player layout used on the Now Playing screen",
+                        icon = { Icon(painterResource(R.drawable.music_note), null) },
+                        selectedValue = playerDesignStyle,
+                        values = availablePlayerDesignStyles,
+                        onValueSelected = onPlayerDesignStyleChange,
+                        isEnabled = true,
+                        valueText = {
+                            when (it) {
+                                PlayerDesignStyle.FROSTSOUL -> "Vinyl player"
+                                PlayerDesignStyle.ARTWORK_BLUR -> "Artwork blur player"
+                                else -> it.name
+                            }
+                        },
+                    )
+                }
+
                 item {
                     SwitchPreference(
                         title = { Text(stringResource(R.string.show_player_volume_bar)) },

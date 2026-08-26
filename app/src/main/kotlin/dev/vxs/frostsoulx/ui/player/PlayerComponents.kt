@@ -407,7 +407,7 @@ fun PlayerTopActions(
             }
         }
 
-        PlayerDesignStyle.V4, PlayerDesignStyle.FROSTSOUL -> {
+        PlayerDesignStyle.V4, PlayerDesignStyle.FROSTSOUL, PlayerDesignStyle.ARTWORK_BLUR -> {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -1178,7 +1178,7 @@ fun PlayerPlaybackControls(
             }
         }
 
-        PlayerDesignStyle.V4, PlayerDesignStyle.FROSTSOUL -> {
+        PlayerDesignStyle.V4, PlayerDesignStyle.FROSTSOUL, PlayerDesignStyle.ARTWORK_BLUR -> {
             BoxWithConstraints(
                 modifier =
                     Modifier

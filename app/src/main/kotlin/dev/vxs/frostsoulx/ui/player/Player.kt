@@ -363,9 +363,10 @@ fun BottomSheetPlayer(
             }
         }
 
-    // FrostSoul is the single supported player surface. Legacy style preferences remain readable
-    // by older backup files, but they no longer change the active player implementation.
-    val playerDesignStyle = PlayerDesignStyle.FROSTSOUL
+    val playerDesignStyle by rememberEnumPreference(
+        PlayerDesignStyleKey,
+        defaultValue = PlayerDesignStyle.FROSTSOUL,
+    )
     val showPlayerVolumeBar = true
     val playerBackground = PlayerBackgroundStyle.DEFAULT
 
@@ -1234,6 +1235,7 @@ if (!aodModeEnabled) {
             enrichedMetadata?.let { metadata ->
                 FrostSoulPlayerAdapter(
                     mediaMetadata = metadata,
+                    playerDesignStyle = playerDesignStyle,
                     positionMs = sliderPosition ?: position,
                     durationMs = duration,
                     isPlaying = isPlaying,
