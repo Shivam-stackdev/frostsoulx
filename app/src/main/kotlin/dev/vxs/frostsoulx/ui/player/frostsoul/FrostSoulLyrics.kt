@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import dev.vxs.frostsoulx.ui.frostsoul.FSIcon as Icon
 import dev.vxs.frostsoulx.ui.frostsoul.FSText as Text
+import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -123,10 +126,10 @@ internal fun FSLyrics(
     val tooltipState = rememberPreference(LyricsTemplateTooltipDismissedKey, false)
     val tooltipDismissed by tooltipState
 
-    Box(modifier = modifier.fillMaxSize()) {
+    PremiumLyricsBackgroundContainer(modifier = modifier) {
         LazyColumn(
             state = listState,
-            contentPadding = PaddingValues(start = 28.dp, top = 88.dp, end = 28.dp, bottom = 156.dp),
+            contentPadding = PaddingValues(start = 24.dp, top = 88.dp, end = 24.dp, bottom = 156.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -190,6 +193,37 @@ internal fun FSLyrics(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun PremiumLyricsBackgroundContainer(
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
+    Box(
+        modifier = modifier.fillMaxSize().background(if (isLightTheme) Color(0xFFF3F5F8) else Color.Black),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                if (isLightTheme) {
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFFE6F1EE).copy(alpha = 0.80f), Color(0xFFF3F5F8)),
+                    )
+                } else {
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFF0A1F1D).copy(alpha = 0.60f), Color.Black),
+                    )
+                },
+            ),
+        )
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                if (isLightTheme) Color.White.copy(alpha = 0.32f) else Color.Black.copy(alpha = 0.50f),
+            ),
+        )
+        Box(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp), content = content)
     }
 }
 
