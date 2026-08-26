@@ -6,6 +6,7 @@
  */
 package dev.vxs.frostsoulx.ui.theme
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.palette.graphics.Palette
 import dev.vxs.frostsoulx.constants.AppFontPreference
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulDesignSystem
 
@@ -79,6 +81,16 @@ private val PureWhiteColorScheme = lightColorScheme(
     outlineVariant = Color(0xFFCCCCCC),
     scrim = Color.Black,
 )
+
+fun Bitmap.extractThemeColor(): Color {
+    val swatch =
+        Palette
+            .from(this)
+            .maximumColorCount(16)
+            .generate()
+            .dominantSwatch
+    return swatch?.rgb?.let { Color(it.toLong() and 0xFFFFFFFFL) } ?: Color(0xFF808080)
+}
 
 @Composable
 fun ArchiveTuneTheme(

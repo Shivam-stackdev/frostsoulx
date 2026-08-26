@@ -280,6 +280,7 @@ import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
 import dev.vxs.frostsoulx.ui.theme.TARGET_REFRESH_RATE_FPS
 import dev.vxs.frostsoulx.ui.theme.rememberSupportedHighestFps
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
+import dev.vxs.frostsoulx.ui.frostsoul.SearchTheme
 import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
 import dev.vxs.frostsoulx.ui.utils.backToMain
 import dev.vxs.frostsoulx.ui.utils.resetHeightOffset
