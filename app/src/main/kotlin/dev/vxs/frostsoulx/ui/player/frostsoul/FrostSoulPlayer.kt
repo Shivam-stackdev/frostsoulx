@@ -78,8 +78,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.palette.graphics.Palette
@@ -309,6 +312,7 @@ internal fun FSMiniPlayer(
     onCardClick: () -> Unit,
     onLongPress: () -> Unit,
     onTogglePlayPause: () -> Unit,
+    onToggleLike: () -> Unit,
     onQueueClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
@@ -351,11 +355,11 @@ internal fun FSMiniPlayer(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxSize().padding(horizontal = 9.dp, vertical = 6.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(artworkSize).clip(RoundedCornerShape(16.dp)).background(FrostSoulSurface),
+                modifier = Modifier.size(artworkSize).clip(RoundedCornerShape(8.dp)).background(FrostSoulSurface),
             ) {
                 AsyncImage(
                     model = track.artworkUrl,
@@ -368,58 +372,66 @@ internal fun FSMiniPlayer(
                         painter = painterResource(R.drawable.music_note),
                         contentDescription = null,
                         tint = mutedTextColor,
-                        modifier = Modifier.size(26.dp),
+                        modifier = Modifier.size(22.dp),
                     )
                 }
             }
-            Spacer(Modifier.width(10.dp))
-            Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.weight(1f).padding(end = 6.dp),
-            ) {
-                Text(
-                    text = track.title,
-                    color = primaryTextColor,
-                    fontSize = if (peeked) 15.sp else 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = track.artist,
-                    color = mutedTextColor,
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 2.dp),
-                )
-                if (peeked && track.album.isNotBlank()) {
-                    Text(
-                        text = track.album,
-                        color = progressColor.copy(alpha = 0.86f),
-                        fontSize = 10.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
-                }
-            }
+            Spacer(Modifier.width(12.dp))
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(
+                        SpanStyle(
+                            color = primaryTextColor,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                    ) {
+                        append(track.title)
+                    }
+                    if (track.artist.isNotBlank()) {
+                        withStyle(
+                            SpanStyle(
+                                color = mutedTextColor,
+                                fontSize = 13.sp,
+                            ),
+                        ) {
+                            append("  -  ${track.artist}")
+                        }
+                    }
+                },
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f).padding(end = 18.dp),
+            )
+            FSIconButton(
+                painter = painterResource(if (track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
+                contentDescription = if (track.isLiked) "Remove from favorites" else "Add to favorites",
+                onClick = onToggleLike,
+                active = track.isLiked,
+                buttonSize = 24.dp,
+                iconSize = 24.dp,
+                showContainer = false,
+                modifier = Modifier.padding(end = 18.dp),
+            )
             FSIconButton(
                 painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
                 contentDescription = if (isPlaying) "Pause" else "Play",
                 onClick = onTogglePlayPause,
                 active = isPlaying,
-                compact = true,
+                buttonSize = 28.dp,
+                iconSize = 28.dp,
+                showContainer = false,
+                modifier = Modifier.padding(end = 18.dp),
             )
-            if (peeked) {
-                onQueueClick?.let { openQueue ->
-                    FSIconButton(
-                        painter = painterResource(R.drawable.queue_music),
-                        contentDescription = "Open queue",
-                        onClick = openQueue,
-                        compact = true,
-                    )
-                }
+            onQueueClick?.let { openQueue ->
+                FSIconButton(
+                    painter = painterResource(R.drawable.queue_music),
+                    contentDescription = "Open queue",
+                    onClick = openQueue,
+                    buttonSize = 24.dp,
+                    iconSize = 24.dp,
+                    showContainer = false,
+                )
             }
         }
         Box(

@@ -82,7 +82,7 @@ internal enum class MiniPlayerPeekState {
 
 private const val MiniPlayerCollapsedHeight = 72
 private const val MiniPlayerPeekHeight = 110
-private const val MiniPlayerCollapsedArtwork = 56
+private const val MiniPlayerCollapsedArtwork = 48
 private const val MiniPlayerPeekArtwork = 64
 private const val SmartPeekTimeoutMs = 2_000L
 private const val ResumePeekThresholdMs = 1_500L
@@ -195,9 +195,9 @@ fun MiniPlayer(
     )
     val shape =
         if (isPairedWithNavigation) {
-            RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp, bottomStart = 12.dp, bottomEnd = 12.dp)
+            RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)
         } else {
-            RoundedCornerShape(22.dp)
+            RoundedCornerShape(16.dp)
         }
 
     Box(
@@ -263,6 +263,7 @@ fun MiniPlayer(
             },
             onLongPress = { quickMenuVisible = true },
             onTogglePlayPause = { playerConnection.player.togglePlayPause() },
+            onToggleLike = playerConnection::toggleLike,
             onQueueClick = onQueueClick,
         )
 

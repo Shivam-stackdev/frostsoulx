@@ -67,6 +67,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -105,6 +106,9 @@ internal fun FSIconButton(
     active: Boolean = false,
     enabled: Boolean = true,
     compact: Boolean = false,
+    buttonSize: Dp = if (compact) 42.dp else 50.dp,
+    iconSize: Dp = if (compact) 20.dp else 23.dp,
+    showContainer: Boolean = true,
 ) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     val baseTint = if (isLightTheme) FrostSoulTheme.colors.onSurface else Color.White
@@ -115,16 +119,21 @@ internal fun FSIconButton(
         } else {
             if (isLightTheme) FrostSoulTheme.colors.surfaceRaised else Color.White.copy(alpha = 0.08f)
         }
-    val buttonSize = if (compact) 42.dp else 50.dp
+    val buttonModifier = modifier.size(buttonSize)
+    val styledModifier =
+        if (showContainer) {
+            buttonModifier
+                .clip(CircleShape)
+                .background(background)
+                .border(1.dp, iconTint.copy(alpha = if (active) 0.52f else 0.15f), CircleShape)
+        } else {
+            buttonModifier
+        }
 
     Box(
         contentAlignment = Alignment.Center,
         modifier =
-            modifier
-                .size(buttonSize)
-                .clip(CircleShape)
-                .background(background)
-                .border(1.dp, iconTint.copy(alpha = if (active) 0.52f else 0.15f), CircleShape)
+            styledModifier
                 .clickable(
                     enabled = enabled,
                     role = Role.Button,
@@ -137,7 +146,7 @@ internal fun FSIconButton(
             painter = painter,
             contentDescription = null,
             tint = iconTint,
-            modifier = Modifier.size(if (compact) 20.dp else 23.dp),
+            modifier = Modifier.size(iconSize),
         )
     }
 }

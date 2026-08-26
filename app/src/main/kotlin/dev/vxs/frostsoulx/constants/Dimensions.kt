@@ -25,8 +25,9 @@ val NavigationBarMaxWidth = 420.dp
 // QQ reference APK exposes 58dip normal and 70dip expanded bottom-navigation heights.
 // The shell adds system-bar padding separately, so the content bar remains 58dp.
 val NavigationBarHeight = 58.dp
-val MiniPlayerHeight = 64.dp
-val MiniPlayerPeekHeight = 104.dp
+// The reconstructed QQ-style collapsed row is 72dp; keep shell insets and sheet anchors aligned.
+val MiniPlayerHeight = 72.dp
+val MiniPlayerPeekHeight = 110.dp
 val MiniPlayerBottomSpacing = 4.dp
 val QueuePeekHeight = 64.dp
 val AppBarHeight = 64.dp
