@@ -7,6 +7,8 @@
 
 package dev.vxs.frostsoulx.ui.player
 
+import android.content.Intent
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.vxs.frostsoulx.utils.oem.SystemMediaControlResolver
+import dev.vxs.frostsoulx.viewmodels.LyricsMenuViewModel
 import dagger.hilt.android.EntryPointAccessors
 import dev.vxs.frostsoulx.db.entities.containerLabel
 import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
@@ -51,6 +54,8 @@ internal fun FrostSoulPlayerAdapter(
     modifier: Modifier = Modifier,
 ) {
     val palette = rememberFrostSoulPalette(mediaMetadata.thumbnailUrl)
+    val lyricsMenuViewModel: LyricsMenuViewModel = hiltViewModel()
+    val isRefetchingLyrics by lyricsMenuViewModel.isRefetching.collectAsStateWithLifecycle()
     val applicationContext = LocalContext.current.applicationContext
     val lyricsSynchronizationEngine =
         remember(applicationContext) {
@@ -97,6 +102,7 @@ internal fun FrostSoulPlayerAdapter(
             currentLyricText,
             audioQualityBadge,
             outputDevice,
+            isRefetchingLyrics,
             palette,
         ) {
             FrostSoulPlayerUiState(
@@ -117,7 +123,7 @@ internal fun FrostSoulPlayerAdapter(
             )
         }
     val actions =
-        remember(playerConnection, queueWindows, onCollapse, applicationContext) {
+        remember(playerConnection, queueWindows, onCollapse, applicationContext, mediaMetadata, isRefetchingLyrics) {
             FrostSoulPlayerActions(
                 onDismiss = onCollapse,
                 onTogglePlayPause = { playerConnection.player.togglePlayPause() },
@@ -126,9 +132,23 @@ internal fun FrostSoulPlayerAdapter(
                 onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
                 onSeek = { targetPosition -> playerConnection.player.seekTo(targetPosition) },
                 onToggleLike = playerConnection::toggleLike,
-                        onOpenAudioOutput = {
-            SystemMediaControlResolver.openMediaOutputSwitcher(applicationContext)
-        },
+                onOpenAudioOutput = {
+                    SystemMediaControlResolver.openMediaOutputSwitcher(applicationContext)
+                },
+                onShareSong = {
+                    val shareIntent =
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_SUBJECT, mediaMetadata.title)
+                            putExtra(Intent.EXTRA_TEXT, "https://music.youtube.com/watch?v=${mediaMetadata.id}")
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                    applicationContext.startActivity(
+                        Intent.createChooser(shareIntent, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
+                },
+                onRefetchLyrics = { lyricsMenuViewModel.refetchLyrics(mediaMetadata) },
+                isRefetchingLyrics = isRefetchingLyrics,
 
                 onSelectQueueItem = { queueIndex ->
                     val targetWindow = queueWindows.getOrNull(queueIndex)

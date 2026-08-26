@@ -7,6 +7,7 @@
 
 package dev.vxs.frostsoulx.ui.player.frostsoul
 
+import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -32,7 +33,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -49,9 +52,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.bush.translator.Language
+import me.bush.translator.Translator
 import dagger.hilt.android.EntryPointAccessors
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.constants.LyricsTemplateTooltipDismissedKey
+import dev.vxs.frostsoulx.utils.TranslatorLang
+import dev.vxs.frostsoulx.utils.TranslatorLanguages
 import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
 import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 import dev.vxs.frostsoulx.lyrics.core.LyricsSyncState
@@ -73,7 +84,8 @@ internal fun FSLyrics(
     onTogglePlayPause: () -> Unit = {},
     onToggleLike: () -> Unit = {},
     onOpenAudioOutput: () -> Unit = {},
-    onOpenOptions: () -> Unit = {},
+    onRefetchLyrics: () -> Unit = {},
+    isRefetchingLyrics: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val applicationContext = LocalContext.current.applicationContext
@@ -88,6 +100,40 @@ internal fun FSLyrics(
     val lines = document?.original?.lines.orEmpty()
     val currentIndex = syncState.currentLineIndex.takeIf { it in lines.indices } ?: -1
     val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val translatorLanguages = remember(applicationContext) { TranslatorLanguages.load(applicationContext) }
+    var languageMenuExpanded by remember(rawLyrics) { mutableStateOf(false) }
+    var showTranslation by remember(rawLyrics) { mutableStateOf(false) }
+    var selectedLanguageCode by remember(rawLyrics) { mutableStateOf("ENGLISH") }
+    var translatedLines by remember(rawLyrics) { mutableStateOf<Map<Int, String>>(emptyMap()) }
+    var isTranslating by remember(rawLyrics) { mutableStateOf(false) }
+
+    fun translateCurrentLyrics(languageCode: String) {
+        if (lines.isEmpty() || isTranslating) return
+        isTranslating = true
+        coroutineScope.launch {
+            try {
+                val language = Language(languageCode)
+                val translated =
+                    withContext(Dispatchers.IO) {
+                        val translator = Translator()
+                        lines.mapIndexed { index, line ->
+                            index to translator.translateBlocking(line.text, language).translatedText
+                        }.toMap()
+                    }
+                translatedLines = translated
+                showTranslation = true
+            } catch (error: Exception) {
+                Toast.makeText(
+                    applicationContext,
+                    "Translation failed: ${error.localizedMessage ?: "try again"}",
+                    Toast.LENGTH_SHORT,
+                ).show()
+            } finally {
+                isTranslating = false
+            }
+        }
+    }
 
     LaunchedEffect(currentIndex, lines.size) {
         if (currentIndex >= 0 && listState.isScrollInProgress.not()) {
@@ -95,83 +141,96 @@ internal fun FSLyrics(
         }
     }
 
-    if (lines.isEmpty()) {
-        val lookupMessage =
-            if (rawLyrics.isNullOrBlank()) {
-                "Lyrics are unavailable for this track."
-            } else {
-                "Preparing synchronized lyrics for this track."
-            }
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxSize().padding(horizontal = 28.dp),
-        ) {
-            Text(
-                text = lookupMessage,
-                color = FrostSoulOnSurfaceMuted,
-                fontSize = 19.sp,
-                lineHeight = 28.sp,
-            )
-            Text(
-                text = "FrostSoul keeps lyrics, notification updates, and overlays on one shared timeline.",
-                color = FrostSoulOnSurfaceMuted.copy(alpha = 0.62f),
-                fontSize = 14.sp,
-                lineHeight = 21.sp,
-                modifier = Modifier.padding(top = 10.dp),
-            )
-        }
-        return
-    }
-
     val tooltipState = rememberPreference(LyricsTemplateTooltipDismissedKey, false)
     val tooltipDismissed by tooltipState
 
     PremiumLyricsBackgroundContainer(modifier = modifier) {
-        LazyColumn(
-            state = listState,
-            contentPadding = PaddingValues(start = 24.dp, top = 88.dp, end = 24.dp, bottom = 156.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            itemsIndexed(
-                items = lines,
-                key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
-            ) { index, line ->
-                val isCurrent = index == currentIndex
-                FrostSoulKaraokeLine(
-                    line = line,
+        if (lines.isEmpty()) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxSize().padding(horizontal = 28.dp),
+            ) {
+                Text(
+                    text = if (rawLyrics.isNullOrBlank()) "Lyrics are unavailable for this track." else "Preparing synchronized lyrics for this track.",
+                    color = FrostSoulOnSurfaceMuted,
+                    fontSize = 19.sp,
+                    lineHeight = 28.sp,
+                )
+                Text(
+                    text = "FrostSoul keeps lyrics, notification updates, and overlays on one shared timeline.",
+                    color = FrostSoulOnSurfaceMuted.copy(alpha = 0.62f),
+                    fontSize = 14.sp,
+                    lineHeight = 21.sp,
+                    modifier = Modifier.padding(top = 10.dp),
+                )
+            }
+        } else {
+            LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(start = 24.dp, top = 88.dp, end = 24.dp, bottom = 156.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                itemsIndexed(
+                    items = lines,
+                    key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
+                ) { index, line ->
+                    val displayLine = if (showTranslation) {
+                        line.copy(text = translatedLines[index] ?: line.text, words = emptyList(), translation = null)
+                    } else {
+                        line
+                    }
+                    val isCurrent = index == currentIndex
+                    FrostSoulKaraokeLine(
+                        line = displayLine,
                     isCurrent = isCurrent,
                     isPast = currentIndex >= 0 && index < currentIndex,
                     currentWordIndex = if (isCurrent) syncState.currentWordIndex else -1,
                     wordProgress = if (isCurrent) syncState.wordProgress else 0f,
                     lineProgress = if (isCurrent) syncState.lineProgress else 0f,
-                    onSeek = onSeek,
-                )
+                        onSeek = onSeek,
+                    )
+                }
             }
         }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 14.dp)
-                    .background(Color.Black.copy(alpha = 0.76f), RoundedCornerShape(28.dp))
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
-        ) {
-            FSIconButton(painterResource(R.drawable.timer), "Sleep timer", onOpenOptions, compact = true)
-            FSIconButton(painterResource(R.drawable.bluetooth), "Audio output", onOpenAudioOutput, compact = true)
-            FSIconButton(painterResource(R.drawable.settings), "Lyrics settings", onOpenOptions, compact = true)
-            FSIconButton(painterResource(R.drawable.share), "Lyrics poster", onOpenOptions, compact = true)
-            FSIconButton(painterResource(R.drawable.favorite_border), "Like this song", onToggleLike, compact = true)
-            FSIconButton(
-                painterResource(R.drawable.play),
-                "Play or pause",
-                onTogglePlayPause,
-                active = true,
-                compact = true,
-            )
+        FrostSoulLyricsBottomControls(
+            onOpenAudioOutput = onOpenAudioOutput,
+            onToggleLike = onToggleLike,
+            onTogglePlayPause = onTogglePlayPause,
+            onRefetchLyrics = onRefetchLyrics,
+            isRefetchingLyrics = isRefetchingLyrics,
+            showTranslation = showTranslation,
+            isTranslating = isTranslating,
+            onToggleTranslation = {
+                if (showTranslation) {
+                    showTranslation = false
+                } else if (translatedLines.isNotEmpty()) {
+                    showTranslation = true
+                } else {
+                    translateCurrentLyrics(selectedLanguageCode)
+                }
+            },
+            onChooseTranslationLanguage = { code ->
+                selectedLanguageCode = code
+                languageMenuExpanded = false
+                translateCurrentLyrics(code)
+            },
+            languageMenuExpanded = languageMenuExpanded,
+            onLanguageMenuExpandedChange = { languageMenuExpanded = it },
+            languages = translatorLanguages,
+        )
+
+        if (isRefetchingLyrics || isTranslating) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.18f)),
+            ) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.size(42.dp),
+                )
+            }
         }
 
         if (!tooltipDismissed) {
@@ -193,6 +252,88 @@ internal fun FSLyrics(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun BoxScope.FrostSoulLyricsBottomControls(
+    onOpenAudioOutput: () -> Unit,
+    onToggleLike: () -> Unit,
+    onTogglePlayPause: () -> Unit,
+    onRefetchLyrics: () -> Unit,
+    isRefetchingLyrics: Boolean,
+    showTranslation: Boolean,
+    isTranslating: Boolean,
+    onToggleTranslation: () -> Unit,
+    onChooseTranslationLanguage: (String) -> Unit,
+    languageMenuExpanded: Boolean,
+    onLanguageMenuExpandedChange: (Boolean) -> Unit,
+    languages: List<TranslatorLang>,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 14.dp)
+                .background(Color.Black.copy(alpha = 0.78f), RoundedCornerShape(28.dp))
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+    ) {
+        FSIconButton(
+            painter = painterResource(R.drawable.sync),
+            contentDescription = "Refetch lyrics",
+            onClick = onRefetchLyrics,
+            enabled = !isRefetchingLyrics && !isTranslating,
+            active = isRefetchingLyrics,
+            compact = true,
+        )
+        Box {
+            FSIconButton(
+                painter = painterResource(R.drawable.translate),
+                contentDescription = "Translate lyrics",
+                onClick = {
+                    if (!isTranslating) {
+                        if (showTranslation) onToggleTranslation() else onLanguageMenuExpandedChange(true)
+                    }
+                },
+                enabled = !isRefetchingLyrics,
+                active = showTranslation || isTranslating,
+                compact = true,
+            )
+            androidx.compose.material3.DropdownMenu(
+                expanded = languageMenuExpanded,
+                onDismissRequest = { onLanguageMenuExpandedChange(false) },
+            ) {
+                languages.forEach { language ->
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(language.name, color = Color.White, fontSize = 14.sp) },
+                        onClick = { onChooseTranslationLanguage(language.code) },
+                    )
+                }
+            }
+        }
+        FSIconButton(
+            painter = painterResource(R.drawable.bluetooth),
+            contentDescription = "Audio output",
+            onClick = onOpenAudioOutput,
+            enabled = !isRefetchingLyrics && !isTranslating,
+            compact = true,
+        )
+        FSIconButton(
+            painter = painterResource(R.drawable.favorite_border),
+            contentDescription = "Like this song",
+            onClick = onToggleLike,
+            enabled = !isRefetchingLyrics && !isTranslating,
+            compact = true,
+        )
+        FSIconButton(
+            painter = painterResource(R.drawable.play),
+            contentDescription = "Play or pause",
+            onClick = onTogglePlayPause,
+            active = true,
+            compact = true,
+        )
     }
 }
 

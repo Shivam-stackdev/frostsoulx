@@ -181,7 +181,7 @@ internal fun FrostSoulPlayer(
                     scope.launch { pagerState.animateScrollToPage(targetPage) }
                 },
                 onDismiss = actions.onDismiss,
-                onOpenOptions = { optionsVisible = true },
+                onShareTrack = actions.onShareSong,
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
             )
             HorizontalPager(
@@ -215,7 +215,8 @@ internal fun FrostSoulPlayer(
                                 onTogglePlayPause = actions.onTogglePlayPause,
                                 onToggleLike = actions.onToggleLike,
                                 onOpenAudioOutput = actions.onOpenAudioOutput,
-                                onOpenOptions = { optionsVisible = true },
+                                onRefetchLyrics = actions.onRefetchLyrics,
+                                isRefetchingLyrics = actions.isRefetchingLyrics,
                             )
 
                         FrostSoulPage.MainPlayer ->
@@ -300,6 +301,7 @@ internal fun FrostSoulPlayer(
                 accent = uiState.palette.accent,
                 onDismiss = { optionsVisible = false },
                 onOpenAudioOutput = actions.onOpenAudioOutput,
+                onShareSong = actions.onShareSong,
             )
         }
     }
@@ -631,25 +633,7 @@ private fun FrostSoulAlbumPage(
     onOpenQueue: () -> Unit,
     onOpenOptions: () -> Unit,
 ) {
-    var upwardDragDistance by remember { mutableFloatStateOf(0f) }
-
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures(
-                        onVerticalDrag = { _, dragAmount ->
-                            upwardDragDistance += dragAmount
-                        },
-                        onDragEnd = {
-                            if (upwardDragDistance <= -72f) onOpenOptions()
-                            upwardDragDistance = 0f
-                        },
-                        onDragCancel = { upwardDragDistance = 0f },
-                    )
-                },
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
@@ -755,6 +739,7 @@ private fun FrostSoulPlayerOptionsSheet(
     accent: Color,
     onDismiss: () -> Unit,
     onOpenAudioOutput: () -> Unit,
+    onShareSong: () -> Unit,
 ) {
     val options =
         listOf(
@@ -765,7 +750,7 @@ private fun FrostSoulPlayerOptionsSheet(
             Triple(R.drawable.graphic_eq, "Workout Mode", false),
             Triple(R.drawable.graphic_eq, "Game Mode", false),
             Triple(R.drawable.settings, "Theme Center", false),
-            Triple(R.drawable.share, "Lyrics Poster", false),
+            Triple(R.drawable.share, "Share Song", true),
             Triple(R.drawable.mic, "Sing This Song", false),
             Triple(R.drawable.tune, "Dislike", false),
             Triple(R.drawable.info, "Report", false),
@@ -834,7 +819,7 @@ private fun FrostSoulPlayerOptionsSheet(
                                 .height(43.dp)
                                 .clickable(enabled = actionable) {
                                     if (actionable) {
-                                        onOpenAudioOutput()
+                                        if (label == "Share Song") onShareSong() else onOpenAudioOutput()
                                         onDismiss()
                                     }
                                 }
