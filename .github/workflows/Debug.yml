@@ -1,10 +1,7 @@
 name: Build Debug APK
 
 on:
-  push:
-
-  pull_request:
-  
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -35,6 +32,36 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-cleanup: on-success
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: |
+          ./gradlew assembleGmsMobileArm64Debug             --no-daemon             --build-cache
+        env:
+          PULL_REQUEST: 'false'
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
+          LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
+          API_BEARER_TOKEN: ${{ secrets.API_BEARER_TOKEN }}
+          TOGETHER_BEARER_TOKEN: ${{ secrets.TOGETHER_BEARER_TOKEN }}
+          CANVAS_BEARER_TOKEN: ${{ secrets.CANVAS_BEARER_TOKEN }}
+          EXTRACTOR_BEARER: ${{ secrets.EXTRACTOR_BEARER }}
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-gms-mobile-arm64-debug
+          path: |
+            app/build/outputs/apk/mobile/arm64/debug/*.apk
+            app/build/outputs/apk/gmsMobileArm64/debug/*.apk
+            app/build/outputs/apk/gms/mobile/arm64/debug/*.apk
+            app/build/outputs/apk/mobileArm64/debug/*.apk
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v6
         with:
