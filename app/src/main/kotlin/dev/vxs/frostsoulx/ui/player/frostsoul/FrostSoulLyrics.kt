@@ -61,7 +61,6 @@ import me.bush.translator.Language
 import me.bush.translator.Translator
 import dagger.hilt.android.EntryPointAccessors
 import dev.vxs.frostsoulx.R
-import dev.vxs.frostsoulx.constants.LyricsTemplateTooltipDismissedKey
 import dev.vxs.frostsoulx.utils.TranslatorLang
 import dev.vxs.frostsoulx.utils.TranslatorLanguages
 import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
@@ -141,9 +140,6 @@ internal fun FSLyrics(
             listState.animateScrollToItem((currentIndex - 1).coerceAtLeast(0))
         }
     }
-
-    val tooltipState = rememberPreference(LyricsTemplateTooltipDismissedKey, false)
-    val tooltipDismissed by tooltipState
 
     PremiumLyricsBackgroundContainer(modifier = modifier) {
         if (lines.isEmpty()) {
@@ -234,25 +230,6 @@ internal fun FSLyrics(
             }
         }
 
-        if (!tooltipDismissed) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier =
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 86.dp)
-                        .background(Color.Black.copy(alpha = 0.86f), RoundedCornerShape(18.dp))
-                        .padding(start = 14.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
-            ) {
-                Text("Lyrics template updated", color = FrostSoulOnSurface, fontSize = 12.sp)
-                FSIconButton(
-                    painter = painterResource(R.drawable.close),
-                    contentDescription = "Dismiss lyrics update",
-                    onClick = { tooltipState.value = true },
-                    compact = true,
-                )
-            }
-        }
     }
 }
 

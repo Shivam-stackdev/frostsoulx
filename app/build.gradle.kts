@@ -50,8 +50,8 @@ android {
     applicationId = "dev.vxs.frostsoulx"
         minSdk = 26
         targetSdk = 37
-        versionCode = 139
-        versionName = "14.0.0"
+        versionCode = 140
+        versionName = "14.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
