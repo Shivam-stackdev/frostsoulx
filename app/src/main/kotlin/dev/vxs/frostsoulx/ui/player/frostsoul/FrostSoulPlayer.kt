@@ -65,6 +65,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
@@ -147,6 +148,7 @@ internal fun FrostSoulPlayer(
                 },
         ) {
             FrostSoulDynamicBackground(
+                artworkUrl = uiState.track.artworkUrl,
                 palette = uiState.palette,
             )
             Column(
@@ -627,7 +629,7 @@ private fun FrostSoulAlbumPage(
                     color = FrostSoulOnSurface,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
@@ -642,14 +644,6 @@ private fun FrostSoulAlbumPage(
                     FSChip(label = uiState.audioQualityBadge ?: "STANDARD", selected = false, onClick = {})
                     FSChip(label = "${uiState.queue.size} IN QUEUE", selected = false, onClick = {})
                 }
-                Text(
-                    text = "${uiState.track.title} · ${uiState.track.artist}",
-                    color = FrostSoulOnSurfaceMuted,
-                    fontSize = 13.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 10.dp),
-                )
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -836,22 +830,22 @@ private fun FrostSoulRecommendationsPage(
         )
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth().weight(1f),
         ) {
             gridItems(recommendationQueue, key = { "recommendation_${it.index}_${it.id}" }) { item ->
                 FSGlassCard(
                     accent = Color.White.copy(alpha = 0.12f),
-                    modifier = Modifier.fillMaxWidth().height(184.dp).clickable { actions.onSelectQueueItem(item.index) },
+                    modifier = Modifier.fillMaxWidth().height(196.dp).clickable { actions.onSelectQueueItem(item.index) },
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         AsyncImage(
                             model = item.artworkUrl,
                             contentDescription = "Artwork for ${item.title}",
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxWidth().height(112.dp).clip(RoundedCornerShape(18.dp)),
+                            modifier = Modifier.fillMaxWidth().height(124.dp).clip(RoundedCornerShape(20.dp)),
                         )
                         Text(
                             text = item.title,
@@ -1044,37 +1038,51 @@ private const val PaletteCacheCapacity = 24
 
 @Composable
 private fun FrostSoulDynamicBackground(
+    artworkUrl: String?,
     palette: FrostSoulPalette,
 ) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .drawWithCache {
-
-                    val topSurface = if (isLightTheme) Color(0xFFF1F3F6) else Color(0xFF101012)
-                    val lowerGlow =
-                        Brush.verticalGradient(
-                            colorStops = arrayOf(
-                                0f to topSurface,
-                                0.44f to topSurface,
-                                0.62f to palette.artworkSecondary.copy(alpha = if (isLightTheme) 0.10f else 0.20f),
-                                0.80f to palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.24f else 0.58f),
-                                1f to palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.38f else 0.90f),
-                            ),
-                        )
-                    val edgeGlow =
-                        Brush.radialGradient(
-                            listOf(palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.10f else 0.20f), Color.Transparent),
-                            center = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.86f),
-                            radius = size.width * 0.88f,
-                        )
-                    onDrawBehind {
-                        drawRect(topSurface)
-                        drawRect(lowerGlow)
-                        drawRect(edgeGlow)
-                    }
-                },
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (!artworkUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = artworkUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().blur(60.dp),
+            )
+        }
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                if (isLightTheme) Color.White.copy(alpha = 0.60f) else Color.Black.copy(alpha = 0.45f),
+            ),
+        )
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .drawWithCache {
+                        val topSurface = if (isLightTheme) Color(0xFFF1F3F6) else Color(0xFF101012)
+                        val lowerGlow =
+                            Brush.verticalGradient(
+                                colorStops = arrayOf(
+                                    0f to topSurface.copy(alpha = 0.90f),
+                                    0.42f to topSurface.copy(alpha = 0.68f),
+                                    0.62f to palette.artworkSecondary.copy(alpha = if (isLightTheme) 0.08f else 0.16f),
+                                    0.80f to palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.16f else 0.34f),
+                                    1f to palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.28f else 0.56f),
+                                ),
+                            )
+                        val edgeGlow =
+                            Brush.radialGradient(
+                                listOf(palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.08f else 0.16f), Color.Transparent),
+                                center = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.86f),
+                                radius = size.width * 0.88f,
+                            )
+                        onDrawBehind {
+                            drawRect(lowerGlow)
+                            drawRect(edgeGlow)
+                        }
+                    },
+        )
+    }
 }

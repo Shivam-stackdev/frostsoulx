@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -80,7 +81,7 @@ internal fun FSGlassCard(
     accent: Color = Color.White,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val shape = RoundedCornerShape(28.dp)
+    val shape = RoundedCornerShape(20.dp)
     Box(
         modifier =
             modifier
@@ -174,6 +175,11 @@ internal fun FSAlbumArt(
         modifier =
             modifier
                 .aspectRatio(1f)
+                .shadow(
+                    elevation = if (compact) 0.dp else 16.dp,
+                    shape = CircleShape,
+                    clip = false,
+                )
                 .drawBehind {
                     val radius = size.minDimension * 0.74f
                     drawCircle(
@@ -206,6 +212,23 @@ internal fun FSAlbumArt(
                     radius = vinylRadius,
                     center = center,
                     style = Stroke(width = 1.5.dp.toPx()),
+                )
+                drawArc(
+                    brush = Brush.sweepGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.04f),
+                            Color.White.copy(alpha = 0.18f),
+                            Color.Transparent,
+                            Color.Transparent,
+                        ),
+                        center = center,
+                    ),
+                    startAngle = -56f,
+                    sweepAngle = 72f,
+                    useCenter = false,
+                    topLeft = Offset(center.x - vinylRadius, center.y - vinylRadius),
+                    size = Size(vinylRadius * 2f, vinylRadius * 2f),
+                    style = Stroke(width = size.minDimension * 0.06f),
                 )
             }
         }
