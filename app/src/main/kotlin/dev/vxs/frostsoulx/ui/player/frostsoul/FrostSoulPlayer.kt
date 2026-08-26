@@ -1088,7 +1088,7 @@ private fun FrostSoulDynamicBackground(artworkUrl: String?) {
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(if (isLightTheme) FrostSoulTheme.colors.background else FrostSoulTheme.PureBlack),
+                .background(if (isLightTheme) FrostSoulTheme.colors.background else Color.Black),
     ) {
         if (!artworkUrl.isNullOrBlank()) {
             AsyncImage(
@@ -1107,7 +1107,7 @@ private fun FrostSoulDynamicBackground(artworkUrl: String?) {
                         if (isLightTheme) {
                             Color.White.copy(alpha = 0.70f)
                         } else {
-                            FrostSoulTheme.PureBlack.copy(alpha = 0.68f)
+                            Color.Black.copy(alpha = 0.68f)
                         },
                     ),
         )
