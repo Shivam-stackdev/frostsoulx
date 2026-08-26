@@ -105,8 +105,6 @@ internal enum class FrostSoulPage {
     Lyrics,
     MainPlayer,
     Recommendations,
-    Details,
-    Queue,
 }
 
 internal fun Long.asFrostSoulTime(): String {

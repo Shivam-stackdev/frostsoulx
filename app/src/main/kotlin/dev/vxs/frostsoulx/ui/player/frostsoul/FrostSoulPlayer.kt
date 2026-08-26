@@ -105,7 +105,8 @@ internal fun FrostSoulPlayer(
     actions: FrostSoulPlayerActions,
     modifier: Modifier = Modifier,
 ) {
-    val pages = remember { listOf(FrostSoulPage.Recommendations, FrostSoulPage.MainPlayer, FrostSoulPage.Details, FrostSoulPage.Lyrics) }
+    // Reference pager: swipe left for lyrics, stay centered on the player, swipe right for recommendations.
+    val pages = remember { listOf(FrostSoulPage.Lyrics, FrostSoulPage.MainPlayer, FrostSoulPage.Recommendations) }
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     var queueVisible by remember { mutableStateOf(false) }
@@ -211,8 +212,6 @@ internal fun FrostSoulPlayer(
                                 onOpenOptions = { optionsVisible = true },
                             )
                         FrostSoulPage.Recommendations -> FrostSoulRecommendationsPage(uiState = uiState, actions = actions)
-                        FrostSoulPage.Details -> FrostSoulSongDetailsPage(uiState = uiState, actions = actions)
-                        FrostSoulPage.Queue -> Unit
                     }
                 }
             }
@@ -1078,89 +1077,4 @@ private fun FrostSoulDynamicBackground(
                     }
                 },
     )
-}
-
-
-@Composable
-private fun FrostSoulSongDetailsPage(
-    uiState: FrostSoulPlayerUiState,
-    actions: FrostSoulPlayerActions,
-) {
-    val track = uiState.track
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 18.dp),
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                AsyncImage(
-                    model = track.artworkUrl,
-                    contentDescription = "Album artwork for ${track.title}",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(104.dp).clip(RoundedCornerShape(22.dp)),
-                )
-                Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
-                    Text(track.title, color = FrostSoulOnSurface, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Text(track.artist, color = Color.White, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp))
-                    Text(track.album.ifBlank { "Single release" }, color = FrostSoulOnSurfaceMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
-                }
-            }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                FSChip(label = uiState.audioQualityBadge ?: "HQ", selected = true, onClick = {})
-                FSChip(label = track.durationMs.asFrostSoulTime(), selected = false, onClick = {})
-                FSChip(label = "ON DEVICE", selected = false, onClick = {})
-            }
-        }
-        item {
-            FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth()) {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(16.dp)) {
-                    Text("TRACK CREDITS", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
-                    FrostSoulDetailRow("Artist", track.artist)
-                    FrostSoulDetailRow("Album", track.album.ifBlank { "Single release" })
-                    FrostSoulDetailRow("Duration", track.durationMs.asFrostSoulTime())
-                    FrostSoulDetailRow("Playback", if (uiState.isPlaying) "Now playing" else "Paused")
-                }
-            }
-        }
-        val related = uiState.queue.filterNot { it.isCurrent }.take(8)
-        if (related.isNotEmpty()) {
-            item {
-                Text("PEOPLE WHO LIKE THIS ALSO LIKE", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
-            }
-            item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(related, key = { "related_${it.id}" }) { item ->
-                        FSGlassCard(
-                            modifier = Modifier.width(142.dp).height(174.dp).clickable { actions.onSelectQueueItem(item.index) },
-                        ) {
-                            Column(modifier = Modifier.padding(10.dp)) {
-                                AsyncImage(model = item.artworkUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxWidth().height(112.dp).clip(RoundedCornerShape(14.dp)))
-                                Text(item.title, color = FrostSoulOnSurface, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 8.dp))
-                                Text(item.artist, color = FrostSoulOnSurfaceMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 3.dp))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        item {
-            FSGlassCard(accent = uiState.palette.accent, modifier = Modifier.fillMaxWidth()) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
-                    Text("FEATURED VIDEOS", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
-                    Text("Video highlights will appear here when available for this track.", color = FrostSoulOnSurfaceMuted, fontSize = 13.sp, lineHeight = 19.sp)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun FrostSoulDetailRow(label: String, value: String) {
-    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-        Text(label, color = FrostSoulOnSurfaceMuted, fontSize = 12.sp)
-        Text(value, color = FrostSoulOnSurface, fontSize = 12.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 16.dp))
-    }
 }

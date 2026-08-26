@@ -1605,7 +1605,10 @@ class MainActivity : ComponentActivity() {
 
                             Scaffold(
                                 topBar = {
-                                    if (shouldShowTopBar) {
+                                    // Home owns its compact FrostSoul header; hiding the generic
+                                    // shell bar prevents the app name from sitting under a camera cutout
+                                    // or duplicating the branded Home header.
+                                    if (shouldShowTopBar && navBackStackEntry?.destination?.route != Screens.Home.route) {
                                         val shouldUseFloatingTopBar =
                                             remember(navBackStackEntry) {
                                                 navBackStackEntry?.destination?.route == Screens.Home.route ||
