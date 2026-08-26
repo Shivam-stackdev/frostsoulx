@@ -11,6 +11,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -48,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -555,41 +557,42 @@ private fun FrostSoulRecommendationList(
 
 @Composable
 private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
+    val shape = RoundedCornerShape(12.dp)
+    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
+    val searchSurface = if (isLightTheme) SearchTheme.SearchBarBackgroundLight else SearchTheme.SearchBarBackground
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page, vertical = 2.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .height(46.dp)
+                .clip(shape)
+                .background(searchSurface)
+                .border(
+                    width = 0.5.dp,
+                    color = FrostSoulTheme.colors.onSurfaceMuted.copy(alpha = 0.24f),
+                    shape = shape,
+                ).clickable(onClick = onOpenSearch)
+                .padding(horizontal = 14.dp),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(14.dp)).background(SearchTheme.SearchBarBackground).clickable(onClick = onOpenSearch).padding(horizontal = 12.dp),
-        ) {
-            FSIcon(
-                painter = painterResource(R.drawable.search),
-                contentDescription = "Search",
-                tint = FrostSoulTheme.colors.onSurfaceMuted,
-                modifier = Modifier.size(16.dp),
-            )
-            FSText(
-                text = "Search songs, albums, artists...",
-                color = FrostSoulTheme.colors.onSurfaceMuted,
-                style = FrostSoulTheme.typography.body,
-                modifier = Modifier.padding(start = 8.dp),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.size(32.dp).clip(RoundedCornerShape(12.dp)).background(SearchTheme.SearchBarBackground).clickable(onClick = onOpenSearch),
-        ) {
-            FSIcon(
-                painter = painterResource(R.drawable.mic),
-                contentDescription = "Voice search",
-                tint = FrostSoulTheme.colors.accentBright,
-                modifier = Modifier.size(16.dp),
-            )
-        }
+        FSIcon(
+            painter = painterResource(R.drawable.search),
+            contentDescription = "Search Icon",
+            tint = FrostSoulTheme.colors.onSurfaceMuted,
+            modifier = Modifier.size(18.dp),
+        )
+        FSText(
+            text = "Search songs, albums, artists...",
+            style =
+                SearchTheme.InputTextStyle.copy(
+                    color = FrostSoulTheme.colors.onSurfaceMuted,
+                    fontSize = 14.sp,
+                ),
+            modifier = Modifier.padding(start = 12.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
