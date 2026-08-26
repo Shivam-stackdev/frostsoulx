@@ -388,7 +388,6 @@ internal fun FSTopBar(
     pageCount: Int,
     onPageSelected: (Int) -> Unit,
     onDismiss: () -> Unit,
-    onShareTrack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -413,11 +412,5 @@ internal fun FSTopBar(
                 onPageSelected = onPageSelected,
             )
         }
-        FSIconButton(
-            painter = painterResource(R.drawable.share),
-            contentDescription = "Share track",
-            onClick = onShareTrack,
-            compact = true,
-        )
     }
 }

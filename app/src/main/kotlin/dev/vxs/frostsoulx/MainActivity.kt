@@ -1110,6 +1110,9 @@ class MainActivity : ComponentActivity() {
                         )
 
                     val handlePrimaryNavigationClick: (Screens, Boolean) -> Unit = { screen, isSelected ->
+                        if (!playerBottomSheetState.isCollapsed && !playerBottomSheetState.isDismissed) {
+                            playerBottomSheetState.collapseSoft()
+                        }
                         if (isSelected) {
                             if (screen == Screens.Search) {
                                 openSearch()
@@ -2027,7 +2030,7 @@ class MainActivity : ComponentActivity() {
                                                             bottom = bottomInset + floatingBarsBottomPadding,
                                                         )
                                                         .height(navVisibleHeight)
-                                                        .zIndex(2f),
+                                                        .zIndex(10f),
                                                 isSelected = { screen ->
                                                     navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } ==
                                                         true

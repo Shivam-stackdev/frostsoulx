@@ -7,7 +7,6 @@
 
 package dev.vxs.frostsoulx.ui.player
 
-import android.content.Intent
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -51,6 +50,7 @@ internal fun FrostSoulPlayerAdapter(
     lyrics: String?,
     playerConnection: PlayerConnection,
     onCollapse: () -> Unit,
+    onOpenOptions: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val palette = rememberFrostSoulPalette(mediaMetadata.thumbnailUrl)
@@ -135,18 +135,7 @@ internal fun FrostSoulPlayerAdapter(
                 onOpenAudioOutput = {
                     SystemMediaControlResolver.openMediaOutputSwitcher(applicationContext)
                 },
-                onShareSong = {
-                    val shareIntent =
-                        Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_SUBJECT, mediaMetadata.title)
-                            putExtra(Intent.EXTRA_TEXT, "https://music.youtube.com/watch?v=${mediaMetadata.id}")
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        }
-                    applicationContext.startActivity(
-                        Intent.createChooser(shareIntent, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                    )
-                },
+                onOpenOptions = onOpenOptions,
                 onRefetchLyrics = { lyricsMenuViewModel.refetchLyrics(mediaMetadata) },
                 isRefetchingLyrics = isRefetchingLyrics,
 

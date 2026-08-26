@@ -117,7 +117,6 @@ internal fun FrostSoulPlayer(
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     var queueVisible by remember { mutableStateOf(false) }
-    var optionsVisible by remember { mutableStateOf(false) }
     var downwardDragDistance by remember { mutableFloatStateOf(0f) }
     val settledDragOffset by animateFloatAsState(
         targetValue = downwardDragDistance,
@@ -182,7 +181,6 @@ internal fun FrostSoulPlayer(
                     scope.launch { pagerState.animateScrollToPage(targetPage) }
                 },
                 onDismiss = actions.onDismiss,
-                onShareTrack = actions.onShareSong,
                 modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
             )
             HorizontalPager(
@@ -225,7 +223,7 @@ internal fun FrostSoulPlayer(
                                 uiState = uiState,
                                 actions = actions,
                                 onOpenQueue = { queueVisible = true },
-                                onOpenOptions = { optionsVisible = true },
+                                onOpenOptions = actions.onOpenOptions,
                             )
                         FrostSoulPage.Recommendations -> FrostSoulRecommendationsPage(uiState = uiState, actions = actions)
                     }
@@ -291,19 +289,6 @@ internal fun FrostSoulPlayer(
                     )
                 }
             }
-        }
-        AnimatedVisibility(
-            visible = optionsVisible,
-            enter = fadeIn(tween(160)) + slideInVertically(tween(280)) { it },
-            exit = fadeOut(tween(140)) + slideOutVertically(tween(240)) { it },
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
-        ) {
-            FrostSoulPlayerOptionsSheet(
-                accent = uiState.palette.accent,
-                onDismiss = { optionsVisible = false },
-                onOpenAudioOutput = actions.onOpenAudioOutput,
-                onShareSong = actions.onShareSong,
-            )
         }
     }
 }
@@ -741,20 +726,17 @@ private fun FrostSoulPlayerOptionsSheet(
     onDismiss: () -> Unit,
     onOpenAudioOutput: () -> Unit,
     onShareSong: () -> Unit,
+    onOpenQueue: () -> Unit,
+    onOpenLyrics: () -> Unit,
+    onToggleLike: () -> Unit,
 ) {
     val options =
         listOf(
-            Triple(R.drawable.style, "Music Therapy", false),
-            Triple(R.drawable.lyrics, "View Score", false),
-            Triple(R.drawable.tune, "Driving Mode", false),
-            Triple(R.drawable.info, "Production Team", false),
-            Triple(R.drawable.graphic_eq, "Workout Mode", false),
-            Triple(R.drawable.graphic_eq, "Game Mode", false),
-            Triple(R.drawable.settings, "Theme Center", false),
+            Triple(R.drawable.playlist_play, "Queue", true),
+            Triple(R.drawable.lyrics, "Lyrics", true),
+            Triple(R.drawable.bluetooth, "Audio output", true),
             Triple(R.drawable.share, "Share Song", true),
-            Triple(R.drawable.mic, "Sing This Song", false),
-            Triple(R.drawable.tune, "Dislike", false),
-            Triple(R.drawable.info, "Report", false),
+            Triple(R.drawable.favorite_border, "Like track", true),
         )
     FSGlassCard(
         accent = accent,
@@ -820,7 +802,13 @@ private fun FrostSoulPlayerOptionsSheet(
                                 .height(43.dp)
                                 .clickable(enabled = actionable) {
                                     if (actionable) {
-                                        if (label == "Share Song") onShareSong() else onOpenAudioOutput()
+                                        when (label) {
+                                            "Queue" -> onOpenQueue()
+                                            "Lyrics" -> onOpenLyrics()
+                                            "Audio output" -> onOpenAudioOutput()
+                                            "Share Song" -> onShareSong()
+                                            "Like track" -> onToggleLike()
+                                        }
                                         onDismiss()
                                     }
                                 }

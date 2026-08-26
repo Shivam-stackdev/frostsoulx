@@ -165,6 +165,7 @@ import dev.vxs.frostsoulx.constants.DisableBlurKey
 import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
 import dev.vxs.frostsoulx.constants.InnerTubeCookieKey
 import dev.vxs.frostsoulx.constants.MaxCanvasCacheSizeKey
+import dev.vxs.frostsoulx.constants.MiniPlayerHeight
 import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
 import dev.vxs.frostsoulx.constants.PlayerBackgroundStyleKey
 import dev.vxs.frostsoulx.constants.PlayerButtonsStyle
@@ -991,6 +992,7 @@ fun BottomSheetPlayer(
         onDismiss = {
             playerConnection.service.stopAndClearPlayback(clearPersistentState = true)
         },
+        collapsedContentHeight = MiniPlayerHeight,
         collapsedContent = {
             MiniPlayer(
                 position = position,
@@ -1245,6 +1247,18 @@ if (!aodModeEnabled) {
                     lyrics = currentLyricsEntity?.lyrics,
                     playerConnection = playerConnection,
                     onCollapse = state::collapseSoft,
+                    onOpenOptions = {
+                        menuState.show {
+                            PlayerMenu(
+                                mediaMetadata = metadata,
+                                navController = navController,
+                                playerBottomSheetState = state,
+                                showDetails = false,
+                                onShowDetailsDialog = {},
+                                onDismiss = menuState::dismiss,
+                            )
+                        }
+                    },
                     modifier =
                         Modifier
                             .fillMaxSize()

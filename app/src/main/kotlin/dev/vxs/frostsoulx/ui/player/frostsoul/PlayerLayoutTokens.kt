@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.sp
 /** Stable geometry and typography tokens for the full-screen FrostSoul player. */
 internal object PlayerLayoutTokens {
     val MasterHorizontalPadding = 24.dp
-    val VinylDiscSize = 300.dp
-    val CenterAlbumArtSize = 180.dp
+    val VinylDiscSize = 310.dp
+    val CenterAlbumArtSize = 190.dp
 
     val TrackTitleStyle = TextStyle(
         fontFamily = FontFamily.SansSerif,

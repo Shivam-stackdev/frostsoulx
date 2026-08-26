@@ -128,6 +128,7 @@ fun PlayerMenu(
     playerBottomSheetState: BottomSheetState,
     isQueueTrigger: Boolean? = false,
     onRemoveFromQueue: (() -> Unit)? = null,
+    showDetails: Boolean = true,
     onShowDetailsDialog: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -863,21 +864,23 @@ fun PlayerMenu(
                         )
                     }
 
-                    ListItem(
-                        headlineContent = { Text(text = stringResource(R.string.details)) },
-                        leadingContent = {
-                            Icon(
-                                painter = painterResource(R.drawable.info),
-                                contentDescription = null,
-                            )
-                        },
-                        modifier =
-                            Modifier.clickable {
-                                onShowDetailsDialog()
-                                onDismiss()
+                    if (showDetails) {
+                        ListItem(
+                            headlineContent = { Text(text = stringResource(R.string.details)) },
+                            leadingContent = {
+                                Icon(
+                                    painter = painterResource(R.drawable.info),
+                                    contentDescription = null,
+                                )
                             },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                    )
+                            modifier =
+                                Modifier.clickable {
+                                    onShowDetailsDialog()
+                                    onDismiss()
+                                },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        )
+                    }
 
                     if (isQueueTrigger != true) {
                         HorizontalDivider(

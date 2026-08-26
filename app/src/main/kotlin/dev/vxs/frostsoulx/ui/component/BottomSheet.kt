@@ -67,6 +67,7 @@ fun BottomSheet(
     modifier: Modifier = Modifier,
     backgroundColor: Color,
     onDismiss: (() -> Unit)? = null,
+    collapsedContentHeight: Dp? = null,
     collapsedContent: @Composable BoxScope.() -> Unit,
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -108,21 +109,30 @@ fun BottomSheet(
             )
         }
 
-        if (!state.isExpanded && (onDismiss == null || !state.isDismissed)) {
+                if (!state.isExpanded && (onDismiss == null || !state.isDismissed)) {
             Box(
                 modifier =
                     Modifier
                         .graphicsLayer {
                             alpha = 1f - (state.progress * 4).coerceAtMost(1f)
-                        }.clickable(
+                        }
+                        .fillMaxWidth()
+                        .height(collapsedContentHeight ?: state.collapsedBound),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(collapsedContentHeight ?: state.collapsedBound)
+                        .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = state::expandSoft,
-                        ).fillMaxWidth()
-                        .height(state.collapsedBound),
-                content = collapsedContent,
-            )
+                        ),
+                    content = collapsedContent,
+                )
+            }
         }
+
     }
 }
 

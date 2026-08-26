@@ -107,7 +107,7 @@ internal data class FrostSoulPlayerActions(
     val onSeek: (Long) -> Unit,
     val onToggleLike: () -> Unit,
     val onOpenAudioOutput: () -> Unit = {},
-    val onShareSong: () -> Unit = {},
+    val onOpenOptions: () -> Unit = {},
     val onRefetchLyrics: () -> Unit = {},
     val isRefetchingLyrics: Boolean = false,
     val onSelectQueueItem: (Int) -> Unit,
