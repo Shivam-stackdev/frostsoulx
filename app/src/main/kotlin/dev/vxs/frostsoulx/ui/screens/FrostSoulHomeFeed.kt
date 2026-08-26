@@ -683,7 +683,7 @@ private fun FrostSoulHomeTabs(
         horizontalArrangement = Arrangement.spacedBy(26.dp),
         modifier = Modifier.fillMaxWidth().height(56.dp),
     ) {
-        itemsIndexed(chips, key = { _, chip -> chip.endpoint }) { index, chip ->
+        itemsIndexed(chips, key = { index, chip -> chip.endpoint?.toString() ?: "home-chip-$index" }) { index, chip ->
             val selected = if (selectedEndpoint == null) index == selectedIndex else chip.endpoint == selectedEndpoint
             val indicatorWidth by animateDpAsState(
                 targetValue = if (selected) 28.dp else 0.dp,
