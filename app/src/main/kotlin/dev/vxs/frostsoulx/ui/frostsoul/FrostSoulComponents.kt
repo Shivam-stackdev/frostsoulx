@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
@@ -70,9 +71,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil3.compose.AsyncImage
@@ -462,6 +465,30 @@ fun FSSectionHeader(
             )
         }
     }
+}
+
+/** Low-profile metadata badge for codec, quality, and queue information. */
+@Composable
+fun MinimalistMetadataChip(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    val colors = FrostSoulTheme.colors
+    val shape = RoundedCornerShape(6.dp)
+    FSText(
+        text = text,
+        color = colors.onSurfaceMuted,
+        fontSize = 11.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 0.5.sp,
+        maxLines = 1,
+        modifier =
+            modifier
+                .clip(shape)
+                .background(colors.surfaceGlass.copy(alpha = 0.06f), shape)
+                .border(width = 0.5.dp, color = colors.onSurfaceMuted.copy(alpha = 0.24f), shape = shape)
+                .padding(horizontal = 10.dp, vertical = 5.dp),
+    )
 }
 
 @Composable

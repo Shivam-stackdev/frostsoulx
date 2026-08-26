@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -67,10 +68,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
@@ -94,7 +96,7 @@ import coil3.size.Size
 import coil3.toBitmap
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
-import dev.vxs.frostsoulx.ui.frostsoul.FSChip
+import dev.vxs.frostsoulx.ui.frostsoul.MinimalistMetadataChip
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
@@ -150,10 +152,7 @@ internal fun FrostSoulPlayer(
                     )
                 },
         ) {
-            FrostSoulDynamicBackground(
-                artworkUrl = uiState.track.artworkUrl,
-                palette = uiState.palette,
-            )
+            FrostSoulDynamicBackground(artworkUrl = uiState.track.artworkUrl)
             Column(
             modifier =
                 Modifier
@@ -620,18 +619,12 @@ private fun FrostSoulAlbumPage(
             modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
         ) {
             Spacer(Modifier.height(2.dp))
-            FSGlassCard(
-                accent = uiState.palette.accent,
-                modifier = Modifier.fillMaxWidth(0.86f).aspectRatio(1f),
-            ) {
-                FSAlbumArt(
-                    artworkUrl = uiState.track.artworkUrl,
-                    title = uiState.track.title,
-                    isPlaying = uiState.isPlaying,
-                    palette = uiState.palette,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+            FSAlbumArt(
+                artworkUrl = uiState.track.artworkUrl,
+                title = uiState.track.title,
+                isPlaying = uiState.isPlaying,
+                modifier = Modifier.fillMaxWidth(0.86f).sizeIn(maxWidth = 310.dp, maxHeight = 310.dp),
+            )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
@@ -653,8 +646,8 @@ private fun FrostSoulAlbumPage(
                     modifier = Modifier.padding(top = 3.dp),
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 7.dp)) {
-                    FSChip(label = uiState.audioQualityBadge ?: "STANDARD", selected = false, onClick = {})
-                    FSChip(label = "${uiState.queue.size} IN QUEUE", selected = false, onClick = {})
+                    MinimalistMetadataChip(text = uiState.audioQualityBadge ?: "STANDARD")
+                    MinimalistMetadataChip(text = "${uiState.queue.size} IN QUEUE")
                 }
             }
             Row(
@@ -1049,52 +1042,35 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 private const val PaletteCacheCapacity = 24
 
 @Composable
-private fun FrostSoulDynamicBackground(
-    artworkUrl: String?,
-    palette: FrostSoulPalette,
-) {
+private fun FrostSoulDynamicBackground(artworkUrl: String?) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    Box(modifier = Modifier.fillMaxSize()) {
+    val saturationMatrix = ColorMatrix().apply { setToSaturation(0.1f) }
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(if (isLightTheme) FrostSoulTheme.colors.background else Color.Black),
+    ) {
         if (!artworkUrl.isNullOrBlank()) {
             AsyncImage(
                 model = artworkUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().blur(60.dp),
+                colorFilter = ColorFilter.colorMatrix(saturationMatrix),
+                modifier = Modifier.fillMaxSize().blur(90.dp),
             )
         }
-        Box(
-            modifier = Modifier.fillMaxSize().background(
-                if (isLightTheme) Color.White.copy(alpha = 0.60f) else Color.Black.copy(alpha = 0.45f),
-            ),
-        )
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .drawWithCache {
-                        val topSurface = if (isLightTheme) Color(0xFFF1F3F6) else Color(0xFF101012)
-                        val lowerGlow =
-                            Brush.verticalGradient(
-                                colorStops = arrayOf(
-                                    0f to topSurface.copy(alpha = 0.90f),
-                                    0.42f to topSurface.copy(alpha = 0.68f),
-                                    0.62f to palette.artworkSecondary.copy(alpha = if (isLightTheme) 0.08f else 0.16f),
-                                    0.80f to palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.16f else 0.34f),
-                                    1f to palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.28f else 0.56f),
-                                ),
-                            )
-                        val edgeGlow =
-                            Brush.radialGradient(
-                                listOf(palette.artworkPrimary.copy(alpha = if (isLightTheme) 0.08f else 0.16f), Color.Transparent),
-                                center = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.86f),
-                                radius = size.width * 0.88f,
-                            )
-                        onDrawBehind {
-                            drawRect(lowerGlow)
-                            drawRect(edgeGlow)
-                        }
-                    },
+                    .background(
+                        if (isLightTheme) {
+                            Color.White.copy(alpha = 0.70f)
+                        } else {
+                            Color.Black.copy(alpha = 0.65f)
+                        },
+                    ),
         )
     }
 }

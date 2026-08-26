@@ -156,7 +156,6 @@ internal fun FSAlbumArt(
     artworkUrl: String?,
     title: String,
     isPlaying: Boolean,
-    palette: FrostSoulPalette,
     modifier: Modifier = Modifier,
     compact: Boolean = false,
 ) {
@@ -185,7 +184,7 @@ internal fun FSAlbumArt(
             modifier
                 .aspectRatio(1f)
                 .shadow(
-                    elevation = if (compact) 0.dp else 16.dp,
+                    elevation = if (compact) 0.dp else 24.dp,
                     shape = CircleShape,
                     clip = false,
                 )
@@ -194,14 +193,15 @@ internal fun FSAlbumArt(
                     drawCircle(
                         brush =
                             Brush.radialGradient(
-                                colors = listOf(palette.accent.copy(alpha = 0.38f), Color.Transparent),
+                                colors = listOf(Color.White.copy(alpha = 0.07f), Color.Transparent),
                                 center = center,
                                 radius = radius,
                             ),
                         radius = radius,
                         center = center,
                     )
-                }.padding(if (compact) 2.dp else 0.dp),
+                }
+                .padding(if (compact) 2.dp else 0.dp),
     ) {
         if (!compact) {
             Canvas(modifier = Modifier.fillMaxSize()) {
@@ -217,7 +217,7 @@ internal fun FSAlbumArt(
                     )
                 }
                 drawCircle(
-                    color = palette.accent.copy(alpha = 0.22f),
+                    color = Color.White.copy(alpha = 0.12f),
                     radius = vinylRadius,
                     center = center,
                     style = Stroke(width = 1.5.dp.toPx()),
@@ -247,11 +247,11 @@ internal fun FSAlbumArt(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(if (compact) 0.dp else 22.dp)
+                    .padding(if (compact) 0.dp else 60.dp)
                     .graphicsLayer { rotationZ = displayedRotation }
                     .clip(artShape)
                     .background(FrostSoulSurfaceElevated)
-                    .border(1.dp, palette.accent.copy(alpha = 0.45f), artShape),
+                    .border(1.dp, Color.White.copy(alpha = 0.10f), artShape),
         ) {
             AsyncImage(
                 model = artworkUrl,
