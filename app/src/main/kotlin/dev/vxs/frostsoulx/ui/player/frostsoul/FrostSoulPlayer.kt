@@ -852,6 +852,10 @@ private fun FrostSoulRecommendationsPage(
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     val primaryText = if (isLightTheme) FrostSoulTheme.colors.onSurface else FrostSoulOnSurface
     val mutedText = if (isLightTheme) FrostSoulTheme.colors.onSurfaceMuted else FrostSoulOnSurfaceMuted
+    val chipText = if (isLightTheme) Color.Black else Color.White
+    val chipSurface = if (isLightTheme) Color.Black.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.08f)
+    val chipOutline = if (isLightTheme) Color.Black.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.18f)
+    val cardSurface = if (isLightTheme) Color.Black.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.07f)
 
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -873,77 +877,173 @@ private fun FrostSoulRecommendationsPage(
             overflow = TextOverflow.Ellipsis,
         )
         Text(
-            text = "FrostSoul keeps this page grounded in songs already selected on this device.",
+            text = "Songs already selected on this device, ready to play next.",
             color = mutedText,
             fontSize = 13.sp,
             lineHeight = 19.sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(vertical = 4.dp),
+        LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            contentPadding = PaddingValues(vertical = 2.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            gridItems(recommendationQueue, key = { "recommendation_${it.index}_${it.id}" }) { item ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { actions.onSelectQueueItem(item.index) },
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(8.dp)),
-                    ) {
-                        AsyncImage(
-                            model = item.artworkUrl,
-                            contentDescription = "Artwork for ${item.title}",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                        if (item.durationMs > 0L) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(5.dp)
-                                    .clip(RoundedCornerShape(7.dp))
-                                    .background(Color.Black.copy(alpha = 0.68f))
-                                    .padding(horizontal = 5.dp, vertical = 3.dp),
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.play),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(11.dp),
-                                )
-                                Text(
-                                    text = item.durationMs.asFrostSoulTime(),
-                                    color = Color.White,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.padding(start = 3.dp),
-                                )
-                            }
-                        }
-                    }
-                    Text(
-                        text = item.title,
-                        color = primaryText,
-                        fontSize = 12.sp,
-                        lineHeight = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 6.dp),
+            item {
+                FrostSoulRecommendationChip(
+                    label = "UP NEXT",
+                    textColor = chipText,
+                    surfaceColor = chipSurface,
+                    outlineColor = chipOutline,
+                    emphasized = true,
+                )
+            }
+            item {
+                FrostSoulRecommendationChip(
+                    label = "${recommendationQueue.size} TRACKS",
+                    textColor = chipText,
+                    surfaceColor = chipSurface,
+                    outlineColor = chipOutline,
+                )
+            }
+            uiState.audioQualityBadge?.takeIf { it.isNotBlank() }?.let { quality ->
+                item {
+                    FrostSoulRecommendationChip(
+                        label = quality,
+                        textColor = chipText,
+                        surfaceColor = chipSurface,
+                        outlineColor = chipOutline,
+                    )
+                }
+            }
+            uiState.queueTitle?.takeIf { it.isNotBlank() }?.let { title ->
+                item {
+                    FrostSoulRecommendationChip(
+                        label = title,
+                        textColor = chipText,
+                        surfaceColor = chipSurface,
+                        outlineColor = chipOutline,
                     )
                 }
             }
         }
+        if (recommendationQueue.isEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxWidth().weight(1f),
+            ) {
+                Text(
+                    text = "No more songs in this queue.",
+                    color = mutedText,
+                    fontSize = 15.sp,
+                )
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(top = 4.dp, bottom = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth().weight(1f),
+            ) {
+                gridItems(recommendationQueue, key = { "recommendation_${it.index}_${it.id}" }) { item ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(cardSurface)
+                            .clickable { actions.onSelectQueueItem(item.index) }
+                            .padding(bottom = 8.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(10.dp)),
+                        ) {
+                            AsyncImage(
+                                model = item.artworkUrl,
+                                contentDescription = "Artwork for ${item.title}",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                            if (item.durationMs > 0L) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(5.dp)
+                                        .clip(RoundedCornerShape(7.dp))
+                                        .background(Color.Black.copy(alpha = 0.72f))
+                                        .padding(horizontal = 5.dp, vertical = 3.dp),
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.play),
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(11.dp),
+                                    )
+                                    Text(
+                                        text = item.durationMs.asFrostSoulTime(),
+                                        color = Color.White,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(start = 3.dp),
+                                    )
+                                }
+                            }
+                        }
+                        Text(
+                            text = item.title,
+                            color = primaryText,
+                            fontSize = 12.sp,
+                            lineHeight = 15.sp,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                        )
+                        Text(
+                            text = item.artist,
+                            color = mutedText,
+                            fontSize = 10.sp,
+                            lineHeight = 13.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FrostSoulRecommendationChip(
+    label: String,
+    textColor: Color,
+    surfaceColor: Color,
+    outlineColor: Color,
+    emphasized: Boolean = false,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .clip(RoundedCornerShape(7.dp))
+            .background(if (emphasized) textColor.copy(alpha = 0.14f) else surfaceColor)
+            .border(1.dp, if (emphasized) textColor.copy(alpha = 0.32f) else outlineColor, RoundedCornerShape(7.dp))
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+    ) {
+        Text(
+            text = label.uppercase(),
+            color = textColor.copy(alpha = if (emphasized) 0.96f else 0.78f),
+            fontSize = 10.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.6.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
