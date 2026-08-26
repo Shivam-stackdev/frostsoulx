@@ -2025,7 +2025,9 @@ class MainActivity : ComponentActivity() {
                                                             start = NavigationBarHorizontalPadding,
                                                             end = NavigationBarHorizontalPadding,
                                                             bottom = bottomInset + floatingBarsBottomPadding,
-                                                        ).height(navVisibleHeight),
+                                                        )
+                                                        .height(navVisibleHeight)
+                                                        .zIndex(2f),
                                                 isSelected = { screen ->
                                                     navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } ==
                                                         true

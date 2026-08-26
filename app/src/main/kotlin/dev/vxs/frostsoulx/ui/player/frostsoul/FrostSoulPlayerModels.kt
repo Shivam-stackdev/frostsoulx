@@ -8,6 +8,9 @@
 package dev.vxs.frostsoulx.ui.player.frostsoul
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.unit.sp
+import dev.vxs.frostsoulx.models.ActiveOutputDevice
+import dev.vxs.frostsoulx.models.PlayerOutputDevice
 import androidx.compose.ui.graphics.Color
 import dev.vxs.frostsoulx.models.MediaMetadata
 
@@ -76,6 +79,10 @@ internal data class FrostSoulPlayerUiState(
     val lyrics: String?,
     val currentLyricLine: String? = null,
     val audioQualityBadge: String? = null,
+    val outputDevice: ActiveOutputDevice = ActiveOutputDevice(
+        type = PlayerOutputDevice.Unknown,
+        name = PlayerOutputDevice.Unknown.defaultName,
+    ),
     val palette: FrostSoulPalette = FrostSoulPalette.Default,
 ) {
     val safeDurationMs: Long

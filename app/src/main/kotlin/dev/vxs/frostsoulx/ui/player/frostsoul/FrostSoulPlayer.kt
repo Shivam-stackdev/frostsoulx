@@ -111,8 +111,8 @@ internal fun FrostSoulPlayer(
     actions: FrostSoulPlayerActions,
     modifier: Modifier = Modifier,
 ) {
-    // Reference pager: swipe left for lyrics, stay centered on the player, swipe right for recommendations.
-    val pages = remember { listOf(FrostSoulPage.Lyrics, FrostSoulPage.MainPlayer, FrostSoulPage.Recommendations) }
+    // QQ-style pager: Recommendations stay on the left, Main Player in the center, Lyrics on the right.
+    val pages = remember { listOf(FrostSoulPage.Recommendations, FrostSoulPage.MainPlayer, FrostSoulPage.Lyrics) }
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     var queueVisible by remember { mutableStateOf(false) }
@@ -222,9 +222,6 @@ internal fun FrostSoulPlayer(
                             FrostSoulAlbumPage(
                                 uiState = uiState,
                                 actions = actions,
-                                onOpenLyrics = {
-                                    scope.launch { pagerState.animateScrollToPage(pages.indexOf(FrostSoulPage.Lyrics)) }
-                                },
                                 onOpenQueue = { queueVisible = true },
                                 onOpenOptions = { optionsVisible = true },
                             )
@@ -631,7 +628,6 @@ internal fun FrostSoulPagerDots(
 private fun FrostSoulAlbumPage(
     uiState: FrostSoulPlayerUiState,
     actions: FrostSoulPlayerActions,
-    onOpenLyrics: () -> Unit,
     onOpenQueue: () -> Unit,
     onOpenOptions: () -> Unit,
 ) {
@@ -700,18 +696,9 @@ private fun FrostSoulAlbumPage(
                     active = uiState.track.isLiked,
                     compact = true,
                 )
-                FSIconButton(
-                    painter = painterResource(R.drawable.lyrics),
-                    contentDescription = "Open synchronized lyrics",
-                    onClick = onOpenLyrics,
-                    active = uiState.currentLyricLine != null,
-                    compact = true,
-                )
-                FSIconButton(
-                    painter = painterResource(R.drawable.bluetooth),
-                    contentDescription = "Open audio output",
+                FrostSoulOutputDeviceButton(
+                    device = uiState.outputDevice,
                     onClick = actions.onOpenAudioOutput,
-                    compact = true,
                 )
                 FSIconButton(
                     painter = painterResource(R.drawable.more_vert),
@@ -727,6 +714,39 @@ private fun FrostSoulAlbumPage(
                     modifier = Modifier.padding(top = 2.dp),
             )
         }
+    }
+}
+
+@Composable
+private fun FrostSoulOutputDeviceButton(
+    device: dev.vxs.frostsoulx.models.ActiveOutputDevice,
+    onClick: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+        modifier = Modifier
+            .clip(RoundedCornerShape(22.dp))
+            .background(FrostSoulTheme.colors.surfaceGlass)
+            .border(1.dp, FrostSoulTheme.colors.outline.copy(alpha = 0.82f), RoundedCornerShape(22.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 9.dp),
+    ) {
+        androidx.compose.material3.Icon(
+            imageVector = device.type.imageVector,
+            contentDescription = "Audio output device",
+            tint = FrostSoulTheme.colors.onSurface,
+            modifier = Modifier.size(20.dp),
+        )
+        Text(
+            text = device.name,
+            color = FrostSoulTheme.colors.onSurface,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.widthIn(max = 126.dp),
+        )
     }
 }
 

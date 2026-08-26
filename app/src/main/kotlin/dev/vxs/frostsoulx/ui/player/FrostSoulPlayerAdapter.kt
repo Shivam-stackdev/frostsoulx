@@ -14,8 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import android.content.Intent
-import android.provider.Settings
+import dev.vxs.frostsoulx.utils.oem.SystemMediaControlResolver
 import dagger.hilt.android.EntryPointAccessors
 import dev.vxs.frostsoulx.db.entities.containerLabel
 import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
@@ -62,6 +61,7 @@ internal fun FrostSoulPlayerAdapter(
     val currentLyricLine by lyricsSynchronizationEngine.currentLine.collectAsState()
     val currentLyricText = currentLyricLine?.text
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
+    val outputDevice by playerConnection.service.activeAudioDevice.collectAsStateWithLifecycle()
     val audioQualityBadge =
         remember(currentFormat) {
             currentFormat?.containerLabel()?.uppercase()?.takeIf { it.isNotBlank() }
@@ -96,6 +96,7 @@ internal fun FrostSoulPlayerAdapter(
             lyrics,
             currentLyricText,
             audioQualityBadge,
+            outputDevice,
             palette,
         ) {
             FrostSoulPlayerUiState(
@@ -111,6 +112,7 @@ internal fun FrostSoulPlayerAdapter(
                 lyrics = lyrics,
                 currentLyricLine = currentLyricText,
                 audioQualityBadge = audioQualityBadge,
+                outputDevice = outputDevice,
                 palette = palette,
             )
         }
@@ -124,11 +126,10 @@ internal fun FrostSoulPlayerAdapter(
                 onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
                 onSeek = { targetPosition -> playerConnection.player.seekTo(targetPosition) },
                 onToggleLike = playerConnection::toggleLike,
-                onOpenAudioOutput = {
-                    applicationContext.startActivity(
-                        Intent(Settings.ACTION_BLUETOOTH_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                    )
-                },
+                        onOpenAudioOutput = {
+            SystemMediaControlResolver.openMediaOutputSwitcher(applicationContext)
+        },
+
                 onSelectQueueItem = { queueIndex ->
                     val targetWindow = queueWindows.getOrNull(queueIndex)
                     if (targetWindow != null) {
