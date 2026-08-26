@@ -247,7 +247,7 @@ internal fun FSAlbumArt(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(if (compact) 0.dp else 60.dp)
+                    .padding(if (compact) 0.dp else (PlayerLayoutTokens.VinylDiscSize - PlayerLayoutTokens.CenterAlbumArtSize) / 2f)
                     .graphicsLayer { rotationZ = displayedRotation }
                     .clip(artShape)
                     .background(FrostSoulSurfaceElevated)

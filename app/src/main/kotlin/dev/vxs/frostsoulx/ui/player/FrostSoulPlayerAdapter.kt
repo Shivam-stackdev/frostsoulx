@@ -23,6 +23,7 @@ import androidx.media3.common.Timeline
 import dev.vxs.frostsoulx.extensions.mediaItems
 import dev.vxs.frostsoulx.extensions.metadata
 import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.extensions.toggleRepeatMode
 import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.playback.PlayerConnection
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulPlayer
@@ -119,6 +120,7 @@ internal fun FrostSoulPlayerAdapter(
                 onTogglePlayPause = { playerConnection.player.togglePlayPause() },
                 onSkipPrevious = playerConnection::seekToPrevious,
                 onSkipNext = playerConnection::seekToNext,
+                onToggleRepeat = { playerConnection.player.toggleRepeatMode() },
                 onSeek = { targetPosition -> playerConnection.player.seekTo(targetPosition) },
                 onToggleLike = playerConnection::toggleLike,
                 onOpenAudioOutput = {

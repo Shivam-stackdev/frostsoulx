@@ -95,6 +95,7 @@ internal data class FrostSoulPlayerActions(
     val onTogglePlayPause: () -> Unit,
     val onSkipPrevious: () -> Unit,
     val onSkipNext: () -> Unit,
+    val onToggleRepeat: () -> Unit = {},
     val onSeek: (Long) -> Unit,
     val onToggleLike: () -> Unit,
     val onOpenAudioOutput: () -> Unit = {},

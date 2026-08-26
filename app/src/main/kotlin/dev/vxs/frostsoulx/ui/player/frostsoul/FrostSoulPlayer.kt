@@ -158,8 +158,21 @@ internal fun FrostSoulPlayer(
                 Modifier
                     .fillMaxSize()
                     .windowInsetsPadding(WindowInsets.systemBars)
-                    .padding(horizontal = 18.dp),
+                    .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding),
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp, bottom = 12.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 40.dp, height = 4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(FrostSoulTheme.colors.onSurfaceMuted.copy(alpha = 0.42f)),
+                )
+            }
             FSTopBar(
                 selectedPage = pagerState.currentPage,
                 pageOffsetFraction = pagerState.currentPageOffsetFraction,
@@ -448,9 +461,9 @@ internal fun FSMiniPlayer(
 internal fun FSPlayerControls(
     state: FrostSoulPlayerUiState,
     actions: FrostSoulPlayerActions,
+    onOpenQueue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val remainingMs = (state.safeDurationMs - state.positionMs).coerceAtLeast(0L)
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
@@ -464,8 +477,14 @@ internal fun FSPlayerControls(
             modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(state.positionMs.asFrostSoulTime(), color = FrostSoulOnSurfaceMuted, fontSize = 11.sp)
-            Text(state.safeDurationMs.asFrostSoulTime(), color = FrostSoulOnSurfaceMuted, fontSize = 11.sp)
+            Text(
+                state.positionMs.asFrostSoulTime(),
+                style = PlayerLayoutTokens.TimelineTimeStyle.copy(color = FrostSoulOnSurfaceMuted),
+            )
+            Text(
+                state.safeDurationMs.asFrostSoulTime(),
+                style = PlayerLayoutTokens.TimelineTimeStyle.copy(color = FrostSoulOnSurfaceMuted),
+            )
         }
         state.audioQualityBadge?.let { badge ->
             Box(
@@ -488,14 +507,25 @@ internal fun FSPlayerControls(
         }
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            FSIconButton(
+                painter = painterResource(R.drawable.repeat),
+                contentDescription = "Toggle repeat mode",
+                onClick = actions.onToggleRepeat,
+                buttonSize = 32.dp,
+                iconSize = 24.dp,
+                showContainer = false,
+            )
             FSIconButton(
                 painter = painterResource(R.drawable.skip_previous),
                 contentDescription = "Previous track",
                 onClick = actions.onSkipPrevious,
                 enabled = state.canSkipPrevious,
+                buttonSize = 32.dp,
+                iconSize = 32.dp,
+                showContainer = false,
             )
             FSPlayButton(
                 isPlaying = state.isPlaying,
@@ -508,6 +538,17 @@ internal fun FSPlayerControls(
                 contentDescription = "Next track",
                 onClick = actions.onSkipNext,
                 enabled = state.canSkipNext,
+                buttonSize = 32.dp,
+                iconSize = 32.dp,
+                showContainer = false,
+            )
+            FSIconButton(
+                painter = painterResource(R.drawable.queue_music),
+                contentDescription = "Open playback queue",
+                onClick = onOpenQueue,
+                buttonSize = 32.dp,
+                iconSize = 24.dp,
+                showContainer = false,
             )
         }
     }
@@ -529,7 +570,7 @@ private fun FSPlayButton(
         contentAlignment = Alignment.Center,
         modifier =
             Modifier
-                .size(68.dp)
+                .size(64.dp)
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
@@ -623,29 +664,26 @@ private fun FrostSoulAlbumPage(
                 artworkUrl = uiState.track.artworkUrl,
                 title = uiState.track.title,
                 isPlaying = uiState.isPlaying,
-                modifier = Modifier.fillMaxWidth(0.86f).sizeIn(maxWidth = 310.dp, maxHeight = 310.dp),
+                modifier = Modifier.size(PlayerLayoutTokens.VinylDiscSize),
             )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             ) {
-                Text(
-                    text = uiState.track.title,
-                    color = FrostSoulOnSurface,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
+                    Text(
+                        text = uiState.track.title,
+                        style = PlayerLayoutTokens.TrackTitleStyle.copy(color = FrostSoulOnSurface),
+                        maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(
-                    text = uiState.track.artist,
-                    color = FrostSoulOnSurface,
-                    fontSize = 14.sp,
-                    maxLines = 1,
+                    Text(
+                        text = uiState.track.artist,
+                        style = PlayerLayoutTokens.ArtistSubtitleStyle.copy(color = FrostSoulOnSurfaceMuted),
+                        maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 3.dp),
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 7.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 14.dp)) {
                     MinimalistMetadataChip(text = uiState.audioQualityBadge ?: "STANDARD")
                     MinimalistMetadataChip(text = "${uiState.queue.size} IN QUEUE")
                 }
@@ -682,10 +720,11 @@ private fun FrostSoulAlbumPage(
                     compact = true,
                 )
             }
-            FSPlayerControls(
-                state = uiState,
-                actions = actions,
-                modifier = Modifier.padding(top = 2.dp),
+                FSPlayerControls(
+                    state = uiState,
+                    actions = actions,
+                    onOpenQueue = onOpenQueue,
+                    modifier = Modifier.padding(top = 2.dp),
             )
         }
     }
@@ -1049,7 +1088,7 @@ private fun FrostSoulDynamicBackground(artworkUrl: String?) {
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(if (isLightTheme) FrostSoulTheme.colors.background else Color.Black),
+                .background(if (isLightTheme) FrostSoulTheme.colors.background else FrostSoulTheme.PureBlack),
     ) {
         if (!artworkUrl.isNullOrBlank()) {
             AsyncImage(
@@ -1068,7 +1107,7 @@ private fun FrostSoulDynamicBackground(artworkUrl: String?) {
                         if (isLightTheme) {
                             Color.White.copy(alpha = 0.70f)
                         } else {
-                            Color.Black.copy(alpha = 0.65f)
+                            FrostSoulTheme.PureBlack.copy(alpha = 0.68f)
                         },
                     ),
         )
