@@ -1925,7 +1925,8 @@ class MainActivity : ComponentActivity() {
                                                                 y = (slideOffset + hideOffset).roundToPx(),
                                                             )
                                                         }
-                                                    },
+                                                    }
+                                                    .zIndex(10f),
                                         ) {
                                             FloatingNavigationToolbar(
                                                 items = navigationItems,
@@ -1939,8 +1940,7 @@ class MainActivity : ComponentActivity() {
                                                             end = NavigationBarHorizontalPadding,
                                                             bottom = bottomInset + floatingBarsBottomPadding,
                                                         )
-                                                        .height(navVisibleHeight)
-                                                        .zIndex(10f),
+                                                        .height(navVisibleHeight),
                                                 isSelected = { screen ->
                                                     navBackStackEntry?.destination?.hierarchy?.any { it.route == screen.route } ==
                                                         true

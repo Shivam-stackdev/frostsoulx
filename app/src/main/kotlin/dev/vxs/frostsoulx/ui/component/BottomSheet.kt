@@ -71,6 +71,13 @@ fun BottomSheet(
     collapsedContent: @Composable BoxScope.() -> Unit,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    val sheetDragModifier =
+        if (!state.isCollapsed && !state.isDismissed) {
+            Modifier.bottomSheetDraggable(state, onDismiss)
+        } else {
+            Modifier
+        }
+
     Box(
         modifier =
             modifier
@@ -81,7 +88,7 @@ fun BottomSheet(
                             .roundToPx()
                             .coerceAtLeast(0)
                     IntOffset(x = 0, y = y)
-                }.bottomSheetDraggable(state, onDismiss)
+                }.then(sheetDragModifier)
                 .clip(
                     RoundedCornerShape(
                         topStart = if (!state.isExpanded) 16.dp else 0.dp,
@@ -398,24 +405,18 @@ fun Modifier.bottomSheetDraggable(
 
         detectVerticalDragGestures(
             onVerticalDrag = { change, dragAmount ->
-                if (!state.isCollapsed && !state.isDismissed) {
-                    velocityTracker.addPointerInputChange(change)
-                    state.dispatchRawDelta(dragAmount)
-                }
+                velocityTracker.addPointerInputChange(change)
+                state.dispatchRawDelta(dragAmount)
             },
             onDragCancel = {
-                if (!state.isCollapsed && !state.isDismissed) {
-                    val velocity = -velocityTracker.calculateVelocity().y
-                    state.performFling(velocity, onDismiss)
-                }
+                val velocity = -velocityTracker.calculateVelocity().y
                 velocityTracker.resetTracking()
+                state.performFling(velocity, onDismiss)
             },
             onDragEnd = {
-                if (!state.isCollapsed && !state.isDismissed) {
-                    val velocity = -velocityTracker.calculateVelocity().y
-                    state.performFling(velocity, onDismiss)
-                }
+                val velocity = -velocityTracker.calculateVelocity().y
                 velocityTracker.resetTracking()
+                state.performFling(velocity, onDismiss)
             },
         )
     }
