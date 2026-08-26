@@ -34,7 +34,6 @@ data class OnboardingUiState(
     val versionName: String,
     val pages: ImmutableList<OnboardingPageUiModel>,
     val permissions: ImmutableList<OnboardingPermissionUiModel>,
-    val communityActions: ImmutableList<OnboardingCommunityActionUiModel>,
 )
 
 @Immutable
@@ -48,7 +47,6 @@ data class OnboardingPageUiModel(
 enum class OnboardingPageId {
     WELCOME,
     PERMISSIONS,
-    COMMUNITY,
 }
 
 @Immutable
@@ -95,15 +93,6 @@ sealed interface OnboardingPermissionAction {
     data object OpenInstallPackagesSettings : OnboardingPermissionAction
 }
 
-@Immutable
-data class OnboardingCommunityActionUiModel(
-    val id: String,
-    @StringRes val titleResId: Int,
-    @StringRes val descriptionResId: Int,
-    @DrawableRes val iconResId: Int,
-    val url: String,
-)
-
 data class OnboardingData(
     val shouldShowOnboarding: Boolean,
     val permissions: ImmutableList<OnboardingPermissionData>,
@@ -115,8 +104,4 @@ sealed interface OnboardingEvent {
     ) : OnboardingEvent
 
     data object OpenInstallPackagesSettings : OnboardingEvent
-
-    data class OpenUri(
-        val url: String,
-    ) : OnboardingEvent
 }

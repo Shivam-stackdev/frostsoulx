@@ -84,12 +84,6 @@ class OnboardingViewModel
             }
         }
 
-        fun onCommunityAction(action: OnboardingCommunityActionUiModel) {
-            viewModelScope.launch {
-                mutableEvents.emit(OnboardingEvent.OpenUri(action.url))
-            }
-        }
-
         fun onPermissionResult() {
             refreshSignals.update { it + 1 }
         }

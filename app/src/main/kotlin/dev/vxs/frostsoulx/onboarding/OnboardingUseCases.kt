@@ -46,7 +46,6 @@ class BuildOnboardingUiStateUseCase
                 versionName = BuildConfig.VERSION_NAME,
                 pages = pages,
                 permissions = ImmutableList.copyOf(data.permissions.map { it.toUiModel() }),
-                communityActions = communityActions,
             )
 
         private fun variantLabelResId(): Int =
@@ -184,8 +183,6 @@ class BuildOnboardingUiStateUseCase
                         iconResId = R.drawable.security,
                     ),
                 )
-
-            val communityActions = ImmutableList.of<OnboardingCommunityActionUiModel>()
         }
     }
 

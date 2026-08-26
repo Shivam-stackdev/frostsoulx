@@ -86,9 +86,6 @@ fun OnboardingRoute(
                         .setData("package:${context.packageName}".toUri())
                     runCatching { settingsLauncher.launch(intent) }
                 }
-                is OnboardingEvent.OpenUri -> runCatching {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, event.url.toUri()))
-                }
             }
         }
     }
@@ -99,7 +96,6 @@ fun OnboardingRoute(
         onBack = viewModel::onBack,
         onComplete = viewModel::complete,
         onPermissionAction = viewModel::onPermissionAction,
-        onCommunityAction = viewModel::onCommunityAction,
         modifier = modifier,
     )
 }
@@ -111,7 +107,6 @@ fun OnboardingScreen(
     onBack: () -> Unit,
     onComplete: () -> Unit,
     onPermissionAction: (OnboardingPermissionAction) -> Unit,
-    onCommunityAction: (dev.vxs.frostsoulx.onboarding.OnboardingCommunityActionUiModel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -223,7 +218,7 @@ private fun OnboardingPager(
                     permissions = uiState.permissions,
                     onPermissionAction = onPermissionAction,
                 )
-                OnboardingPageId.COMMUNITY, null -> WelcomePage(uiState = uiState)
+                null -> WelcomePage(uiState = uiState)
             }
         }
 

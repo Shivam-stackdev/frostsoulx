@@ -708,7 +708,6 @@ private fun FrostSoulPlayerOptionsSheet(
             Triple(R.drawable.graphic_eq, "Workout Mode", false),
             Triple(R.drawable.graphic_eq, "Game Mode", false),
             Triple(R.drawable.settings, "Theme Center", false),
-            Triple(R.drawable.favorite, "Listen Together", false),
             Triple(R.drawable.share, "Lyrics Poster", false),
             Triple(R.drawable.mic, "Sing This Song", false),
             Triple(R.drawable.tune, "Dislike", false),
