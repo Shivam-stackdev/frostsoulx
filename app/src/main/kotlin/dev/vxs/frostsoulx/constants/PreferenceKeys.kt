@@ -16,11 +16,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-val DynamicThemeKey = booleanPreferencesKey("dynamicTheme")
-val CustomThemeColorKey = stringPreferencesKey("customThemeColor")
-val RandomThemeOnStartupKey = booleanPreferencesKey("randomThemeOnStartup")
 val DarkModeKey = stringPreferencesKey("darkMode")
-val PureBlackKey = booleanPreferencesKey("pureBlack")
 val DisableAnimationsKey = booleanPreferencesKey("disableAnimations")
 val ForceHighRefreshRateKey = booleanPreferencesKey("forceHighRefreshRate")
 val EnableHapticFeedbackKey = booleanPreferencesKey("enableHapticFeedback")

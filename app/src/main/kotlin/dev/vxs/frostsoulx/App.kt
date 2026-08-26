@@ -46,9 +46,6 @@ import dev.vxs.frostsoulx.scrobbling.LastFmServiceConfig
 import dev.vxs.frostsoulx.storage.StorageFolderKind
 import dev.vxs.frostsoulx.storage.StorageLocationRepository
 import dev.vxs.frostsoulx.ui.player.CanvasArtworkPlaybackCache
-import dev.vxs.frostsoulx.ui.screens.settings.ThemePalettes
-import dev.vxs.frostsoulx.ui.theme.ThemeSeedPalette
-import dev.vxs.frostsoulx.ui.theme.ThemeSeedPaletteCodec
 import dev.vxs.frostsoulx.utils.MoriCipherUpdateScheduler
 import dev.vxs.frostsoulx.utils.PreferenceStore
 import dev.vxs.frostsoulx.utils.ProxyUtils
@@ -193,21 +190,6 @@ class App :
                     YouTube.useLoginForBrowse = true
                 }
 
-                // Apply random theme on startup if enabled
-                if (prefs[RandomThemeOnStartupKey] == true) {
-                    val randomPalette = ThemePalettes.generateRandomPalette()
-                    val seedPalette =
-                        ThemeSeedPalette(
-                            primary = randomPalette.primary,
-                            secondary = randomPalette.secondary,
-                            tertiary = randomPalette.tertiary,
-                            neutral = randomPalette.neutral,
-                        )
-                    val encodedPalette = ThemeSeedPaletteCodec.encodeForPreference(seedPalette, "Random")
-                    dataStore.edit { settings ->
-                        settings[CustomThemeColorKey] = encodedPalette
-                    }
-                }
 
                 isInitialized = true
             } catch (e: Exception) {

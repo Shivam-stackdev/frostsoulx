@@ -169,10 +169,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
-import coil3.imageLoader
-import coil3.request.ImageRequest
-import coil3.request.allowHardware
-import coil3.toBitmap
 import com.valentinilk.shimmer.LocalShimmerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -190,12 +186,10 @@ import dev.vxs.frostsoulx.constants.AppBarHeight
 import dev.vxs.frostsoulx.constants.AppFontPreference
 import dev.vxs.frostsoulx.constants.AppLanguageKey
 import dev.vxs.frostsoulx.constants.CustomFontUriKey
-import dev.vxs.frostsoulx.constants.CustomThemeColorKey
 import dev.vxs.frostsoulx.constants.DarkModeKey
 import dev.vxs.frostsoulx.constants.DefaultOpenTabKey
 import dev.vxs.frostsoulx.constants.DisableAnimationsKey
 import dev.vxs.frostsoulx.constants.DisableScreenshotKey
-import dev.vxs.frostsoulx.constants.DynamicThemeKey
 import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
 import dev.vxs.frostsoulx.constants.FontPreferenceKey
 import dev.vxs.frostsoulx.constants.HasPressedStarKey
@@ -213,7 +207,6 @@ import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
 import dev.vxs.frostsoulx.constants.PlayerBackgroundStyleKey
 import dev.vxs.frostsoulx.constants.PlayerDesignStyle
 import dev.vxs.frostsoulx.constants.PlayerDesignStyleKey
-import dev.vxs.frostsoulx.constants.PureBlackKey
 import dev.vxs.frostsoulx.constants.RemindAfterKey
 import dev.vxs.frostsoulx.constants.SYSTEM_DEFAULT
 import dev.vxs.frostsoulx.constants.SearchSource
@@ -221,7 +214,6 @@ import dev.vxs.frostsoulx.constants.SearchSourceKey
 import dev.vxs.frostsoulx.constants.StopMusicOnTaskClearKey
 import dev.vxs.frostsoulx.constants.UpdateChannel
 import dev.vxs.frostsoulx.constants.UpdateChannelKey
-import dev.vxs.frostsoulx.constants.UseSystemFontKey
 import dev.vxs.frostsoulx.db.MusicDatabase
 import dev.vxs.frostsoulx.db.entities.Album
 import dev.vxs.frostsoulx.db.entities.Artist
@@ -283,10 +275,6 @@ import dev.vxs.frostsoulx.ui.screens.settings.DarkMode
 import dev.vxs.frostsoulx.ui.screens.settings.NavigationTab
 import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
-import dev.vxs.frostsoulx.ui.frostsoul.SearchTheme
-import dev.vxs.frostsoulx.ui.theme.ColorSaver
-import dev.vxs.frostsoulx.ui.theme.DefaultThemeColor
-import dev.vxs.frostsoulx.ui.theme.extractThemeColor
 import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
 import dev.vxs.frostsoulx.ui.utils.backToMain
 import dev.vxs.frostsoulx.ui.utils.resetHeightOffset
@@ -695,9 +683,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            val enableDynamicTheme by rememberPreference(DynamicThemeKey, defaultValue = true)
-            val customThemeColorValue by rememberPreference(CustomThemeColorKey, defaultValue = "default")
-            val darkTheme by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
+            val darkMode by rememberEnumPreference(DarkModeKey, defaultValue = DarkMode.AUTO)
+            val systemDarkTheme = isSystemInDarkTheme()
+            val useDarkTheme = remember(darkMode, systemDarkTheme) {
+                if (darkMode == DarkMode.AUTO) systemDarkTheme else darkMode == DarkMode.ON
+            }
+            val pureBlack = useDarkTheme
             val defaultDisableAnimations = remember(this@MainActivity) { applicationContext.isLowRamDevice() }
             val disableAnimations by rememberPreference(
                 DisableAnimationsKey,
@@ -705,105 +696,9 @@ class MainActivity : ComponentActivity() {
             )
             val fontPreference by rememberEnumPreference(FontPreferenceKey, defaultValue = AppFontPreference.DEFAULT)
             val customFontUri by rememberPreference(CustomFontUriKey, defaultValue = "")
-            val legacyUseSystemFont by rememberPreference(UseSystemFontKey, defaultValue = false)
-            val isSystemInDarkTheme = isSystemInDarkTheme()
-            val useDarkTheme =
-                remember(darkTheme, isSystemInDarkTheme) {
-                    if (darkTheme == DarkMode.AUTO) isSystemInDarkTheme else darkTheme == DarkMode.ON
-                }
-            val pureBlackEnabled by rememberPreference(PureBlackKey, defaultValue = false)
-            val pureBlack = pureBlackEnabled && useDarkTheme
-
-            val customThemeSeedPalette =
-                remember(customThemeColorValue) {
-                    if (customThemeColorValue.startsWith("#")) {
-                        null
-                    } else if (customThemeColorValue.startsWith("seedPalette:")) {
-                        dev.vxs.frostsoulx.ui.theme.ThemeSeedPaletteCodec
-                            .decodeFromPreference(customThemeColorValue)
-                    } else {
-                        dev.vxs.frostsoulx.ui.screens.settings.ThemePalettes
-                            .findById(customThemeColorValue)
-                            ?.let {
-                                dev.vxs.frostsoulx.ui.theme.ThemeSeedPalette(
-                                    primary = it.primary,
-                                    secondary = it.secondary,
-                                    tertiary = it.tertiary,
-                                    neutral = it.neutral,
-                                )
-                            }
-                    }
-                }
-
-            val customThemeColor =
-                remember(customThemeColorValue, customThemeSeedPalette) {
-                    if (customThemeColorValue.startsWith("#")) {
-                        try {
-                            val colorString = customThemeColorValue.removePrefix("#")
-                            Color(android.graphics.Color.parseColor("#$colorString"))
-                        } catch (e: Exception) {
-                            DefaultThemeColor
-                        }
-                    } else {
-                        customThemeSeedPalette?.primary ?: DefaultThemeColor
-                    }
-                }
-
-            var themeColor by rememberSaveable(stateSaver = ColorSaver) {
-                mutableStateOf(DefaultThemeColor)
-            }
-
-            LaunchedEffect(legacyUseSystemFont) {
-                if (!legacyUseSystemFont) return@LaunchedEffect
-                val preferences = dataStore.data.first()
-                if (preferences[FontPreferenceKey] == null) {
-                    dataStore.edit { it[FontPreferenceKey] = AppFontPreference.SYSTEM.name }
-                }
-            }
-
-            LaunchedEffect(playerConnection, enableDynamicTheme, isSystemInDarkTheme, customThemeColor) {
-                val playerConnection = playerConnection
-                if (!enableDynamicTheme || playerConnection == null) {
-                    themeColor = if (!enableDynamicTheme) customThemeColor else DefaultThemeColor
-                    return@LaunchedEffect
-                }
-                playerConnection.service.currentMediaMetadata.collectLatest { song ->
-                    if (song != null) {
-                        withContext(Dispatchers.Default) {
-                            try {
-                                val result =
-                                    imageLoader.execute(
-                                        ImageRequest
-                                            .Builder(this@MainActivity)
-                                            .data(song.thumbnailUrl)
-                                            .allowHardware(false)
-                                            .build(),
-                                    )
-                                val extractedColor = result.image?.toBitmap()?.extractThemeColor()
-                                withContext(Dispatchers.Main) {
-                                    themeColor = extractedColor ?: DefaultThemeColor
-                                }
-                            } catch (e: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    themeColor = DefaultThemeColor
-                                }
-                            }
-                        }
-                    } else {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            themeColor = DefaultThemeColor
-                        } else {
-                            themeColor = customThemeColor
-                        }
-                    }
-                }
-            }
 
             ArchiveTuneTheme(
                 darkTheme = useDarkTheme,
-                pureBlack = pureBlack,
-                themeColor = themeColor,
-                seedPalette = if (!enableDynamicTheme) customThemeSeedPalette else null,
                 disableAnimations = disableAnimations,
                 fontPreference = fontPreference,
                 customFontUri = customFontUri,

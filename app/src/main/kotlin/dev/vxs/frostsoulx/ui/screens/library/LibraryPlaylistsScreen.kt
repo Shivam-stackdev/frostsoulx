@@ -92,7 +92,6 @@ import dev.vxs.frostsoulx.constants.PlaylistEditLockKey
 import dev.vxs.frostsoulx.constants.PlaylistSortDescendingKey
 import dev.vxs.frostsoulx.constants.PlaylistSortType
 import dev.vxs.frostsoulx.constants.PlaylistSortTypeKey
-import dev.vxs.frostsoulx.constants.PureBlackKey
 import dev.vxs.frostsoulx.db.entities.Playlist
 import dev.vxs.frostsoulx.extensions.move
 import dev.vxs.frostsoulx.extensions.toMediaItem
@@ -682,7 +681,7 @@ fun rememberArtworkCardColor(
         )
     val surfaceColor = MaterialTheme.colorScheme.surface
     val useDarkTheme = remember(surfaceColor) { ColorUtils.calculateLuminance(surfaceColor.toArgb()) < 0.5 }
-    val pureBlack by rememberPreference(PureBlackKey, defaultValue = false)
+    val pureBlack = useDarkTheme
 
     return remember(gradientColors, useDarkTheme, pureBlack) {
         val baseColor = gradientColors.firstOrNull() ?: fallbackColor

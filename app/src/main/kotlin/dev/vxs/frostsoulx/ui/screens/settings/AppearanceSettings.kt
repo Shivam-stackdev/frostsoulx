@@ -21,7 +21,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -80,7 +79,6 @@ import dev.vxs.frostsoulx.constants.DarkModeKey
 import dev.vxs.frostsoulx.constants.DefaultOpenTabKey
 import dev.vxs.frostsoulx.constants.DisableAnimationsKey
 import dev.vxs.frostsoulx.constants.DisableBlurKey
-import dev.vxs.frostsoulx.constants.DynamicThemeKey
 import dev.vxs.frostsoulx.constants.FontPreferenceKey
 import dev.vxs.frostsoulx.constants.ForceHighRefreshRateKey
 import dev.vxs.frostsoulx.constants.GridItemSize
@@ -89,10 +87,8 @@ import dev.vxs.frostsoulx.constants.HidePlayerThumbnailKey
 import dev.vxs.frostsoulx.constants.LibraryFilter
 import dev.vxs.frostsoulx.constants.LyricsBackgroundStyle
 import dev.vxs.frostsoulx.constants.LyricsBackgroundStyleKey
-import dev.vxs.frostsoulx.constants.PureBlackKey
 import dev.vxs.frostsoulx.constants.QuickPicksDisplayMode
 import dev.vxs.frostsoulx.constants.QuickPicksDisplayModeKey
-import dev.vxs.frostsoulx.constants.RandomThemeOnStartupKey
 import dev.vxs.frostsoulx.constants.ShowHomeCategoryChipsKey
 import dev.vxs.frostsoulx.constants.ShowPlayerVolumeBarKey
 import dev.vxs.frostsoulx.constants.ShowTagsInLibraryKey
@@ -120,16 +116,6 @@ import kotlin.math.roundToInt
 fun AppearanceSettings(navController: NavController) {
     val context = LocalContext.current
     val defaultDisableAnimations = remember(context) { context.isLowRamDevice() }
-    val (dynamicTheme, onDynamicThemeChange) =
-        rememberPreference(
-            DynamicThemeKey,
-            defaultValue = true,
-        )
-    val (randomThemeOnStartup, onRandomThemeOnStartupChange) =
-        rememberPreference(
-            RandomThemeOnStartupKey,
-            defaultValue = false,
-        )
     val (darkMode, onDarkModeChange) =
         rememberEnumPreference(
             DarkModeKey,
@@ -165,7 +151,6 @@ fun AppearanceSettings(navController: NavController) {
             LyricsBackgroundStyleKey,
             defaultValue = LyricsBackgroundStyle.DEFAULT,
         )
-    val (pureBlack, onPureBlackChange) = rememberPreference(PureBlackKey, defaultValue = false)
     val (disableBlur, onDisableBlurChange) = rememberPreference(DisableBlurKey, defaultValue = false)
     val (disableAnimations, onDisableAnimationsChange) =
         rememberPreference(
@@ -283,11 +268,6 @@ fun AppearanceSettings(navController: NavController) {
         }
     val lyricsBackground = configuredLyricsBackground
     val isVolumeBarSupported = true
-    val isSystemInDarkTheme = isSystemInDarkTheme()
-    val useDarkTheme =
-        remember(darkMode, isSystemInDarkTheme) {
-            if (darkMode == DarkMode.AUTO) isSystemInDarkTheme else darkMode == DarkMode.ON
-        }
 
     val (defaultChip, onDefaultChipChange) =
         rememberEnumPreference(
@@ -331,34 +311,6 @@ fun AppearanceSettings(navController: NavController) {
         ) {
             PreferenceGroup(title = stringResource(R.string.theme)) {
                 item {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.enable_dynamic_theme)) },
-                        icon = { Icon(painterResource(R.drawable.palette), null) },
-                        checked = dynamicTheme,
-                        onCheckedChange = onDynamicThemeChange,
-                    )
-                }
-
-                item(visible = !dynamicTheme || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.random_theme_on_startup)) },
-                        description = stringResource(R.string.random_theme_on_startup_desc),
-                        icon = { Icon(painterResource(R.drawable.shuffle), null) },
-                        checked = randomThemeOnStartup,
-                        onCheckedChange = onRandomThemeOnStartupChange,
-                    )
-                }
-
-                item(visible = !dynamicTheme || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                    PreferenceEntry(
-                        title = { Text(stringResource(R.string.color_palette)) },
-                        description = stringResource(R.string.customize_theme_colors),
-                        icon = { Icon(painterResource(R.drawable.format_paint), null) },
-                        onClick = { navController.navigate("settings/appearance/palette_picker") },
-                    )
-                }
-
-                item {
                     PreferenceEntry(
                         title = { Text(stringResource(R.string.app_icon)) },
                         description = stringResource(R.string.app_icon_description),
@@ -380,15 +332,6 @@ fun AppearanceSettings(navController: NavController) {
                                 DarkMode.AUTO -> stringResource(R.string.dark_theme_follow_system)
                             }
                         },
-                    )
-                }
-
-                item(visible = useDarkTheme) {
-                    SwitchPreference(
-                        title = { Text(stringResource(R.string.pure_black)) },
-                        icon = { Icon(painterResource(R.drawable.contrast), null) },
-                        checked = pureBlack,
-                        onCheckedChange = onPureBlackChange,
                     )
                 }
 

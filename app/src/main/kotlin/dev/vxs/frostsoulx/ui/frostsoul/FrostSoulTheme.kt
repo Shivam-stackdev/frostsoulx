@@ -131,19 +131,19 @@ data class FrostSoulDesignTokens(
 
 private val DefaultFrostSoulTokens = FrostSoulDesignTokens(
     colors = FrostSoulColors(
-        background = Color(0xFF06120D),
-        surface = Color(0xFF101713),
-        surfaceRaised = Color(0xFF17221C),
-        surfaceGlass = Color(0xFF101713),
-        surfaceGlassStrong = Color(0xFF18251E),
-        accent = Color(0xFF00E676),
-        accentBright = Color(0xFF00E676),
-        accentMuted = Color(0xFF008542),
-        onBackground = Color(0xFFFDFDFD),
-        onSurface = Color(0xFFFDFDFD),
-        onSurfaceMuted = Color(0xFFA5A5A5),
-        outline = Color.Transparent,
-        error = Color(0xFFFF7C8F),
+        background = Color.Black,
+        surface = Color(0xFF0B0B0B),
+        surfaceRaised = Color(0xFF151515),
+        surfaceGlass = Color(0xFF0E0E0E),
+        surfaceGlassStrong = Color(0xFF181818),
+        accent = Color.White,
+        accentBright = Color.White,
+        accentMuted = Color(0xFFB0B0B0),
+        onBackground = Color.White,
+        onSurface = Color.White,
+        onSurfaceMuted = Color(0xFFA6A6A6),
+        outline = Color(0xFF3A3A3A),
+        error = Color(0xFFFF6B6B),
         scrim = Color.Black.copy(alpha = 0.72f),
     ),
     typography = FrostSoulTypography(
@@ -206,18 +206,18 @@ fun FrostSoulDesignSystem(
         } else {
             DefaultFrostSoulTokens.copy(
                 colors = DefaultFrostSoulTokens.colors.copy(
-                    background = Color(0xFFF3F5F8),
+                    background = Color.White,
                     surface = Color.White,
-                    surfaceRaised = Color(0xFFF8F9FB),
+                    surfaceRaised = Color(0xFFF5F5F5),
                     surfaceGlass = Color.White.copy(alpha = 0.96f),
                     surfaceGlassStrong = Color.White,
-                    accent = Color(0xFF00C979),
-                    accentBright = Color(0xFF00E676),
-                    accentMuted = Color(0xFF168A5D),
-                    onBackground = Color(0xFF101216),
-                    onSurface = Color(0xFF101216),
-                    onSurfaceMuted = Color(0xFF656B73),
-                    outline = Color(0x1A101216),
+                    accent = Color.Black,
+                    accentBright = Color.Black,
+                    accentMuted = Color(0xFF555555),
+                    onBackground = Color.Black,
+                    onSurface = Color.Black,
+                    onSurfaceMuted = Color(0xFF666666),
+                    outline = Color(0x1A000000),
                     scrim = Color.Black.copy(alpha = 0.48f),
                 ),
             )
@@ -249,18 +249,5 @@ fun Modifier.frostSoulGlow(
     }
 
 @Composable
-fun Modifier.frostSoulScreenBackground(): Modifier {
-    val colors = FrostSoulTheme.colors
-    return background(colors.background)
-        .drawBehind {
-            drawRect(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        colors.accent.copy(alpha = 0.09f),
-                        Color.Transparent,
-                    ),
-                    endY = size.height * 0.42f,
-                ),
-            )
-        }
-}
+fun Modifier.frostSoulScreenBackground(): Modifier =
+    background(FrostSoulTheme.colors.background)

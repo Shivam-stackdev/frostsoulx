@@ -12,7 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -70,7 +70,6 @@ import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
 import dev.vxs.frostsoulx.LocalPlayerConnection
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.constants.HideExplicitKey
-import dev.vxs.frostsoulx.constants.PureBlackKey
 import dev.vxs.frostsoulx.constants.SongFilter
 import dev.vxs.frostsoulx.constants.SongFilterKey
 import dev.vxs.frostsoulx.constants.SongSortDescendingKey
@@ -104,8 +103,8 @@ fun LibrarySongsScreen(
     val isPlaying by playerConnection.isPlaying.collectAsState()
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val isDarkTheme = isSystemInDarkTheme()
-    val pureBlack by rememberPreference(PureBlackKey, defaultValue = false)
+    val isDarkTheme = MaterialTheme.colorScheme.background.luminance() <= 0.5f
+    val pureBlack = isDarkTheme
 
     val (sortType, onSortTypeChange) =
         rememberEnumPreference(

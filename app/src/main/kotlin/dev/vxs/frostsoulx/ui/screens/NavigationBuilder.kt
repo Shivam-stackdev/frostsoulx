@@ -70,13 +70,11 @@ import dev.vxs.frostsoulx.ui.screens.settings.LyricsAnimationSettings
 import dev.vxs.frostsoulx.ui.screens.settings.LyricsSettings
 import dev.vxs.frostsoulx.ui.screens.settings.MusicTogetherScreen
 import dev.vxs.frostsoulx.ui.screens.settings.PO_TOKEN_ROUTE
-import dev.vxs.frostsoulx.ui.screens.settings.PalettePickerScreen
 import dev.vxs.frostsoulx.ui.screens.settings.PlayerSettings
 import dev.vxs.frostsoulx.ui.screens.settings.PoTokenScreen
 import dev.vxs.frostsoulx.ui.screens.settings.PrivacySettings
 import dev.vxs.frostsoulx.ui.screens.settings.SettingsScreen
 import dev.vxs.frostsoulx.ui.screens.settings.StorageSettings
-import dev.vxs.frostsoulx.ui.screens.settings.ThemeCreatorScreen
 import dev.vxs.frostsoulx.ui.screens.settings.UpdateScreen
 import dev.vxs.frostsoulx.viewmodels.OnlineSearchSort
 
@@ -394,14 +392,8 @@ fun NavGraphBuilder.navigationBuilder(
     composable("settings/appearance/aod_customized") {
         AodCustomizedScreen(navController)
     }
-    composable("settings/appearance/palette_picker") {
-        PalettePickerScreen(navController)
-    }
     composable("settings/appearance/lyrics_animations") {
         LyricsAnimationSettings(navController)
-    }
-    composable("settings/appearance/theme_creator") {
-        ThemeCreatorScreen(navController)
     }
     composable("settings/content") {
         ContentSettings(navController)
