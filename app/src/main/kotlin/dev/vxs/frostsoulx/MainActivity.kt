@@ -283,6 +283,7 @@ import dev.vxs.frostsoulx.ui.screens.settings.DarkMode
 import dev.vxs.frostsoulx.ui.screens.settings.NavigationTab
 import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
+import dev.vxs.frostsoulx.ui.frostsoul.SearchTheme
 import dev.vxs.frostsoulx.ui.theme.ColorSaver
 import dev.vxs.frostsoulx.ui.theme.DefaultThemeColor
 import dev.vxs.frostsoulx.ui.theme.extractThemeColor
@@ -1996,8 +1997,8 @@ class MainActivity : ComponentActivity() {
                                             colors =
                                                 if (pureBlack && active) {
                                                     SearchBarDefaults.colors(
-                                                        containerColor = Color.Black,
-                                                        dividerColor = Color.DarkGray,
+                                                        containerColor = SearchTheme.SearchBarBackground,
+                                                        dividerColor = Color.White.copy(alpha = 0.10f),
                                                         inputFieldColors =
                                                             TextFieldDefaults.colors(
                                                                 focusedTextColor = Color.White,

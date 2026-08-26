@@ -31,10 +31,16 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +59,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.constants.MiniPlayerHeight
@@ -86,6 +95,7 @@ import dev.vxs.frostsoulx.ui.frostsoul.FSListItem
 import dev.vxs.frostsoulx.ui.frostsoul.FSLoading
 import dev.vxs.frostsoulx.ui.frostsoul.FSSectionHeader
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
+import dev.vxs.frostsoulx.ui.frostsoul.SearchTheme
 import dev.vxs.frostsoulx.ui.frostsoul.frostSoulScreenBackground
 import dev.vxs.frostsoulx.ui.player.frostsoul.asFrostSoulTime
 import coil3.compose.AsyncImage
@@ -552,7 +562,7 @@ private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f).height(32.dp).clip(FrostSoulTheme.shapes.pill).background(Color(0xFF1E1E1E)).clickable(onClick = onOpenSearch).padding(horizontal = 12.dp),
+            modifier = Modifier.weight(1f).height(40.dp).clip(RoundedCornerShape(14.dp)).background(SearchTheme.SearchBarBackground).clickable(onClick = onOpenSearch).padding(horizontal = 12.dp),
         ) {
             FSIcon(
                 painter = painterResource(R.drawable.search),
@@ -571,7 +581,7 @@ private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
         }
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.size(24.dp).clip(CircleShape).background(Color(0xFF1E1E1E)).clickable(onClick = onOpenSearch),
+            modifier = Modifier.size(32.dp).clip(RoundedCornerShape(12.dp)).background(SearchTheme.SearchBarBackground).clickable(onClick = onOpenSearch),
         ) {
             FSIcon(
                 painter = painterResource(R.drawable.mic),
@@ -650,50 +660,83 @@ private fun FrostSoulHomeHeader(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FrostSoulHomeTabs(
     chips: List<HomePage.Chip>,
     selectedChip: HomePage.Chip?,
     onChipSelected: (HomePage.Chip) -> Unit,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(18.dp),
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = FrostSoulTheme.spacing.page),
-    ) {
-        chips.forEach { chip ->
-            val selected = chip == selectedChip
-            val indicatorWidth by animateDpAsState(
-                targetValue = if (selected) 28.dp else 0.dp,
-                animationSpec = tween(durationMillis = 220),
-                label = "frostsoul-home-tab-indicator",
-            )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier =
-                    Modifier
-                        .clickable { onChipSelected(chip) }
-                        .padding(vertical = 8.dp),
-            ) {
-                FSText(
-                    text = chip.title,
-                    color = if (selected) FrostSoulTheme.colors.onSurface else FrostSoulTheme.colors.onSurfaceMuted,
-                    style = FrostSoulTheme.typography.label,
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+    if (chips.isEmpty()) return
+
+    val selectedEndpoint by rememberUpdatedState(selectedChip?.endpoint)
+    val selectedIndex = chips.indexOfFirst { it.endpoint == selectedChip?.endpoint }.coerceAtLeast(0)
+    val pagerState = rememberPagerState(initialPage = selectedIndex, pageCount = { chips.size })
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .distinctUntilChanged()
+            .collectLatest { page ->
+                chips.getOrNull(page)?.let { chip ->
+                    if (chip.endpoint != selectedEndpoint && (selectedEndpoint != null || page != selectedIndex)) {
+                        onChipSelected(chip)
+                    }
+                }
+            }
+    }
+
+    LaunchedEffect(selectedChip?.endpoint, chips) {
+        val targetPage = chips.indexOfFirst { it.endpoint == selectedChip?.endpoint }.let { if (it < 0) 0 else it }
+        if (targetPage != pagerState.currentPage) {
+            pagerState.animateScrollToPage(targetPage)
+        }
+    }
+
+    HorizontalPager(
+        state = pagerState,
+        beyondViewportPageCount = 1,
+        modifier = Modifier.fillMaxWidth().height(48.dp),
+    ) { page ->
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(18.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = FrostSoulTheme.spacing.page),
+        ) {
+            chips.forEachIndexed { index, chip ->
+                val selected = index == page
+                val indicatorWidth by animateDpAsState(
+                    targetValue = if (selected) 28.dp else 0.dp,
+                    animationSpec = tween(durationMillis = 220),
+                    label = "frostsoul-home-tab-indicator",
                 )
-                Box(
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier =
                         Modifier
-                            .padding(top = 8.dp)
-                            .width(indicatorWidth)
-                            .height(2.dp)
-                            .background(FrostSoulTheme.colors.accentBright),
-                )
+                            .clickable { scope.launch { pagerState.animateScrollToPage(index) } }
+                            .padding(vertical = 8.dp),
+                ) {
+                    FSText(
+                        text = chip.title,
+                        color = if (selected) FrostSoulTheme.colors.onSurface else FrostSoulTheme.colors.onSurfaceMuted,
+                        style = FrostSoulTheme.typography.label,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Box(
+                        modifier =
+                            Modifier
+                                .padding(top = 8.dp)
+                                .width(indicatorWidth)
+                                .height(2.dp)
+                                .background(FrostSoulTheme.colors.accentBright),
+                    )
+                }
             }
         }
     }

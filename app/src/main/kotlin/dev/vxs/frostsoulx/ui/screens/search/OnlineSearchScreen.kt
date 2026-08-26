@@ -44,6 +44,7 @@ import dev.vxs.frostsoulx.innertube.models.*
 import dev.vxs.frostsoulx.models.toMediaMetadata
 import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
 import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.frostsoul.SearchTheme
 import dev.vxs.frostsoulx.ui.component.YouTubeListItem
 import dev.vxs.frostsoulx.ui.menu.*
 import dev.vxs.frostsoulx.viewmodels.OnlineSearchSuggestionViewModel
@@ -84,7 +85,7 @@ fun OnlineSearchScreen(
         viewModel.updateQuery(query)
     }
 
-    val backgroundColor = if (pureBlack) Color.Black else MaterialTheme.colorScheme.background
+    val backgroundColor = if (pureBlack) SearchTheme.SearchBarBackground else MaterialTheme.colorScheme.background
     val distinctResultItems = remember(viewState.items) { viewState.items.distinctBy { it.id } }
 
     Box(
@@ -158,7 +159,12 @@ fun OnlineSearchScreen(
                     contentType = "section_header",
                 ) {
                     SearchSectionHeader(
-                        title = stringResource(R.string.suggestions),
+                        title =
+                            if (query.isBlank()) {
+                                stringResource(R.string.suggestions)
+                            } else {
+                                stringResource(R.string.live_recommended_word_matches)
+                            },
                         pureBlack = pureBlack,
                         modifier = Modifier.animateItem(),
                     )
@@ -434,7 +440,7 @@ fun SuggestionItem(
 ) {
     val containerColor =
         if (pureBlack) {
-            Color.White.copy(alpha = 0.08f)
+            Color.White.copy(alpha = 0.045f)
         } else {
             MaterialTheme.colorScheme.surfaceContainerLow
         }
@@ -492,8 +498,10 @@ fun SuggestionItem(
 
             Text(
                 text = query,
-                style = MaterialTheme.typography.bodyLarge,
-                color = if (pureBlack) Color.White.copy(alpha = 0.92f) else MaterialTheme.colorScheme.onSurface,
+                style = SearchTheme.InputTextStyle.copy(
+                    color = if (pureBlack) Color.White.copy(alpha = 0.92f) else MaterialTheme.colorScheme.onSurface,
+                ),
+                color = Color.Unspecified,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
@@ -533,8 +541,8 @@ fun SuggestionItem(
 }
 
 private val SearchContentMaxWidth = 720.dp
-private val SearchHorizontalPadding = 12.dp
-private val SearchRowMinHeight = 64.dp
+private val SearchHorizontalPadding = 16.dp
+private val SearchRowMinHeight = 56.dp
 private val SearchRowSpacing = 2.dp
-private val SearchGroupOuterCorner = 24.dp
+private val SearchGroupOuterCorner = 16.dp
 private val SearchGroupInnerCorner = 6.dp

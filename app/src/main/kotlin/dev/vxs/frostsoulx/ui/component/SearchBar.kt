@@ -85,6 +85,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
 import dev.vxs.frostsoulx.constants.AppBarHeight
+import dev.vxs.frostsoulx.ui.frostsoul.SearchTheme
 import kotlin.math.max
 
 @ExperimentalMaterial3Api
@@ -327,7 +328,7 @@ private fun SearchBarInputField(
                     },
             enabled = enabled,
             singleLine = true,
-            textStyle = LocalTextStyle.current.merge(TextStyle(color = textColor)),
+                    textStyle = SearchTheme.InputTextStyle.copy(color = textColor),
             cursorBrush = SolidColor(colors.cursorColor),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = { onSearch(coercedQuery.text) }),
@@ -377,6 +378,6 @@ private fun TextRange.coerceInText(textLength: Int): TextRange =
 val InputFieldHeight = 48.dp
 private val SearchBarCornerRadius: Dp = InputFieldHeight / 2
 internal val SearchBarVerticalPadding: Dp = 8.dp
-internal val SearchBarHorizontalPadding: Dp = 12.dp
+internal val SearchBarHorizontalPadding: Dp = 16.dp
 val SearchBarIconOffsetX: Dp = 4.dp
 private const val AnimationDurationMillis: Int = 300
