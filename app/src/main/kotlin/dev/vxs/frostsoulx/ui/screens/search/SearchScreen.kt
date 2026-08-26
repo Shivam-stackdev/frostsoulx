@@ -9,11 +9,13 @@ package dev.vxs.frostsoulx.ui.screens.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -61,6 +63,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -80,6 +83,10 @@ import dev.vxs.frostsoulx.models.toMediaMetadata
 import dev.vxs.frostsoulx.playback.queues.YouTubeQueue
 import dev.vxs.frostsoulx.search.SearchDiscoveryUiModel
 import dev.vxs.frostsoulx.ui.component.LocalMenuState
+import dev.vxs.frostsoulx.ui.frostsoul.FSIcon as FrostSoulIcon
+import dev.vxs.frostsoulx.ui.frostsoul.FSText as FrostSoulText
+import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
+import dev.vxs.frostsoulx.ui.frostsoul.SearchTheme
 import dev.vxs.frostsoulx.ui.component.NavigationTitle
 import dev.vxs.frostsoulx.ui.component.YouTubeGridItem
 import dev.vxs.frostsoulx.ui.component.YouTubeListItem
@@ -90,6 +97,7 @@ import dev.vxs.frostsoulx.ui.menu.YouTubeArtistMenu
 import dev.vxs.frostsoulx.ui.menu.YouTubeSongMenu
 import dev.vxs.frostsoulx.ui.screens.MoodAndGenresButton
 import dev.vxs.frostsoulx.ui.screens.MoodAndGenresButtonHeight
+import dev.vxs.frostsoulx.ui.screens.search.onlineSearchResultRoute
 import dev.vxs.frostsoulx.utils.rememberPreference
 import dev.vxs.frostsoulx.viewmodels.SearchDiscoveryScreenState
 import dev.vxs.frostsoulx.viewmodels.SearchDiscoveryTab
@@ -127,6 +135,7 @@ fun SearchScreen(
         modifier =
             Modifier
                 .fillMaxSize()
+                .background(if (pureBlack) SearchTheme.SearchBarBackground else MaterialTheme.colorScheme.background)
                 .then(
                     // Step 2b: attach the shell's floating-header connection here so Search's
                     // scroll/fling writes Search's own header state and can't leak elsewhere.
@@ -167,6 +176,7 @@ fun SearchScreen(
             ) {
                 SearchEntryField(
                     onClick = onSearchClick,
+                    pureBlack = pureBlack,
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -231,6 +241,29 @@ fun SearchScreen(
                 is SearchDiscoveryScreenState.Success -> {
                     when (selectedTab) {
                         SearchDiscoveryTab.EXPLORE -> {
+                            val hotSearches =
+                                currentState.data.suggestedSongs
+                                    .map { it.title }
+                                    .distinct()
+                                    .take(6)
+                            val recommendedMusic =
+                                (
+                                    currentState.data.trendingAlbums.map { it.title } +
+                                        currentState.data.suggestedArtists.map { it.title }
+                                ).distinct().take(6)
+                            item(
+                                key = "search_explore_trending_matrix",
+                                contentType = "trending_matrix",
+                            ) {
+                                QQStyleTrendingMatrix(
+                                    hotSearches = hotSearches,
+                                    recommendedMusic = recommendedMusic,
+                                    onItemClick = { keyword ->
+                                        navController.navigate(onlineSearchResultRoute(keyword))
+                                    },
+                                    modifier = Modifier.animateItem(),
+                                )
+                            }
                             item(
                                 key = "search_explore_moods_title",
                                 contentType = "section_title",
@@ -293,50 +326,44 @@ fun SearchScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchEntryField(
     onClick: () -> Unit,
+    pureBlack: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    SearchBar(
-        inputField = {
-            SearchBarDefaults.InputField(
-                query = "",
-                onQueryChange = { onClick() },
-                onSearch = { onClick() },
-                expanded = false,
-                onExpandedChange = { expanded ->
-                    if (expanded) onClick()
-                },
-                placeholder = {
-                    Text(
-                        text = stringResource(R.string.search_yt_music),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.search),
-                        contentDescription = null,
-                    )
-                },
-                trailingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.language),
-                        contentDescription = null,
-                    )
-                },
-            )
-        },
-        expanded = false,
-        onExpandedChange = { expanded ->
-            if (expanded) onClick()
-        },
-        windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
-        modifier = modifier.fillMaxWidth(),
-    ) {}
+    val shape = RoundedCornerShape(12.dp)
+    val searchSurface = if (pureBlack) SearchTheme.SearchBarBackground else FrostSoulTheme.colors.surfaceRaised
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .height(46.dp)
+                .clip(shape)
+                .background(searchSurface)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 14.dp),
+    ) {
+        FrostSoulIcon(
+            painter = painterResource(R.drawable.search),
+            contentDescription = "Search Icon",
+            tint = if (pureBlack) Color.White.copy(alpha = 0.62f) else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(18.dp),
+        )
+        FrostSoulText(
+            text = stringResource(R.string.search_yt_music),
+            style =
+                SearchTheme.InputTextStyle.copy(
+                    color = if (pureBlack) Color.White.copy(alpha = 0.62f) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 14.sp,
+                ),
+            modifier = Modifier.padding(start = 12.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -382,6 +409,83 @@ private fun SearchDiscoveryTabs(
                     )
                 },
             )
+        }
+    }
+}
+
+@Composable
+private fun QQStyleTrendingMatrix(
+    hotSearches: List<String>,
+    recommendedMusic: List<String>,
+    onItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (hotSearches.isEmpty() && recommendedMusic.isEmpty()) return
+
+    Row(
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+    ) {
+        TrendingColumn(
+            title = "Trending Search",
+            entries = hotSearches,
+            onItemClick = onItemClick,
+            modifier = Modifier.weight(1f),
+        )
+        TrendingColumn(
+            title = "Recommended Music",
+            entries = recommendedMusic,
+            onItemClick = onItemClick,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun TrendingColumn(
+    title: String,
+    entries: List<String>,
+    onItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        FrostSoulText(
+            text = title,
+            color = FrostSoulTheme.colors.onSurface,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
+        entries.take(6).forEachIndexed { index, keyword ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onItemClick(keyword) }
+                        .padding(vertical = 10.dp),
+            ) {
+                FrostSoulText(
+                    text = (index + 1).toString(),
+                    color =
+                        if (index < 3) {
+                            FrostSoulTheme.colors.accentBright
+                        } else {
+                            FrostSoulTheme.colors.onSurfaceMuted
+                        },
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.width(24.dp),
+                )
+                FrostSoulText(
+                    text = keyword,
+                    color = FrostSoulTheme.colors.onSurface,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

@@ -1216,6 +1216,9 @@ class MainActivity : ComponentActivity() {
                                     else -> {}
                                 }
                             }
+                        } else if (screen == Screens.Search) {
+                            // Search is a front-layer portal, not a separate middle destination.
+                            openSearch()
                         } else {
                             if (navController.currentDestination?.route != screen.route) {
                                 navController.navigate(screen.route) {

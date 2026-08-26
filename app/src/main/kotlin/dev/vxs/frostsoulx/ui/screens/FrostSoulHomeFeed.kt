@@ -125,6 +125,9 @@ internal fun FrostSoulHomeFeed(
     val albums = remember(uiState.speedDialItems) { uiState.speedDialItems.filterIsInstance<Album>() }
     val artists = remember(uiState.speedDialItems) { uiState.speedDialItems.filterIsInstance<Artist>() }
     val recentItems = remember(uiState.keepListening) { uiState.keepListening.take(6) }
+    val openSearchPortal: () -> Unit = {
+        navController.currentBackStackEntry?.savedStateHandle?.set("openSearch", true)
+    }
     val pageSections = uiState.homePage?.sections.orEmpty()
 
     LazyColumn(
@@ -145,7 +148,7 @@ internal fun FrostSoulHomeFeed(
         }
 
         item(key = "frostsoul_quick_search") {
-            FrostSoulQuickSearch(onOpenSearch = { navController.navigate(Screens.Search.route) })
+            FrostSoulQuickSearch(onOpenSearch = { openSearchPortal() })
         }
 
         uiState.homePage?.chips.orEmpty().takeIf { it.isNotEmpty() }?.let { sourceChips ->
@@ -191,7 +194,7 @@ internal fun FrostSoulHomeFeed(
             FrostSoulHomeHero(
                 track = mediaMetadata,
                 isPlaying = isPlaying,
-                onQuickSearch = { navController.navigate(Screens.Search.route) },
+                onQuickSearch = { openSearchPortal() },
                 onPlayPause = { playerConnection.player.togglePlayPause() },
                 positionMs = playerConnection.player.currentPosition,
                 durationMs = playerConnection.player.duration,
@@ -218,7 +221,7 @@ internal fun FrostSoulHomeFeed(
 
         if (uiState.quickPicks.isNotEmpty()) {
             item(key = "frostsoul_for_this_moment_header") {
-                FSSectionHeader(title = "For This Moment", actionLabel = "See All", onAction = { navController.navigate(Screens.Search.route) })
+                FSSectionHeader(title = "For This Moment", actionLabel = "See All", onAction = { openSearchPortal() })
             }
             item(key = "frostsoul_for_this_moment") {
                 FrostSoulSongShelf(
@@ -393,7 +396,7 @@ internal fun FrostSoulHomeFeed(
                     message = "Start a search or play something to build a listening home tailored to you.",
                     modifier = Modifier.height(360.dp),
                     actionLabel = "Quick Search",
-                    onAction = { navController.navigate(Screens.Search.route) },
+                    onAction = { openSearchPortal() },
                 )
             }
         }
