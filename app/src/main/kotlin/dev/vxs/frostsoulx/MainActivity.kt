@@ -192,6 +192,7 @@ import dev.vxs.frostsoulx.constants.DisableAnimationsKey
 import dev.vxs.frostsoulx.constants.DisableScreenshotKey
 import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
 import dev.vxs.frostsoulx.constants.FontPreferenceKey
+import dev.vxs.frostsoulx.constants.ForceHighRefreshRateKey
 import dev.vxs.frostsoulx.constants.HasPressedStarKey
 import dev.vxs.frostsoulx.constants.LaunchCountKey
 import dev.vxs.frostsoulx.constants.MiniPlayerBottomSpacing
@@ -273,7 +274,11 @@ import dev.vxs.frostsoulx.ui.screens.search.decodeOnlineSearchQuery
 import dev.vxs.frostsoulx.ui.screens.search.onlineSearchResultRoute
 import dev.vxs.frostsoulx.ui.screens.settings.DarkMode
 import dev.vxs.frostsoulx.ui.screens.settings.NavigationTab
+import dev.vxs.frostsoulx.ui.theme.ApplyRefreshRate
+import dev.vxs.frostsoulx.ui.theme.HIGH_REFRESH_RATE_THRESHOLD_FPS
 import dev.vxs.frostsoulx.ui.theme.ArchiveTuneTheme
+import dev.vxs.frostsoulx.ui.theme.TARGET_REFRESH_RATE_FPS
+import dev.vxs.frostsoulx.ui.theme.rememberSupportedHighestFps
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 import dev.vxs.frostsoulx.ui.utils.appBarScrollBehavior
 import dev.vxs.frostsoulx.ui.utils.backToMain
@@ -696,6 +701,8 @@ class MainActivity : ComponentActivity() {
             )
             val fontPreference by rememberEnumPreference(FontPreferenceKey, defaultValue = AppFontPreference.DEFAULT)
             val customFontUri by rememberPreference(CustomFontUriKey, defaultValue = "")
+            val forceHighRefreshRate by rememberPreference(ForceHighRefreshRateKey, defaultValue = false)
+            val supportedHighestFps = rememberSupportedHighestFps()
 
             ArchiveTuneTheme(
                 darkTheme = useDarkTheme,
@@ -703,6 +710,11 @@ class MainActivity : ComponentActivity() {
                 fontPreference = fontPreference,
                 customFontUri = customFontUri,
             ) {
+                ApplyRefreshRate(
+                    isEnabled = forceHighRefreshRate && supportedHighestFps > HIGH_REFRESH_RATE_THRESHOLD_FPS,
+                    targetFps = supportedHighestFps.coerceAtMost(TARGET_REFRESH_RATE_FPS),
+                )
+
                 val onboardingViewModel: OnboardingViewModel = hiltViewModel()
                 val onboardingState by onboardingViewModel.screenState.collectAsStateWithLifecycle()
                 val shouldShowOnboarding =
