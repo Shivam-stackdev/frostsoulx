@@ -144,7 +144,7 @@ App launch
        -> Settings
 ```
 
-The navigation map is intentionally smaller than the APK’s full feature graph. It covers the observable core experience requested for FrostSoul and avoids reproducing proprietary service integrations.
+The navigation map is intentionally smaller than the APK’s full feature graph. It covers the observable core experience requested for FrostSoul and avoids reproducing proprietary service integrations. The reference’s interactive Community Hub/social layer is intentionally excluded from the reconstruction: the player remains focused on playback, lyrics, queue and music recommendations, and first-run onboarding does not expose community actions or URI launches.
 
 ## Phase 5: Design-token map
 
