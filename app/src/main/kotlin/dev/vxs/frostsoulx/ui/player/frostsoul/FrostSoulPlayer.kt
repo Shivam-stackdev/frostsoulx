@@ -144,10 +144,11 @@ internal fun FrostSoulPlayer(
                         onDragCancel = { downwardDragDistance = 0f },
                     )
                 },
-             FrostSoulDynamicBackground(
-            palette = uiState.palette,
-        )
-        Column(
+        ) {
+            FrostSoulDynamicBackground(
+                palette = uiState.palette,
+            )
+            Column(
             modifier =
                 Modifier
                     .fillMaxSize()
