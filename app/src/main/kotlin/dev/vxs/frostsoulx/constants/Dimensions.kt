@@ -22,15 +22,17 @@ const val CONTENT_TYPE_PLAYLIST = 5
 val NavigationBarHorizontalPadding = 12.dp
 val NavigationBarBottomPadding = 10.dp
 val NavigationBarMaxWidth = 420.dp
-val NavigationBarHeight = 78.dp
-val MiniPlayerHeight = 72.dp
-val MiniPlayerPeekHeight = 110.dp
+// QQ reference APK exposes 58dip normal and 70dip expanded bottom-navigation heights.
+// The shell adds system-bar padding separately, so the content bar remains 58dp.
+val NavigationBarHeight = 58.dp
+val MiniPlayerHeight = 64.dp
+val MiniPlayerPeekHeight = 104.dp
 val MiniPlayerBottomSpacing = 4.dp
 val QueuePeekHeight = 64.dp
 val AppBarHeight = 64.dp
 
-val ListItemHeight = 72.dp
-val SuggestionItemHeight = 56.dp
+val ListItemHeight = 64.dp
+val SuggestionItemHeight = 52.dp
 val SearchFilterHeight = 48.dp
 val ListThumbnailSize = 56.dp
 val SmallGridThumbnailHeight = 104.dp
@@ -40,7 +42,8 @@ val AlbumThumbnailSize = 144.dp
 val ThumbnailCornerRadius = 10.dp
 val GridThumbnailCornerRadius = 8.dp
 
-val PlayerHorizontalPadding = 32.dp
+// The reference phone shell uses a compact 16dp content inset around the player.
+val PlayerHorizontalPadding = 16.dp
 
 val NavigationBarAnimationSpec =
     spring<Dp>(

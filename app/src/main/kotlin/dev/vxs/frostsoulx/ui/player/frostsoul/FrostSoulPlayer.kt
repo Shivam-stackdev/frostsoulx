@@ -92,7 +92,6 @@ import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSChip
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
-import dev.vxs.frostsoulx.ui.player.rememberDeviceMusicVolumeController
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -145,8 +144,7 @@ internal fun FrostSoulPlayer(
                         onDragCancel = { downwardDragDistance = 0f },
                     )
                 },
-    ) {
-        FrostSoulDynamicBackground(
+             FrostSoulDynamicBackground(
             palette = uiState.palette,
         )
         Column(
@@ -454,7 +452,7 @@ internal fun FSPlayerControls(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(state.positionMs.asFrostSoulTime(), color = FrostSoulOnSurfaceMuted, fontSize = 11.sp)
-            Text("−${remainingMs.asFrostSoulTime()}", color = FrostSoulOnSurfaceMuted, fontSize = 11.sp)
+            Text(state.safeDurationMs.asFrostSoulTime(), color = FrostSoulOnSurfaceMuted, fontSize = 11.sp)
         }
         state.audioQualityBadge?.let { badge ->
             Box(
@@ -583,10 +581,7 @@ private fun FrostSoulAlbumPage(
     onOpenQueue: () -> Unit,
     onOpenOptions: () -> Unit,
 ) {
-    val volumeController = rememberDeviceMusicVolumeController()
-    var lastAudibleVolume by remember { mutableFloatStateOf(0.55f) }
     var upwardDragDistance by remember { mutableFloatStateOf(0f) }
-    val volumeFraction = volumeController.volumeFraction.coerceIn(0f, 1f)
 
     Box(
         modifier =
@@ -608,12 +603,12 @@ private fun FrostSoulAlbumPage(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize().padding(bottom = 12.dp),
+            modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
         ) {
             Spacer(Modifier.height(2.dp))
             FSGlassCard(
                 accent = uiState.palette.accent,
-                modifier = Modifier.fillMaxWidth(0.90f).aspectRatio(1f),
+                modifier = Modifier.fillMaxWidth(0.86f).aspectRatio(1f),
             ) {
                 FSAlbumArt(
                     artworkUrl = uiState.track.artworkUrl,
@@ -647,34 +642,14 @@ private fun FrostSoulAlbumPage(
                     FSChip(label = uiState.audioQualityBadge ?: "STANDARD", selected = false, onClick = {})
                     FSChip(label = "${uiState.queue.size} IN QUEUE", selected = false, onClick = {})
                 }
-                AnimatedContent(
-                    targetState = uiState.currentLyricLine?.takeIf { it.isNotBlank() } ?: "Lyrics unavailable",
-                    transitionSpec = {
-                        (fadeIn(tween(280)) + slideInVertically(tween(280)) { it / 2 }) togetherWith
-                            (fadeOut(tween(220)) + slideOutVertically(tween(220)) { -it / 2 })
-                    },
-                    label = "frostsoul-live-lyric-preview",
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 10.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .clickable(onClick = onOpenLyrics)
-                            .padding(horizontal = 14.dp, vertical = 7.dp),
-                ) { lyricLine ->
-                    Text(
-                        text = lyricLine,
-                        color =
-                            if (uiState.currentLyricLine.isNullOrBlank()) {
-                                FrostSoulOnSurfaceMuted.copy(alpha = 0.60f)
-                            } else {
-                                FrostSoulOnSurface.copy(alpha = 0.88f)
-                            },
-                        fontSize = 13.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+                Text(
+                    text = "${uiState.track.title} · ${uiState.track.artist}",
+                    color = FrostSoulOnSurfaceMuted,
+                    fontSize = 13.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 10.dp),
+                )
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -713,65 +688,6 @@ private fun FrostSoulAlbumPage(
                 actions = actions,
                 modifier = Modifier.padding(top = 2.dp),
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-            ) {
-                FSIconButton(
-                    painter = painterResource(R.drawable.volume_off),
-                    contentDescription = if (volumeFraction > 0.01f) "Mute" else "Restore volume",
-                    onClick = {
-                        if (volumeFraction > 0.01f) {
-                            lastAudibleVolume = volumeFraction
-                            volumeController.setVolumeFraction(0f)
-                        } else {
-                            volumeController.setVolumeFraction(lastAudibleVolume.coerceAtLeast(0.1f))
-                        }
-                    },
-                    active = volumeFraction <= 0.01f,
-                    compact = true,
-                )
-                FSSeekbar(
-                    progress = volumeFraction,
-                    durationMs = 1_000L,
-                    onSeek = { target -> volumeController.setVolumeFraction(target / 1_000f) },
-                    accent = uiState.palette.accent,
-                    modifier = Modifier.weight(1f),
-                )
-                FSIconButton(
-                    painter = painterResource(R.drawable.volume_up),
-                    contentDescription = "Set full volume",
-                    onClick = { volumeController.setVolumeFraction(1f) },
-                    active = volumeFraction > 0.01f,
-                    compact = true,
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
-            ) {
-                FSIconButton(
-                    painter = painterResource(R.drawable.queue_music),
-                    contentDescription = "Open playback queue",
-                    onClick = onOpenQueue,
-                    compact = true,
-                )
-                FSIconButton(
-                    painter = painterResource(R.drawable.lyrics),
-                    contentDescription = "Open synchronized lyrics",
-                    onClick = onOpenLyrics,
-                    active = uiState.currentLyricLine != null,
-                    compact = true,
-                )
-                FSIconButton(
-                    painter = painterResource(R.drawable.bluetooth),
-                    contentDescription = "Open Bluetooth audio output",
-                    onClick = actions.onOpenAudioOutput,
-                    compact = true,
-                )
-            }
         }
     }
 }

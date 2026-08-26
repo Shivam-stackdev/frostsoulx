@@ -1,0 +1,50 @@
+assets/bw_main_player/qmkuikly_btn_bw_main_pause.png:            PNG image data, 256 x 256, 8-bit/color RGBA, non-interlaced
+assets/bw_main_player/qmkuikly_btn_bw_main_play.png:             PNG image data, 256 x 256, 8-bit/color RGBA, non-interlaced
+assets/bw_main_player/qmkuikly_btn_bw_main_play_loading.png:     PNG image data, 252 x 252, 8-bit/color RGBA, non-interlaced
+assets/bw_main_player/qmkuikly_bw_main_play_time_setup_btn.png:  PNG image data, 192 x 80, 8-bit/color RGBA, non-interlaced
+assets/bw_main_player/qmkuikly_right_arrow_white.png:             PNG image data, 40 x 41, 8-bit/color RGBA, non-interlaced
+assets/personal_home_page/home_page_album_decorate.webp:         RIFF (little-endian) data, Web/P image
+assets/personal_home_page/home_page_album_default.png:           PNG image data, 224 x 224, 8-bit colormap, non-interlaced
+assets/personal_home_page/home_page_auto_organization.png:       PNG image data, 64 x 64, 8-bit/color RGBA, non-interlaced
+assets/personal_home_page/home_page_card_item_add.png:           PNG image data, 100 x 100, 8-bit/color RGBA, non-interlaced
+assets/personal_home_page/home_page_card_item_remove.png:        PNG image data, 100 x 100, 8-bit/color RGBA, non-interlaced
+assets/personal_home_page/home_page_card_lock.png:              PNG image data, 48 x 69, 8-bit colormap, non-interlaced
+assets/personal_home_page/home_page_edit_sort_disable.png:       PNG image data, 100 x 100, 8-bit/color RGBA, non-interlaced
+assets/personal_home_page/home_page_edit_sort_enable.png:        PNG image data, 100 x 100, 8-bit/color RGBA, non-interlaced
+assets/personal_home_page/home_page_folder_more.png:             PNG image data, 60 x 60, 2-bit colormap, non-interlaced
+assets/personal_home_page/home_page_restore_default.png:          PNG image data, 64 x 64, 8-bit/color RGBA, non-interlaced
+assets/personal_home_page/home_page_single_album_decorate.webp:  RIFF (little-endian) data, Web/P image
+assets/personal_home_page/home_page_song_pause.png:              PNG image data, 90 x 90, 8-bit colormap, non-interlaced
+assets/personal_home_page/home_page_song_play.png:               PNG image data, 90 x 90, 8-bit colormap, non-interlaced
+assets/common/common_empty.png:                                  PNG image data, 214 x 214, 8-bit colormap, non-interlaced
+assets/common/common_error.png:                                  PNG image data, 214 x 214, 8-bit colormap, non-interlaced
+assets/common/common_no_net.png:                                  PNG image data, 214 x 214, 8-bit colormap, non-interlaced
+assets/common/qmkuikly_album_bg_icon.png:                        PNG image data, 140 x 140, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_back_normal.webp:                         RIFF (little-endian) data, Web/P image
+assets/common/qmkuikly_back_white.png:                           PNG image data, 120 x 120, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_black_right_arrow.png:                     PNG image data, 120 x 120, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_btn_back.png:                             PNG image data, 90 x 90, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_btn_back_black.webp:                      RIFF (little-endian) data, Web/P image
+assets/common/qmkuikly_btn_exit_white.png:                       PNG image data, 90 x 90, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_close_black.png:                          PNG image data, 80 x 80, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_default_album.webp:                       RIFF (little-endian) data, Web/P image
+assets/common/qmkuikly_header_share_icon_white.png:              PNG image data, 120 x 120, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_icon_delete.png:                          PNG image data, 90 x 90, 8-bit colormap, non-interlaced
+assets/common/qmkuikly_interactive_folder_create_null_topic.png: PNG image data, 56 x 56, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_play_icon.png:                            PNG image data, 20 x 21, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_rank_down_icon.png:                       PNG image data, 18 x 15, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_rank_down_icon_dark.png:                  PNG image data, 52 x 20, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_rank_equal_icon.png:                     PNG image data, 16 x 4, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_rank_equal_icon_dark.png:                PNG image data, 52 x 20, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_rank_up_icon.png:                          PNG image data, 18 x 15, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_rank_up_icon_dark.png:                     PNG image data, 52 x 20, 8-bit/color RGBA, non-interlaced
+assets/common/qmkuikly_save_order.png:                            PNG image data, 90 x 90, 8-bit colormap, non-interlaced
+assets/common/qmkuikly_web_view_top_share_new.webp:               RIFF (little-endian) data, Web/P image
+assets/common/qmkuikly_white_right_arrow.png:                     PNG image data, 60 x 60, 4-bit colormap, non-interlaced
+assets/common/svip_icon.png:                                      PNG image data, 34 x 34, 8-bit/color RGBA, non-interlaced
+assets/common/upload_loading.webp:                                 RIFF (little-endian) data, Web/P image
+assets/common/vip_icon.png:                                       PNG image data, 40 x 40, 8-bit/color RGBA, non-interlaced
+
+Visual inspection findings:
+- `assets/bw_main_player/qmkuikly_btn_bw_main_play.png`: 256x256 white circular play-control asset with transparent background; the glyph is not visible in the extracted preview, implying a layered or mask-driven final control.
+- `assets/bw_main_player/qmkuikly_btn_bw_main_pause.png`: 256x256 white circular pause-control asset with transparent background; same layered/mask-driven treatment.

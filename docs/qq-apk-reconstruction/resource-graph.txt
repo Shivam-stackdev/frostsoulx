@@ -1,0 +1,91 @@
+-- framework keyword counts --
+androidx.compose              0
+android.view                  2025
+androidx.fragment             397
+androidx.navigation           339
+com.tencent.kg.hippy          296
+com.tencent.kuikly            5652
+com.tencent.qqmusic           138654
+-- likely UI bundle/resource directories --
+assets/banner_acq_recall
+assets/bubble/bubble_font_preview
+assets/bubble/search
+assets/bw_main_player
+assets/fonts
+assets/fonts/karaoke
+assets/fonts/kk
+assets/hippy
+assets/hippyLite
+assets/kuikly_assets
+assets/personal_home_page
+assets/sound_effect_search
+assets/vip_rec_banner
+assets/vip_tab
+-- resource file counts by top-level asset directory --
+  251 bubble
+  146 pag
+  105 lottie
+   77 agent
+   72 kuikly_assets
+   71 loading
+   32 common
+   25 sound_effect_main
+   22 wvs
+   21 fonts
+   17 hippy
+   15 vip_tab
+   13 raw
+   13 personal_home_page
+   12 sound_effect_search
+   11 sound_effect_detail
+   11 images
+   10 song_reward_gift
+    9 long_audio_album_header
+    9 car_with_room_page
+    8 jsbundle
+    8 interactive_folder_create
+    7 sound_effect_history_collect
+    7 bw_common
+    7 aimv_edit_page
+    6 sound_effect_my_equipment
+    6 long_audio_album_direct_zone
+    5 bw_main_player
+    5 arcard
+    4 typeface_setup
+    4 song_reward_rank
+    4 qbar
+    4 effects
+    4 dialog_universal_style
+    4 ai
+    3 supersound
+    3 res_hub
+    3 lighteffect
+    3 insideslide
+    3 banner_acq_recall
+    2 wemagic
+    2 webcontain
+    2 vip_rec_banner
+    2 org
+    2 materials
+    2 long_audio_preview_page
+    2 jsb-adapter
+    2 inplaylistblock
+    2 dts
+    2 dialog_login
+    2 dexopt
+    1 typeface_edit
+    1 sonic
+    1 qmtest
+    1 push
+    1 particles
+    1 magicbrush_v2
+    1 long_audio_top_list
+    1 long_audio_listen_list
+    1 longAudio
+    1 js
+    1 hippyLite
+    1 dolby
+    1 bluetooth
+    1 aimv_create_role_page
+    1 aabplugin
+    1 ImageBus

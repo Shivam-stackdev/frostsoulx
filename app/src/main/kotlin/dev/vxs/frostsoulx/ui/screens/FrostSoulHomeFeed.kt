@@ -91,8 +91,8 @@ import coil3.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import java.util.Calendar
 
-private val FrostSoulShelfItemPadding = PaddingValues(horizontal = 20.dp)
-private val FrostSoulShelfSpacing = 14.dp
+private val FrostSoulShelfItemPadding = PaddingValues(horizontal = 16.dp)
+private val FrostSoulShelfSpacing = 12.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -121,7 +121,7 @@ internal fun FrostSoulHomeFeed(
                 top = 8.dp,
                 bottom = LocalPlayerAwareWindowInsets.current.asPaddingValues().calculateBottomPadding() + MiniPlayerHeight + 108.dp,
             ),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier.fillMaxSize().frostSoulScreenBackground(),
     ) {
         item(key = "frostsoul_home_header") {

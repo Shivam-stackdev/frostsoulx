@@ -1,0 +1,5 @@
+-- layout count --
+5202 /home/ubuntu/qq-apk-analysis/layout-files.txt
+-- relevant layouts --
+bar.xml
+dialog_project_version.xml

@@ -91,9 +91,9 @@ data class FrostSoulSpacing(
     val small: Dp = 8.dp,
     val medium: Dp = 12.dp,
     val large: Dp = 16.dp,
-    val section: Dp = 24.dp,
-    val page: Dp = 20.dp,
-    val hero: Dp = 32.dp,
+    val section: Dp = 20.dp,
+    val page: Dp = 16.dp,
+    val hero: Dp = 24.dp,
 )
 
 @Immutable
@@ -158,9 +158,9 @@ private val DefaultFrostSoulTokens = FrostSoulDesignTokens(
     shapes = FrostSoulShapes(
         tiny = RoundedCornerShape(10.dp),
         small = RoundedCornerShape(14.dp),
-        medium = RoundedCornerShape(20.dp),
-        large = RoundedCornerShape(28.dp),
-        extraLarge = RoundedCornerShape(36.dp),
+        medium = RoundedCornerShape(16.dp),
+        large = RoundedCornerShape(20.dp),
+        extraLarge = RoundedCornerShape(24.dp),
         pill = RoundedCornerShape(50),
     ),
     elevation = FrostSoulElevation(),
