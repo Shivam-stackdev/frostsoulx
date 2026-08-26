@@ -848,67 +848,99 @@ private fun FrostSoulRecommendationsPage(
     uiState: FrostSoulPlayerUiState,
     actions: FrostSoulPlayerActions,
 ) {
-    val recommendationQueue = uiState.queue.filterNot { it.isCurrent }.take(8)
+    val recommendationQueue = uiState.queue.filterNot { it.isCurrent }.take(12)
+    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
+    val primaryText = if (isLightTheme) FrostSoulTheme.colors.onSurface else FrostSoulOnSurface
+    val mutedText = if (isLightTheme) FrostSoulTheme.colors.onSurfaceMuted else FrostSoulOnSurfaceMuted
+
     Column(
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 22.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.fillMaxSize().padding(vertical = 22.dp),
     ) {
         Text(
             text = "RECOMMENDATIONS",
-                    color = Color.White.copy(alpha = 0.78f),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 1.5.sp,
+            color = primaryText.copy(alpha = 0.78f),
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 1.5.sp,
         )
         Text(
             text = "Continue with your listening queue",
-            color = FrostSoulOnSurface,
+            color = primaryText,
             fontSize = 23.sp,
             fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = "FrostSoul keeps this page grounded in songs already selected on this device.",
-            color = FrostSoulOnSurfaceMuted,
+            color = mutedText,
             fontSize = 13.sp,
             lineHeight = 19.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
         )
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth().weight(1f),
         ) {
             gridItems(recommendationQueue, key = { "recommendation_${it.index}_${it.id}" }) { item ->
-                FSGlassCard(
-                    accent = Color.White.copy(alpha = 0.12f),
-                    modifier = Modifier.fillMaxWidth().height(196.dp).clickable { actions.onSelectQueueItem(item.index) },
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { actions.onSelectQueueItem(item.index) },
                 ) {
-                    Column(modifier = Modifier.padding(10.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(8.dp)),
+                    ) {
                         AsyncImage(
                             model = item.artworkUrl,
                             contentDescription = "Artwork for ${item.title}",
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxWidth().height(124.dp).clip(RoundedCornerShape(20.dp)),
+                            modifier = Modifier.fillMaxSize(),
                         )
-                        Text(
-                            text = item.title,
-                            color = FrostSoulOnSurface,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 8.dp),
-                        )
-                        Text(
-                            text = item.artist,
-                            color = FrostSoulOnSurfaceMuted,
-                            fontSize = 11.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 3.dp),
-                        )
+                        if (item.durationMs > 0L) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(5.dp)
+                                    .clip(RoundedCornerShape(7.dp))
+                                    .background(Color.Black.copy(alpha = 0.68f))
+                                    .padding(horizontal = 5.dp, vertical = 3.dp),
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.play),
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(11.dp),
+                                )
+                                Text(
+                                    text = item.durationMs.asFrostSoulTime(),
+                                    color = Color.White,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.padding(start = 3.dp),
+                                )
+                            }
+                        }
                     }
+                    Text(
+                        text = item.title,
+                        color = primaryText,
+                        fontSize = 12.sp,
+                        lineHeight = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 6.dp),
+                    )
                 }
             }
         }

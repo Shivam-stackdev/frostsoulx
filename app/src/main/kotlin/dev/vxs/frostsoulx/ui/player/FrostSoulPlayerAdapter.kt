@@ -76,6 +76,7 @@ internal fun FrostSoulPlayerAdapter(
                     title = item.title,
                     artist = item.artists.joinToString(separator = " • ") { it.name }.ifBlank { "Unknown artist" },
                     artworkUrl = item.thumbnailUrl,
+                    durationMs = item.duration.coerceAtLeast(0).toLong() * 1_000L,
                     isCurrent = index == currentQueueIndex,
                 )
             }

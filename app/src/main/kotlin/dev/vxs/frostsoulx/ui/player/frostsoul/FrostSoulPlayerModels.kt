@@ -58,6 +58,7 @@ internal data class FrostSoulQueueItem(
     val title: String,
     val artist: String,
     val artworkUrl: String?,
+    val durationMs: Long = 0L,
     val isCurrent: Boolean,
 )
 
