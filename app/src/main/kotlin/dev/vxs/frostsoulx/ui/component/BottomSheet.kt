@@ -398,18 +398,24 @@ fun Modifier.bottomSheetDraggable(
 
         detectVerticalDragGestures(
             onVerticalDrag = { change, dragAmount ->
-                velocityTracker.addPointerInputChange(change)
-                state.dispatchRawDelta(dragAmount)
+                if (!state.isCollapsed && !state.isDismissed) {
+                    velocityTracker.addPointerInputChange(change)
+                    state.dispatchRawDelta(dragAmount)
+                }
             },
             onDragCancel = {
-                val velocity = -velocityTracker.calculateVelocity().y
+                if (!state.isCollapsed && !state.isDismissed) {
+                    val velocity = -velocityTracker.calculateVelocity().y
+                    state.performFling(velocity, onDismiss)
+                }
                 velocityTracker.resetTracking()
-                state.performFling(velocity, onDismiss)
             },
             onDragEnd = {
-                val velocity = -velocityTracker.calculateVelocity().y
+                if (!state.isCollapsed && !state.isDismissed) {
+                    val velocity = -velocityTracker.calculateVelocity().y
+                    state.performFling(velocity, onDismiss)
+                }
                 velocityTracker.resetTracking()
-                state.performFling(velocity, onDismiss)
             },
         )
     }

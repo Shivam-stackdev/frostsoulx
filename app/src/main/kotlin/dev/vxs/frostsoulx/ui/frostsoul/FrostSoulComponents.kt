@@ -26,7 +26,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -581,7 +580,6 @@ fun FSNavigationBar(
     } else {
         FrostSoulTheme.shapes.extraLarge
     }
-    var swipeDistance by remember { mutableFloatStateOf(0f) }
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -590,21 +588,6 @@ fun FSNavigationBar(
                 .height(60.dp)
                 .clip(shape)
                 .frostSoulGlass(shape)
-                .pointerInput(items, selectedRoute) {
-                    detectHorizontalDragGestures(
-                        onHorizontalDrag = { _, amount -> swipeDistance += amount },
-                        onDragEnd = {
-                            val currentIndex = items.indexOfFirst { it.route == selectedRoute }
-                            if (currentIndex >= 0 && abs(swipeDistance) >= 72f) {
-                                val targetIndex =
-                                    if (swipeDistance < 0f) currentIndex + 1 else currentIndex - 1
-                                items.getOrNull(targetIndex)?.let { target -> onItemClick(target, false) }
-                            }
-                            swipeDistance = 0f
-                        },
-                        onDragCancel = { swipeDistance = 0f },
-                    )
-                }
                 .padding(horizontal = FrostSoulTheme.spacing.small, vertical = 4.dp),
     ) {
         items.forEachIndexed { index, item ->

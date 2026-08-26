@@ -1957,13 +1957,14 @@ class MainActivity : ComponentActivity() {
 
                                         // The existing BottomSheetPlayer is intentionally rendered after
                                         // navigation, making its collapsed row the independent front layer.
-                                        BottomSheetPlayer(
-                                            state = playerBottomSheetState,
-                                            navController = navController,
-                                            pureBlack = pureBlack,
-                                            isMiniPlayerPairedWithNavigation = areBottomBarsPaired,
-                                            onMiniPlayerPeekChanged = { miniPlayerPeeked = it },
-                                        )
+        BottomSheetPlayer(
+            state = playerBottomSheetState,
+            navController = navController,
+            pureBlack = pureBlack,
+            isMiniPlayerPairedWithNavigation = areBottomBarsPaired,
+            onMiniPlayerPeekChanged = { miniPlayerPeeked = it },
+            modifier = Modifier.zIndex(1f),
+        )
 
                                         val homeOverflowFabBottomPadding =
                                             bottomInset +
