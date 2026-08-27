@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -69,6 +70,7 @@ import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
 import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 import dev.vxs.frostsoulx.lyrics.core.LyricsSyncState
 import dev.vxs.frostsoulx.utils.rememberPreference
+import coil3.compose.AsyncImage
 
 private val LyricsHeaderPadding = 24.dp
 private val LyricsActiveFontSize = 32.sp
