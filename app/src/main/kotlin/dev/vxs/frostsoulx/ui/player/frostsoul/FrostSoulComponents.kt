@@ -247,6 +247,19 @@ internal fun FSAlbumArt(
                     center = center,
                     style = Stroke(width = 1.dp.toPx()),
                 )
+                drawArc(
+                    brush = Brush.sweepGradient(
+                        listOf(
+                            Color.Transparent,
+                            Color.White.copy(alpha = 0.30f),
+                            Color.Transparent,
+                        ),
+                    ),
+                    startAngle = 206f,
+                    sweepAngle = 92f,
+                    useCenter = false,
+                    style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round),
+                )
             }
 
             Box(
@@ -315,6 +328,13 @@ internal fun FSAlbumArt(
                     strokeWidth = 8.dp.toPx(),
                     cap = StrokeCap.Round,
                 )
+                drawLine(
+                    color = Color.White.copy(alpha = 0.22f),
+                    start = Offset(pivot.x - 1.dp.toPx(), pivot.y - 1.dp.toPx()),
+                    end = Offset(elbow.x - 1.dp.toPx(), elbow.y - 1.dp.toPx()),
+                    strokeWidth = 1.5.dp.toPx(),
+                    cap = StrokeCap.Round,
+                )
                 drawCircle(
                     brush = metalBrush,
                     radius = PlayerLayoutTokens.TurntableTonearmElbowSize.toPx() / 2f,
@@ -325,6 +345,13 @@ internal fun FSAlbumArt(
                     start = elbow,
                     end = needle,
                     strokeWidth = 6.dp.toPx(),
+                    cap = StrokeCap.Round,
+                )
+                drawLine(
+                    color = Color.White.copy(alpha = 0.20f),
+                    start = Offset(elbow.x - 1.dp.toPx(), elbow.y - 1.dp.toPx()),
+                    end = Offset(needle.x - 1.dp.toPx(), needle.y - 1.dp.toPx()),
+                    strokeWidth = 1.2.dp.toPx(),
                     cap = StrokeCap.Round,
                 )
                 drawCircle(

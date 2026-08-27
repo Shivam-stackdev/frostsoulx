@@ -8,6 +8,7 @@
 package dev.vxs.frostsoulx.ui.player
 
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.media3.exoplayer.offline.Download
 import dev.vxs.frostsoulx.LocalDownloadUtil
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -63,6 +64,17 @@ internal fun FrostSoulPlayerAdapter(
     val isRefetchingLyrics by lyricsMenuViewModel.isRefetching.collectAsStateWithLifecycle()
     val downloadUtil = LocalDownloadUtil.current
     val downloads by downloadUtil.downloads.collectAsStateWithLifecycle()
+    val downloadProgress =
+        downloads[mediaMetadata.id]?.let { download ->
+            when (download.state) {
+                Download.STATE_COMPLETED -> 1f
+                Download.STATE_QUEUED,
+                Download.STATE_DOWNLOADING,
+                Download.STATE_RESTARTING,
+                -> download.percentDownloaded.takeIf { it >= 0f }?.div(100f) ?: 0f
+                else -> null
+            }
+        }
     val applicationContext = LocalContext.current.applicationContext
     val lyricsSynchronizationEngine =
         remember(applicationContext) {
@@ -112,6 +124,7 @@ internal fun FrostSoulPlayerAdapter(
             nextLyricText,
             audioQualityBadge,
             outputDevice,
+            downloadProgress,
             isRefetchingLyrics,
             palette,
         ) {
@@ -130,6 +143,7 @@ internal fun FrostSoulPlayerAdapter(
                 nextLyricLine = nextLyricText,
                 audioQualityBadge = audioQualityBadge,
                 outputDevice = outputDevice,
+                downloadProgress = downloadProgress,
                 palette = palette,
             )
         }

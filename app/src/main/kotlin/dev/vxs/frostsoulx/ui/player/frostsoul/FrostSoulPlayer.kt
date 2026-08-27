@@ -20,6 +20,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.combinedClickable
@@ -61,6 +62,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -73,6 +75,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.luminance
@@ -97,12 +100,16 @@ import coil3.request.allowHardware
 import coil3.size.Size
 import coil3.toBitmap
 import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.MinimalistMetadataChip
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -221,7 +228,6 @@ internal fun FrostSoulPlayer(
                         FrostSoulPage.Lyrics ->
                             FSLyrics(
                                 rawLyrics = uiState.lyrics,
-                                artworkUrl = uiState.track.artworkUrl,
                                 title = uiState.track.title,
                                 artist = uiState.track.artist,
                                 isPlaying = uiState.isPlaying,
@@ -485,13 +491,9 @@ internal fun FSPlayerControls(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            FSIconButton(
-                painter = painterResource(R.drawable.ic_download),
-                contentDescription = "Download song",
+            FSDownloadButton(
+                progress = state.downloadProgress,
                 onClick = actions.onDownload,
-                buttonSize = 36.dp,
-                iconSize = 21.dp,
-                showContainer = false,
             )
             FrostSoulOutputDeviceButton(
                 device = state.outputDevice,
@@ -583,6 +585,43 @@ internal fun FSPlayerControls(
                 showContainer = false,
             )
         }
+    }
+}
+
+@Composable
+private fun FSDownloadButton(
+    progress: Float?,
+    onClick: () -> Unit,
+) {
+    val normalizedProgress = progress?.coerceIn(0f, 1f)
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(36.dp).clickable(onClick = onClick),
+    ) {
+        normalizedProgress?.let { value ->
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawArc(
+                    color = Color.White.copy(alpha = 0.22f),
+                    startAngle = -90f,
+                    sweepAngle = 360f,
+                    useCenter = false,
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.5.dp.toPx()),
+                )
+                drawArc(
+                    color = Color.White,
+                    startAngle = -90f,
+                    sweepAngle = 360f * value,
+                    useCenter = false,
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round),
+                )
+            }
+        }
+        Icon(
+            painter = painterResource(if (normalizedProgress == 1f) R.drawable.check else R.drawable.ic_download),
+            contentDescription = if (normalizedProgress == null) "Download song" else "Download progress ${((normalizedProgress * 100f).toInt())}%",
+            tint = Color.White,
+            modifier = Modifier.size(18.dp),
+        )
     }
 }
 
@@ -696,7 +735,9 @@ private fun FrostSoulAlbumPage(
                 artworkUrl = uiState.track.artworkUrl,
                 title = uiState.track.title,
                 isPlaying = uiState.isPlaying,
-                modifier = Modifier.size(PlayerLayoutTokens.TurntableCardSize),
+                modifier = Modifier
+                    .size(PlayerLayoutTokens.TurntableCardSize)
+                    .graphicsLayer { translationY = -8.dp.toPx() },
             )
             Row(
                 horizontalArrangement = Arrangement.End,
@@ -753,9 +794,6 @@ private fun FrostSoulArtworkBlurAlbumPage(
 ) {
     val artworkShape = RoundedCornerShape(24.dp)
     val titleScrollState = rememberScrollState()
-    val artworkSaturationMatrix = remember {
-        ColorMatrix().apply { setToSaturation(1.35f) }
-    }
     Column(
         modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
         verticalArrangement = Arrangement.SpaceBetween,
@@ -765,23 +803,6 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 modifier = Modifier.fillMaxWidth().height(300.dp).clip(artworkShape),
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
-                    AsyncImage(
-                        model = uiState.track.artworkUrl,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.colorMatrix(artworkSaturationMatrix),
-                        modifier = Modifier.fillMaxSize().blur(80.dp),
-                    )
-                    Box(
-                        modifier = Modifier.fillMaxSize().background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    uiState.palette.artworkPrimary.copy(alpha = 0.50f),
-                                    uiState.palette.artworkSecondary.copy(alpha = 0.68f),
-                                ),
-                            ),
-                        ),
-                    )
                     AsyncImage(
                         model = uiState.track.artworkUrl,
                         contentDescription = "Album artwork",
@@ -1047,6 +1068,17 @@ private fun FrostSoulRecommendationsPage(
     actions: FrostSoulPlayerActions,
 ) {
     val recommendationQueue = uiState.queue.filterNot { it.isCurrent }.take(12)
+    val viewCounts by produceState<Map<String, Int?>>(emptyMap(), recommendationQueue) {
+        value = coroutineScope {
+            recommendationQueue
+                .map { item ->
+                    async {
+                        item.id to YouTube.getMediaInfo(item.id).getOrNull()?.viewCount
+                    }
+                }.awaitAll()
+                .toMap()
+        }
+    }
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     val primaryText = if (isLightTheme) FrostSoulTheme.colors.onSurface else FrostSoulOnSurface
     val mutedText = if (isLightTheme) FrostSoulTheme.colors.onSurfaceMuted else FrostSoulOnSurfaceMuted
@@ -1065,6 +1097,21 @@ private fun FrostSoulRecommendationsPage(
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
             letterSpacing = 1.5.sp,
+        )
+        Text(
+            text = uiState.track.title,
+            color = primaryText,
+            fontSize = 23.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = uiState.track.artist,
+            color = mutedText,
+            fontSize = 14.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         Text(
             text = "Continue with your listening queue",
@@ -1165,7 +1212,7 @@ private fun FrostSoulRecommendationsPage(
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize(),
                             )
-                            if (item.durationMs > 0L) {
+                            viewCounts[item.id]?.takeIf { it >= 0 }?.let { count ->
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
@@ -1176,13 +1223,13 @@ private fun FrostSoulRecommendationsPage(
                                         .padding(horizontal = 5.dp, vertical = 3.dp),
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.play),
+                                        painter = painterResource(if (item.isCurrent) R.drawable.pause else R.drawable.play),
                                         contentDescription = null,
                                         tint = Color.White,
                                         modifier = Modifier.size(11.dp),
                                     )
                                     Text(
-                                        text = item.durationMs.asFrostSoulTime(),
+                                        text = formatRecommendationViewCount(count),
                                         color = Color.White,
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Medium,
@@ -1214,6 +1261,14 @@ private fun FrostSoulRecommendationsPage(
                 }
             }
         }
+    }
+}
+
+private fun formatRecommendationViewCount(count: Int): String {
+    return when {
+        count >= 1_000_000 -> "${"%.1f".format(count / 1_000_000f)}M"
+        count >= 1_000 -> "${"%.1f".format(count / 1_000f)}K"
+        else -> count.toString()
     }
 }
 

@@ -84,6 +84,7 @@ internal data class FrostSoulPlayerUiState(
         type = PlayerOutputDevice.Unknown,
         name = PlayerOutputDevice.Unknown.defaultName,
     ),
+    val downloadProgress: Float? = null,
     val palette: FrostSoulPalette = FrostSoulPalette.Default,
 ) {
     val safeDurationMs: Long
