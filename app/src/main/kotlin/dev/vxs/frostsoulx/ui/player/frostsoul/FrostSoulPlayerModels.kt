@@ -107,6 +107,7 @@ internal data class FrostSoulPlayerUiState(
     ),
     val downloadProgress: Float? = null,
     val sleepTimerActive: Boolean = false,
+    val blurRadius: Float = 48f,
     val palette: FrostSoulPalette = FrostSoulPalette.Default,
     val playerBackgroundStyle: PlayerBackgroundStyle = PlayerBackgroundStyle.GLOW_ANIMATED,
 ) {

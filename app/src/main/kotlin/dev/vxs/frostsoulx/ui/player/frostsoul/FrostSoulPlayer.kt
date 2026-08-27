@@ -54,9 +54,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -122,6 +119,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -188,6 +187,7 @@ internal fun FrostSoulPlayer(
                 artworkUrl = uiState.track.artworkUrl,
                 playerDesignStyle = playerDesignStyle,
                 playerBackgroundStyle = uiState.playerBackgroundStyle,
+                blurRadius = uiState.blurRadius,
                 palette = uiState.palette,
                 moodSeed = "${uiState.track.title} ${uiState.track.artist} ${uiState.track.album}",
             )
@@ -1319,12 +1319,18 @@ private fun FrostSoulRecommendationsPage(
             .distinctBy { it.id }
             .take(5)
             .ifEmpty { recommendationQueue.take(5) }
-    val viewCounts by produceState<Map<String, Int?>>(emptyMap(), recommendationQueue) {
+    val recommendationKey = remember(recommendationQueue) {
+        recommendationQueue.joinToString(separator = "|") { it.id }
+    }
+    val viewCounts by produceState<Map<String, Int?>>(emptyMap(), recommendationKey) {
+        val requestLimiter = Semaphore(permits = 3)
         value = coroutineScope {
             recommendationQueue
                 .map { item ->
-                    async {
-                        item.id to YouTube.getMediaInfo(item.id).getOrNull()?.viewCount
+                    async(Dispatchers.IO) {
+                        requestLimiter.withPermit {
+                            item.id to YouTube.getMediaInfo(item.id).getOrNull()?.viewCount
+                        }
                     }
                 }.awaitAll()
                 .toMap()
@@ -1341,6 +1347,7 @@ private fun FrostSoulRecommendationsPage(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(top = 10.dp, bottom = 6.dp),
     ) {
         // Header block keeps a single shared gutter so nothing hangs off-screen.
@@ -1537,7 +1544,7 @@ private fun FrostSoulRecommendationsPage(
         if (recommendationQueue.isEmpty()) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth().weight(1f),
+                modifier = Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 20.dp),
             ) {
                 Text(
                     text = "No more songs in this queue.",
@@ -1546,86 +1553,94 @@ private fun FrostSoulRecommendationsPage(
                 )
             }
         } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(
-                    start = PlayerLayoutTokens.MasterHorizontalPadding,
-                    end = PlayerLayoutTokens.MasterHorizontalPadding,
-                    top = 14.dp,
-                    bottom = 16.dp,
-                ),
-                horizontalArrangement = Arrangement.spacedBy(9.dp),
+            Column(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
-                modifier = Modifier.fillMaxWidth().weight(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = PlayerLayoutTokens.MasterHorizontalPadding,
+                        end = PlayerLayoutTokens.MasterHorizontalPadding,
+                        top = 14.dp,
+                        bottom = 16.dp,
+                    ),
             ) {
-                gridItems(recommendationQueue, key = { "recommendation_${it.index}_${it.id}" }) { item ->
-                    // Tile = artwork card + text below it, matching the QQ recommendation grid:
-                    // the tinted surface only wraps the artwork so titles read on the page itself.
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(9.dp))
-                            .clickable { actions.onSelectQueueItem(item.index) },
+                recommendationQueue.chunked(3).forEach { rowItems ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(9.dp),
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(9.dp))
-                                .background(cardSurface),
-                        ) {
-                            AsyncImage(
-                                model = item.artworkUrl,
-                                contentDescription = "Artwork for ${item.title}",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                            viewCounts[item.id]?.takeIf { it >= 0 }?.let { count ->
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
+                        rowItems.forEach { item ->
+                            // Tile = artwork card + text below it, matching the QQ recommendation grid.
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(9.dp))
+                                    .clickable { actions.onSelectQueueItem(item.index) },
+                            ) {
+                                Box(
                                     modifier = Modifier
-                                        .align(Alignment.BottomStart)
-                                        .padding(5.dp)
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(Color.Black.copy(alpha = 0.74f))
-                                        .padding(horizontal = 5.dp, vertical = 2.dp),
+                                        .fillMaxWidth()
+                                        .aspectRatio(1f)
+                                        .clip(RoundedCornerShape(9.dp))
+                                        .background(cardSurface),
                                 ) {
-                                    Icon(
-                                        painter = painterResource(if (item.isCurrent) R.drawable.pause else R.drawable.play),
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(10.dp),
+                                    AsyncImage(
+                                        model = item.artworkUrl,
+                                        contentDescription = "Artwork for ${item.title}",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize(),
                                     )
-                                    Text(
-                                        text = formatRecommendationViewCount(count),
-                                        color = Color.White,
-                                        fontSize = 9.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1,
-                                        modifier = Modifier.padding(start = 3.dp),
-                                    )
+                                    viewCounts[item.id]?.takeIf { it >= 0 }?.let { count ->
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier
+                                                .align(Alignment.BottomStart)
+                                                .padding(5.dp)
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(Color.Black.copy(alpha = 0.74f))
+                                                .padding(horizontal = 5.dp, vertical = 2.dp),
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(if (item.isCurrent) R.drawable.pause else R.drawable.play),
+                                                contentDescription = null,
+                                                tint = Color.White,
+                                                modifier = Modifier.size(10.dp),
+                                            )
+                                            Text(
+                                                text = formatRecommendationViewCount(count),
+                                                color = Color.White,
+                                                fontSize = 9.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                maxLines = 1,
+                                                modifier = Modifier.padding(start = 3.dp),
+                                            )
+                                        }
+                                    }
                                 }
+                                Text(
+                                    text = item.title,
+                                    color = primaryText,
+                                    fontSize = 11.sp,
+                                    lineHeight = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(top = 6.dp),
+                                )
+                                Text(
+                                    text = item.artist,
+                                    color = mutedText,
+                                    fontSize = 10.sp,
+                                    lineHeight = 13.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(top = 2.dp),
+                                )
                             }
                         }
-                        Text(
-                            text = item.title,
-                            color = primaryText,
-                            fontSize = 11.sp,
-                            lineHeight = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 6.dp),
-                        )
-                        Text(
-                            text = item.artist,
-                            color = mutedText,
-                            fontSize = 10.sp,
-                            lineHeight = 13.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 2.dp),
-                        )
+                        repeat(3 - rowItems.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                 }
             }
@@ -1885,6 +1900,7 @@ private fun FrostSoulDynamicBackground(
     artworkUrl: String?,
     playerDesignStyle: PlayerDesignStyle,
     playerBackgroundStyle: PlayerBackgroundStyle,
+    blurRadius: Float,
     palette: FrostSoulPalette,
     moodSeed: String,
 ) {
@@ -1904,12 +1920,16 @@ private fun FrostSoulDynamicBackground(
     )
     val moodAccent = remember(moodSeed, palette) { resolveVinylMoodAccent(moodSeed, palette) }
     val animatedGlowPhase =
-        rememberInfiniteTransition(label = "vinyl-glow-transition").animateFloat(
-            initialValue = 0f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(tween(8_000), RepeatMode.Reverse),
-            label = "vinyl-glow-phase",
-        ).value
+        if (isAnimatedGlow) {
+            rememberInfiniteTransition(label = "vinyl-glow-transition").animateFloat(
+                initialValue = 0f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(tween(8_000), RepeatMode.Reverse),
+                label = "vinyl-glow-phase",
+            ).value
+        } else {
+            0.5f
+        }
     val glowPhase = if (isAnimatedGlow) animatedGlowPhase else 0.5f
     Box(
         modifier =
@@ -1924,8 +1944,12 @@ private fun FrostSoulDynamicBackground(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 colorFilter = ColorFilter.colorMatrix(saturationMatrix),
-                                        modifier = Modifier.fillMaxSize().blur(64.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded),
-
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(
+                        blurRadius.coerceIn(0f, 120f).dp,
+                        edgeTreatment = BlurredEdgeTreatment.Unbounded,
+                    ),
             )
         }
         if (shouldUseGradient) {
@@ -1982,6 +2006,19 @@ private fun FrostSoulDynamicBackground(
                 ),
             )
         }
+        // Keep lyric text readable when artwork contains bright whites or skin tones. This is
+        // deliberately the final backdrop layer so animated glow cannot wash out lyric text.
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Black.copy(alpha = 0.24f),
+                        Color.Black.copy(alpha = 0.14f),
+                        Color.Black.copy(alpha = 0.42f),
+                    ),
+                ),
+            ),
+        )
     }
 }
 

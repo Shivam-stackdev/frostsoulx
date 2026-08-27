@@ -28,6 +28,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Slider
+import androidx.compose.material3.TextButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSIcon as Icon
 import dev.vxs.frostsoulx.ui.frostsoul.FSText as Text
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
@@ -119,6 +122,23 @@ internal fun FSLyrics(
     var selectedLanguageCode by remember(rawLyrics) { mutableStateOf("ENGLISH") }
     var translatedLines by remember(rawLyrics) { mutableStateOf<Map<Int, String>>(emptyMap()) }
     var isTranslating by remember(rawLyrics) { mutableStateOf(false) }
+    var showOffsetDialog by remember(document?.songId) { mutableStateOf(false) }
+    var draftOffsetMs by remember(document?.songId, document?.offsetMs) {
+        mutableStateOf(document?.offsetMs ?: 0L)
+    }
+    val lyricsRepository = remember(applicationContext) {
+        EntryPointAccessors
+            .fromApplication(applicationContext, LyricsHelperEntryPoint::class.java)
+            .lyricsRepository()
+    }
+
+    fun applyLyricsOffset(offsetMs: Long) {
+        val safeOffset = offsetMs.coerceIn(-5_000L, 5_000L)
+        synchronizationEngine.setOffset(safeOffset)
+        document?.songId?.let { songId ->
+            coroutineScope.launch { lyricsRepository.updateOffset(songId, safeOffset) }
+        }
+    }
 
     fun translateCurrentLyrics(languageCode: String) {
         if (lines.isEmpty() || isTranslating) return
@@ -271,7 +291,52 @@ internal fun FSLyrics(
             languageMenuExpanded = languageMenuExpanded,
             onLanguageMenuExpandedChange = { languageMenuExpanded = it },
             languages = translatorLanguages,
+            currentOffsetMs = document?.offsetMs ?: 0L,
+            onOpenOffset = {
+                draftOffsetMs = document?.offsetMs ?: 0L
+                showOffsetDialog = true
+            },
         )
+
+        if (showOffsetDialog) {
+            AlertDialog(
+                onDismissRequest = { showOffsetDialog = false },
+                title = { Text("Lyrics sync offset") },
+                text = {
+                    Column {
+                        Text(
+                            text = "%+d ms".format(draftOffsetMs),
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Slider(
+                            value = draftOffsetMs.toFloat(),
+                            onValueChange = { draftOffsetMs = it.toLong() },
+                            valueRange = -5_000f..5_000f,
+                            steps = 99,
+                        )
+                        Text(
+                            text = "Positive values advance lyric selection; negative values delay it.",
+                            color = FrostSoulOnSurfaceMuted,
+                            fontSize = 12.sp,
+                            lineHeight = 17.sp,
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            applyLyricsOffset(draftOffsetMs)
+                            showOffsetDialog = false
+                        },
+                    ) { Text("Apply") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showOffsetDialog = false }) { Text("Cancel") }
+                },
+            )
+        }
 
         // Compact inline spinner instead of a full-screen scrim, so lyrics stay readable
         // while a refetch or translation is in flight.
@@ -310,6 +375,8 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
     languageMenuExpanded: Boolean,
     onLanguageMenuExpandedChange: (Boolean) -> Unit,
     languages: List<TranslatorLang>,
+    currentOffsetMs: Long,
+    onOpenOffset: () -> Unit,
 ) {
     // Floating action pill: kept centred with a fixed bottom offset and uniform 6.dp inner
     // padding so Refresh / Translate / Like and the play button share one baseline and the
@@ -324,6 +391,14 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
                 .background(Color.Black.copy(alpha = 0.82f), RoundedCornerShape(30.dp))
                 .padding(start = 10.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
     ) {
+        LyricsActionButton(
+            painter = painterResource(R.drawable.tune),
+            label = "Offset",
+            contentDescription = "Adjust lyrics sync offset (${currentOffsetMs}ms)",
+            onClick = onOpenOffset,
+            enabled = !isRefetchingLyrics && !isTranslating,
+            active = currentOffsetMs != 0L,
+        )
         LyricsActionButton(
             painter = painterResource(R.drawable.sync),
             label = "Refresh",

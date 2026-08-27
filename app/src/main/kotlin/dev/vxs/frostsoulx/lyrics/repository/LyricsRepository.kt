@@ -47,7 +47,13 @@ class LyricsRepository @Inject constructor(
             val existingRaw = database.getLyricsById(metadata.id)
             val raw =
                 when {
-                    !forceRefresh && existingRaw != null && existingRaw.lyrics != LyricsEntity.LYRICS_NOT_FOUND -> existingRaw.lyrics
+                    !forceRefresh &&
+                        existingRaw != null &&
+                        existingRaw.lyrics != LyricsEntity.LYRICS_NOT_FOUND &&
+                        (
+                            existingRaw.source == LyricsEntity.Source.USER_SELECTION.value ||
+                                lyricsHelper.isLikelyForTrack(existingRaw.lyrics, metadata)
+                        ) -> existingRaw.lyrics
                     else -> lyricsHelper.getLyrics(metadata, forceRefresh = forceRefresh)
                 }
             if (raw == LyricsEntity.LYRICS_NOT_FOUND || raw.isBlank()) return@withContext null

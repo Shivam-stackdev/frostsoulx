@@ -117,7 +117,14 @@ class LyricsHelper
             forceRefresh: Boolean = false,
             callback: (LyricsResult) -> Unit,
         ) {
-            val cacheKey = lyricsCacheKey(songTitle, songArtists)
+            val cacheKey =
+                lyricsCacheKey(
+                    mediaId = mediaId,
+                    title = songTitle,
+                    artists = songArtists,
+                    album = songAlbum,
+                    duration = duration,
+                )
             if (forceRefresh) {
                 invalidateCache(cacheKey)
             } else {
@@ -147,7 +154,14 @@ class LyricsHelper
                     try {
                         provider.getAllLyrics(mediaId, songTitle, songArtists, songAlbum, duration) lyricsCallback@{ lyrics ->
                             val normalizedLyrics = LyricsUtils.lyricsOrNotFound(lyrics)
-                            if (normalizedLyrics == LYRICS_NOT_FOUND) return@lyricsCallback
+                            if (
+                                normalizedLyrics == LYRICS_NOT_FOUND ||
+                                    hasConflictingLrcMetadata(
+                                        normalizedLyrics,
+                                        title = songTitle,
+                                        artists = songArtists,
+                                    )
+                            ) return@lyricsCallback
                             val result = LyricsResult(provider.name, normalizedLyrics)
                             allResult += result
                             callback(result)
@@ -169,9 +183,23 @@ class LyricsHelper
             if (providers.isEmpty()) return LYRICS_NOT_FOUND
 
             val artist = mediaMetadata.artists.joinToString { it.name }
+            // ID-aware providers are less likely to return a same-title remix or live version.
+            // Keep the user's ordering for the remaining providers.
+            val exactIdProviders =
+                listOf(
+                    SimpMusicLyricsProvider,
+                    UnisonLyricsProvider,
+                    YouTubeSubtitleLyricsProvider,
+                )
+            val prioritizedProviders =
+                if (mediaMetadata.id.isNotBlank()) {
+                    providers.filter { it in exactIdProviders } + providers.filterNot { it in exactIdProviders }
+                } else {
+                    providers
+                }
             val results =
                 supervisorScope {
-                    providers
+                    prioritizedProviders
                         .map { provider ->
                             async(Dispatchers.IO) {
                                 fetchProviderLyrics(provider, mediaMetadata, artist)
@@ -203,7 +231,11 @@ class LyricsHelper
                         mediaMetadata.duration,
                     ).fold(
                         onSuccess = { lyrics ->
-                            LyricsUtils.lyricsOrNotFound(lyrics).takeIf { it != LYRICS_NOT_FOUND }
+                            LyricsUtils
+                                .lyricsOrNotFound(lyrics)
+                                .takeIf {
+                                    it != LYRICS_NOT_FOUND && !hasConflictingLrcMetadata(it, mediaMetadata)
+                                }
                         },
                         onFailure = {
                             reportException(it)
@@ -255,14 +287,66 @@ class LyricsHelper
         private val MediaMetadata.lyricsCacheKey: String
             get() =
                 lyricsCacheKey(
+                    mediaId = id,
                     title = title,
                     artists = artists.joinToString { it.name },
+                    album = album?.title,
+                    duration = duration,
                 )
 
         private fun lyricsCacheKey(
+            mediaId: String,
             title: String,
             artists: String,
-        ): String = "$artists-$title".replace(" ", "")
+            album: String?,
+            duration: Int,
+        ): String =
+            listOf(mediaId, title, artists, album.orEmpty(), duration.toString())
+                .joinToString("|") { normalizeIdentity(it) }
+
+        private fun normalizeIdentity(value: String): String =
+            value
+                .lowercase()
+                .replace("＆", "&")
+                .replace(Regex("[^a-z0-9]+"), " ")
+                .trim()
+                .replace(Regex("\\s+"), " ")
+
+        /** Reject only explicit provider metadata that contradicts the current track. */
+        fun isLikelyForTrack(lyrics: String, metadata: MediaMetadata): Boolean =
+            !hasConflictingLrcMetadata(
+                lyrics,
+                title = metadata.title,
+                artists = metadata.artists.joinToString { it.name },
+            )
+
+        private fun hasConflictingLrcMetadata(
+            lyrics: String,
+            title: String,
+            artists: String,
+        ): Boolean {
+            val titleTag = Regex("(?im)^\\s*\\[ti\\s*:\\s*([^]]+)]").find(lyrics)?.groupValues?.getOrNull(1)
+            val artistTag = Regex("(?im)^\\s*\\[ar\\s*:\\s*([^]]+)]").find(lyrics)?.groupValues?.getOrNull(1)
+            val normalizedTitle = normalizeIdentity(title)
+            val normalizedArtists = artists.split(Regex("\\s*[,•;|/]\\s*"), limit = 0).map { normalizeIdentity(it) }
+            val normalizedTaggedTitle = titleTag?.let(::normalizeIdentity)
+            val normalizedTaggedArtist = artistTag?.let(::normalizeIdentity)
+            val titleConflict =
+                normalizedTaggedTitle != null &&
+                    normalizedTitle.isNotBlank() &&
+                    normalizedTaggedTitle != normalizedTitle &&
+                    !normalizedTaggedTitle.contains(normalizedTitle) &&
+                    !normalizedTitle.contains(normalizedTaggedTitle)
+            val artistConflict =
+                normalizedTaggedArtist != null &&
+                    normalizedArtists.isNotEmpty() &&
+                    normalizedArtists.none {
+                        it == normalizedTaggedArtist ||
+                            it.contains(normalizedTaggedArtist) ||
+                            normalizedTaggedArtist.contains(it)
+                    }
+            return titleConflict || artistConflict
+        }
 
         companion object {
             private const val MAX_CACHE_SIZE = 16

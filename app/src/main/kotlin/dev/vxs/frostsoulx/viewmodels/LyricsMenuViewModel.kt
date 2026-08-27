@@ -47,6 +47,8 @@ import dev.vxs.frostsoulx.lyrics.LyricsUtils
 import dev.vxs.frostsoulx.lyrics.LyricsUtils.displayLyricsText
 import dev.vxs.frostsoulx.lyrics.LyricsUtils.isLineSyncedLrc
 import dev.vxs.frostsoulx.lyrics.LyricsUtils.isTtml
+import dev.vxs.frostsoulx.lyrics.repository.LyricsRepository
+import dev.vxs.frostsoulx.lyrics.sync.LyricsSynchronizationEngine
 import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.utils.NetworkConnectivityObserver
 import dev.vxs.frostsoulx.utils.dataStore
@@ -88,6 +90,8 @@ class LyricsMenuViewModel
     constructor(
         @ApplicationContext private val context: Context,
         private val lyricsHelper: LyricsHelper,
+        private val lyricsRepository: LyricsRepository,
+        private val lyricsSynchronizationEngine: LyricsSynchronizationEngine,
         val database: MusicDatabase,
         private val networkConnectivity: NetworkConnectivityObserver,
     ) : ViewModel() {
@@ -192,13 +196,9 @@ class LyricsMenuViewModel
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val lyrics = lyricsHelper.getLyrics(mediaMetadata, forceRefresh = true)
-                    database.withTransaction {
-                        replaceLyrics(
-                            id = mediaMetadata.id,
-                            lyrics = lyrics,
-                            source = LyricsEntity.Source.REMOTE.value,
-                        )
+                    val document = lyricsRepository.resolve(mediaMetadata, forceRefresh = true)
+                    if (document?.songId == lyricsSynchronizationEngine.documentState.value?.songId) {
+                        lyricsSynchronizationEngine.setDocument(document)
                     }
                 } catch (e: CancellationException) {
                     throw e

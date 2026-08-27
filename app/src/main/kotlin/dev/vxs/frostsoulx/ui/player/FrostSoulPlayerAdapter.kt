@@ -48,6 +48,7 @@ internal fun FrostSoulPlayerAdapter(
     mediaMetadata: MediaMetadata,
     playerDesignStyle: PlayerDesignStyle = PlayerDesignStyle.FROSTSOUL,
     playerBackgroundStyle: PlayerBackgroundStyle = PlayerBackgroundStyle.GLOW_ANIMATED,
+    blurRadius: Float = 48f,
     positionMs: Long,
     durationMs: Long,
     isPlaying: Boolean,
@@ -166,6 +167,7 @@ internal fun FrostSoulPlayerAdapter(
             downloadProgress,
             isRefetchingLyrics,
             sleepTimerActive,
+            blurRadius,
             palette,
             playerBackgroundStyle,
         ) {
@@ -191,6 +193,7 @@ internal fun FrostSoulPlayerAdapter(
                 audioTechnicalInfo = audioTechnicalInfo,
                 outputDevice = outputDevice,
                 downloadProgress = downloadProgress,
+                blurRadius = blurRadius,
                 palette = palette,
                 playerBackgroundStyle = playerBackgroundStyle,
             )

@@ -23,6 +23,7 @@ class LyricsSynchronizationEngine @Inject constructor() {
     private val _document = MutableStateFlow<LyricsDocument?>(null)
     private val _currentLine = MutableStateFlow<LyricsLine?>(null)
     private var document: LyricsDocument? = null
+    private var lastPlaybackPositionMs: Long = 0L
 
     val state: StateFlow<LyricsSyncState> = _state.asStateFlow()
     val documentState: StateFlow<LyricsDocument?> = _document.asStateFlow()
@@ -30,6 +31,7 @@ class LyricsSynchronizationEngine @Inject constructor() {
 
     fun setDocument(document: LyricsDocument?) {
         this.document = document
+        lastPlaybackPositionMs = 0L
         _document.value = document
         publishState(
             if (document == null || document.original.lines.isEmpty()) {
@@ -45,7 +47,14 @@ class LyricsSynchronizationEngine @Inject constructor() {
         document = current.withOffset(offsetMs)
         _document.value = document
         val state = _state.value
-        publishState(resolve(state.timestampMs, durationMs = 0L, isPlaying = state.status == LyricsSyncStatus.Playing, isSeeking = false))
+        publishState(
+            resolve(
+                playbackPositionMs = lastPlaybackPositionMs,
+                durationMs = 0L,
+                isPlaying = state.status == LyricsSyncStatus.Playing,
+                isSeeking = false,
+            ),
+        )
     }
 
     fun update(
@@ -54,6 +63,7 @@ class LyricsSynchronizationEngine @Inject constructor() {
         isPlaying: Boolean,
         isSeeking: Boolean = false,
     ) {
+        lastPlaybackPositionMs = playbackPositionMs.coerceAtLeast(0L)
         if (document == null) {
             publishState(LyricsSyncState(timestampMs = playbackPositionMs.coerceAtLeast(0L)))
             return

@@ -1241,6 +1241,7 @@ if (!aodModeEnabled) {
                     mediaMetadata = metadata,
                     playerDesignStyle = playerDesignStyle,
                     playerBackgroundStyle = playerBackground,
+                    blurRadius = if (disableBlur) 0f else blurRadius,
                     positionMs = sliderPosition ?: position,
                     durationMs = duration,
                     isPlaying = isPlaying,
