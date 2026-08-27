@@ -209,6 +209,10 @@ internal fun FrostSoulPlayer(
                         FrostSoulPage.Lyrics ->
                             FSLyrics(
                                 rawLyrics = uiState.lyrics,
+                                title = uiState.track.title,
+                                artist = uiState.track.artist,
+                                isPlaying = uiState.isPlaying,
+                                isLiked = uiState.track.isLiked,
                                 positionMs = uiState.positionMs,
                                 durationMs = uiState.safeDurationMs,
                                 onSeek = actions.onSeek,
@@ -640,7 +644,8 @@ private fun FrostSoulAlbumPage(
                 artworkUrl = uiState.track.artworkUrl,
                 title = uiState.track.title,
                 isPlaying = uiState.isPlaying,
-                modifier = Modifier.size(PlayerLayoutTokens.VinylDiscSize),
+                                    modifier = Modifier.size(PlayerLayoutTokens.TurntableCardSize),
+
             )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

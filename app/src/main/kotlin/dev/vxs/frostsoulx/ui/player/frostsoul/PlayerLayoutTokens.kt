@@ -18,6 +18,13 @@ internal object PlayerLayoutTokens {
     val MasterHorizontalPadding = 24.dp
     val VinylDiscSize = 310.dp
     val CenterAlbumArtSize = 190.dp
+    val TurntableCardSize = 336.dp
+    val TurntablePlatterSize = 316.dp
+    val TurntablePolaroidOuterSize = 150.dp
+    val TurntablePolaroidInnerSize = 122.dp
+    val TurntableTonearmMountSize = 48.dp
+    val TurntableTonearmElbowSize = 14.dp
+    val TurntableRestPegSize = 18.dp
 
     val TrackTitleStyle = TextStyle(
         fontFamily = FontFamily.SansSerif,

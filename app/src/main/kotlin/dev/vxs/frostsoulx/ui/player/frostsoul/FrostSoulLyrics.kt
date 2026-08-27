@@ -68,6 +68,11 @@ import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 import dev.vxs.frostsoulx.lyrics.core.LyricsSyncState
 import dev.vxs.frostsoulx.utils.rememberPreference
 
+private val LyricsHeaderPadding = 24.dp
+private val LyricsActiveFontSize = 32.sp
+private val LyricsInactiveFontSize = 27.sp
+private val LyricsControlLabelSize = 10.sp
+
 /**
  * Renders karaoke directly from the singleton lyrics synchronization engine.
  *
@@ -78,6 +83,10 @@ import dev.vxs.frostsoulx.utils.rememberPreference
 @Composable
 internal fun FSLyrics(
     rawLyrics: String?,
+    title: String,
+    artist: String,
+    isPlaying: Boolean,
+    isLiked: Boolean,
     positionMs: Long,
     durationMs: Long,
     onSeek: (Long) -> Unit,
@@ -162,41 +171,69 @@ internal fun FSLyrics(
                 )
             }
         } else {
-            LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(start = 24.dp, top = 88.dp, end = 24.dp, bottom = 156.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                itemsIndexed(
-                    items = lines,
-                    key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
-                ) { index, line ->
-                    val displayLine = if (showTranslation) {
-                        line.copy(text = translatedLines[index] ?: line.text, words = emptyList(), translation = null)
-                    } else {
-                        line
-                    }
-                    val isCurrent = index == currentIndex
-                    FrostSoulKaraokeLine(
-                        line = displayLine,
-                    isCurrent = isCurrent,
-                    isPast = currentIndex >= 0 && index < currentIndex,
-                    currentWordIndex = if (isCurrent) syncState.currentWordIndex else -1,
-                    wordProgress = if (isCurrent) syncState.wordProgress else 0f,
-                    lineProgress = if (isCurrent) syncState.lineProgress else 0f,
-                        onSeek = onSeek,
+            Column(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(
+                        start = LyricsHeaderPadding,
+                        end = LyricsHeaderPadding,
+                        top = 12.dp,
+                        bottom = 8.dp,
+                    ),
+                ) {
+                    Text(
+                        text = title,
+                        color = FrostSoulOnSurface,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
+                    Text(
+                        text = artist,
+                        color = FrostSoulOnSurfaceMuted,
+                        fontSize = 15.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+                LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 156.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    itemsIndexed(
+                        items = lines,
+                        key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
+                    ) { index, line ->
+                        val displayLine = if (showTranslation) {
+                            line.copy(text = translatedLines[index] ?: line.text, words = emptyList(), translation = null)
+                        } else {
+                            line
+                        }
+                        val isCurrent = index == currentIndex
+                        FrostSoulKaraokeLine(
+                            line = displayLine,
+                            isCurrent = isCurrent,
+                            isPast = currentIndex >= 0 && index < currentIndex,
+                            currentWordIndex = if (isCurrent) syncState.currentWordIndex else -1,
+                            wordProgress = if (isCurrent) syncState.wordProgress else 0f,
+                            lineProgress = if (isCurrent) syncState.lineProgress else 0f,
+                            onSeek = onSeek,
+                        )
+                    }
                 }
             }
         }
 
         FrostSoulLyricsBottomControls(
-            onOpenAudioOutput = onOpenAudioOutput,
             onToggleLike = onToggleLike,
             onTogglePlayPause = onTogglePlayPause,
             onRefetchLyrics = onRefetchLyrics,
             isRefetchingLyrics = isRefetchingLyrics,
+            isPlaying = isPlaying,
+            isLiked = isLiked,
             showTranslation = showTranslation,
             isTranslating = isTranslating,
             onToggleTranslation = {
@@ -235,11 +272,12 @@ internal fun FSLyrics(
 
 @Composable
 private fun BoxScope.FrostSoulLyricsBottomControls(
-    onOpenAudioOutput: () -> Unit,
     onToggleLike: () -> Unit,
     onTogglePlayPause: () -> Unit,
     onRefetchLyrics: () -> Unit,
     isRefetchingLyrics: Boolean,
+    isPlaying: Boolean,
+    isLiked: Boolean,
     showTranslation: Boolean,
     isTranslating: Boolean,
     onToggleTranslation: () -> Unit,
@@ -249,26 +287,27 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
     languages: List<TranslatorLang>,
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier =
             Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 14.dp)
                 .background(Color.Black.copy(alpha = 0.78f), RoundedCornerShape(28.dp))
-                .padding(horizontal = 8.dp, vertical = 6.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
     ) {
-        FSIconButton(
+        LyricsActionButton(
             painter = painterResource(R.drawable.sync),
+            label = "Refresh",
             contentDescription = "Refetch lyrics",
             onClick = onRefetchLyrics,
             enabled = !isRefetchingLyrics && !isTranslating,
             active = isRefetchingLyrics,
-            compact = true,
         )
         Box {
-            FSIconButton(
+            LyricsActionButton(
                 painter = painterResource(R.drawable.translate),
+                label = "Translate",
                 contentDescription = "Translate lyrics",
                 onClick = {
                     if (!isTranslating) {
@@ -277,7 +316,6 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
                 },
                 enabled = !isRefetchingLyrics,
                 active = showTranslation || isTranslating,
-                compact = true,
             )
             androidx.compose.material3.DropdownMenu(
                 expanded = languageMenuExpanded,
@@ -291,26 +329,62 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
                 }
             }
         }
-        FSIconButton(
-            painter = painterResource(R.drawable.bluetooth),
-            contentDescription = "Audio output",
-            onClick = onOpenAudioOutput,
-            enabled = !isRefetchingLyrics && !isTranslating,
-            compact = true,
-        )
-        FSIconButton(
-            painter = painterResource(R.drawable.favorite_border),
+        LyricsActionButton(
+            painter = painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
+            label = "Like",
             contentDescription = "Like this song",
             onClick = onToggleLike,
             enabled = !isRefetchingLyrics && !isTranslating,
-            compact = true,
+            active = isLiked,
         )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(52.dp)
+                .background(FrostSoulTheme.colors.accentBright, androidx.compose.foundation.shape.CircleShape)
+                .clickable(
+                    enabled = !isRefetchingLyrics && !isTranslating,
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onTogglePlayPause,
+                ),
+        ) {
+            Icon(
+                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                contentDescription = "Play or pause",
+                tint = Color.Black,
+                modifier = Modifier.size(22.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun LyricsActionButton(
+    painter: androidx.compose.ui.graphics.painter.Painter,
+    label: String,
+    contentDescription: String,
+    onClick: () -> Unit,
+    enabled: Boolean,
+    active: Boolean,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         FSIconButton(
-            painter = painterResource(R.drawable.play),
-            contentDescription = "Play or pause",
-            onClick = onTogglePlayPause,
-            active = true,
+            painter = painter,
+            contentDescription = contentDescription,
+            onClick = onClick,
+            enabled = enabled,
+            active = active,
             compact = true,
+            buttonSize = 30.dp,
+            iconSize = 22.dp,
+            showContainer = false,
+        )
+        Text(
+            text = label,
+            color = if (active) FrostSoulTheme.colors.accentBright else FrostSoulOnSurfaceMuted,
+            fontSize = LyricsControlLabelSize,
+            maxLines = 1,
         )
     }
 }
@@ -362,11 +436,16 @@ private fun FrostSoulKaraokeLine(
         label = "fs-karaoke-line-emphasis",
     )
     val scale by animateFloatAsState(
-        targetValue = 1f,
+        targetValue = if (isCurrent) 1.04f else 1f,
         animationSpec = spring(dampingRatio = 0.84f, stiffness = 420f),
         label = "fs-karaoke-line-scale",
     )
-    val lineColor = if (isCurrent) FrostSoulOnSurface else FrostSoulOnSurfaceMuted
+    val lineColor =
+        when {
+            isCurrent -> FrostSoulOnSurface
+            isPast -> FrostSoulOnSurfaceMuted.copy(alpha = 0.70f)
+            else -> FrostSoulOnSurfaceMuted.copy(alpha = 0.45f)
+        }
     val annotatedText =
         remember(line, currentWordIndex, wordProgress, lineProgress, isCurrent, lineColor, emphasis) {
             line.asKaraokeAnnotatedText(
@@ -398,7 +477,7 @@ private fun FrostSoulKaraokeLine(
         Text(
             text = annotatedText,
             color = lineColor,
-            fontSize = 27.sp,
+            fontSize = if (isCurrent) LyricsActiveFontSize else LyricsInactiveFontSize,
             lineHeight = 36.sp,
             fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Medium,
             maxLines = 4,

@@ -74,6 +74,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.ui.frostsoul.FSIcon
+import dev.vxs.frostsoulx.ui.frostsoul.FSText
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 
 @Composable
@@ -176,82 +177,11 @@ internal fun FSAlbumArt(
         animationSpec = tween(durationMillis = 420),
         label = "fs-tonearm-angle",
     )
-    val artShape = if (compact) RoundedCornerShape(16.dp) else CircleShape
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier =
-            modifier
-                .aspectRatio(1f)
-                .shadow(
-                    elevation = if (compact) 0.dp else 24.dp,
-                    shape = CircleShape,
-                    clip = false,
-                )
-                .drawBehind {
-                    val radius = size.minDimension * 0.74f
-                    drawCircle(
-                        brush =
-                            Brush.radialGradient(
-                                colors = listOf(Color.White.copy(alpha = 0.07f), Color.Transparent),
-                                center = center,
-                                radius = radius,
-                            ),
-                        radius = radius,
-                        center = center,
-                    )
-                }
-                .padding(if (compact) 2.dp else 0.dp),
-    ) {
-        if (!compact) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val vinylRadius = size.minDimension * 0.47f
-                drawCircle(color = Color(0xFF020506), radius = vinylRadius, center = center)
-                for (ringIndex in 1..7) {
-                    val ringRadius = vinylRadius * (0.22f + ringIndex * 0.095f)
-                    drawCircle(
-                        color = Color.White.copy(alpha = 0.035f + ringIndex * 0.006f),
-                        radius = ringRadius,
-                        center = center,
-                        style = Stroke(width = (1f + ringIndex * 0.18f).dp.toPx()),
-                    )
-                }
-                drawCircle(
-                    color = Color.White.copy(alpha = 0.12f),
-                    radius = vinylRadius,
-                    center = center,
-                    style = Stroke(width = 1.5.dp.toPx()),
-                )
-                drawArc(
-                    brush = Brush.sweepGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.04f),
-                            Color.White.copy(alpha = 0.18f),
-                            Color.Transparent,
-                            Color.Transparent,
-                        ),
-                        center = center,
-                    ),
-                    startAngle = -56f,
-                    sweepAngle = 72f,
-                    useCenter = false,
-                    topLeft = Offset(center.x - vinylRadius, center.y - vinylRadius),
-                    size = Size(vinylRadius * 2f, vinylRadius * 2f),
-                    style = Stroke(width = size.minDimension * 0.06f),
-                )
-            }
-        }
-
+    if (compact) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(if (compact) 0.dp else (PlayerLayoutTokens.VinylDiscSize - PlayerLayoutTokens.CenterAlbumArtSize) / 2f)
-                    .graphicsLayer { rotationZ = displayedRotation }
-                    .clip(artShape)
-                    .background(FrostSoulSurfaceElevated)
-                    .border(1.dp, Color.White.copy(alpha = 0.10f), artShape),
+            modifier = modifier.aspectRatio(1f).clip(RoundedCornerShape(16.dp)).background(FrostSoulSurfaceElevated),
         ) {
             AsyncImage(
                 model = artworkUrl,
@@ -264,44 +194,168 @@ internal fun FSAlbumArt(
                     painter = painterResource(R.drawable.music_note),
                     contentDescription = null,
                     tint = FrostSoulOnSurfaceMuted,
-                    modifier = Modifier.size(if (compact) 26.dp else 72.dp),
+                    modifier = Modifier.size(26.dp),
                 )
             }
-            if (!compact) {
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    val discRadius = size.minDimension * 0.14f
-                    drawCircle(color = Color.Black.copy(alpha = 0.72f), radius = discRadius, center = center)
-                    drawCircle(color = Color.White.copy(alpha = 0.14f),
- radius = discRadius * 0.34f, center = center)
-                    drawCircle(color = Color.Black.copy(alpha = 0.9f), radius = discRadius * 0.11f, center = center)
+        }
+        return
+    }
+
+    val cardShape = RoundedCornerShape(24.dp)
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .aspectRatio(1f)
+            .shadow(elevation = 18.dp, shape = cardShape, clip = false)
+            .clip(cardShape)
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(Color(0xFF3A3A3E), Color(0xFF141416)),
+                ),
+            ),
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(PlayerLayoutTokens.TurntablePlatterSize)
+                .graphicsLayer { rotationZ = displayedRotation },
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val platterRadius = size.minDimension / 2f
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFFC7C7CC), Color(0xFF8A8A90)),
+                        center = center,
+                        radius = platterRadius,
+                    ),
+                    radius = platterRadius,
+                    center = center,
+                )
+                for (ringIndex in 1..20) {
+                    val ringRadius = platterRadius * (0.14f + ringIndex * 0.041f)
+                    drawCircle(
+                        color = Color.White.copy(alpha = 0.08f),
+                        radius = ringRadius,
+                        center = center,
+                        style = Stroke(width = 1.dp.toPx()),
+                    )
                 }
+                drawCircle(
+                    color = Color.Black.copy(alpha = 0.14f),
+                    radius = platterRadius,
+                    center = center,
+                    style = Stroke(width = 1.dp.toPx()),
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(PlayerLayoutTokens.TurntablePolaroidOuterSize)
+                    .graphicsLayer { rotationZ = 45f }
+                    .shadow(4.dp, RoundedCornerShape(4.dp), clip = false)
+                    .background(Color(0xFFF5F1E8), RoundedCornerShape(4.dp))
+                    .padding(14.dp),
+            ) {
+                AsyncImage(
+                    model = artworkUrl,
+                    contentDescription = "Album artwork for $title",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(1.dp)),
+                )
+                if (artworkUrl.isNullOrBlank()) {
+                    FSIcon(
+                        painter = painterResource(R.drawable.music_note),
+                        contentDescription = null,
+                        tint = Color(0xFF2B2B2B),
+                        modifier = Modifier.align(Alignment.Center).size(32.dp),
+                    )
+                }
+                FSText(
+                    text = title.take(18),
+                    color = Color(0xFF2B2B2B),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.8.sp,
+                    maxLines = 1,
+                    modifier = Modifier.align(Alignment.CenterStart).rotate(-90f),
+                )
+                FSText(
+                    text = title.take(18),
+                    color = Color(0xFF2B2B2B),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.8.sp,
+                    maxLines = 1,
+                    modifier = Modifier.align(Alignment.CenterEnd).rotate(90f),
+                )
             }
         }
 
-        if (!compact) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val pivot = Offset(size.width * 0.77f, size.height * 0.15f)
-                val armLength = size.minDimension * 0.38f
-                val armEnd = Offset(pivot.x - armLength * 0.74f, pivot.y + armLength * 0.68f)
-                withTransform({ rotate(tonearmAngle, pivot) }) {
-                    drawCircle(color = Color(0xFF1B2A2E), radius = size.minDimension * 0.065f, center = pivot)
-                    drawLine(
-                        color = Color(0xFFB9D1D5),
-                        start = pivot,
-                        end = armEnd,
-                        strokeWidth = size.minDimension * 0.022f,
-                        cap = StrokeCap.Round,
-                    )
-                    drawLine(
-                        color = Color.White.copy(alpha = 0.28f),
-                        start = pivot,
-                        end = armEnd,
-                        strokeWidth = size.minDimension * 0.007f,
-                        cap = StrokeCap.Round,
-                    )
-                    drawCircle(color = Color(0xFFD5F2F5), radius = size.minDimension * 0.024f, center = armEnd)
-                }
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val pivot = Offset(size.width * 0.77f, size.height * 0.15f)
+            val armLength = size.minDimension * 0.38f
+            val elbow = Offset(pivot.x - armLength * 0.74f, pivot.y + armLength * 0.68f)
+            val needle = Offset(elbow.x - armLength * 0.16f, elbow.y + armLength * 0.15f)
+            val metalBrush = Brush.linearGradient(
+                colors = listOf(Color(0xFF4A4A4E), Color(0xFF1A1A1C)),
+                start = pivot,
+                end = elbow,
+            )
+            withTransform({ rotate(tonearmAngle, pivot) }) {
+                drawCircle(
+                    brush = metalBrush,
+                    radius = PlayerLayoutTokens.TurntableTonearmMountSize.toPx() / 2f,
+                    center = pivot,
+                )
+                drawLine(
+                    brush = metalBrush,
+                    start = pivot,
+                    end = elbow,
+                    strokeWidth = 8.dp.toPx(),
+                    cap = StrokeCap.Round,
+                )
+                drawCircle(
+                    brush = metalBrush,
+                    radius = PlayerLayoutTokens.TurntableTonearmElbowSize.toPx() / 2f,
+                    center = elbow,
+                )
+                drawLine(
+                    brush = metalBrush,
+                    start = elbow,
+                    end = needle,
+                    strokeWidth = 6.dp.toPx(),
+                    cap = StrokeCap.Round,
+                )
+                drawCircle(
+                    color = Color(0xFFD5F2F5),
+                    radius = 8.dp.toPx(),
+                    center = needle,
+                )
             }
+
+            val pegCenter = Offset(
+                center.x + size.minDimension * 0.29f,
+                center.y + size.minDimension * 0.31f,
+            )
+            drawCircle(
+                brush = Brush.linearGradient(colors = listOf(Color(0xFF4A4A4E), Color(0xFF1A1A1C))),
+                radius = PlayerLayoutTokens.TurntableRestPegSize.toPx() / 2f,
+                center = pegCenter,
+            )
+        }
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.align(Alignment.BottomEnd).padding(14.dp).size(40.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF101012)),
+        ) {
+            FSIcon(
+                painter = painterResource(R.drawable.music_note),
+                contentDescription = "Audio source",
+                tint = FrostSoulTheme.colors.accentBright,
+                modifier = Modifier.size(20.dp),
+            )
         }
     }
 }
