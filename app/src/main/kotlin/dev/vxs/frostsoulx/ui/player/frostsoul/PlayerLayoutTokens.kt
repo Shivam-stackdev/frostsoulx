@@ -15,16 +15,31 @@ import androidx.compose.ui.unit.sp
 
 /** Stable geometry and typography tokens for the full-screen FrostSoul player. */
 internal object PlayerLayoutTokens {
-    val MasterHorizontalPadding = 24.dp
+    val MasterHorizontalPadding = 22.dp
     val VinylDiscSize = 310.dp
     val CenterAlbumArtSize = 190.dp
-    val TurntableCardSize = 336.dp
-    val TurntablePlatterSize = 316.dp
-    val TurntablePolaroidOuterSize = 150.dp
-    val TurntablePolaroidInnerSize = 122.dp
-    val TurntableTonearmMountSize = 48.dp
-    val TurntableTonearmElbowSize = 14.dp
-    val TurntableRestPegSize = 18.dp
+
+    /** Turntable geometry — the platter is inset inside the deck card, QQ-style. */
+    val TurntableCardSize = 330.dp
+    val TurntablePlatterSize = 262.dp
+    val TurntablePolaroidOuterSize = 128.dp
+    val TurntablePolaroidInnerSize = 104.dp
+    val TurntableTonearmMountSize = 34.dp
+    val TurntableTonearmElbowSize = 11.dp
+    val TurntableRestPegSize = 13.dp
+    val TurntableSpindleSize = 11.dp
+
+    /** Artwork-blur header height, kept full-bleed so it melts into the page. */
+    val ArtworkBlurHeaderHeight = 342.dp
+
+    /** Lyrics typography and rhythm, tuned against the QQ Music lyric sheet. */
+    val LyricsActiveFontSize = 21.sp
+    val LyricsInactiveFontSize = 18.sp
+    val LyricsLineHeight = 27.sp
+    val LyricsLineSpacing = 15.dp
+    val LyricsTextStartInset = 2.dp
+    val LyricsTextEndInset = 16.dp
+    val LyricsBottomControlsReserve = 128.dp
 
     val TrackTitleStyle = TextStyle(
         fontFamily = FontFamily.SansSerif,

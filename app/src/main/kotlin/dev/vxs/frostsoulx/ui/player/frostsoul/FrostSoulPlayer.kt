@@ -175,11 +175,18 @@ internal fun FrostSoulPlayer(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.systemBars)
-                    .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding),
+                    .windowInsetsPadding(WindowInsets.systemBars),
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth().height(42.dp).padding(top = 4.dp, bottom = 6.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(42.dp)
+                    .padding(
+                        start = PlayerLayoutTokens.MasterHorizontalPadding,
+                        end = PlayerLayoutTokens.MasterHorizontalPadding,
+                        top = 4.dp,
+                        bottom = 6.dp,
+                    ),
             ) {
                 Icon(
                     painter = painterResource(R.drawable.expand_more),
@@ -215,13 +222,10 @@ internal fun FrostSoulPlayer(
                         Modifier
                             .fillMaxSize()
                             .graphicsLayer {
+                                // Keep pages flat and full-bleed: only a light cross-fade so
+                                // adjacent pages never look scaled-in or pushed off-centre.
                                 val distance = kotlin.math.abs(pageDistance).coerceIn(0f, 1f)
-                                alpha = (1f - distance * 0.34f).coerceIn(0.62f, 1f)
-                                translationX = -pageDistance * 28f
-                                scaleX = 1f - distance * 0.055f
-                                scaleY = 1f - distance * 0.055f
-                                rotationY = pageDistance * 2.8f
-                                cameraDistance = 16f * density
+                                alpha = (1f - distance * 0.28f).coerceIn(0.70f, 1f)
                             },
                 ) {
                     when (pages[pageIndex]) {
@@ -724,7 +728,7 @@ private fun FrostSoulAlbumPage(
     onOpenOptions: () -> Unit,
 ) {
     val titleScrollState = rememberScrollState()
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
@@ -736,12 +740,13 @@ private fun FrostSoulAlbumPage(
                 title = uiState.track.title,
                 isPlaying = uiState.isPlaying,
                 modifier = Modifier
-                    .size(PlayerLayoutTokens.TurntableCardSize)
-                    .graphicsLayer { translationY = -8.dp.toPx() },
+                    .fillMaxWidth()
+                    .sizeIn(maxWidth = PlayerLayoutTokens.TurntableCardSize)
+                    .aspectRatio(1f),
             )
             Row(
                 horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp, end = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp, end = 4.dp),
             ) {
                 FSIconButton(
                     painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
@@ -792,35 +797,47 @@ private fun FrostSoulArtworkBlurAlbumPage(
     onOpenQueue: () -> Unit,
     onOpenOptions: () -> Unit,
 ) {
-    val artworkShape = RoundedCornerShape(24.dp)
     val titleScrollState = rememberScrollState()
     Column(
         modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
+            // Full-bleed artwork header: the image spans the whole width with no card
+            // inset, and fades edge-to-edge into the page background so the thumbnail
+            // reads as one seamless surface (QQ Music "immersive cover" behaviour).
             Box(
-                modifier = Modifier.fillMaxWidth().height(300.dp).clip(artworkShape),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight),
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
                     AsyncImage(
                         model = uiState.track.artworkUrl,
                         contentDescription = "Album artwork",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(310.dp)
-                            .align(Alignment.Center)
-                            .clip(RoundedCornerShape(18.dp)),
+                        modifier = Modifier.fillMaxSize(),
                     )
+                    // Bottom fade blends the cover into the page with no visible seam.
                     Box(
                         modifier = Modifier.fillMaxSize().background(
                             Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color.Black.copy(alpha = 0.06f),
-                                    Color.Black.copy(alpha = 0.76f),
-                                ),
+                                0.00f to Color.Black.copy(alpha = 0.34f),
+                                0.16f to Color.Transparent,
+                                0.58f to Color.Transparent,
+                                0.82f to Color.Black.copy(alpha = 0.55f),
+                                1.00f to Color.Black.copy(alpha = 0.97f),
+                            ),
+                        ),
+                    )
+                    // Horizontal vignette softens the left/right cut lines.
+                    Box(
+                        modifier = Modifier.fillMaxSize().background(
+                            Brush.horizontalGradient(
+                                0.00f to Color.Black.copy(alpha = 0.30f),
+                                0.14f to Color.Transparent,
+                                0.86f to Color.Transparent,
+                                1.00f to Color.Black.copy(alpha = 0.30f),
                             ),
                         ),
                     )
@@ -835,17 +852,32 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 }
                 Text(
                     text = uiState.track.album.ifBlank { "Now playing" },
-                    color = Color.White.copy(alpha = 0.82f),
+                    color = Color.White.copy(alpha = 0.86f),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 1.3.sp,
-                    modifier = Modifier.align(Alignment.BottomStart).padding(18.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(
+                            start = PlayerLayoutTokens.MasterHorizontalPadding,
+                            end = PlayerLayoutTokens.MasterHorizontalPadding,
+                            bottom = 14.dp,
+                        ),
                 )
             }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = PlayerLayoutTokens.MasterHorizontalPadding,
+                        end = PlayerLayoutTokens.MasterHorizontalPadding,
+                        top = 14.dp,
+                        bottom = 12.dp,
+                    ),
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Box(modifier = Modifier.fillMaxWidth().horizontalScroll(titleScrollState)) {
@@ -877,12 +909,13 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 )
             }
 
-            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+            Column(modifier = Modifier.padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)) {
                 uiState.currentLyricLine?.takeIf { it.isNotBlank() }?.let { current ->
                     Text(
                         text = current,
                         color = FrostSoulOnSurface,
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
+                        lineHeight = 23.sp,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -894,7 +927,8 @@ private fun FrostSoulArtworkBlurAlbumPage(
                         Text(
                             text = next,
                             color = FrostSoulOnSurfaceMuted,
-                            fontSize = 15.sp,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(top = 4.dp),
@@ -907,7 +941,9 @@ private fun FrostSoulArtworkBlurAlbumPage(
             state = uiState,
             actions = actions,
             onOpenQueue = onOpenQueue,
-            modifier = Modifier.padding(top = 18.dp),
+            modifier = Modifier
+                .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)
+                .padding(top = 18.dp),
         )
     }
 }
@@ -1088,50 +1124,71 @@ private fun FrostSoulRecommendationsPage(
     val cardSurface = if (isLightTheme) Color.Black.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.07f)
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.fillMaxSize().padding(vertical = 22.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 10.dp, bottom = 6.dp),
     ) {
-        Text(
-            text = "RECOMMENDATIONS",
-            color = primaryText.copy(alpha = 0.78f),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.5.sp,
-        )
-        Text(
-            text = uiState.track.title,
-            color = primaryText,
-            fontSize = 23.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Text(
-            text = uiState.track.artist,
-            color = mutedText,
-            fontSize = 14.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Text(
-            text = "Continue with your listening queue",
-            color = primaryText,
-            fontSize = 23.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Text(
-            text = "Songs already selected on this device, ready to play next.",
-            color = mutedText,
-            fontSize = 13.sp,
-            lineHeight = 19.sp,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+        // Header block keeps a single shared gutter so nothing hangs off-screen.
+        Column(
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding),
+        ) {
+            Text(
+                text = "RECOMMENDATIONS",
+                color = primaryText.copy(alpha = 0.72f),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 1.6.sp,
+                maxLines = 1,
+            )
+            Text(
+                text = uiState.track.title,
+                color = primaryText,
+                fontSize = 20.sp,
+                lineHeight = 26.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+            Text(
+                text = uiState.track.artist,
+                color = mutedText,
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = "Continue with your listening queue",
+                color = primaryText,
+                fontSize = 19.sp,
+                lineHeight = 25.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 12.dp),
+            )
+            Text(
+                text = "Songs already selected on this device, ready to play next.",
+                color = mutedText,
+                fontSize = 12.sp,
+                lineHeight = 17.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(vertical = 2.dp),
+            contentPadding = PaddingValues(
+                start = PlayerLayoutTokens.MasterHorizontalPadding,
+                end = PlayerLayoutTokens.MasterHorizontalPadding,
+                top = 12.dp,
+                bottom = 2.dp,
+            ),
             modifier = Modifier.fillMaxWidth(),
         ) {
             item {
@@ -1180,31 +1237,37 @@ private fun FrostSoulRecommendationsPage(
                 Text(
                     text = "No more songs in this queue.",
                     color = mutedText,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                 )
             }
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(top = 4.dp, bottom = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(
+                    start = PlayerLayoutTokens.MasterHorizontalPadding,
+                    end = PlayerLayoutTokens.MasterHorizontalPadding,
+                    top = 14.dp,
+                    bottom = 16.dp,
+                ),
+                horizontalArrangement = Arrangement.spacedBy(9.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxWidth().weight(1f),
             ) {
                 gridItems(recommendationQueue, key = { "recommendation_${it.index}_${it.id}" }) { item ->
+                    // Tile = artwork card + text below it, matching the QQ recommendation grid:
+                    // the tinted surface only wraps the artwork so titles read on the page itself.
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(cardSurface)
-                            .clickable { actions.onSelectQueueItem(item.index) }
-                            .padding(bottom = 8.dp),
+                            .clip(RoundedCornerShape(9.dp))
+                            .clickable { actions.onSelectQueueItem(item.index) },
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(1f)
-                                .clip(RoundedCornerShape(10.dp)),
+                                .clip(RoundedCornerShape(9.dp))
+                                .background(cardSurface),
                         ) {
                             AsyncImage(
                                 model = item.artworkUrl,
@@ -1218,21 +1281,22 @@ private fun FrostSoulRecommendationsPage(
                                     modifier = Modifier
                                         .align(Alignment.BottomStart)
                                         .padding(5.dp)
-                                        .clip(RoundedCornerShape(7.dp))
-                                        .background(Color.Black.copy(alpha = 0.72f))
-                                        .padding(horizontal = 5.dp, vertical = 3.dp),
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color.Black.copy(alpha = 0.74f))
+                                        .padding(horizontal = 5.dp, vertical = 2.dp),
                                 ) {
                                     Icon(
                                         painter = painterResource(if (item.isCurrent) R.drawable.pause else R.drawable.play),
                                         contentDescription = null,
                                         tint = Color.White,
-                                        modifier = Modifier.size(11.dp),
+                                        modifier = Modifier.size(10.dp),
                                     )
                                     Text(
                                         text = formatRecommendationViewCount(count),
                                         color = Color.White,
-                                        fontSize = 10.sp,
+                                        fontSize = 9.sp,
                                         fontWeight = FontWeight.Medium,
+                                        maxLines = 1,
                                         modifier = Modifier.padding(start = 3.dp),
                                     )
                                 }
@@ -1241,12 +1305,12 @@ private fun FrostSoulRecommendationsPage(
                         Text(
                             text = item.title,
                             color = primaryText,
-                            fontSize = 12.sp,
-                            lineHeight = 15.sp,
+                            fontSize = 11.sp,
+                            lineHeight = 14.sp,
                             fontWeight = FontWeight.Medium,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                            modifier = Modifier.padding(top = 6.dp),
                         )
                         Text(
                             text = item.artist,
@@ -1255,7 +1319,7 @@ private fun FrostSoulRecommendationsPage(
                             lineHeight = 13.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(horizontal = 8.dp),
+                            modifier = Modifier.padding(top = 2.dp),
                         )
                     }
                 }

@@ -46,8 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
@@ -63,7 +61,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -71,11 +68,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.ui.frostsoul.FSIcon
-import dev.vxs.frostsoulx.ui.frostsoul.FSText
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 
 @Composable
@@ -173,9 +168,10 @@ internal fun FSAlbumArt(
         if (!isPlaying) pausedRotation = rotation
     }
     val displayedRotation = if (isPlaying) rotation else pausedRotation
+    // Playing → the stylus sits on the record. Off → the arm swings back to its rest peg.
     val tonearmAngle by animateFloatAsState(
-        targetValue = if (isPlaying) -5f else -58f,
-        animationSpec = tween(durationMillis = 420),
+        targetValue = if (isPlaying) 0f else 26f,
+        animationSpec = tween(durationMillis = 520),
         label = "fs-tonearm-angle",
     )
 
@@ -202,139 +198,175 @@ internal fun FSAlbumArt(
         return
     }
 
-    val cardShape = RoundedCornerShape(24.dp)
+    val cardShape = RoundedCornerShape(26.dp)
+    val platterFraction = PlayerLayoutTokens.TurntablePlatterSize.value /
+        PlayerLayoutTokens.TurntableCardSize.value
+    val polaroidFraction = PlayerLayoutTokens.TurntablePolaroidOuterSize.value /
+        PlayerLayoutTokens.TurntableCardSize.value
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .aspectRatio(1f)
-            .shadow(elevation = 18.dp, shape = cardShape, clip = false)
+            .shadow(elevation = 20.dp, shape = cardShape, clip = false)
             .clip(cardShape)
             .background(
                 Brush.linearGradient(
-                    colors = listOf(Color(0xFF3A3A3E), Color(0xFF141416)),
+                    colors = listOf(Color(0xFF3B3B40), Color(0xFF17171A)),
                 ),
             ),
     ) {
+        // Deck plate sheen so the card reads as a physical turntable body.
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.radialGradient(
+                    colors = listOf(Color.White.copy(alpha = 0.05f), Color.Transparent),
+                    radius = 640f,
+                ),
+            ),
+        )
+
+        // Spinning platter: sized relative to the deck so it never overflows the card.
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(PlayerLayoutTokens.TurntablePlatterSize)
+                .fillMaxSize(platterFraction)
                 .graphicsLayer { rotationZ = displayedRotation },
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val platterRadius = size.minDimension / 2f
                 drawCircle(
                     brush = Brush.radialGradient(
-                        colors = listOf(Color(0xFFC7C7CC), Color(0xFF8A8A90)),
+                        colors = listOf(Color(0xFFCBCBD0), Color(0xFFA0A0A6), Color(0xFF7E7E85)),
                         center = center,
                         radius = platterRadius,
                     ),
                     radius = platterRadius,
                     center = center,
                 )
-                for (ringIndex in 1..20) {
-                    val ringRadius = platterRadius * (0.14f + ringIndex * 0.041f)
+                // Concentric grooves, densest toward the rim like a pressed record.
+                for (ringIndex in 1..26) {
+                    val ringRadius = platterRadius * (0.20f + ringIndex * 0.0305f)
+                    if (ringRadius > platterRadius) break
                     drawCircle(
-                        color = Color.White.copy(alpha = 0.08f),
+                        color = Color.White.copy(alpha = 0.07f),
                         radius = ringRadius,
                         center = center,
-                        style = Stroke(width = 1.dp.toPx()),
+                        style = Stroke(width = 0.9.dp.toPx()),
                     )
                 }
                 drawCircle(
-                    color = Color.Black.copy(alpha = 0.14f),
+                    color = Color.Black.copy(alpha = 0.20f),
                     radius = platterRadius,
                     center = center,
-                    style = Stroke(width = 1.dp.toPx()),
+                    style = Stroke(width = 1.2.dp.toPx()),
                 )
+                // Rotating highlight sweep.
                 drawArc(
                     brush = Brush.sweepGradient(
                         listOf(
                             Color.Transparent,
-                            Color.White.copy(alpha = 0.30f),
+                            Color.White.copy(alpha = 0.26f),
                             Color.Transparent,
                         ),
                     ),
-                    startAngle = 206f,
-                    sweepAngle = 92f,
+                    startAngle = 204f,
+                    sweepAngle = 96f,
                     useCenter = false,
                     style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round),
                 )
             }
 
+            // Polaroid-mounted artwork, tilted on the platter and rotating with it.
             Box(
                 modifier = Modifier
-                    .size(PlayerLayoutTokens.TurntablePolaroidOuterSize)
+                    .fillMaxSize(polaroidFraction / platterFraction)
                     .graphicsLayer { rotationZ = 45f }
-                    .shadow(4.dp, RoundedCornerShape(4.dp), clip = false)
-                    .background(Color(0xFFF5F1E8), RoundedCornerShape(4.dp))
-                    .padding(14.dp),
+                    .shadow(6.dp, RoundedCornerShape(3.dp), clip = false)
+                    .background(Color(0xFFF7F3EA), RoundedCornerShape(3.dp))
+                    .padding(9.dp),
             ) {
                 AsyncImage(
                     model = artworkUrl,
                     contentDescription = "Album artwork for $title",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(1.dp)),
+                    modifier = Modifier.fillMaxSize(),
                 )
                 if (artworkUrl.isNullOrBlank()) {
                     FSIcon(
                         painter = painterResource(R.drawable.music_note),
                         contentDescription = null,
                         tint = Color(0xFF2B2B2B),
-                        modifier = Modifier.align(Alignment.Center).size(32.dp),
+                        modifier = Modifier.align(Alignment.Center).size(28.dp),
                     )
                 }
-                FSText(
-                    text = title.take(18),
-                    color = Color(0xFF2B2B2B),
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = 0.8.sp,
-                    maxLines = 1,
-                    modifier = Modifier.align(Alignment.CenterStart).rotate(-90f),
-                )
-                FSText(
-                    text = title.take(18),
-                    color = Color(0xFF2B2B2B),
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = 0.8.sp,
-                    maxLines = 1,
-                    modifier = Modifier.align(Alignment.CenterEnd).rotate(90f),
-                )
             }
+
+            // Spindle pin punched through the artwork centre.
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(PlayerLayoutTokens.TurntableSpindleSize)
+                    .clip(CircleShape)
+                    .background(Color(0xFFBFE4EC)),
+            )
         }
 
+        // Tonearm: mount at the top-right of the deck, stylus resting on the record when
+        // playing and parked outward toward the rest peg when playback is off.
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val pivot = Offset(size.width * 0.77f, size.height * 0.15f)
-            val armLength = size.minDimension * 0.38f
-            val elbow = Offset(pivot.x - armLength * 0.74f, pivot.y + armLength * 0.68f)
-            val needle = Offset(elbow.x - armLength * 0.16f, elbow.y + armLength * 0.15f)
+            val deck = size.minDimension
+            val pivot = Offset(size.width * 0.795f, size.height * 0.165f)
+            val armLength = deck * 0.42f
+            val elbow = Offset(pivot.x - armLength * 0.62f, pivot.y + armLength * 0.74f)
+            val needle = Offset(elbow.x - armLength * 0.13f, elbow.y + armLength * 0.14f)
             val metalBrush = Brush.linearGradient(
-                colors = listOf(Color(0xFF4A4A4E), Color(0xFF1A1A1C)),
+                colors = listOf(Color(0xFF52525A), Color(0xFF1B1B1E)),
                 start = pivot,
                 end = elbow,
             )
+
+            // Rest peg sits under the parked arm position.
+            val pegCenter = Offset(size.width * 0.845f, size.height * 0.795f)
+            drawCircle(
+                brush = Brush.linearGradient(colors = listOf(Color(0xFF4A4A50), Color(0xFF17171A))),
+                radius = PlayerLayoutTokens.TurntableRestPegSize.toPx() / 2f,
+                center = pegCenter,
+            )
+
             withTransform({ rotate(tonearmAngle, pivot) }) {
+                // Pivot housing.
                 drawCircle(
-                    brush = metalBrush,
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF5C5C64), Color(0xFF1A1A1D)),
+                        center = pivot,
+                        radius = PlayerLayoutTokens.TurntableTonearmMountSize.toPx(),
+                    ),
                     radius = PlayerLayoutTokens.TurntableTonearmMountSize.toPx() / 2f,
                     center = pivot,
                 )
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.16f),
+                    radius = PlayerLayoutTokens.TurntableTonearmMountSize.toPx() / 2f,
+                    center = pivot,
+                    style = Stroke(width = 1.dp.toPx()),
+                )
+                // Main arm tube.
                 drawLine(
                     brush = metalBrush,
                     start = pivot,
                     end = elbow,
-                    strokeWidth = 8.dp.toPx(),
+                    strokeWidth = 5.5.dp.toPx(),
                     cap = StrokeCap.Round,
                 )
                 drawLine(
-                    color = Color.White.copy(alpha = 0.22f),
+                    color = Color.White.copy(alpha = 0.24f),
                     start = Offset(pivot.x - 1.dp.toPx(), pivot.y - 1.dp.toPx()),
                     end = Offset(elbow.x - 1.dp.toPx(), elbow.y - 1.dp.toPx()),
-                    strokeWidth = 1.5.dp.toPx(),
+                    strokeWidth = 1.2.dp.toPx(),
                     cap = StrokeCap.Round,
                 )
+                // Headshell joint + stylus segment.
                 drawCircle(
                     brush = metalBrush,
                     radius = PlayerLayoutTokens.TurntableTonearmElbowSize.toPx() / 2f,
@@ -344,37 +376,21 @@ internal fun FSAlbumArt(
                     brush = metalBrush,
                     start = elbow,
                     end = needle,
-                    strokeWidth = 6.dp.toPx(),
-                    cap = StrokeCap.Round,
-                )
-                drawLine(
-                    color = Color.White.copy(alpha = 0.20f),
-                    start = Offset(elbow.x - 1.dp.toPx(), elbow.y - 1.dp.toPx()),
-                    end = Offset(needle.x - 1.dp.toPx(), needle.y - 1.dp.toPx()),
-                    strokeWidth = 1.2.dp.toPx(),
+                    strokeWidth = 4.5.dp.toPx(),
                     cap = StrokeCap.Round,
                 )
                 drawCircle(
-                    color = Color(0xFFD5F2F5),
-                    radius = 8.dp.toPx(),
+                    color = if (isPlaying) Color(0xFFD5F2F5) else Color(0xFF8A9EA2),
+                    radius = 5.dp.toPx(),
                     center = needle,
                 )
             }
-
-            val pegCenter = Offset(
-                center.x + size.minDimension * 0.29f,
-                center.y + size.minDimension * 0.31f,
-            )
-            drawCircle(
-                brush = Brush.linearGradient(colors = listOf(Color(0xFF4A4A4E), Color(0xFF1A1A1C))),
-                radius = PlayerLayoutTokens.TurntableRestPegSize.toPx() / 2f,
-                center = pegCenter,
-            )
         }
 
+        // Source badge in the deck corner.
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(14.dp).size(40.dp)
+            modifier = Modifier.align(Alignment.BottomEnd).padding(14.dp).size(38.dp)
                 .clip(CircleShape)
                 .background(Color(0xFF101012)),
         ) {
@@ -382,7 +398,7 @@ internal fun FSAlbumArt(
                 painter = painterResource(R.drawable.music_note),
                 contentDescription = "Audio source",
                 tint = FrostSoulTheme.colors.accentBright,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(18.dp),
             )
         }
     }

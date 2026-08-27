@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -42,12 +43,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -67,10 +70,10 @@ import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 import dev.vxs.frostsoulx.lyrics.core.LyricsSyncState
 import dev.vxs.frostsoulx.utils.rememberPreference
 
-private val LyricsHeaderPadding = 24.dp
-private val LyricsActiveFontSize = 32.sp
-private val LyricsInactiveFontSize = 27.sp
-private val LyricsControlLabelSize = 10.sp
+private val LyricsHeaderPadding = PlayerLayoutTokens.MasterHorizontalPadding
+private val LyricsActiveFontSize = PlayerLayoutTokens.LyricsActiveFontSize
+private val LyricsInactiveFontSize = PlayerLayoutTokens.LyricsInactiveFontSize
+private val LyricsControlLabelSize = 9.sp
 
 /**
  * Renders karaoke directly from the singleton lyrics synchronization engine.
@@ -143,29 +146,34 @@ internal fun FSLyrics(
         }
     }
 
+    // Park the active line roughly a third down the sheet, matching QQ's reading position,
+    // and never fight a user-initiated scroll.
     LaunchedEffect(currentIndex, lines.size) {
         if (currentIndex >= 0 && listState.isScrollInProgress.not()) {
-            listState.animateScrollToItem((currentIndex - 1).coerceAtLeast(0))
+            listState.animateScrollToItem(
+                index = (currentIndex - 2).coerceAtLeast(0),
+                scrollOffset = 0,
+            )
         }
     }
 
-        PremiumLyricsBackgroundContainer(modifier = modifier) {
+    PremiumLyricsBackgroundContainer(modifier = modifier) {
         if (lines.isEmpty()) {
             Column(
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize().padding(horizontal = 28.dp),
+                modifier = Modifier.fillMaxSize().padding(horizontal = LyricsHeaderPadding),
             ) {
                 Text(
                     text = if (rawLyrics.isNullOrBlank()) "Lyrics are unavailable for this track." else "Preparing synchronized lyrics for this track.",
                     color = FrostSoulOnSurfaceMuted,
-                    fontSize = 19.sp,
-                    lineHeight = 28.sp,
+                    fontSize = 18.sp,
+                    lineHeight = 26.sp,
                 )
                 Text(
                     text = "FrostSoul keeps lyrics, notification updates, and overlays on one shared timeline.",
                     color = FrostSoulOnSurfaceMuted.copy(alpha = 0.62f),
-                    fontSize = 14.sp,
-                    lineHeight = 21.sp,
+                    fontSize = 13.sp,
+                    lineHeight = 19.sp,
                     modifier = Modifier.padding(top = 10.dp),
                 )
             }
@@ -175,14 +183,15 @@ internal fun FSLyrics(
                     modifier = Modifier.fillMaxWidth().padding(
                         start = LyricsHeaderPadding,
                         end = LyricsHeaderPadding,
-                        top = 12.dp,
-                        bottom = 8.dp,
+                        top = 10.dp,
+                        bottom = 10.dp,
                     ),
                 ) {
                     Text(
                         text = title,
                         color = FrostSoulOnSurface,
-                        fontSize = 24.sp,
+                        fontSize = 20.sp,
+                        lineHeight = 26.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -190,17 +199,26 @@ internal fun FSLyrics(
                     Text(
                         text = artist,
                         color = FrostSoulOnSurfaceMuted,
-                        fontSize = 15.sp,
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 4.dp),
+                        modifier = Modifier.padding(top = 3.dp),
                     )
                 }
+                // Lyric column: text begins flush with the page gutter on the left and keeps a
+                // wider right inset, so long lines wrap instead of appearing to slide under the
+                // right screen edge (QQ Music lyric-sheet behaviour).
                 LazyColumn(
                     state = listState,
-                    contentPadding = PaddingValues(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 156.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(
+                        start = PlayerLayoutTokens.LyricsTextStartInset,
+                        end = PlayerLayoutTokens.LyricsTextEndInset,
+                        top = 4.dp,
+                        bottom = PlayerLayoutTokens.LyricsBottomControlsReserve,
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(PlayerLayoutTokens.LyricsLineSpacing),
+                    modifier = Modifier.fillMaxWidth().weight(1f),
                 ) {
                     itemsIndexed(
                         items = lines,
@@ -254,14 +272,21 @@ internal fun FSLyrics(
             languages = translatorLanguages,
         )
 
+        // Compact inline spinner instead of a full-screen scrim, so lyrics stay readable
+        // while a refetch or translation is in flight.
         if (isRefetchingLyrics || isTranslating) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.18f)),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 84.dp)
+                    .size(40.dp)
+                    .background(Color.Black.copy(alpha = 0.62f), androidx.compose.foundation.shape.CircleShape),
             ) {
                 androidx.compose.material3.CircularProgressIndicator(
                     color = Color.White,
-                    modifier = Modifier.size(42.dp),
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.size(22.dp),
                 )
             }
         }
@@ -285,15 +310,18 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
     onLanguageMenuExpandedChange: (Boolean) -> Unit,
     languages: List<TranslatorLang>,
 ) {
+    // Floating action pill: kept centred with a fixed bottom offset and uniform 6.dp inner
+    // padding so Refresh / Translate / Like and the play button share one baseline and the
+    // pill never clips against the screen edge.
     Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier =
             Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 14.dp)
-                .background(Color.Black.copy(alpha = 0.78f), RoundedCornerShape(28.dp))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(bottom = 22.dp)
+                .background(Color.Black.copy(alpha = 0.82f), RoundedCornerShape(30.dp))
+                .padding(start = 10.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
     ) {
         LyricsActionButton(
             painter = painterResource(R.drawable.sync),
@@ -339,7 +367,8 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(52.dp)
+                .padding(start = 4.dp)
+                .size(46.dp)
                 .background(FrostSoulTheme.colors.accentBright, androidx.compose.foundation.shape.CircleShape)
                 .clickable(
                     enabled = !isRefetchingLyrics && !isTranslating,
@@ -352,7 +381,7 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
                 painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
                 contentDescription = "Play or pause",
                 tint = Color.Black,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(19.dp),
             )
         }
     }
@@ -367,7 +396,13 @@ private fun LyricsActionButton(
     enabled: Boolean,
     active: Boolean,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    // Fixed-width slot keeps the icon perfectly centred over its label regardless of the
+    // label's text width, so the pill's items stay evenly spaced.
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.width(54.dp),
+    ) {
         FSIconButton(
             painter = painter,
             contentDescription = contentDescription,
@@ -375,8 +410,8 @@ private fun LyricsActionButton(
             enabled = enabled,
             active = active,
             compact = true,
-            buttonSize = 30.dp,
-            iconSize = 22.dp,
+            buttonSize = 26.dp,
+            iconSize = 20.dp,
             showContainer = false,
         )
         Text(
@@ -384,6 +419,8 @@ private fun LyricsActionButton(
             color = if (active) FrostSoulTheme.colors.accentBright else FrostSoulOnSurfaceMuted,
             fontSize = LyricsControlLabelSize,
             maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 2.dp),
         )
     }
 }
@@ -393,8 +430,13 @@ private fun PremiumLyricsBackgroundContainer(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    // The page itself is full-bleed; the shared gutter is applied by the header and the
+    // lyric list separately so lyric text can hug the left edge without a nested inset
+    // pushing wrapped lines under the right side of the screen.
     Box(
-        modifier = modifier.fillMaxSize().padding(horizontal = 24.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding),
         content = content,
     )
 }
@@ -415,7 +457,7 @@ private fun FrostSoulKaraokeLine(
         label = "fs-karaoke-line-emphasis",
     )
     val scale by animateFloatAsState(
-        targetValue = if (isCurrent) 1.04f else 1f,
+        targetValue = if (isCurrent) 1.02f else 1f,
         animationSpec = spring(dampingRatio = 0.84f, stiffness = 420f),
         label = "fs-karaoke-line-scale",
     )
@@ -443,6 +485,9 @@ private fun FrostSoulKaraokeLine(
             Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
+                    // Grow the active line from its left edge so emphasis never pushes text
+                    // beyond the right gutter.
+                    transformOrigin = TransformOrigin(0f, 0.5f)
                     scaleX = scale
                     scaleY = scale
                     alpha = 1f
@@ -457,31 +502,35 @@ private fun FrostSoulKaraokeLine(
             text = annotatedText,
             color = lineColor,
             fontSize = if (isCurrent) LyricsActiveFontSize else LyricsInactiveFontSize,
-            lineHeight = 36.sp,
-            fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Medium,
+            lineHeight = PlayerLayoutTokens.LyricsLineHeight,
+            fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Medium,
+            textAlign = TextAlign.Start,
             maxLines = 4,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth(),
         )
         line.translation?.takeIf { it.isNotBlank() }?.let { translation ->
             Text(
                 text = translation,
-                color = if (isCurrent) FrostSoulOnSurface else FrostSoulOnSurfaceMuted,
-                fontSize = 20.sp,
-                lineHeight = 22.sp,
+                color = if (isCurrent) FrostSoulOnSurface.copy(alpha = 0.88f) else FrostSoulOnSurfaceMuted,
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                textAlign = TextAlign.Start,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 6.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
             )
         }
         line.romanization?.takeIf { it.isNotBlank() }?.let { romanization ->
             Text(
                 text = romanization,
-                color = if (isCurrent) FrostSoulOnSurface else FrostSoulOnSurfaceMuted,
-                fontSize = 16.sp,
-                lineHeight = 19.sp,
+                color = if (isCurrent) FrostSoulOnSurface.copy(alpha = 0.72f) else FrostSoulOnSurfaceMuted.copy(alpha = 0.78f),
+                fontSize = 13.sp,
+                lineHeight = 17.sp,
+                textAlign = TextAlign.Start,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 1.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
             )
         }
     }
