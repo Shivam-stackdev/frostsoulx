@@ -196,7 +196,7 @@ internal fun FrostSoulPlayerAdapter(
             )
         }
     val actions =
-        remember(playerConnection, queueWindows, onCollapse, applicationContext, mediaMetadata, isRefetchingLyrics, downloads) {
+        remember(playerConnection, queueWindows, onCollapse, applicationContext, mediaMetadata, isRefetchingLyrics, downloads, onOpenSleepTimer) {
             FrostSoulPlayerActions(
                 onDismiss = onCollapse,
                 onTogglePlayPause = { playerConnection.player.togglePlayPause() },
@@ -219,10 +219,9 @@ internal fun FrostSoulPlayerAdapter(
                 onOpenSleepTimer = onOpenSleepTimer,
                 onOpenAlbum = onOpenAlbum,
                 onRefetchLyrics = { lyricsMenuViewModel.refetchLyrics(mediaMetadata) },
-                isRefetchingLyrics = isRefetchingLyrics,
-                sleepTimerActive = sleepTimerActive,
-                palette = palette,
-m = { queueIndex ->
+                                isRefetchingLyrics = isRefetchingLyrics,
+                onSelectQueueItem = { queueIndex ->
+
                     val targetWindow = queueWindows.getOrNull(queueIndex)
                     if (targetWindow != null) {
                         val targetMediaId = targetWindow.mediaItem.mediaId
