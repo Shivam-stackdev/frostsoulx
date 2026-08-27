@@ -234,7 +234,12 @@ class LyricsHelper
                             LyricsUtils
                                 .lyricsOrNotFound(lyrics)
                                 .takeIf {
-                                    it != LYRICS_NOT_FOUND && !hasConflictingLrcMetadata(it, mediaMetadata)
+                                    it != LYRICS_NOT_FOUND &&
+                                        !hasConflictingLrcMetadata(
+                                            lyrics = it,
+                                            title = mediaMetadata.title,
+                                            artists = artist,
+                                        )
                                 }
                         },
                         onFailure = {
