@@ -67,6 +67,7 @@ internal fun FrostSoulPlayerAdapter(
     onOpenSleepTimer: () -> Unit = {},
     onSearchTrack: () -> Unit = {},
     onOpenAlbum: () -> Unit = {},
+    onOpenArtist: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val palette = rememberFrostSoulPalette(mediaMetadata.thumbnailUrl)
@@ -244,6 +245,7 @@ internal fun FrostSoulPlayerAdapter(
         actions = actions,
         playerDesignStyle = playerDesignStyle,
         onSearchTrack = onSearchTrack,
+        onOpenArtist = onOpenArtist,
         modifier = modifier,
     )
 }

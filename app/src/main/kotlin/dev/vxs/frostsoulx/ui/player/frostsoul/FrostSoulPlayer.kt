@@ -132,6 +132,7 @@ internal fun FrostSoulPlayer(
     actions: FrostSoulPlayerActions,
     playerDesignStyle: dev.vxs.frostsoulx.constants.PlayerDesignStyle = dev.vxs.frostsoulx.constants.PlayerDesignStyle.FROSTSOUL,
     onSearchTrack: () -> Unit = {},
+    onOpenArtist: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     // QQ-style pager: Recommendations stay on the left, Main Player in the center, Lyrics on the right.
@@ -308,6 +309,10 @@ internal fun FrostSoulPlayer(
                                 .filter { it.name.isNotBlank() }
                         },
                         onDismiss = { showArtistDialog = false },
+                        onOpenArtist = { artistId ->
+                            showArtistDialog = false
+                            onOpenArtist(artistId)
+                        },
                     )
                 }
             }
@@ -755,6 +760,7 @@ internal fun FrostSoulPagerDots(
 private fun FrostSoulArtistDialog(
     artists: List<FrostSoulArtist>,
     onDismiss: () -> Unit,
+    onOpenArtist: (String) -> Unit,
 ) {
     FSGlassCard(
         accent = Color.White,
@@ -783,11 +789,18 @@ private fun FrostSoulArtistDialog(
                 artists.forEach { artist ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier.size(48.dp).clip(androidx.compose.foundation.shape.CircleShape).background(FrostSoulSurfaceElevated),
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(androidx.compose.foundation.shape.CircleShape)
+                                .background(FrostSoulSurfaceElevated)
+                                .clickable(enabled = !artist.id.isNullOrBlank()) {
+                                    artist.id?.let(onOpenArtist)
+                                },
                         ) {
                             if (artist.artworkUrl.isNullOrBlank()) {
                                 Text(

@@ -1281,6 +1281,9 @@ if (!aodModeEnabled) {
                     onOpenAlbum = {
                         metadata.album?.id?.let { albumId -> navController.navigate("album/$albumId") }
                     },
+                    onOpenArtist = { artistId ->
+                        navController.navigate("artist/$artistId")
+                    },
                     modifier =
                         Modifier
                             .fillMaxSize()
