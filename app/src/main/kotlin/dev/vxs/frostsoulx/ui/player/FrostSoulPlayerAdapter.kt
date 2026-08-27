@@ -66,7 +66,9 @@ internal fun FrostSoulPlayerAdapter(
                 .lyricsSynchronizationEngine()
         }
     val currentLyricLine by lyricsSynchronizationEngine.currentLine.collectAsState()
+    val lyricSyncState by lyricsSynchronizationEngine.state.collectAsState()
     val currentLyricText = currentLyricLine?.text
+    val nextLyricText = lyricSyncState.nextLine?.text
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
     val outputDevice by playerConnection.service.activeAudioDevice.collectAsStateWithLifecycle()
     val audioQualityBadge =
@@ -102,6 +104,7 @@ internal fun FrostSoulPlayerAdapter(
             queue,
             lyrics,
             currentLyricText,
+            nextLyricText,
             audioQualityBadge,
             outputDevice,
             isRefetchingLyrics,
@@ -119,6 +122,7 @@ internal fun FrostSoulPlayerAdapter(
                 queue = queue,
                 lyrics = lyrics,
                 currentLyricLine = currentLyricText,
+                nextLyricLine = nextLyricText,
                 audioQualityBadge = audioQualityBadge,
                 outputDevice = outputDevice,
                 palette = palette,

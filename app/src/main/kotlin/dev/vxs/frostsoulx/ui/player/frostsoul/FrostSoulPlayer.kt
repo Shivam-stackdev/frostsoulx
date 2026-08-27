@@ -710,6 +710,9 @@ private fun FrostSoulArtworkBlurAlbumPage(
     onOpenOptions: () -> Unit,
 ) {
     val artworkShape = RoundedCornerShape(24.dp)
+    val artworkSaturationMatrix = remember {
+        ColorMatrix().apply { setToSaturation(1.35f) }
+    }
     Column(
         modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
         verticalArrangement = Arrangement.SpaceBetween,
@@ -723,14 +726,15 @@ private fun FrostSoulArtworkBlurAlbumPage(
                         model = uiState.track.artworkUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize().blur(48.dp).alpha(0.82f),
+                        colorFilter = ColorFilter.colorMatrix(artworkSaturationMatrix),
+                        modifier = Modifier.fillMaxSize().blur(80.dp),
                     )
                     Box(
                         modifier = Modifier.fillMaxSize().background(
                             Brush.verticalGradient(
                                 colors = listOf(
-                                    uiState.palette.artworkPrimary.copy(alpha = 0.30f),
-                                    uiState.palette.artworkSecondary.copy(alpha = 0.74f),
+                                    uiState.palette.artworkPrimary.copy(alpha = 0.50f),
+                                    uiState.palette.artworkSecondary.copy(alpha = 0.68f),
                                 ),
                             ),
                         ),
@@ -818,15 +822,29 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 )
             }
 
-            uiState.currentLyricLine?.takeIf { it.isNotBlank() }?.let { lyric ->
-                Text(
-                    text = lyric,
-                    color = FrostSoulOnSurfaceMuted,
-                    fontSize = 16.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                )
+            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                uiState.currentLyricLine?.takeIf { it.isNotBlank() }?.let { current ->
+                    Text(
+                        text = current,
+                        color = FrostSoulOnSurface,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                uiState.nextLyricLine
+                    ?.takeIf { it.isNotBlank() && it != uiState.currentLyricLine }
+                    ?.let { next ->
+                        Text(
+                            text = next,
+                            color = FrostSoulOnSurfaceMuted,
+                            fontSize = 15.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                    }
             }
         }
 
