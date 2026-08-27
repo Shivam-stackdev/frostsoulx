@@ -68,6 +68,7 @@ import dev.vxs.frostsoulx.utils.TranslatorLanguages
 import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
 import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 import dev.vxs.frostsoulx.lyrics.core.LyricsSyncState
+import dev.vxs.frostsoulx.lyrics.core.LyricsWord
 import dev.vxs.frostsoulx.utils.rememberPreference
 
 private val LyricsHeaderPadding = PlayerLayoutTokens.MasterHorizontalPadding
@@ -148,8 +149,8 @@ internal fun FSLyrics(
 
     // Park the active line roughly a third down the sheet, matching QQ's reading position,
     // and never fight a user-initiated scroll.
-    LaunchedEffect(currentIndex, lines.size) {
-        if (currentIndex >= 0 && listState.isScrollInProgress.not()) {
+    LaunchedEffect(currentIndex, lines.size, isPlaying) {
+        if (isPlaying && currentIndex >= 0 && listState.isScrollInProgress.not()) {
             listState.animateScrollToItem(
                 index = (currentIndex - 2).coerceAtLeast(0),
                 scrollOffset = 0,
@@ -551,29 +552,33 @@ private fun LyricsLine.asKaraokeAnnotatedText(
             return@buildAnnotatedString
         }
 
-        if (words.isEmpty()) {
-            val progress = lineProgress.coerceIn(0f, 1f)
-            withStyle(
-                SpanStyle(
-                    color = lerpColor(inactiveColor, activeColor, progress),
-                    shadow =
-                        Shadow(
-                            color = activeColor.copy(alpha = 0.42f * progress * glowStrength),
-                            blurRadius = 16f * progress,
-                        ),
-                ),
-            ) {
-                append(text)
+        val timedWords =
+            if (words.isNotEmpty()) {
+                words
+            } else {
+                text.split(Regex("\\s+")).filter { it.isNotBlank() }.map { LyricsWord(it, 0L, 0L) }
             }
-            return@buildAnnotatedString
-        }
+        if (timedWords.isEmpty()) return@buildAnnotatedString
 
-        words.forEachIndexed { index, word ->
+        val fallbackProgress = lineProgress.coerceIn(0f, 1f)
+        val fallbackPosition = fallbackProgress * timedWords.size
+        val fallbackIndex = fallbackPosition.toInt().coerceAtMost(timedWords.lastIndex)
+        val fallbackWordProgress = (fallbackPosition - fallbackIndex).coerceIn(0f, 1f)
+        val hasRealWordTiming = words.isNotEmpty()
+        timedWords.forEachIndexed { index, word ->
             val progress =
-                when {
-                    index < currentWordIndex -> 1f
-                    index == currentWordIndex -> wordProgress.coerceIn(0f, 1f)
-                    else -> 0f
+                if (hasRealWordTiming) {
+                    when {
+                        index < currentWordIndex -> 1f
+                        index == currentWordIndex -> wordProgress.coerceIn(0f, 1f)
+                        else -> 0f
+                    }
+                } else {
+                    when {
+                        index < fallbackIndex -> 1f
+                        index == fallbackIndex -> fallbackWordProgress
+                        else -> 0f
+                    }
                 }
             withStyle(
                 wordKaraokeStyle(
@@ -584,7 +589,7 @@ private fun LyricsLine.asKaraokeAnnotatedText(
                 ),
             ) {
                 append(word.text)
-                if (index < words.lastIndex && word.text.lastOrNull()?.isWhitespace() != true) append(" ")
+                if (index < timedWords.lastIndex) append(" ")
             }
         }
     }

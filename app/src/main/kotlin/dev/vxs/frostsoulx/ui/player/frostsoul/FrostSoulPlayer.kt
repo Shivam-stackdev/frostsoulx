@@ -544,6 +544,15 @@ internal fun FSPlayerControls(
                 progress = state.downloadProgress,
                 onClick = actions.onDownload,
             )
+            FSIconButton(
+                painter = painterResource(R.drawable.bedtime),
+                contentDescription = if (state.sleepTimerActive) "Clear sleep timer" else "Set sleep timer",
+                onClick = actions.onOpenSleepTimer,
+                active = state.sleepTimerActive,
+                buttonSize = 32.dp,
+                iconSize = 21.dp,
+                showContainer = false,
+            )
             FrostSoulOutputDeviceButton(
                 device = state.outputDevice,
                 onClick = actions.onOpenAudioOutput,
@@ -568,25 +577,6 @@ internal fun FSPlayerControls(
                 state.safeDurationMs.asFrostSoulTime(),
                 style = PlayerLayoutTokens.TimelineTimeStyle.copy(color = FrostSoulOnSurfaceMuted),
             )
-        }
-        state.audioQualityBadge?.let { badge ->
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier =
-                    Modifier
-                        .padding(top = 7.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(1.dp, state.palette.accent.copy(alpha = 0.72f), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 10.dp, vertical = 3.dp),
-            ) {
-                Text(
-                    text = badge,
-                    color = Color.White,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.2.sp,
-                )
-            }
         }
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
@@ -833,13 +823,15 @@ private fun FrostSoulArtistDialog(
 @Composable
 private fun FrostSoulMainLyricPreview(
     uiState: FrostSoulPlayerUiState,
+    onlyCurrentLine: Boolean = false,
+    modifier: Modifier = Modifier,
 ) {
     val currentLine = uiState.currentLyricModel
     if (currentLine == null && uiState.lyricPreviewLines.isEmpty()) return
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding),
     ) {
@@ -854,7 +846,7 @@ private fun FrostSoulMainLyricPreview(
                 fontSize = 17.sp,
                 lineHeight = 23.sp,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 2,
+                maxLines = if (onlyCurrentLine) 1 else 2,
                 overflow = TextOverflow.Ellipsis,
             )
         } ?: uiState.currentLyricLine?.takeIf { it.isNotBlank() }?.let { line ->
@@ -864,19 +856,21 @@ private fun FrostSoulMainLyricPreview(
                 fontSize = 17.sp,
                 lineHeight = 23.sp,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 2,
+                maxLines = if (onlyCurrentLine) 1 else 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        uiState.lyricPreviewLines.drop(1).take(3).forEach { line ->
-            Text(
-                text = line,
-                color = FrostSoulOnSurfaceMuted.copy(alpha = 0.58f),
-                fontSize = 14.sp,
-                lineHeight = 19.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+        if (!onlyCurrentLine) {
+            uiState.lyricPreviewLines.drop(1).take(3).forEach { line ->
+                Text(
+                    text = line,
+                    color = FrostSoulOnSurfaceMuted.copy(alpha = 0.58f),
+                    fontSize = 14.sp,
+                    lineHeight = 19.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }
@@ -1007,12 +1001,12 @@ private fun FrostSoulAlbumPage(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(top = 3.dp).clickable(onClick = onShowArtists),
                     )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 14.dp)) {
-                    MinimalistMetadataChip(text = uiState.audioQualityBadge ?: "STANDARD")
-                    MinimalistMetadataChip(text = "${uiState.queue.size} IN QUEUE")
-                }
             }
-            FrostSoulMainLyricPreview(uiState = uiState)
+            FrostSoulMainLyricPreview(
+                uiState = uiState,
+                onlyCurrentLine = true,
+                modifier = Modifier.align(Alignment.Start),
+            )
             FSPlayerControls(
                     state = uiState,
                     actions = actions,
@@ -1898,13 +1892,9 @@ private fun FrostSoulDynamicBackground(
     val isVinyl = playerDesignStyle == PlayerDesignStyle.FROSTSOUL
     val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
     val isStaticGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW
-    val shouldBlurArtwork = !isVinyl || playerBackgroundStyle in setOf(
-        PlayerBackgroundStyle.DEFAULT,
-        PlayerBackgroundStyle.BLUR,
-        PlayerBackgroundStyle.BLUR_GRADIENT,
-        PlayerBackgroundStyle.GLOW,
-        PlayerBackgroundStyle.GLOW_ANIMATED,
-    )
+    // Keep the selected artwork present behind every player mode. Vinyl's Gradient/Glow
+    // variants tint this same blurred image instead of replacing it with a flat color.
+    val shouldBlurArtwork = !artworkUrl.isNullOrBlank()
     val shouldUseGradient = isVinyl && playerBackgroundStyle in setOf(
         PlayerBackgroundStyle.GRADIENT,
         PlayerBackgroundStyle.COLORING,
@@ -1934,7 +1924,8 @@ private fun FrostSoulDynamicBackground(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 colorFilter = ColorFilter.colorMatrix(saturationMatrix),
-                modifier = Modifier.fillMaxSize().blur(90.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded),
+                                        modifier = Modifier.fillMaxSize().blur(64.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded),
+
             )
         }
         if (shouldUseGradient) {
@@ -1972,7 +1963,8 @@ private fun FrostSoulDynamicBackground(
             Box(
                 modifier = Modifier.fillMaxSize().background(
                     Brush.radialGradient(
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.72f)),
+                        colors =                                 listOf(Color.Transparent, Color.Black.copy(alpha = 0.54f)),
+
                         radius = 1_250f,
                     ),
                 ),

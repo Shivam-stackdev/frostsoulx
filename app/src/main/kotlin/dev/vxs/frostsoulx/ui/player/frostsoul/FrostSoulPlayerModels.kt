@@ -106,6 +106,7 @@ internal data class FrostSoulPlayerUiState(
         name = PlayerOutputDevice.Unknown.defaultName,
     ),
     val downloadProgress: Float? = null,
+    val sleepTimerActive: Boolean = false,
     val palette: FrostSoulPalette = FrostSoulPalette.Default,
     val playerBackgroundStyle: PlayerBackgroundStyle = PlayerBackgroundStyle.GLOW_ANIMATED,
 ) {
@@ -132,6 +133,7 @@ internal data class FrostSoulPlayerActions(
     val onToggleLike: () -> Unit,
     val onOpenAudioOutput: () -> Unit = {},
     val onDownload: () -> Unit = {},
+    val onOpenSleepTimer: () -> Unit = {},
     val onOpenOptions: () -> Unit = {},
     val onOpenAlbum: () -> Unit = {},
     val onRefetchLyrics: () -> Unit = {},

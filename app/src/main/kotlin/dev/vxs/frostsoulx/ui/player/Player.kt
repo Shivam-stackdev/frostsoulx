@@ -1266,6 +1266,14 @@ if (!aodModeEnabled) {
                             )
                         }
                     },
+                    sleepTimerActive = sleepTimerEnabled,
+                    onOpenSleepTimer = {
+                        if (sleepTimerEnabled) {
+                            playerConnection.service.sleepTimer.clear()
+                        } else {
+                            showSleepTimerDialog = true
+                        }
+                    },
                     onSearchTrack = {
                         navController.navigate(onlineSearchResultRoute(metadata.title))
                     },
