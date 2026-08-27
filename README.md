@@ -147,7 +147,17 @@ The release workflow is intended for signed distribution builds and depends on r
 
 ## Screenshots
 
-The README intentionally does not link to screenshots from other projects. This keeps the documentation accurate for FrostSoulX and avoids presenting unrelated reference images as the current application. Device captures can be added later under `docs/screenshots/` with descriptive names such as `home.png`, `vinyl-player.png`, `artwork-blur-player.png`, and `lyrics.png`.
+The following device captures document the current FrostSoulX interface and make the repository easier to browse from GitHub. They cover the main navigation, Vinyl player, recommendations surface, and synchronized lyrics page.
+
+| Home screen | Vinyl player |
+| --- | --- |
+| ![FrostSoulX Home screen](docs/screenshots/home-screen.jpg) | ![FrostSoulX Vinyl player](docs/screenshots/vinyl-player.jpg) |
+
+| Recommendations | Lyrics page |
+| --- | --- |
+| ![FrostSoulX Recommendations page](docs/screenshots/recommendations-page.jpg) | ![FrostSoulX synchronized Lyrics page](docs/screenshots/lyrics-page.jpg) |
+
+Screenshots are stored in [`docs/screenshots/`](docs/screenshots/) with semantic filenames so additional device captures can be added without changing the documentation structure.
 
 ## Contributing
 
