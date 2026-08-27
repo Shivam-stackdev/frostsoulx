@@ -84,8 +84,20 @@ internal fun FrostSoulPlayerAdapter(
         }
     val currentLyricLine by lyricsSynchronizationEngine.currentLine.collectAsState()
     val lyricSyncState by lyricsSynchronizationEngine.state.collectAsState()
-    val currentLyricText = currentLyricLine?.text
-    val nextLyricText = lyricSyncState.nextLine?.text
+    val lyricsDocument by lyricsSynchronizationEngine.documentState.collectAsState()
+    val currentLyricText = currentLyricLine?.text?.trim()
+    val nextLyricText = lyricSyncState.nextLine?.text?.trim()
+    val lyricPreviewLines = remember(lyricsDocument, lyricSyncState.currentLineIndex) {
+        val lines = lyricsDocument?.original?.lines.orEmpty()
+        val currentIndex = lyricSyncState.currentLineIndex
+        if (currentIndex < 0) {
+            emptyList()
+        } else {
+            lines.drop(currentIndex)
+                .mapNotNull { line -> line.text.trim().takeIf { it.isNotBlank() } }
+                .take(4)
+        }
+    }
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
     val outputDevice by playerConnection.service.activeAudioDevice.collectAsStateWithLifecycle()
     val audioQualityBadge =
@@ -122,6 +134,7 @@ internal fun FrostSoulPlayerAdapter(
             lyrics,
             currentLyricText,
             nextLyricText,
+            lyricPreviewLines,
             audioQualityBadge,
             outputDevice,
             downloadProgress,
@@ -141,6 +154,7 @@ internal fun FrostSoulPlayerAdapter(
                 lyrics = lyrics,
                 currentLyricLine = currentLyricText,
                 nextLyricLine = nextLyricText,
+                lyricPreviewLines = lyricPreviewLines,
                 audioQualityBadge = audioQualityBadge,
                 outputDevice = outputDevice,
                 downloadProgress = downloadProgress,

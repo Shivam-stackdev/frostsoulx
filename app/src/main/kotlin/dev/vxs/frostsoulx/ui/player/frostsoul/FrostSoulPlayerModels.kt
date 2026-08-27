@@ -79,6 +79,7 @@ internal data class FrostSoulPlayerUiState(
     val lyrics: String?,
     val currentLyricLine: String? = null,
     val nextLyricLine: String? = null,
+    val lyricPreviewLines: List<String> = emptyList(),
     val audioQualityBadge: String? = null,
     val outputDevice: ActiveOutputDevice = ActiveOutputDevice(
         type = PlayerOutputDevice.Unknown,

@@ -667,17 +667,13 @@ private fun FSPlayButton(
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
-                }.clip(androidx.compose.foundation.shape.CircleShape)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(Color.White, Color(0xFFE2E2E2), Color(0xFF777777)),
-                    ),
-                ).clickable(onClick = onClick),
+                }
+                .clickable(onClick = onClick),
     ) {
         Icon(
             painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
             contentDescription = if (isPlaying) "Pause" else "Play",
-            tint = Color.Black,
+            tint = Color.White,
             modifier = Modifier.size(if (isBuffering) 24.dp else 30.dp).alpha(if (isBuffering) 0.54f else 1f),
         )
     }
@@ -910,31 +906,22 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 )
             }
 
-            Column(modifier = Modifier.padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)) {
-                uiState.currentLyricLine?.takeIf { it.isNotBlank() }?.let { current ->
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding),
+            ) {
+                uiState.lyricPreviewLines.take(4).forEachIndexed { index, line ->
+                    val isCurrent = index == 0
                     Text(
-                        text = current,
-                        color = FrostSoulOnSurface,
-                        fontSize = 17.sp,
-                        lineHeight = 23.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 2,
+                        text = line,
+                        color = if (isCurrent) FrostSoulOnSurface else FrostSoulOnSurfaceMuted.copy(alpha = if (index < 2) 0.78f else 0.52f),
+                        fontSize = if (isCurrent) 17.sp else 14.sp,
+                        lineHeight = if (isCurrent) 23.sp else 20.sp,
+                        fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Normal,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                uiState.nextLyricLine
-                    ?.takeIf { it.isNotBlank() && it != uiState.currentLyricLine }
-                    ?.let { next ->
-                        Text(
-                            text = next,
-                            color = FrostSoulOnSurfaceMuted,
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 4.dp),
-                        )
-                    }
             }
         }
 
