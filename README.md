@@ -1,8 +1,8 @@
 # FrostSoulX
 
-**FrostSoulX** is an independently rebuilt Android music player focused on a polished, QQ Music-inspired listening experience. The project combines a modern Jetpack Compose interface with Media3 playback, synchronized lyrics, local persistence, artwork-driven player surfaces, and background media controls.
+**FrostSoulX** is an independently rebuilt Android music player focused on a polished, music-first listening experience. The project combines a modern Jetpack Compose interface with Media3 playback, synchronized lyrics, local persistence, artwork-driven player surfaces, and background media controls.
 
-> FrostSoulX is an independent project. It is not affiliated with Tencent, QQ Music, Google, or YouTube. It does not reproduce proprietary source code or proprietary application assets.
+> FrostSoulX is an independent project. It is not an official Google or YouTube application and does not reproduce proprietary application source code or proprietary application assets.
 
 [![Branch](https://img.shields.io/badge/default%20branch-frostsoul--reboot-111827?style=flat-square)](https://github.com/sakuraDev31/frostsoulx/tree/frostsoul-reboot)
 [![Language](https://img.shields.io/badge/language-Kotlin-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
@@ -147,7 +147,7 @@ The release workflow is intended for signed distribution builds and depends on r
 
 ## Screenshots
 
-The README intentionally does not link to screenshots from the upstream ArchiveTune project. This keeps the documentation accurate for FrostSoulX and avoids presenting unrelated reference images as the current application. Device captures can be added later under `docs/screenshots/` with descriptive names such as `home.png`, `vinyl-player.png`, `artwork-blur-player.png`, and `lyrics.png`.
+The README intentionally does not link to screenshots from other projects. This keeps the documentation accurate for FrostSoulX and avoids presenting unrelated reference images as the current application. Device captures can be added later under `docs/screenshots/` with descriptive names such as `home.png`, `vinyl-player.png`, `artwork-blur-player.png`, and `lyrics.png`.
 
 ## Contributing
 
@@ -168,11 +168,23 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the project’s existing engineeri
 | An APK upload step fails | Check the workflow’s resolved APK path and artifact name. The build output directory can differ between Android Gradle Plugin versions. |
 | Artwork Blur text is hard to read | Confirm that the effective blur intensity and dark contrast scrim are enabled; the player is designed to keep lyric text readable over bright artwork. |
 
+## Credits and acknowledgments
+
+FrostSoulX builds on ideas, libraries, and engineering work from the open-source Android music community. Credit is given to the following projects and maintainers:
+
+| Project | Contribution or relationship | Link |
+| --- | --- | --- |
+| **ArchiveTune** | Upstream Android music-player foundation and project context retained in applicable source notices. | [github.com/rukamori/ArchiveTune](https://github.com/rukamori/ArchiveTune) |
+| **InnerTube** | YouTube/YouTube Music data-model and client integration reference used by the project’s browsing and playback layers. | [InnerTube on GitHub](https://github.com/tombulled/innertube) |
+| **Metrolist** | Open-source Android music-player project whose architecture and implementation patterns are acknowledged as project inspiration. | [github.com/mostafaalagamy/Metrolist](https://github.com/mostafaalagamy/Metrolist) |
+
+FrostSoulX is independently maintained and is not an official release of any credited project. Their respective licenses, notices, names, and trademarks remain applicable to the portions governed by them.
+
 ## Legal and licensing
 
 FrostSoulX is distributed under the GNU General Public License v3.0 as represented by [`LICENSE`](LICENSE). Review the license and the applicable notices in source files before redistributing modified builds.
 
-FrostSoulX is not an official QQ Music, Tencent, Google, YouTube, or YouTube Music application. Product names, logos, and service marks remain the property of their respective owners. Users are responsible for complying with the terms and laws applicable to the services they access.
+FrostSoulX is not an official Google, YouTube, or YouTube Music application. Product names, logos, and service marks remain the property of their respective owners. Users are responsible for complying with the terms and laws applicable to the services they access.
 
 ## References
 
