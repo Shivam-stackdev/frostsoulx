@@ -576,7 +576,7 @@ fun AodPlayerScreen(
                                     ),
                                 ),
                         )
-                        AnimatedVisibility(
+                        androidx.compose.animation.AnimatedVisibility(
                             visible = showLyricTicker && !lyricsText.isNullOrBlank(),
                             enter = fadeIn(tween(220)),
                             exit = fadeOut(tween(220)),
