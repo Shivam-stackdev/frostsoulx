@@ -11,6 +11,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -39,6 +42,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.systemBars
@@ -101,6 +105,8 @@ import coil3.request.allowHardware
 import coil3.size.Size
 import coil3.toBitmap
 import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
+import dev.vxs.frostsoulx.constants.PlayerDesignStyle
 import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.MinimalistMetadataChip
@@ -171,7 +177,13 @@ internal fun FrostSoulPlayer(
                     )
                 },
         ) {
-            FrostSoulDynamicBackground(artworkUrl = uiState.track.artworkUrl)
+            FrostSoulDynamicBackground(
+                artworkUrl = uiState.track.artworkUrl,
+                playerDesignStyle = playerDesignStyle,
+                playerBackgroundStyle = uiState.playerBackgroundStyle,
+                palette = uiState.palette,
+                moodSeed = "${uiState.track.title} ${uiState.track.artist} ${uiState.track.album}",
+            )
             Column(
             modifier =
                 Modifier
@@ -632,9 +644,9 @@ private fun FSDownloadButton(
 
 @Composable
 private fun FSTwoDotButton(onClick: () -> Unit) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.size(36.dp).clickable(onClick = onClick),
     ) {
         repeat(2) {
@@ -1518,16 +1530,48 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 private const val PaletteCacheCapacity = 24
 
 @Composable
-private fun FrostSoulDynamicBackground(artworkUrl: String?) {
+private fun FrostSoulDynamicBackground(
+    artworkUrl: String?,
+    playerDesignStyle: PlayerDesignStyle,
+    playerBackgroundStyle: PlayerBackgroundStyle,
+    palette: FrostSoulPalette,
+    moodSeed: String,
+) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    val saturationMatrix = ColorMatrix().apply { setToSaturation(1.0f) }
+    val isVinyl = playerDesignStyle == PlayerDesignStyle.FROSTSOUL
+    val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
+    val isStaticGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW
+    val shouldBlurArtwork = !isVinyl || playerBackgroundStyle in setOf(
+        PlayerBackgroundStyle.DEFAULT,
+        PlayerBackgroundStyle.BLUR,
+        PlayerBackgroundStyle.BLUR_GRADIENT,
+        PlayerBackgroundStyle.GLOW,
+        PlayerBackgroundStyle.GLOW_ANIMATED,
+    )
+    val shouldUseGradient = isVinyl && playerBackgroundStyle in setOf(
+        PlayerBackgroundStyle.GRADIENT,
+        PlayerBackgroundStyle.COLORING,
+        PlayerBackgroundStyle.BLUR_GRADIENT,
+        PlayerBackgroundStyle.GLOW,
+        PlayerBackgroundStyle.GLOW_ANIMATED,
+    )
+    val moodAccent = remember(moodSeed, palette) { resolveVinylMoodAccent(moodSeed, palette) }
+    val animatedGlowPhase =
+        rememberInfiniteTransition(label = "vinyl-glow-transition").animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(8_000), RepeatMode.Reverse),
+            label = "vinyl-glow-phase",
+        ).value
+    val glowPhase = if (isAnimatedGlow) animatedGlowPhase else 0.5f
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(if (isLightTheme) FrostSoulTheme.colors.background else Color.Black),
     ) {
-        if (!artworkUrl.isNullOrBlank()) {
+        if (shouldBlurArtwork && !artworkUrl.isNullOrBlank()) {
+            val saturationMatrix = ColorMatrix().apply { setToSaturation(1.0f) }
             AsyncImage(
                 model = artworkUrl,
                 contentDescription = null,
@@ -1536,18 +1580,68 @@ private fun FrostSoulDynamicBackground(artworkUrl: String?) {
                 modifier = Modifier.fillMaxSize().blur(90.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded),
             )
         }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
+        if (shouldUseGradient) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(
                     Brush.verticalGradient(
-                        colors = if (isLightTheme) {
+                        colors = listOf(
+                            palette.artworkPrimary.copy(alpha = 0.48f),
+                            palette.artworkSecondary.copy(alpha = 0.30f),
+                            Color.Black.copy(alpha = 0.92f),
+                        ),
+                    ),
+                ),
+            )
+        }
+        if (isAnimatedGlow || isStaticGlow) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset(
+                        x = ((glowPhase - 0.5f) * 180f).dp,
+                        y = ((0.5f - glowPhase) * 120f).dp,
+                    )
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                moodAccent.copy(alpha = if (isAnimatedGlow) 0.54f else 0.38f),
+                                palette.artworkPrimary.copy(alpha = 0.18f),
+                                Color.Transparent,
+                            ),
+                            radius = 900f,
+                        ),
+                    ),
+            )
+            Box(
+                modifier = Modifier.fillMaxSize().background(
+                    Brush.radialGradient(
+                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.72f)),
+                        radius = 1_250f,
+                    ),
+                ),
+            )
+        } else {
+            Box(
+                modifier = Modifier.fillMaxSize().background(
+                    Brush.verticalGradient(
+                        colors = if (isLightTheme && !isVinyl) {
                             listOf(Color.White.copy(alpha = 0.38f), Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.34f))
                         } else {
                             listOf(Color.Black.copy(alpha = 0.18f), Color.Transparent, Color.Black.copy(alpha = 0.30f))
                         },
                     ),
                 ),
-        )
+            )
+        }
+    }
+}
+
+private fun resolveVinylMoodAccent(seed: String, palette: FrostSoulPalette): Color {
+    val mood = seed.lowercase()
+    return when {
+        listOf("sad", "alone", "cry", "night", "broken", "dard", "udaas").any { keyword -> mood.contains(keyword) } -> Color(0xFF6D8FD6)
+        listOf("love", "romance", "heart", "ishq", "pyaar", "romantic").any { keyword -> mood.contains(keyword) } -> Color(0xFFE27B93)
+        listOf("party", "dance", "energy", "rock", "remix", "beat").any { keyword -> mood.contains(keyword) } -> Color(0xFFF09A58)
+        else -> palette.artworkPrimary
     }
 }

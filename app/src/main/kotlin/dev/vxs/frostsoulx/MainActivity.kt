@@ -828,7 +828,7 @@ class MainActivity : ComponentActivity() {
 
                     val playerBackground by rememberEnumPreference(
                         key = PlayerBackgroundStyleKey,
-                        defaultValue = PlayerBackgroundStyle.DEFAULT,
+                        defaultValue = PlayerBackgroundStyle.GLOW_ANIMATED,
                     )
                     val playerDesignStyle by rememberEnumPreference(
                         key = PlayerDesignStyleKey,

@@ -28,6 +28,7 @@ import dev.vxs.frostsoulx.extensions.metadata
 import dev.vxs.frostsoulx.extensions.togglePlayPause
 import dev.vxs.frostsoulx.extensions.toggleRepeatMode
 import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
 import dev.vxs.frostsoulx.constants.PlayerDesignStyle
 import dev.vxs.frostsoulx.playback.PlayerConnection
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulPlayer
@@ -43,6 +44,7 @@ import dev.vxs.frostsoulx.ui.utils.sendAddMissingDownloads
 internal fun FrostSoulPlayerAdapter(
     mediaMetadata: MediaMetadata,
     playerDesignStyle: PlayerDesignStyle = PlayerDesignStyle.FROSTSOUL,
+    playerBackgroundStyle: PlayerBackgroundStyle = PlayerBackgroundStyle.GLOW_ANIMATED,
     positionMs: Long,
     durationMs: Long,
     isPlaying: Boolean,
@@ -140,6 +142,7 @@ internal fun FrostSoulPlayerAdapter(
             downloadProgress,
             isRefetchingLyrics,
             palette,
+            playerBackgroundStyle,
         ) {
             FrostSoulPlayerUiState(
                 track = FrostSoulTrack.from(mediaMetadata, isLiked),
@@ -159,6 +162,7 @@ internal fun FrostSoulPlayerAdapter(
                 outputDevice = outputDevice,
                 downloadProgress = downloadProgress,
                 palette = palette,
+                playerBackgroundStyle = playerBackgroundStyle,
             )
         }
     val actions =

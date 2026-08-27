@@ -368,7 +368,10 @@ fun BottomSheetPlayer(
         defaultValue = PlayerDesignStyle.FROSTSOUL,
     )
     val showPlayerVolumeBar = true
-    val playerBackground = PlayerBackgroundStyle.DEFAULT
+    val playerBackground by rememberEnumPreference(
+        PlayerBackgroundStyleKey,
+        defaultValue = PlayerBackgroundStyle.GLOW_ANIMATED,
+    )
 
     // Custom background preferences (image + effects)
     val (playerCustomImageUri) = rememberPreference(PlayerCustomImageUriKey, "")
@@ -1236,6 +1239,7 @@ if (!aodModeEnabled) {
                 FrostSoulPlayerAdapter(
                     mediaMetadata = metadata,
                     playerDesignStyle = playerDesignStyle,
+                    playerBackgroundStyle = playerBackground,
                     positionMs = sliderPosition ?: position,
                     durationMs = duration,
                     isPlaying = isPlaying,

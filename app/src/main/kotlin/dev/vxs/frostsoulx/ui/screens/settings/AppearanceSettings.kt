@@ -77,6 +77,8 @@ import dev.vxs.frostsoulx.constants.ForceHighRefreshRateKey
 import dev.vxs.frostsoulx.constants.GridItemSize
 import dev.vxs.frostsoulx.constants.GridItemsSizeKey
 import dev.vxs.frostsoulx.constants.HidePlayerThumbnailKey
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyleKey
 import dev.vxs.frostsoulx.constants.PlayerDesignStyle
 import dev.vxs.frostsoulx.constants.PlayerDesignStyleKey
 import dev.vxs.frostsoulx.constants.LibraryFilter
@@ -127,6 +129,11 @@ fun AppearanceSettings(navController: NavController) {
         rememberEnumPreference(
             PlayerDesignStyleKey,
             defaultValue = PlayerDesignStyle.FROSTSOUL,
+        )
+    val (playerBackgroundStyle, onPlayerBackgroundStyleChange) =
+        rememberEnumPreference(
+            PlayerBackgroundStyleKey,
+            defaultValue = PlayerBackgroundStyle.GLOW_ANIMATED,
         )
     val (hidePlayerThumbnail, onHidePlayerThumbnailChange) =
         rememberPreference(
@@ -274,6 +281,14 @@ fun AppearanceSettings(navController: NavController) {
             listOf(
                 PlayerDesignStyle.FROSTSOUL,
                 PlayerDesignStyle.ARTWORK_BLUR,
+            )
+        }
+    val availableVinylBackgroundStyles =
+        remember {
+            listOf(
+                PlayerBackgroundStyle.BLUR,
+                PlayerBackgroundStyle.GRADIENT,
+                PlayerBackgroundStyle.GLOW_ANIMATED,
             )
         }
     val isVolumeBarSupported = true
@@ -474,6 +489,31 @@ fun AppearanceSettings(navController: NavController) {
                             when (it) {
                                 PlayerDesignStyle.FROSTSOUL -> "Vinyl player"
                                 PlayerDesignStyle.ARTWORK_BLUR -> "Artwork blur player"
+                                else -> it.name
+                            }
+                        },
+                    )
+                }
+
+                item {
+                    ListPreference(
+                        title = { Text("Vinyl player background") },
+                        description =
+                            if (playerDesignStyle == PlayerDesignStyle.FROSTSOUL) {
+                                "Choose Blur, Gradient or Animated Glow"
+                            } else {
+                                "Clickable only when Vinyl player is selected"
+                            },
+                        icon = { Icon(painterResource(R.drawable.palette), null) },
+                        selectedValue = playerBackgroundStyle,
+                        values = availableVinylBackgroundStyles,
+                        onValueSelected = onPlayerBackgroundStyleChange,
+                        isEnabled = playerDesignStyle == PlayerDesignStyle.FROSTSOUL,
+                        valueText = {
+                            when (it) {
+                                PlayerBackgroundStyle.BLUR -> "Blur"
+                                PlayerBackgroundStyle.GRADIENT -> "Gradient"
+                                PlayerBackgroundStyle.GLOW_ANIMATED -> "Animated Glow"
                                 else -> it.name
                             }
                         },

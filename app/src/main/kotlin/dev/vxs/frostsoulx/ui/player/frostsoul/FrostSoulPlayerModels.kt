@@ -13,6 +13,7 @@ import dev.vxs.frostsoulx.models.ActiveOutputDevice
 import dev.vxs.frostsoulx.models.PlayerOutputDevice
 import androidx.compose.ui.graphics.Color
 import dev.vxs.frostsoulx.models.MediaMetadata
+import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
 
 internal val FrostSoulSurface = Color(0xFF1E1E1E)
 internal val FrostSoulSurfaceElevated = Color(0xFF242424)
@@ -87,6 +88,7 @@ internal data class FrostSoulPlayerUiState(
     ),
     val downloadProgress: Float? = null,
     val palette: FrostSoulPalette = FrostSoulPalette.Default,
+    val playerBackgroundStyle: PlayerBackgroundStyle = PlayerBackgroundStyle.GLOW_ANIMATED,
 ) {
     val safeDurationMs: Long
         get() = durationMs.takeIf { it > 0L } ?: track.durationMs
