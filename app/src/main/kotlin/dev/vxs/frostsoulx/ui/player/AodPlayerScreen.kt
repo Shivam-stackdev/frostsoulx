@@ -63,7 +63,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -138,9 +137,9 @@ import dev.vxs.frostsoulx.constants.AodUnlockMethod
 import dev.vxs.frostsoulx.constants.AodUnlockMethodKey
 import dev.vxs.frostsoulx.constants.AodVerticalSpacingKey
 import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.lyrics.LyricsUtils
 import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
-import dev.vxs.frostsoulx.ui.utils.supportsArtworkGlowShadow
 import dev.vxs.frostsoulx.ui.utils.toComposeShape
 import dev.vxs.frostsoulx.utils.makeTimeString
 import dev.vxs.frostsoulx.utils.rememberEnumPreference
@@ -186,7 +185,6 @@ fun AodPlayerScreen(
     val showControls = true
     val showExitButton = true
     val showLyricTicker = true
-    val artworkGlow = false
     val backgroundStyle = AodBackgroundStyle.PURE_BLACK
     val accentStyle = AodAccentStyle.MONOCHROME
     val contentPosition = AodContentPosition.TOP
@@ -376,6 +374,17 @@ fun AodPlayerScreen(
     }
 
     val dominantArtworkColor = extractedArtworkColors.firstOrNull() ?: MaterialTheme.colorScheme.primary
+    val lyricsEntries = remember(lyricsText) {
+        lyricsText?.takeIf { it.isNotBlank() }?.let { raw ->
+            runCatching { LyricsUtils.parseLyrics(raw) }.getOrDefault(emptyList())
+        } ?: emptyList()
+    }
+    val currentLyricIndex = remember(lyricsEntries, position) {
+        if (lyricsEntries.isEmpty()) -1 else LyricsUtils.findCurrentLineIndex(lyricsEntries, position)
+    }
+    val currentLyricLine = lyricsEntries.getOrNull(currentLyricIndex)?.text?.takeIf { it.isNotBlank() }
+    val nextLyricLine = lyricsEntries.getOrNull(currentLyricIndex + 1)?.text?.takeIf { it.isNotBlank() }
+
     val targetAccentColor =
         if (accentStyle == AodAccentStyle.THEME) dominantArtworkColor else Color.White
 
@@ -384,7 +393,6 @@ fun AodPlayerScreen(
         animationSpec = tween(1000),
         label = "accentColorMorph",
     )
-    val supportsArtworkGlowShadow = thumbnailShapeType.supportsArtworkGlowShadow()
     val thumbnailShape =
         thumbnailShapeType.toComposeShape(
             cornerRadius = thumbnailCornerRadius,
@@ -465,7 +473,8 @@ fun AodPlayerScreen(
                 }
                 .background(Color.Black),
     ) {
-        // Fixed reference backdrop: artwork fills the screen as a dim, blurred ambient layer.
+        // Artwork-tinted scrim keeps the backdrop reading as the cover itself, darkened,
+        // instead of a flat black screen with a separate image layer.
         if (!mediaMetadata.thumbnailUrl.isNullOrBlank()) {
             AsyncImage(
                 model = mediaMetadata.thumbnailUrl,
@@ -473,11 +482,21 @@ fun AodPlayerScreen(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .blur(52.dp)
+                    .blur(42.dp)
                     .alpha(0.34f),
             )
         }
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.62f)))
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        dominantArtworkColor.copy(alpha = 0.38f),
+                        Color.Black.copy(alpha = 0.72f),
+                        Color.Black.copy(alpha = 0.85f),
+                    ),
+                ),
+            ),
+        )
         Box(
             modifier = Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
@@ -536,29 +555,84 @@ fun AodPlayerScreen(
                 exit = fadeOut(tween(300)),
             ) {
                 if (showThumbnail) {
-                AsyncImage(
-                    model = imageRequest,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier =
-                        Modifier
+                    Box(
+                        modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .size(artworkSize)
-                            .then(
-                                if (artworkGlow && supportsArtworkGlowShadow) {
-                                    Modifier.shadow(
-                                        elevation = 28.dp,
-                                        shape = thumbnailShape,
-                                        clip = false,
-                                        ambientColor = accentColor,
-                                        spotColor = accentColor,
-                                    )
-                                } else {
-                                    Modifier
-                                },
-                            ).clip(thumbnailShape),
-                )
-                } 
+                            .size(artworkSize + 48.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        // A soft copy of the cover bridges the sharp artwork into the blurred
+                        // backdrop without the detached card-like glow/shadow effect.
+                        AsyncImage(
+                            model = imageRequest,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(artworkSize + 48.dp)
+                                .blur(24.dp)
+                                .alpha(0.55f)
+                                .clip(thumbnailShape),
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .size(artworkSize)
+                                .clip(thumbnailShape),
+                        ) {
+                            AsyncImage(
+                                model = imageRequest,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+
+                            if (showLyricTicker && (currentLyricLine != null || nextLyricLine != null)) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .background(
+                                            Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color.Transparent,
+                                                    Color.Black.copy(alpha = 0.55f),
+                                                ),
+                                            ),
+                                        )
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                                        modifier = Modifier.fillMaxWidth(),
+                                    ) {
+                                        currentLyricLine?.let {
+                                            Text(
+                                                text = it,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = Color.White,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.fillMaxWidth(),
+                                            )
+                                        }
+                                        nextLyricLine?.let {
+                                            Text(
+                                                text = it,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = White65,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.fillMaxWidth(),
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             } 
 
             Column(
@@ -593,25 +667,6 @@ fun AodPlayerScreen(
                             overflow = TextOverflow.Ellipsis,
                             textAlign = textAlign,
                             modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-                AnimatedVisibility(
-                    visible = showFullContent && showLyricTicker && !lyricsText.isNullOrBlank(),
-                    enter = fadeIn(tween(300)),
-                    exit = fadeOut(tween(300)),
-                ) {
-                    if (showLyricTicker && !lyricsText.isNullOrBlank()) {
-                        Text(
-                            text = lyricsText,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = accentColor.copy(alpha = 0.85f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Clip,
-                            textAlign = textAlign,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .basicMarquee(),
                         )
                     }
                 }
