@@ -71,6 +71,9 @@ class ArchiveTuneMediaNotificationProvider(
         val originalDeleteIntent = original.deleteIntent
         val notification =
             NotificationCompat.Builder(context, original)
+                // Rebuilding the notification with custom RemoteViews can otherwise drop the
+                // large icon that Media3 loaded through the session's CoilBitmapLoader.
+                .setLargeIcon(original.largeIcon)
                 .setContentText(lastLyricPrimary)
                 .setSubText(lastLyricSecondary)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())

@@ -62,6 +62,8 @@ import dev.vxs.frostsoulx.models.PersistQueue
 import dev.vxs.frostsoulx.playback.MusicService.Companion.PERSISTENT_QUEUE_FILE
 import dev.vxs.frostsoulx.utils.dataStore
 import dev.vxs.frostsoulx.utils.get
+import dev.vxs.frostsoulx.ui.utils.YTThumbQuality
+import dev.vxs.frostsoulx.ui.utils.buildYTThumbnailUrl
 import dev.vxs.frostsoulx.utils.isLocalMediaId
 import java.io.ObjectInputStream
 import java.text.Collator
@@ -1862,7 +1864,12 @@ class MediaLibrarySessionCallback
                         .setTitle(song.title)
                         .setSubtitle(artists.joinToString { it.name })
                         .setArtist(artists.joinToString { it.name })
-                        .setArtworkUri(song.thumbnailUrl?.toUri())
+                        .setArtworkUri(
+                            song.thumbnailUrl?.takeIf { it.isNotBlank() }?.toUri()
+                                ?: song.id.takeIf { it.length == 11 && !it.isLocalMediaId() }?.let {
+                                    buildYTThumbnailUrl(it, YTThumbQuality.HQ).toUri()
+                                },
+                        )
                         .setIsPlayable(true)
                         .setIsBrowsable(false)
                         .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)

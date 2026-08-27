@@ -31,11 +31,23 @@ val MediaItem.metadata: MediaMetadata?
 
 private fun String?.toNotificationArtworkUri() =
     this
+        ?.takeIf { it.isNotBlank() }
         ?.resize(
             width = NotificationArtworkSizePx,
             height = NotificationArtworkSizePx,
             ytimgResizePolicy = YtimgResizePolicy.PreserveOriginal,
         )?.toUri()
+
+private fun notificationArtworkUri(
+    mediaId: String,
+    thumbnailUrl: String?,
+    isMusicVideo: Boolean,
+) =
+    if (isMusicVideo && mediaId.length == 11 && !mediaId.isLocalMediaId()) {
+        buildYTThumbnailUrl(mediaId, YTThumbQuality.HQ).toUri()
+    } else {
+        thumbnailUrl.toNotificationArtworkUri()
+    }
 
 private fun MediaItem.Builder.setCacheKeyIfRemote(mediaId: String): MediaItem.Builder {
     if (!mediaId.isLocalMediaId()) {
@@ -58,11 +70,11 @@ fun Song.toMediaItem() =
                 .setSubtitle(artists.joinToString { it.name })
                 .setArtist(artists.joinToString { it.name })
                 .setArtworkUri(
-                    if (song.isMusicVideo) {
-                        buildYTThumbnailUrl(song.id, YTThumbQuality.HQ).toUri()
-                    } else {
-                        song.thumbnailUrl.toNotificationArtworkUri()
-                    },
+                    notificationArtworkUri(
+                        mediaId = song.id,
+                        thumbnailUrl = song.thumbnailUrl,
+                        isMusicVideo = song.isMusicVideo,
+                    ),
                 )
                 .setAlbumTitle(song.albumName)
                 .setIsPlayable(true)
@@ -85,11 +97,11 @@ fun SongItem.toMediaItem() =
                 .setSubtitle(artists.joinToString { it.name })
                 .setArtist(artists.joinToString { it.name })
                 .setArtworkUri(
-                    if (isMusicVideo()) {
-                        buildYTThumbnailUrl(id, YTThumbQuality.HQ).toUri()
-                    } else {
-                        thumbnail.toNotificationArtworkUri()
-                    },
+                    notificationArtworkUri(
+                        mediaId = id,
+                        thumbnailUrl = thumbnail,
+                        isMusicVideo = isMusicVideo(),
+                    ),
                 ).setAlbumTitle(album?.name)
                 .setIsPlayable(true)
                 .setMediaType(MEDIA_TYPE_MUSIC)
@@ -111,11 +123,11 @@ fun MediaMetadata.toMediaItem() =
                 .setSubtitle(artists.joinToString { it.name })
                 .setArtist(artists.joinToString { it.name })
                 .setArtworkUri(
-                    if (isMusicVideo) {
-                        buildYTThumbnailUrl(id, YTThumbQuality.HQ).toUri()
-                    } else {
-                        thumbnailUrl.toNotificationArtworkUri()
-                    },
+                    notificationArtworkUri(
+                        mediaId = id,
+                        thumbnailUrl = thumbnailUrl,
+                        isMusicVideo = isMusicVideo,
+                    ),
                 ).setAlbumTitle(album?.title)
                 .setIsPlayable(true)
                 .setMediaType(MEDIA_TYPE_MUSIC)
