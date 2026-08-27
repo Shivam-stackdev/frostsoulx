@@ -1027,6 +1027,12 @@ private fun FrostSoulArtworkBlurAlbumPage(
     onShowArtists: () -> Unit,
 ) {
     val titleScrollState = rememberScrollState()
+    val artworkHeaderBlur =
+        if (uiState.blurRadius > 0f) {
+            (uiState.blurRadius + 18f).coerceIn(18f, 120f)
+        } else {
+            0f
+        }
     Column(
         modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
         verticalArrangement = Arrangement.SpaceBetween,
@@ -1041,35 +1047,74 @@ private fun FrostSoulArtworkBlurAlbumPage(
                     .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight),
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
-                    AsyncImage(
-                        model = uiState.track.artworkUrl,
-                        contentDescription = "Album artwork",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    // Bottom fade blends the cover into the page with no visible seam.
+                    // Artwork Blur only: use an enlarged, low-opacity duplicate as an ambient
+                    // canvas so the sharp cover never reads as a floating rectangle.
                     Box(
-                        modifier = Modifier.fillMaxSize().background(
-                            Brush.verticalGradient(
-                                0.00f to Color.Black.copy(alpha = 0.34f),
-                                0.16f to Color.Transparent,
-                                0.58f to Color.Transparent,
-                                0.82f to Color.Black.copy(alpha = 0.55f),
-                                1.00f to Color.Black.copy(alpha = 0.97f),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.radialGradient(
+                                    colors = listOf(
+                                        uiState.palette.artworkPrimary.copy(alpha = 0.52f),
+                                        uiState.palette.artworkSecondary.copy(alpha = 0.34f),
+                                        Color.Black.copy(alpha = 0.82f),
+                                    ),
+                                    radius = 920f,
+                                ),
                             ),
-                        ),
-                    )
-                    // Horizontal vignette softens the left/right cut lines.
-                    Box(
-                        modifier = Modifier.fillMaxSize().background(
-                            Brush.horizontalGradient(
-                                0.00f to Color.Black.copy(alpha = 0.30f),
-                                0.14f to Color.Transparent,
-                                0.86f to Color.Transparent,
-                                1.00f to Color.Black.copy(alpha = 0.30f),
+                    ) {
+                        AsyncImage(
+                            model = uiState.track.artworkUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer {
+                                    scaleX = 1.18f
+                                    scaleY = 1.18f
+                                    alpha = 0.62f
+                                }
+                                .blur(
+                                    artworkHeaderBlur.dp,
+                                    edgeTreatment = BlurredEdgeTreatment.Unbounded,
+                                ),
+                        )
+                        // Low-opacity matte keeps the bright duplicate from overpowering text.
+                        Box(
+                            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.22f)),
+                        )
+                        AsyncImage(
+                            model = uiState.track.artworkUrl,
+                            contentDescription = "Album artwork",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                        // Bottom fade blends the cover into the page with no visible seam.
+                        Box(
+                            modifier = Modifier.fillMaxSize().background(
+                                Brush.verticalGradient(
+                                    0.00f to Color.Black.copy(alpha = 0.42f),
+                                    0.14f to Color.Transparent,
+                                    0.54f to Color.Transparent,
+                                    0.78f to Color.Black.copy(alpha = 0.60f),
+                                    1.00f to Color.Black.copy(alpha = 0.98f),
+                                ),
                             ),
-                        ),
-                    )
+                        )
+                        // Stronger horizontal edge fade removes visible rectangular side cuts.
+                        Box(
+                            modifier = Modifier.fillMaxSize().background(
+                                Brush.horizontalGradient(
+                                    0.00f to Color.Black.copy(alpha = 0.62f),
+                                    0.12f to Color.Black.copy(alpha = 0.18f),
+                                    0.25f to Color.Transparent,
+                                    0.75f to Color.Transparent,
+                                    0.88f to Color.Black.copy(alpha = 0.18f),
+                                    1.00f to Color.Black.copy(alpha = 0.62f),
+                                ),
+                            ),
+                        )
+                    }
                 } else {
                     Box(
                         modifier = Modifier.fillMaxSize().background(
