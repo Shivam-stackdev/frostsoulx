@@ -930,12 +930,12 @@ private fun LyricsLine.asMainPlayerKaraokeText(
                 if (brush != null) {
                     SpanStyle(
                         brush = brush,
-                        shadow = if (fill > 0.02f) Shadow(Color.White.copy(alpha = 0.44f * fill), 14f * fill) else null,
+                        shadow = if (fill > 0.02f) Shadow(color = Color.White.copy(alpha = 0.44f * fill), blurRadius = 14f * fill) else null,
                     )
                 } else {
                     SpanStyle(
                         color = wordColor,
-                        shadow = if (fill > 0.02f) Shadow(Color.White.copy(alpha = 0.44f * fill), 14f * fill) else null,
+                        shadow = if (fill > 0.02f) Shadow(color = Color.White.copy(alpha = 0.44f * fill), blurRadius = 14f * fill) else null,
                     )
                 },
             ) {
