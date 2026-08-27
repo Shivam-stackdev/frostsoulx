@@ -1,324 +1,192 @@
-<div align="center">
+# FrostSoulX
 
-  <img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/icon.png" width="160" height="160" alt="ArchiveTune Logo" style="border-radius: 22%">
+**FrostSoulX** is an independently rebuilt Android music player focused on a polished, QQ Music-inspired listening experience. The project combines a modern Jetpack Compose interface with Media3 playback, synchronized lyrics, local persistence, artwork-driven player surfaces, and background media controls.
 
-  <h1>ArchiveTune</h1>
+> FrostSoulX is an independent project. It is not affiliated with Tencent, QQ Music, Google, or YouTube. It does not reproduce proprietary source code or proprietary application assets.
 
-  <p align="center">
-    <a href="README.md">
-      <img src="https://img.shields.io/badge/🇺🇸%20English-6366f1?style=for-the-badge&labelColor=1e1e2e" />
-    </a>
-    <a href="README_JA.md">
-      <img src="https://img.shields.io/badge/🇯🇵%20日本語-6366f1?style=for-the-badge&labelColor=1e1e2e" />
-    </a>
-  </p>
+[![Branch](https://img.shields.io/badge/default%20branch-frostsoul--reboot-111827?style=flat-square)](https://github.com/sakuraDev31/frostsoulx/tree/frostsoul-reboot)
+[![Language](https://img.shields.io/badge/language-Kotlin-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![UI](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=flat-square&logo=jetpackcompose&logoColor=white)](https://developer.android.com/compose)
+[![Playback](https://img.shields.io/badge/playback-Media3-3DDC84?style=flat-square&logo=android&logoColor=white)](https://developer.android.com/media/media3)
+[![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
 
-  <p align="center">
-    <strong>Redefining the YouTube Music Experience on Android.</strong>
-    <br />
-    <em>It’s high-performance, privacy-focused, and packed with features for people who really care about their experience.</em>
-  </p>
+## Project at a glance
 
-  <p align="center">
-    <a href="https://archivetune.koiiverse.cloud"><b>Official Website</b></a> •
-    <a href="#features"><b>Features</b></a> •
-    <a href="https://archivetune.koiiverse.cloud/privacy"><b>Privacy</b></a> •
-    <a href="#download-now"><b>Download</b></a> •
-    <a href="#screenshots"><b>Screenshots</b></a> •
-    <a href="https://github.com/rukamori/ArchiveTune/issues/new/choose"><b>Support</b></a>
-  </p>
+| Item | Details |
+| --- | --- |
+| Application ID | `dev.vxs.frostsoulx` |
+| Current version | `14.0.1` (`versionCode 140`) |
+| Primary branch | [`frostsoul-reboot`](https://github.com/sakuraDev31/frostsoulx/tree/frostsoul-reboot) |
+| Platform | Android |
+| Language | Kotlin |
+| UI toolkit | Jetpack Compose and Material components used by the existing project |
+| Playback engine | AndroidX Media3 / ExoPlayer |
+| Persistence | Room and DataStore |
+| Image loading | Coil 3 |
+| Dependency injection | Hilt |
+| Main verified CI task | `assembleGmsMobileArm64Debug` |
+| License | GNU General Public License v3.0 |
 
-  <div align="center">
-    <img src="https://img.shields.io/github/v/release/rukamori/ArchiveTune?style=for-the-badge&color=6366f1&labelColor=1e1e2e&logo=github" alt="Latest Version" />
-    <img src="https://img.shields.io/github/downloads/rukamori/ArchiveTune/total?style=for-the-badge&color=6366f1&labelColor=1e1e2e&logo=github" alt="Downloads" />
-    <img src="https://img.shields.io/github/stars/rukamori/ArchiveTune?style=for-the-badge&color=6366f1&labelColor=1e1e2e&logo=github" alt="Stars" />
-    <img src="https://img.shields.io/github/license/rukamori/ArchiveTune?style=for-the-badge&color=6366f1&labelColor=1e1e2e" alt="License" />
-    <img src="https://img.shields.io/badge/Architecture-MVVM-6366f1?style=for-the-badge&labelColor=1e1e2e&logo=kotlin" alt="MVVM Architecture" />
-    <img src="https://img.shields.io/badge/Language-Kotlin-7f52ff?style=for-the-badge&logo=kotlin&color=6366f1&labelColor=1e1e2e" alt="Kotlin Language" />
-    <img src="https://img.shields.io/badge/Toolkit-Jetpack_Compose-4285f4?style=for-the-badge&logo=jetpack-compose&color=6366f1&labelColor=1e1e2e" alt="Jetpack Compose Toolkit" />
-    <img src="https://img.shields.io/badge/Design-Material_3-000000?style=for-the-badge&logo=material-design&color=6366f1&labelColor=1e1e2e" alt="Material Design 3" />
-    <a href="https://www.virustotal.com/gui/file/176bea37aff02a606d04ff0a61478fabdb0bd079f9e97319645452af420e5d84/detection/f-176bea37aff02a606d04ff0a61478fabdb0bd079f9e97319645452af420e5d84-1778840479" target="_blank"><img src="https://img.shields.io/badge/VirusTotal-SAFE-green?style=for-the-badge&logo=virustotal&logoColor=white&labelColor=1e1e2e&color=5865F2" alt="VirusTotal" /></a>
-    <a href="https://t.me/ArchiveTuneGC"><img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram" /></a>
-    <a href="https://discord.gg/XF2fpb9rTq"><img src="https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord" /></a>
-  </div>
-  
-  <br />
+## Why FrostSoulX exists
 
-  <a href="https://trendshift.io/repositories/17521" target="_blank">
-    <img src="https://trendshift.io/api/badge/repositories/17521" alt="ArchiveTune | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/>
-  </a>
-</div>
+The project is a clean, independently implemented Android player designed around three priorities: a focused music-first interface, reliable playback and queue behavior, and a premium full-player experience. The default navigation is organized around **Home**, **Search**, and **Library**, while the player provides dedicated Vinyl, Artwork Blur, lyrics, and recommendations surfaces.
 
-<hr />
+The repository is also structured to make the player easy to inspect and extend. Playback state is kept in the Media3 service layer, application data is persisted through repositories and Room/DataStore, and Compose screens consume state through view models and state adapters rather than directly owning the playback engine.
 
-> [!WARNING]
-**Forks are not supported in any way.**  
-We do not provide support, maintenance, troubleshooting, or assistance for any forked version of this project.
-If you choose to use a fork, you do so at your own risk.
+## Current feature set
 
-**ArchiveTune** isn’t just another generic YouTube Music wrapper. It’s a fully custom-built player made from the ground up, because we think your music should stay private, look clean, and work exactly the way you expect. If you care about sound quality and want something that actually feels good to use, this is it.
+### Listening and playback
 
----
+FrostSoulX supports online music discovery, queue-based playback, background playback, local media handling, previous/next controls, seeking, playback speed controls, repeat behavior, audio-output selection, download actions, and a sleep timer. The Media3 `MediaSession` integration also exposes track metadata and artwork to Android system media controls.
 
-> [!IMPORTANT]  
-> **Geographic Availability:** If YouTube Music is not supported in your region, a VPN or proxy set to a supported region is required for initial data fetching.
+### FrostSoulX player experience
 
----
+The full player contains three horizontally navigable surfaces: the main player, recommendations, and lyrics. The two visual player styles are:
 
-## 📸 Showcase
+| Player surface | Purpose |
+| --- | --- |
+| Vinyl player | A turntable-inspired player with artwork, rotating vinyl presentation, metadata, one-line karaoke preview, and queue/output controls. |
+| Artwork Blur player | A full-bleed artwork player with a seamless blurred backdrop, readable lyric contrast, metadata, recommendations, and synchronized lyric preview. |
+| Lyrics page | A dedicated word-by-word karaoke surface with white fill/glow, active-line scrolling, translation/refetch actions, and per-track timing offset controls. |
 
-<div align="center">
+Artwork rendering is intentionally separated from the notification pipeline. The in-app player uses artwork palettes and blurred layers for visual continuity, while Media3 receives notification-safe artwork metadata and a custom bitmap loader for Android media controls.
 
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_1.jpg" alt="Browse" width="30%" />
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_2.jpg" alt="Live Lyrics" width="30%" />
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_3.jpg" alt="Theme Customization" width="30%" />
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_4.jpg" alt="Live Statistics" width="30%" />
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_5.jpg" alt="Artist" width="30%" />
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_6.jpg" alt="Album" width="30%" />
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_7.jpg" alt="Player" width="30%" />
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_8.jpg" alt="Settings" width="30%" />
-<img src="https://github.com/rukamori/ArchiveTune/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_9.jpg" alt="Settings" width="30%" />
+### Lyrics and synchronization
 
-</div>
+The lyrics subsystem supports timed lines, word-level karaoke where provider timing is available, line-level fallback timing, translation/refetch flows, and a persisted per-track offset. Positive offset values advance lyric selection relative to playback; negative values delay it. The offset is applied by the shared synchronization engine rather than by a second UI clock.
 
----
+Lyrics fetching includes track identity safeguards intended to reduce wrong-song matches. Cache identity includes the track metadata used by the repository, and provider results are checked before being accepted when sufficient title or artist information is available.
 
-## ✨ Features
+### Discovery and library
 
-<div align="center">
+Home and search surfaces expose music discovery, artist and album navigation, recent listening content, queue actions, and recommendation cards. Artist entries shown in the player’s Artists Involved dialog can open the corresponding artist profile when a provider identity is available. Library screens cover saved songs, albums, playlists, mixes, and local content.
 
-<table>
-  <tr>
-    <td width="50%" valign="top">
-      <div align="left">
-        <h3>Playback</h3>
-        <ul>
-          <li>Multiple account support with quick switching</li>
-          <li>Ad-free playback with background listening</li>
-          <li>Your playlists, liked songs, and subscriptions appear after sign-in</li>
-          <li>Support local file and local song playback
-          <li>Fast startup and lightweight performance</li>
-          <li>Built for a private, uninterrupted listening experience</li>
-        </ul>
-      </div>
-    </td>
-    <td width="50%" valign="top">
-      <div align="left">
-        <h3>Audio</h3>
-        <ul>
-          <li>EBU R128 loudness normalization</li>
-          <li>Tempo, pitch, and playback speed controls</li>
-          <li>Crossfade between tracks</li>
-          <li>System equalizer and spatial audio integration</li>
-        </ul>
-      </div>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <div align="left">
-        <h3>Lyrics &amp; Discovery</h3>
-        <ul>
-          <li>Live synced lyrics</li>
-          <li>Lyrics translation, AI Lyrics translation and romanization</li>
-          <li>Music recognition for songs around you</li>
-          <li>Listening statistics whenever you want them</li>
-        </ul>
-      </div>
-    </td>
-    <td width="50%" valign="top">
-      <div align="left">
-        <h3>Sync &amp; Social</h3>
-        <ul>
-          <li>Import playlist from spotify</li>
-          <li>YouTube Music account integration</li>
-          <li>Last.fm scrobbling</li>
-          <li>ListenBrainz history sync</li>
-          <li>Discord rich presence support</li>
-        </ul>
-      </div>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <div align="left">
-        <h3>Interface</h3>
-        <ul>
-          <li>Material 3 design language</li>
-          <li>Album-art powered dynamic colors</li>
-          <li>Up to 9 different player styles</li>
-          <li>Up to 8 different player background styles</li>
-          <li>Responsive layouts for different screen sizes</li>
-          <li>Clean browsing, player, artist, album, and lyrics views</li>
-        </ul>
-      </div>
-    </td>
-    <td width="50%" valign="top">
-      <div align="left">
-        <h3>Customization</h3>
-        <ul>
-          <li>Deep playback and interface settings</li>
-          <li>Dynamic color theming options</li>
-          <li>Gesture customization</li>
-          <li>Animation and layout tuning</li>
-          <li>Flexible controls to shape the app around your workflow</li>
-        </ul>
-      </div>
-    </td>
-  </tr>
-</table>
+### Appearance and interaction
 
-</div>
+The app includes a focused light/dark visual system, artwork blur intensity controls, player background options, lyric animation controls, gesture-aware player navigation, configurable refresh-rate behavior where supported, and responsive layouts for different Android screen sizes. AOD customization is no longer exposed as a separate settings page; the AOD player uses a stable artwork-backed reference layout.
 
----
+## Architecture and repository map
 
-## 📥 Download Now
+FrostSoulX uses a feature-oriented Kotlin structure with a service-backed playback core.
 
-<div align="center">
+| Area | Location | Responsibility |
+| --- | --- | --- |
+| Android application | `app/src/main/` | Manifest, resources, application wiring, and Android components. |
+| Playback service | `app/src/main/kotlin/dev/vxs/frostsoulx/playback/` | Media3 player, MediaSession, notifications, queue persistence, downloads, and system integration. |
+| Player UI | `app/src/main/kotlin/dev/vxs/frostsoulx/ui/player/` | Mini player, full player, Vinyl/Artwork Blur surfaces, lyrics preview, AOD, and controls. |
+| Lyrics | `app/src/main/kotlin/dev/vxs/frostsoulx/lyrics/` | Provider orchestration, parsing, repository caching, synchronization, offsets, and lyric models. |
+| Compose screens | `app/src/main/kotlin/dev/vxs/frostsoulx/ui/screens/` | Home, search, library, artist, album, settings, playlist, and detail screens. |
+| View models | `app/src/main/kotlin/dev/vxs/frostsoulx/viewmodels/` | UI state, search, lyrics menus, queue flows, and feature-level actions. |
+| Database | `app/src/main/kotlin/dev/vxs/frostsoulx/db/` | Room entities, DAOs, migrations, and persistent music data. |
+| Settings/constants | `app/src/main/kotlin/dev/vxs/frostsoulx/constants/` | Preference keys, feature flags, player styles, and shared constants. |
+| Image and palette utilities | `app/src/main/kotlin/dev/vxs/frostsoulx/ui/utils/` and `ui/theme/` | Artwork URLs, palette extraction, blur/background helpers, and Compose utilities. |
+| Gradle configuration | `build.gradle.kts`, `app/build.gradle.kts`, `gradle/` | Plugins, dependencies, version catalog, variants, and build configuration. |
+| CI workflows | `.github/workflows/` | Debug, release, and signing-key workflow definitions. |
 
-<h2>Stable Release</h2>
+## Getting started
 
-<table>
-  <thead>
-    <tr>
-      <th align="center">Obtainium</th>
-      <th align="center">IzzyOnDroid</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center">
-        <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/rukamori/ArchiveTune/">
-          <img src="https://github.com/ImranR98/Obtainium/blob/main/assets/graphics/badge_obtainium.png" height="50" alt="Get ArchiveTune on Obtainium">
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://apt.izzysoft.de/fdroid/index/apk/dev.vxs.frostsoulx">
-          <img src="https://raw.githubusercontent.com/rukamori/ArchiveTune/757d5932832e1da27ced56de98c5ad1275cf0db1/assets/IzzyOnDroidButtonBorder.svg" height="50" alt="Get ArchiveTune on IzzyOnDroid">
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <th align="center" colspan="2">GitHub</th>
-    </tr>
-    <tr>
-      <td align="center" colspan="2">
-        <a href="https://github.com/rukamori/ArchiveTune/releases/latest">
-          <img src="https://raw.githubusercontent.com/rukamori/ArchiveTune/refs/heads/main/assets/badge_github.png" height="50" alt="Get ArchiveTune on GitHub">
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <th align="center">OpenAPK</th>
-      <th align="center">Unclouded</th>
-    </tr>
-    <tr>
-      <td align="center">
-        <a href="https://www.openapk.net/archivetune/dev.vxs.frostsoulx/">
-          <img src="https://www.openapk.net/images/openapk-badge.png" height="75" alt="Get ArchiveTune on OpenAPK">
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://unclouded.app/apps/archivetune/">
-          <img src="https://raw.githubusercontent.com/rukamori/ArchiveTune/refs/heads/dev/assets/badge_unclouded.png" height="50" alt="Get ArchiveTune on Unclouded">
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
+### Requirements
 
-<h2>Nightly Build</h2>
+Use Android Studio with a recent Android SDK, JDK 21, and the repository’s Gradle Wrapper. A physical Android device or emulator is recommended for validating Media3 notifications, audio output selection, background playback, artwork loading, gestures, and AOD behavior.
 
-<table>
-  <thead>
-    <tr>
-      <th align="center">GitHub Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center">
-        <a href="https://nightly.link/rukamori/ArchiveTune/workflows/build/dev/app-gms-mobile-universal-release">
-          <img src="https://raw.githubusercontent.com/rukamori/ArchiveTune/refs/heads/main/assets/badge_github.png" height="50" alt="Download the latest ArchiveTune nightly build">
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>
-</div>
+### Clone the repository
 
-> [!WARNING]  
-> **Notes:** The trusted download source is listed above; we are not responsible for any risks you may encounter from downloading from other sources.
+```bash
+git clone --branch frostsoul-reboot https://github.com/sakuraDev31/frostsoulx.git
+cd frostsoulx
+```
 
-## ❓ Need Help or Have Questions?
-Join Our Telegram Channels or Discord Servers for Support and Discussion.
+### Open the project
 
-[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/ArchiveTuneGC)
-[![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/XF2fpb9rTq)
+Open the repository root in Android Studio and allow Gradle synchronization to complete. The project uses Kotlin DSL and the version catalog in `gradle/libs.versions.toml`; do not replace the Gradle Wrapper with a system Gradle installation.
 
----
+### Build the verified debug variant
 
-## 🌍 Globalization
+```bash
+./gradlew assembleGmsMobileArm64Debug --no-daemon --build-cache
+```
 
-ArchiveTune belongs to everyone. Help us localize the experience for your region.
+The generated debug APK is normally located under an `app/build/outputs/apk/` variant directory. CI uses the same `assembleGmsMobileArm64Debug` task for the arm64 debug build.
 
-[![Static Badge](https://img.shields.io/badge/translate-help?style=for-the-badge&logo=weblate&labelColor=grey)](https://translate.codeberg.org/engage/archivetune/)
+### Install a local debug APK
 
-<div align="center">
-  <a href="https://translate.codeberg.org/engage/archivetune/">
-    <img src="https://translate.codeberg.org/widget/archivetune/horizontal-blue.svg" alt="Translation status" />
-  </a>
-</div>
+After a successful build, locate the generated APK and install it with Android Debug Bridge:
 
-### ✨ Project Contributors
-<a href="https://github.com/rukamori/ArchiveTune/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=rukamori/ArchiveTune&columns=6" />
-</a>
+```bash
+adb devices
+adb install -r path/to/app-gms-mobile-arm64-debug.apk
+```
 
-### 🛠️ Development & Engineering
-Interested in building the project or contributing? ArchiveTune is built on a high-performance Kotlin stack.
-<a href="CONTRIBUTING.md"><b>Read the Build & Contribution Guide →</b></a>
+The exact APK filename can vary with the Android Gradle Plugin output layout. If the path differs, search the output directory rather than changing the build task:
 
----
+```bash
+find app/build/outputs/apk -type f -name '*.apk' -print
+```
 
-### Open-Source Acknowledgments
+### Useful development commands
 
-ArchiveTune is made possible by the work of many open-source projects and communities:
+| Command | Use |
+| --- | --- |
+| `./gradlew assembleGmsMobileArm64Debug --no-daemon --build-cache` | Build the CI-equivalent debug APK. |
+| `./gradlew lintDebug` | Run Android lint for the debug configuration when the task is available. |
+| `./gradlew testDebugUnitTest` | Run debug unit tests when the project contains applicable tests. |
+| `./gradlew clean` | Clear generated build output when diagnosing stale artifacts. |
+| `git diff --check` | Detect whitespace errors before committing. |
 
-- **Metrolist** by [Mostafa Alagamy](https://github.com/mostafaalagamy/Metrolist) for the base framework.
-- **SimpMusic** by [maxrave-dev](https://github.com/maxrave-dev/SimpMusic) for the lyrics API provider.
-- [BetterLyrics](https://better-lyrics.boidu.dev/) for word-by-word lyrics, unison and artwork provider support.
-- [Material Color Utilities](https://github.com/material-foundation/material-color-utilities)
-- [Read You](https://github.com/Ashinch/ReadYou) and [Seal](https://github.com/JunkFood02/Seal) for UI component inspiration.
-- Translators, beta testers, contributors, and community members who continue to support the project.
+## Configuration and secrets
 
----
+Do not commit API keys, signing keys, keystores, or personal `local.properties` files. Build-time integrations are supplied through the local environment or GitHub Actions secrets as appropriate. A normal local debug build should not require committing credentials to the repository.
 
-## ⚖️ Legal Disclaimer
+Release builds require correctly configured signing inputs in the release environment. Treat generated keystores and passwords as sensitive material and rotate them if they are ever exposed.
 
-ArchiveTune is an independent third-party client.
-- Not affiliated with Google LLC or YouTube.
-- Does not bypass YouTube's technical protections.
-- Users are encouraged to support artists by purchasing music via official channels.
+## CI and branches
 
-## ⚖️ License, Copyright, and Trademark Notice
+The repository’s active development branch is [`frostsoul-reboot`](https://github.com/sakuraDev31/frostsoulx/tree/frostsoul-reboot). Pushes and pull requests can trigger the Debug workflow, which builds the arm64 debug variant and uploads the resulting APK as a workflow artifact.
 
-ArchiveTune is licensed under the **GNU General Public License v3.0 (GPLv3)**.
+The release workflow is intended for signed distribution builds and depends on repository secrets. Workflow files may be adjusted independently from source changes when GitHub Actions permissions or artifact-upload behavior require repository-owner intervention.
 
-You may copy, modify, and redistribute the source code, including commercially, provided that you comply with the GPLv3. This includes preserving applicable copyright and license notices, clearly identifying modified versions, and providing the corresponding source code when required.
+## Screenshots
 
-Copyright © Rukamori and the ArchiveTune contributors for their respective original contributions.
+The README intentionally does not link to screenshots from the upstream ArchiveTune project. This keeps the documentation accurate for FrostSoulX and avoids presenting unrelated reference images as the current application. Device captures can be added later under `docs/screenshots/` with descriptive names such as `home.png`, `vinyl-player.png`, `artwork-blur-player.png`, and `lyrics.png`.
 
-The **ArchiveTune™** name, logo, application icon, and official branding are not licensed under the GPLv3. Unofficial forks must not present themselves as official ArchiveTune releases or imply endorsement by the ArchiveTune maintainers.
+## Contributing
 
-See the [`LICENSE`](LICENSE) file for the complete GPLv3 terms.
+Before opening a pull request, describe the user-visible behavior being changed, identify the affected feature area, and verify that normal playback and navigation still work. For player changes, test both Vinyl and Artwork Blur modes, the mini player, queue/output controls, lyrics synchronization, notification metadata, and rotation or process recreation where possible.
 
+Keep changes focused. Do not modify workflow files as part of a source-only fix unless the workflow change is explicitly required. Run `git diff --check`, review the staged diff, and include the relevant Gradle task and result in the pull request description.
 
----
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the project’s existing engineering guidance.
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/rukamori/ArchiveTune/refs/heads/dev/fastlane/metadata/android/en-US/images/ArchiveTuneFull.png" alt="ArchiveTune Banner" style="width: 100%; max-width: 500px;">
-  <p><b>If ArchiveTune elevated your music experience, please consider giving us a ⭐</b></p>
-  <br />
-  <img src="https://raw.githubusercontent.com/rukamori/ArchiveTune/refs/heads/dev/assets/badge_part.png" alt="ArchiveTune Banner" style="width: 180px">
-</div>
+## Troubleshooting
+
+| Symptom | Checks |
+| --- | --- |
+| Artwork is missing in the Android media notification | Confirm that the current `MediaItem` contains `MediaMetadata.artworkUri`, that the Media3 bitmap loader is registered, and that the notification provider preserves the loaded large icon. |
+| Lyrics appear early or late | Use the Lyrics page offset control. Positive values advance lyric selection; negative values delay it. Verify that the track identity and fetched lyrics match before changing the offset. |
+| The player build fails at Kotlin compilation | Read the first `e: file:///...` compiler line in CI, fix the source error, and rerun `assembleGmsMobileArm64Debug`. Do not rely only on the final Gradle summary. |
+| A release build fails during signing | Verify the keystore, alias, passwords, and CI secrets in the release environment. Never place signing credentials in committed source. |
+| An APK upload step fails | Check the workflow’s resolved APK path and artifact name. The build output directory can differ between Android Gradle Plugin versions. |
+| Artwork Blur text is hard to read | Confirm that the effective blur intensity and dark contrast scrim are enabled; the player is designed to keep lyric text readable over bright artwork. |
+
+## Legal and licensing
+
+FrostSoulX is distributed under the GNU General Public License v3.0 as represented by [`LICENSE`](LICENSE). Review the license and the applicable notices in source files before redistributing modified builds.
+
+FrostSoulX is not an official QQ Music, Tencent, Google, YouTube, or YouTube Music application. Product names, logos, and service marks remain the property of their respective owners. Users are responsible for complying with the terms and laws applicable to the services they access.
+
+## References
+
+1. [Android Developers — Jetpack Compose](https://developer.android.com/compose)
+2. [Android Developers — Media3](https://developer.android.com/media/media3)
+3. [Android Developers — MediaSession and media controls](https://developer.android.com/media/media3/session)
+4. [Kotlin documentation](https://kotlinlang.org/docs/home.html)
+5. [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html)
+
+## Repository navigation
+
+- [Source tree](https://github.com/sakuraDev31/frostsoulx/tree/frostsoul-reboot)
+- [Issues](https://github.com/sakuraDev31/frostsoulx/issues)
+- [Pull requests](https://github.com/sakuraDev31/frostsoulx/pulls)
+- [Debug workflow](https://github.com/sakuraDev31/frostsoulx/actions/workflows/Debug.yml)
+- [Contributing guide](CONTRIBUTING.md)
+- [License](LICENSE)
