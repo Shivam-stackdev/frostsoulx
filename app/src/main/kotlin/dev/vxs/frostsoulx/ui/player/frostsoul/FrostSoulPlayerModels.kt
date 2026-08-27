@@ -14,6 +14,7 @@ import dev.vxs.frostsoulx.models.PlayerOutputDevice
 import androidx.compose.ui.graphics.Color
 import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
+import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 
 internal val FrostSoulSurface = Color(0xFF1E1E1E)
 internal val FrostSoulSurfaceElevated = Color(0xFF242424)
@@ -32,11 +33,20 @@ internal data class FrostSoulPalette(
 }
 
 @Immutable
+internal data class FrostSoulArtist(
+    val id: String? = null,
+    val name: String,
+    val artworkUrl: String? = null,
+)
+
+@Immutable
 internal data class FrostSoulTrack(
     val id: String,
     val title: String,
     val artist: String,
+    val artists: List<FrostSoulArtist> = emptyList(),
     val album: String,
+    val albumId: String? = null,
     val artworkUrl: String?,
     val durationMs: Long,
     val isLiked: Boolean,
@@ -47,7 +57,9 @@ internal data class FrostSoulTrack(
                 id = metadata.id,
                 title = metadata.title.ifBlank { "Unknown track" },
                 artist = metadata.artists.joinToString(separator = " • ") { it.name }.ifBlank { "Unknown artist" },
+                artists = metadata.artists.map { FrostSoulArtist(id = it.id, name = it.name, artworkUrl = it.thumbnailUrl) },
                 album = metadata.album?.title.orEmpty(),
+                albumId = metadata.album?.id,
                 artworkUrl = metadata.thumbnailUrl,
                 durationMs = metadata.duration.coerceAtLeast(0).toLong() * 1_000L,
                 isLiked = isLiked,
@@ -62,6 +74,8 @@ internal data class FrostSoulQueueItem(
     val title: String,
     val artist: String,
     val artworkUrl: String?,
+    val albumId: String? = null,
+    val albumTitle: String? = null,
     val durationMs: Long = 0L,
     val isCurrent: Boolean,
 )
@@ -80,8 +94,13 @@ internal data class FrostSoulPlayerUiState(
     val lyrics: String?,
     val currentLyricLine: String? = null,
     val nextLyricLine: String? = null,
+    val currentLyricModel: LyricsLine? = null,
+    val currentWordIndex: Int = -1,
+    val currentWordProgress: Float = 0f,
+    val currentLineProgress: Float = 0f,
     val lyricPreviewLines: List<String> = emptyList(),
     val audioQualityBadge: String? = null,
+    val audioTechnicalInfo: String? = null,
     val outputDevice: ActiveOutputDevice = ActiveOutputDevice(
         type = PlayerOutputDevice.Unknown,
         name = PlayerOutputDevice.Unknown.defaultName,
@@ -114,6 +133,7 @@ internal data class FrostSoulPlayerActions(
     val onOpenAudioOutput: () -> Unit = {},
     val onDownload: () -> Unit = {},
     val onOpenOptions: () -> Unit = {},
+    val onOpenAlbum: () -> Unit = {},
     val onRefetchLyrics: () -> Unit = {},
     val isRefetchingLyrics: Boolean = false,
     val onSelectQueueItem: (Int) -> Unit,

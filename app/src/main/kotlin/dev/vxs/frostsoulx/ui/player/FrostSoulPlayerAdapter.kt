@@ -20,7 +20,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.vxs.frostsoulx.utils.oem.SystemMediaControlResolver
 import dev.vxs.frostsoulx.viewmodels.LyricsMenuViewModel
 import dagger.hilt.android.EntryPointAccessors
+import dev.vxs.frostsoulx.db.entities.codecLabel
 import dev.vxs.frostsoulx.db.entities.containerLabel
+import dev.vxs.frostsoulx.db.entities.formattedBitrate
+import dev.vxs.frostsoulx.db.entities.formattedSampleRate
 import dev.vxs.frostsoulx.di.LyricsHelperEntryPoint
 import androidx.media3.common.Timeline
 import dev.vxs.frostsoulx.extensions.mediaItems
@@ -59,6 +62,8 @@ internal fun FrostSoulPlayerAdapter(
     playerConnection: PlayerConnection,
     onCollapse: () -> Unit,
     onOpenOptions: () -> Unit = {},
+    onSearchTrack: () -> Unit = {},
+    onOpenAlbum: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val palette = rememberFrostSoulPalette(mediaMetadata.thumbnailUrl)
@@ -106,6 +111,16 @@ internal fun FrostSoulPlayerAdapter(
         remember(currentFormat) {
             currentFormat?.containerLabel()?.uppercase()?.takeIf { it.isNotBlank() }
         }
+    val audioTechnicalInfo =
+        remember(currentFormat) {
+            currentFormat?.let { format ->
+                listOfNotNull(
+                    format.formattedSampleRate(),
+                    format.formattedBitrate(),
+                    format.codecLabel().takeIf { it.isNotBlank() },
+                ).joinToString(separator = "  ").takeIf { it.isNotBlank() }
+            }
+        }
     val queue =
         remember(queueWindows, currentQueueIndex) {
             queueWindows.mapIndexedNotNull { index, window ->
@@ -116,6 +131,8 @@ internal fun FrostSoulPlayerAdapter(
                     title = item.title,
                     artist = item.artists.joinToString(separator = " • ") { it.name }.ifBlank { "Unknown artist" },
                     artworkUrl = item.thumbnailUrl,
+                    albumId = item.album?.id,
+                    albumTitle = item.album?.title,
                     durationMs = item.duration.coerceAtLeast(0).toLong() * 1_000L,
                     isCurrent = index == currentQueueIndex,
                 )
@@ -136,8 +153,13 @@ internal fun FrostSoulPlayerAdapter(
             lyrics,
             currentLyricText,
             nextLyricText,
+            currentLyricLine,
+            lyricSyncState.currentWordIndex,
+            lyricSyncState.wordProgress,
+            lyricSyncState.lineProgress,
             lyricPreviewLines,
             audioQualityBadge,
+            audioTechnicalInfo,
             outputDevice,
             downloadProgress,
             isRefetchingLyrics,
@@ -157,8 +179,13 @@ internal fun FrostSoulPlayerAdapter(
                 lyrics = lyrics,
                 currentLyricLine = currentLyricText,
                 nextLyricLine = nextLyricText,
+                currentLyricModel = currentLyricLine,
+                currentWordIndex = lyricSyncState.currentWordIndex,
+                currentWordProgress = lyricSyncState.wordProgress,
+                currentLineProgress = lyricSyncState.lineProgress,
                 lyricPreviewLines = lyricPreviewLines,
                 audioQualityBadge = audioQualityBadge,
+                audioTechnicalInfo = audioTechnicalInfo,
                 outputDevice = outputDevice,
                 downloadProgress = downloadProgress,
                 palette = palette,
@@ -186,6 +213,7 @@ internal fun FrostSoulPlayerAdapter(
                     )
                 },
                 onOpenOptions = onOpenOptions,
+                onOpenAlbum = onOpenAlbum,
                 onRefetchLyrics = { lyricsMenuViewModel.refetchLyrics(mediaMetadata) },
                 isRefetchingLyrics = isRefetchingLyrics,
 
@@ -208,6 +236,7 @@ internal fun FrostSoulPlayerAdapter(
         uiState = uiState,
         actions = actions,
         playerDesignStyle = playerDesignStyle,
+        onSearchTrack = onSearchTrack,
         modifier = modifier,
     )
 }

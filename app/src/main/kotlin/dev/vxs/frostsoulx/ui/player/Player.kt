@@ -197,6 +197,7 @@ import dev.vxs.frostsoulx.ui.screens.LOGIN_ROUTE
 import dev.vxs.frostsoulx.ui.screens.buildLoginRoute
 import dev.vxs.frostsoulx.ui.screens.settings.DarkMode
 import dev.vxs.frostsoulx.ui.screens.settings.PO_TOKEN_ROUTE
+import dev.vxs.frostsoulx.ui.screens.search.onlineSearchResultRoute
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import dev.vxs.frostsoulx.ui.utils.ShowMediaInfo
 import dev.vxs.frostsoulx.ui.utils.YtimgResizePolicy
@@ -1264,6 +1265,12 @@ if (!aodModeEnabled) {
                                 onDismiss = menuState::dismiss,
                             )
                         }
+                    },
+                    onSearchTrack = {
+                        navController.navigate(onlineSearchResultRoute(metadata.title))
+                    },
+                    onOpenAlbum = {
+                        metadata.album?.id?.let { albumId -> navController.navigate("album/$albumId") }
                     },
                     modifier =
                         Modifier
