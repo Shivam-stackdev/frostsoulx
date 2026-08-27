@@ -965,7 +965,7 @@ private fun FrostSoulAlbumPage(
     Box(modifier = Modifier.fillMaxSize().padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.Top,
             modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
         ) {
             Spacer(Modifier.height(2.dp))
@@ -1015,10 +1015,11 @@ private fun FrostSoulAlbumPage(
                         modifier = Modifier.padding(top = 3.dp).clickable(onClick = onShowArtists),
                     )
             }
+            Spacer(modifier = Modifier.weight(1f))
             FrostSoulMainLyricPreview(
                 uiState = uiState,
                 onlyCurrentLine = true,
-                modifier = Modifier.align(Alignment.Start),
+                modifier = Modifier.align(Alignment.Start).padding(bottom = 8.dp),
             )
             FSPlayerControls(
                     state = uiState,

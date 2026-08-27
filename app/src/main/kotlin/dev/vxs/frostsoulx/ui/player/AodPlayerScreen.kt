@@ -481,9 +481,11 @@ fun AodPlayerScreen(
         Box(
             modifier = Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
-                    Color.Black.copy(alpha = 0.16f),
-                    Color.Transparent,
-                    Color.Black.copy(alpha = 0.40f),
+                    colors = listOf(
+                        Color.Black.copy(alpha = 0.16f),
+                        Color.Transparent,
+                        Color.Black.copy(alpha = 0.40f),
+                    ),
                 ),
             ),
         )
