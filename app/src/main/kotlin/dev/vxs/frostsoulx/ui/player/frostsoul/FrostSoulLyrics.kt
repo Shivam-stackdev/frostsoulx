@@ -42,6 +42,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -83,6 +85,7 @@ private val LyricsControlLabelSize = 10.sp
 @Composable
 internal fun FSLyrics(
     rawLyrics: String?,
+    artworkUrl: String?,
     title: String,
     artist: String,
     isPlaying: Boolean,
@@ -150,7 +153,7 @@ internal fun FSLyrics(
         }
     }
 
-    PremiumLyricsBackgroundContainer(modifier = modifier) {
+        PremiumLyricsBackgroundContainer(artworkUrl = artworkUrl, modifier = modifier) {
         if (lines.isEmpty()) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -391,29 +394,38 @@ private fun LyricsActionButton(
 
 @Composable
 private fun PremiumLyricsBackgroundContainer(
+    artworkUrl: String?,
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     Box(
-        modifier = modifier.fillMaxSize().background(if (isLightTheme) Color(0xFFF3F5F8) else Color.Black),
+        modifier = modifier.fillMaxSize().background(
+            if (artworkUrl.isNullOrBlank()) FrostSoulTheme.colors.background else Color.Transparent,
+        ),
     ) {
+        if (!artworkUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = artworkUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().blur(80.dp).alpha(0.82f),
+            )
+        }
         Box(
             modifier = Modifier.fillMaxSize().background(
-                if (isLightTheme) {
-                    Brush.verticalGradient(
-                        colors = listOf(Color(0xFFE6F1EE).copy(alpha = 0.80f), Color(0xFFF3F5F8)),
-                    )
-                } else {
-                    Brush.verticalGradient(
-                        colors = listOf(Color(0xFF0A1F1D).copy(alpha = 0.60f), Color.Black),
-                    )
-                },
+                Brush.verticalGradient(
+                    colors = if (isLightTheme) {
+                        listOf(Color.White.copy(alpha = 0.42f), FrostSoulTheme.colors.background.copy(alpha = 0.82f))
+                    } else {
+                        listOf(Color.Transparent, Color.Black.copy(alpha = 0.42f))
+                    },
+                ),
             ),
         )
         Box(
             modifier = Modifier.fillMaxSize().background(
-                if (isLightTheme) Color.White.copy(alpha = 0.32f) else Color.Black.copy(alpha = 0.50f),
+                if (isLightTheme) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.18f),
             ),
         )
         Box(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp), content = content)

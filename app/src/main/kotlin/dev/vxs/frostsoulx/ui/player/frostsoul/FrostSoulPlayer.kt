@@ -21,6 +21,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -102,6 +103,7 @@ import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.LinkedHashMap
@@ -118,6 +120,7 @@ internal fun FrostSoulPlayer(
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     var queueVisible by remember { mutableStateOf(false) }
+    var showPagerDots by remember { mutableStateOf(true) }
     var downwardDragDistance by remember { mutableFloatStateOf(0f) }
     val settledDragOffset by animateFloatAsState(
         targetValue = downwardDragDistance,
@@ -125,6 +128,13 @@ internal fun FrostSoulPlayer(
         label = "frostsoul-player-dismiss-drag",
     )
     val collapseFraction = (settledDragOffset / 280f).coerceIn(0f, 1f)
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+        showPagerDots = true
+        if (!pagerState.isScrollInProgress) {
+            delay(1_000L)
+            if (!pagerState.isScrollInProgress) showPagerDots = false
+        }
+    }
 
     Box(
         modifier =
@@ -162,28 +172,30 @@ internal fun FrostSoulPlayer(
                     .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding),
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp, bottom = 12.dp),
-                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxWidth().height(42.dp).padding(top = 4.dp, bottom = 6.dp),
             ) {
-                Box(
+                Icon(
+                    painter = painterResource(R.drawable.expand_more),
+                    contentDescription = "Collapse player",
+                    tint = FrostSoulTheme.colors.onSurface,
                     modifier = Modifier
-                        .size(width = 40.dp, height = 4.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(FrostSoulTheme.colors.onSurfaceMuted.copy(alpha = 0.42f)),
+                        .align(Alignment.CenterStart)
+                        .size(28.dp)
+                        .clickable(onClick = actions.onDismiss),
                 )
+                if (showPagerDots) {
+                    FrostSoulPagerDots(
+                        pageCount = pages.size,
+                        selectedPage = pagerState.currentPage,
+                        selectedPageOffsetFraction = pagerState.currentPageOffsetFraction,
+                        emphasizeSelected = pagerState.isScrollInProgress,
+                        onPageSelected = { targetPage ->
+                            scope.launch { pagerState.animateScrollToPage(targetPage) }
+                        },
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
             }
-            FSTopBar(
-                selectedPage = pagerState.currentPage,
-                pageOffsetFraction = pagerState.currentPageOffsetFraction,
-                pageCount = pages.size,
-                onPageSelected = { targetPage ->
-                    scope.launch { pagerState.animateScrollToPage(targetPage) }
-                },
-                onDismiss = actions.onDismiss,
-                modifier = Modifier.padding(top = 8.dp, bottom = 10.dp),
-            )
             HorizontalPager(
                 state = pagerState,
                 key = { index -> pages[index].name },
@@ -209,6 +221,7 @@ internal fun FrostSoulPlayer(
                         FrostSoulPage.Lyrics ->
                             FSLyrics(
                                 rawLyrics = uiState.lyrics,
+                                artworkUrl = uiState.track.artworkUrl,
                                 title = uiState.track.title,
                                 artist = uiState.track.artist,
                                 isPlaying = uiState.isPlaying,
@@ -466,6 +479,26 @@ internal fun FSPlayerControls(
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+            FSIconButton(
+                painter = painterResource(R.drawable.ic_download),
+                contentDescription = "Download song",
+                onClick = actions.onDownload,
+                buttonSize = 36.dp,
+                iconSize = 21.dp,
+                showContainer = false,
+            )
+            FrostSoulOutputDeviceButton(
+                device = state.outputDevice,
+                onClick = actions.onOpenAudioOutput,
+            )
+            FSTwoDotButton(onClick = actions.onOpenOptions)
+        }
         FSSeekbar(
             progress = state.progress,
             durationMs = state.safeDurationMs,
@@ -554,6 +587,23 @@ internal fun FSPlayerControls(
 }
 
 @Composable
+private fun FSTwoDotButton(onClick: () -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.size(36.dp).clickable(onClick = onClick),
+    ) {
+        repeat(2) {
+            Box(
+                modifier = Modifier
+                    .size(5.dp)
+                    .background(FrostSoulTheme.colors.onSurface, androidx.compose.foundation.shape.CircleShape),
+            )
+        }
+    }
+}
+
+@Composable
 private fun FSPlayButton(
     isPlaying: Boolean,
     isBuffering: Boolean,
@@ -594,6 +644,7 @@ internal fun FrostSoulPagerDots(
     pageCount: Int,
     selectedPage: Int,
     selectedPageOffsetFraction: Float = 0f,
+    emphasizeSelected: Boolean = true,
     onPageSelected: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -607,8 +658,8 @@ internal fun FrostSoulPagerDots(
     ) {
         repeat(pageCount) { index ->
             val selection = (1f - kotlin.math.abs(pagerPosition - index.toFloat())).coerceIn(0f, 1f)
-            val width = 7.dp + (22.dp - 7.dp) * selection
-            val alpha = 0.36f + (1f - 0.36f) * selection
+            val width = if (emphasizeSelected) 7.dp + (22.dp - 7.dp) * selection else 7.dp
+            val alpha = if (emphasizeSelected) 0.36f + (1f - 0.36f) * selection else if (index == selectedPage) 0.95f else 0.34f
             Box(
                 modifier =
                     Modifier
@@ -633,6 +684,7 @@ private fun FrostSoulAlbumPage(
     onOpenQueue: () -> Unit,
     onOpenOptions: () -> Unit,
 ) {
+    val titleScrollState = rememberScrollState()
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -644,19 +696,32 @@ private fun FrostSoulAlbumPage(
                 artworkUrl = uiState.track.artworkUrl,
                 title = uiState.track.title,
                 isPlaying = uiState.isPlaying,
-                                    modifier = Modifier.size(PlayerLayoutTokens.TurntableCardSize),
-
+                modifier = Modifier.size(PlayerLayoutTokens.TurntableCardSize),
             )
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp, end = 8.dp),
+            ) {
+                FSIconButton(
+                    painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
+                    contentDescription = if (uiState.track.isLiked) "Unlike track" else "Like track",
+                    onClick = actions.onToggleLike,
+                    active = uiState.track.isLiked,
+                    compact = true,
+                )
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             ) {
-                    Text(
-                        text = uiState.track.title,
-                        style = PlayerLayoutTokens.TrackTitleStyle.copy(color = FrostSoulOnSurface),
-                        maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                    Box(modifier = Modifier.fillMaxWidth().horizontalScroll(titleScrollState)) {
+                        Text(
+                            text = uiState.track.title,
+                            style = PlayerLayoutTokens.TrackTitleStyle.copy(color = FrostSoulOnSurface),
+                            maxLines = 1,
+                            softWrap = false,
+                        )
+                    }
                     Text(
                         text = uiState.track.artist,
                         style = PlayerLayoutTokens.ArtistSubtitleStyle.copy(color = FrostSoulOnSurfaceMuted),
@@ -668,29 +733,6 @@ private fun FrostSoulAlbumPage(
                     MinimalistMetadataChip(text = uiState.audioQualityBadge ?: "STANDARD")
                     MinimalistMetadataChip(text = "${uiState.queue.size} IN QUEUE")
                 }
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-            ) {
-                FSIconButton(
-                    painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                    contentDescription = if (uiState.track.isLiked) "Remove like" else "Like track",
-                    onClick = actions.onToggleLike,
-                    active = uiState.track.isLiked,
-                    compact = true,
-                )
-                FrostSoulOutputDeviceButton(
-                    device = uiState.outputDevice,
-                    onClick = actions.onOpenAudioOutput,
-                )
-                FSIconButton(
-                    painter = painterResource(R.drawable.more_vert),
-                    contentDescription = "Open player options",
-                    onClick = onOpenOptions,
-                    compact = true,
-                )
             }
                 FSPlayerControls(
                     state = uiState,
@@ -710,6 +752,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
     onOpenOptions: () -> Unit,
 ) {
     val artworkShape = RoundedCornerShape(24.dp)
+    val titleScrollState = rememberScrollState()
     val artworkSaturationMatrix = remember {
         ColorMatrix().apply { setToSaturation(1.35f) }
     }
@@ -719,7 +762,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Box(
-                modifier = Modifier.fillMaxWidth().height(332.dp).clip(artworkShape),
+                modifier = Modifier.fillMaxWidth().height(300.dp).clip(artworkShape),
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
                     AsyncImage(
@@ -784,14 +827,16 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 16.dp),
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = uiState.track.title,
-                        color = FrostSoulOnSurface,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    Box(modifier = Modifier.fillMaxWidth().horizontalScroll(titleScrollState)) {
+                        Text(
+                            text = uiState.track.title,
+                            color = FrostSoulOnSurface,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            softWrap = false,
+                        )
+                    }
                     Text(
                         text = uiState.track.artist,
                         color = FrostSoulOnSurfaceMuted,
@@ -803,22 +848,11 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 }
                 FSIconButton(
                     painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                    contentDescription = if (uiState.track.isLiked) "Remove from favorites" else "Add to favorites",
+                    contentDescription = if (uiState.track.isLiked) "Unlike track" else "Like track",
                     onClick = actions.onToggleLike,
                     active = uiState.track.isLiked,
                     compact = true,
-                    modifier = Modifier.padding(start = 4.dp),
-                )
-                FrostSoulOutputDeviceButton(
-                    device = uiState.outputDevice,
-                    onClick = actions.onOpenAudioOutput,
-                )
-                FSIconButton(
-                    painter = painterResource(R.drawable.more_vert),
-                    contentDescription = "Open player options",
-                    onClick = onOpenOptions,
-                    compact = true,
-                    modifier = Modifier.padding(start = 4.dp),
+                    modifier = Modifier.padding(start = 8.dp),
                 )
             }
 
@@ -1379,7 +1413,7 @@ private const val PaletteCacheCapacity = 24
 @Composable
 private fun FrostSoulDynamicBackground(artworkUrl: String?) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    val saturationMatrix = ColorMatrix().apply { setToSaturation(0.1f) }
+    val saturationMatrix = ColorMatrix().apply { setToSaturation(0.82f) }
     Box(
         modifier =
             Modifier
@@ -1403,7 +1437,7 @@ private fun FrostSoulDynamicBackground(artworkUrl: String?) {
                         if (isLightTheme) {
                             Color.White.copy(alpha = 0.70f)
                         } else {
-                            Color.Black.copy(alpha = 0.68f)
+                            Color.Black.copy(alpha = 0.48f)
                         },
                     ),
         )

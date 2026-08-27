@@ -8,6 +8,7 @@
 package dev.vxs.frostsoulx.ui.player
 
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import dev.vxs.frostsoulx.LocalDownloadUtil
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,6 +35,8 @@ import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulPlayerUiState
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulQueueItem
 import dev.vxs.frostsoulx.ui.player.frostsoul.FrostSoulTrack
 import dev.vxs.frostsoulx.ui.player.frostsoul.rememberFrostSoulPalette
+import dev.vxs.frostsoulx.ui.utils.HeaderDownloadItem
+import dev.vxs.frostsoulx.ui.utils.sendAddMissingDownloads
 
 @Composable
 internal fun FrostSoulPlayerAdapter(
@@ -58,6 +61,8 @@ internal fun FrostSoulPlayerAdapter(
     val palette = rememberFrostSoulPalette(mediaMetadata.thumbnailUrl)
     val lyricsMenuViewModel: LyricsMenuViewModel = hiltViewModel()
     val isRefetchingLyrics by lyricsMenuViewModel.isRefetching.collectAsStateWithLifecycle()
+    val downloadUtil = LocalDownloadUtil.current
+    val downloads by downloadUtil.downloads.collectAsStateWithLifecycle()
     val applicationContext = LocalContext.current.applicationContext
     val lyricsSynchronizationEngine =
         remember(applicationContext) {
@@ -129,7 +134,7 @@ internal fun FrostSoulPlayerAdapter(
             )
         }
     val actions =
-        remember(playerConnection, queueWindows, onCollapse, applicationContext, mediaMetadata, isRefetchingLyrics) {
+        remember(playerConnection, queueWindows, onCollapse, applicationContext, mediaMetadata, isRefetchingLyrics, downloads) {
             FrostSoulPlayerActions(
                 onDismiss = onCollapse,
                 onTogglePlayPause = { playerConnection.player.togglePlayPause() },
@@ -140,6 +145,13 @@ internal fun FrostSoulPlayerAdapter(
                 onToggleLike = playerConnection::toggleLike,
                 onOpenAudioOutput = {
                     SystemMediaControlResolver.openMediaOutputSwitcher(applicationContext)
+                },
+                onDownload = {
+                    sendAddMissingDownloads(
+                        context = applicationContext,
+                        songs = listOf(HeaderDownloadItem(id = mediaMetadata.id, title = mediaMetadata.title)),
+                        downloads = downloads,
+                    )
                 },
                 onOpenOptions = onOpenOptions,
                 onRefetchLyrics = { lyricsMenuViewModel.refetchLyrics(mediaMetadata) },

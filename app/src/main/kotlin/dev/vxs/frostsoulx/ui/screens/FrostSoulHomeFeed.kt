@@ -134,7 +134,7 @@ internal fun FrostSoulHomeFeed(
         item(key = "frostsoul_home_header") {
             FrostSoulHomeHeader(
                 accountName = uiState.accountName,
-                onOpenNotifications = { navController.navigate("news") },
+                onOpenRecent = { navController.navigate("history") },
             )
         }
 
@@ -262,7 +262,12 @@ internal fun FrostSoulHomeFeed(
 
         if (recentItems.isNotEmpty()) {
             item(key = "frostsoul_recently_played_header") {
-                FSSectionHeader(title = "Recently Played", eyebrow = "YOUR HISTORY")
+                FSSectionHeader(
+                    title = "Recently Played",
+                    eyebrow = "YOUR HISTORY",
+                    actionLabel = "See All",
+                    onAction = { navController.navigate("history") },
+                )
             }
             item(key = "frostsoul_recently_played") {
                 FSGlassCard(
@@ -593,7 +598,7 @@ private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
 @Composable
 private fun FrostSoulHomeHeader(
     accountName: String,
-    onOpenNotifications: () -> Unit,
+    onOpenRecent: () -> Unit,
 ) {
     val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
     val timeOfDay =
@@ -628,22 +633,16 @@ private fun FrostSoulHomeHeader(
             }
             Box {
                 FSIconButton(
-                    onClick = onOpenNotifications,
-                    contentDescription = "Notifications",
+                    onClick = onOpenRecent,
+                    contentDescription = "Recently played",
                     modifier = Modifier.size(44.dp),
                 ) {
                     FSIcon(
-                        painter = painterResource(R.drawable.newspaper),
+                        painter = painterResource(R.drawable.history),
                         contentDescription = null,
                         tint = FrostSoulTheme.colors.onSurface,
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .align(Alignment.TopEnd)
-                        .background(FrostSoulTheme.colors.accentBright, FrostSoulTheme.shapes.pill),
-                )
             }
         }
         FSText(

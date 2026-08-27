@@ -174,7 +174,7 @@ internal fun FSAlbumArt(
     }
     val displayedRotation = if (isPlaying) rotation else pausedRotation
     val tonearmAngle by animateFloatAsState(
-        targetValue = if (isPlaying) -5f else -25f,
+        targetValue = if (isPlaying) -5f else -58f,
         animationSpec = tween(durationMillis = 420),
         label = "fs-tonearm-angle",
     )
