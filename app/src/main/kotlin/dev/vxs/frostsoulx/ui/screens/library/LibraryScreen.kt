@@ -73,6 +73,7 @@ import dev.vxs.frostsoulx.constants.ShowSpotifyPlaylistsKey
 import dev.vxs.frostsoulx.constants.ShowTagsInLibraryKey
 import dev.vxs.frostsoulx.db.entities.TagEntity
 import dev.vxs.frostsoulx.ui.component.TagsManagementDialog
+import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
 import dev.vxs.frostsoulx.utils.rememberEnumPreference
 import dev.vxs.frostsoulx.utils.rememberPreference
 import dev.vxs.frostsoulx.ui.premium.PremiumSegmentedTabs
