@@ -94,7 +94,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -838,7 +837,6 @@ private fun FrostSoulArtistDialog(
 private fun FrostSoulMainLyricPreview(
     uiState: FrostSoulPlayerUiState,
     onlyCurrentLine: Boolean = false,
-    horizontalPadding: Dp = PlayerLayoutTokens.MasterHorizontalPadding,
     modifier: Modifier = Modifier,
 ) {
     val currentLine = uiState.currentLyricModel
@@ -848,7 +846,7 @@ private fun FrostSoulMainLyricPreview(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = horizontalPadding),
+            .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding),
     ) {
         currentLine?.let { line ->
             Text(
@@ -993,7 +991,7 @@ private fun FrostSoulAlbumPage(
                 )
             }
             Column(
-                horizontalAlignment = Alignment.Start,
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             ) {
                     Box(
@@ -1021,8 +1019,7 @@ private fun FrostSoulAlbumPage(
             FrostSoulMainLyricPreview(
                 uiState = uiState,
                 onlyCurrentLine = true,
-                horizontalPadding = 8.dp,
-                modifier = Modifier.align(Alignment.Start).padding(bottom = 18.dp),
+                modifier = Modifier.align(Alignment.Start).padding(bottom = 8.dp),
             )
             FSPlayerControls(
                     state = uiState,
