@@ -63,11 +63,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -140,7 +140,6 @@ import dev.vxs.frostsoulx.constants.AodVerticalSpacingKey
 import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
 import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
-import dev.vxs.frostsoulx.ui.utils.supportsArtworkGlowShadow
 import dev.vxs.frostsoulx.ui.utils.toComposeShape
 import dev.vxs.frostsoulx.utils.makeTimeString
 import dev.vxs.frostsoulx.utils.rememberEnumPreference
@@ -186,7 +185,6 @@ fun AodPlayerScreen(
     val showControls = true
     val showExitButton = true
     val showLyricTicker = true
-    val artworkGlow = false
     val backgroundStyle = AodBackgroundStyle.PURE_BLACK
     val accentStyle = AodAccentStyle.MONOCHROME
     val contentPosition = AodContentPosition.TOP
@@ -384,13 +382,16 @@ fun AodPlayerScreen(
         animationSpec = tween(1000),
         label = "accentColorMorph",
     )
-    val supportsArtworkGlowShadow = thumbnailShapeType.supportsArtworkGlowShadow()
     val thumbnailShape =
         thumbnailShapeType.toComposeShape(
             cornerRadius = thumbnailCornerRadius,
             startAngle = thumbnailShapeRotation,
         )
-    val artworkSize = thumbnailSize.coerceIn(160f, 340f).dp
+    val configuration = LocalConfiguration.current
+    val artworkSizeDp =
+        (configuration.screenWidthDp.toFloat() - (horizontalPadding * 2f + 20f))
+            .coerceIn(160f, 340f)
+    val artworkSize = artworkSizeDp.dp
     val artworkSizePx = with(density) { artworkSize.roundToPx().coerceAtLeast(1) }
     val imageRequest =
         remember(context, mediaMetadata.thumbnailUrl, artworkSizePx) {
@@ -473,18 +474,17 @@ fun AodPlayerScreen(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .blur(52.dp)
+                    .blur(42.dp, edgeTreatment = androidx.compose.ui.draw.BlurredEdgeTreatment.Unbounded)
                     .alpha(0.34f),
             )
         }
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.62f)))
         Box(
             modifier = Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color.Black.copy(alpha = 0.16f),
-                        Color.Transparent,
-                        Color.Black.copy(alpha = 0.40f),
+                        dominantArtworkColor.copy(alpha = 0.34f),
+                        dominantArtworkColor.copy(alpha = 0.14f),
+                        Color.Black.copy(alpha = 0.76f),
                     ),
                 ),
             ),
@@ -530,44 +530,81 @@ fun AodPlayerScreen(
                 accentColor = accentColor,
             )
 
+            val showFullContent = !isLocked || !minimalLockedState
             AnimatedVisibility(
-                visible = showThumbnail && (!isLocked || !minimalLockedState),
+                visible = showThumbnail && showFullContent,
                 enter = fadeIn(tween(300)),
                 exit = fadeOut(tween(300)),
             ) {
                 if (showThumbnail) {
-                AsyncImage(
-                    model = imageRequest,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier =
-                        Modifier
+                    Box(
+                        modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .size(artworkSize)
-                            .then(
-                                if (artworkGlow && supportsArtworkGlowShadow) {
-                                    Modifier.shadow(
-                                        elevation = 28.dp,
-                                        shape = thumbnailShape,
-                                        clip = false,
-                                        ambientColor = accentColor,
-                                        spotColor = accentColor,
-                                    )
-                                } else {
-                                    Modifier
-                                },
-                            ).clip(thumbnailShape),
-                )
-                } 
-            } 
+                            .size(artworkSize),
+                    ) {
+                        // A slightly enlarged, softly blurred copy bridges the sharp cover
+                        // into the ambient backdrop and removes the visible card boundary.
+                        AsyncImage(
+                            model = imageRequest,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(artworkSize + 40.dp)
+                                .align(Alignment.Center)
+                                .blur(24.dp, edgeTreatment = androidx.compose.ui.draw.BlurredEdgeTreatment.Unbounded)
+                                .alpha(0.72f)
+                                .clip(thumbnailShape),
+                        )
+                        AsyncImage(
+                            model = imageRequest,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(thumbnailShape),
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            Color.Transparent,
+                                            Color.Black.copy(alpha = 0.62f),
+                                        ),
+                                    ),
+                                ),
+                        )
+                        AnimatedVisibility(
+                            visible = showLyricTicker && !lyricsText.isNullOrBlank(),
+                            enter = fadeIn(tween(220)),
+                            exit = fadeOut(tween(220)),
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                        ) {
+                            if (showLyricTicker && !lyricsText.isNullOrBlank()) {
+                                Text(
+                                    text = lyricsText,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White.copy(alpha = 0.96f),
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 14.dp),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
 
             Column(
                 horizontalAlignment = textHorizontalAlignment,
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                val showFullContent = !isLocked || !minimalLockedState
-
                 Text(
                     text = mediaMetadata.title,
                     style = MaterialTheme.typography.titleLarge,
@@ -593,25 +630,6 @@ fun AodPlayerScreen(
                             overflow = TextOverflow.Ellipsis,
                             textAlign = textAlign,
                             modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-                AnimatedVisibility(
-                    visible = showFullContent && showLyricTicker && !lyricsText.isNullOrBlank(),
-                    enter = fadeIn(tween(300)),
-                    exit = fadeOut(tween(300)),
-                ) {
-                    if (showLyricTicker && !lyricsText.isNullOrBlank()) {
-                        Text(
-                            text = lyricsText,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = accentColor.copy(alpha = 0.85f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Clip,
-                            textAlign = textAlign,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .basicMarquee(),
                         )
                     }
                 }
