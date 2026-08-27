@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -106,10 +107,12 @@ fun PremiumSegmentedTabs(
     ) {
         labels.forEachIndexed { index, label ->
             val selected = index == selectedIndex
+            val selectedTextColor =
+                if (FrostSoulTheme.colors.accentBright.luminance() > 0.5f) Color.Black else Color.White
             Text(
                 text = label,
                 style = FrostSoulTheme.typography.label,
-                color = if (selected) FrostSoulTheme.colors.onSurface else FrostSoulTheme.colors.onSurfaceMuted,
+                color = if (selected) selectedTextColor else FrostSoulTheme.colors.onSurfaceMuted,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1,
                 modifier = Modifier
