@@ -51,7 +51,6 @@ import dev.vxs.frostsoulx.ui.screens.search.SearchScreen
 import dev.vxs.frostsoulx.ui.screens.settings.AboutScreen
 import dev.vxs.frostsoulx.ui.screens.settings.AccountSettings
 import dev.vxs.frostsoulx.ui.screens.settings.AiIntegrationSettings
-import dev.vxs.frostsoulx.ui.screens.settings.AodCustomizedScreen
 import dev.vxs.frostsoulx.ui.screens.settings.AppearanceSettings
 import dev.vxs.frostsoulx.ui.screens.settings.BackupAndRestore
 import dev.vxs.frostsoulx.ui.screens.settings.ChangelogScreen
@@ -388,9 +387,6 @@ fun NavGraphBuilder.navigationBuilder(
     }
     composable("settings/appearance/icon") {
         IconScreen(navController)
-    }
-    composable("settings/appearance/aod_customized") {
-        AodCustomizedScreen(navController)
     }
     composable("settings/appearance/lyrics_animations") {
         LyricsAnimationSettings(navController)

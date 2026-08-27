@@ -61,6 +61,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -172,46 +173,48 @@ fun AodPlayerScreen(
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
-    val (thumbnailShapeType) = rememberEnumPreference(AodThumbnailShapeKey, AodThumbnailShape.ROUNDED)
-    val (thumbnailSize) = rememberPreference(AodThumbnailSizeKey, 260f)
-    val (thumbnailShapeRotation) = rememberPreference(AodThumbnailShapeRotationKey, 0)
-    val (showThumbnail) = rememberPreference(AodShowThumbnailKey, true)
-    val (showArtist) = rememberPreference(AodShowArtistKey, true)
-    val (showAlbum) = rememberPreference(AodShowAlbumKey, false)
-    val (showProgress) = rememberPreference(AodShowProgressKey, true)
-    val (showTimeLabels) = rememberPreference(AodShowTimeLabelsKey, true)
-    val (showControls) = rememberPreference(AodShowControlsKey, true)
-    val (showExitButton) = rememberPreference(AodShowExitButtonKey, true)
-    val (showLyricTicker) = rememberPreference(AodShowLyricTickerKey, true)
-    val (artworkGlow) = rememberPreference(AodArtworkGlowKey, true)
-    val (backgroundStyle) = rememberEnumPreference(AodBackgroundStyleKey, AodBackgroundStyle.PURE_BLACK)
-    val (accentStyle) = rememberEnumPreference(AodAccentStyleKey, AodAccentStyle.MONOCHROME)
-    val (contentPosition) = rememberEnumPreference(AodContentPositionKey, AodContentPosition.CENTER)
-    val (textAlignment) = rememberEnumPreference(AodTextAlignmentKey, AodTextAlignment.CENTER)
-    val (controlStyle) = rememberEnumPreference(AodControlStyleKey, AodControlStyle.FILLED)
-    val (controlSize) = rememberPreference(AodControlSizeKey, 64f)
-    val (horizontalPadding) = rememberPreference(AodHorizontalPaddingKey, 40f)
-    val (verticalSpacing) = rememberPreference(AodVerticalSpacingKey, 20f)
-    val (titleMaxLines) = rememberPreference(AodTitleMaxLinesKey, 1)
-    val (ambientIntensity) = rememberPreference(AodAmbientIntensityKey, 0.18f)
+    // AOD is intentionally a single, stable QQ-style surface. The former customization
+    // settings are no longer read, so stale preferences cannot change its layout.
+    val thumbnailShapeType = AodThumbnailShape.ROUNDED
+    val thumbnailSize = 300f
+    val thumbnailShapeRotation = 0
+    val showThumbnail = true
+    val showArtist = true
+    val showAlbum = false
+    val showProgress = true
+    val showTimeLabels = true
+    val showControls = true
+    val showExitButton = true
+    val showLyricTicker = true
+    val artworkGlow = false
+    val backgroundStyle = AodBackgroundStyle.PURE_BLACK
+    val accentStyle = AodAccentStyle.MONOCHROME
+    val contentPosition = AodContentPosition.TOP
+    val textAlignment = AodTextAlignment.CENTER
+    val controlStyle = AodControlStyle.FILLED
+    val controlSize = 72f
+    val horizontalPadding = 30f
+    val verticalSpacing = 18f
+    val titleMaxLines = 1
+    val ambientIntensity = 0f
 
-    val (touchLockEnabled) = rememberPreference(AodTouchLockEnabledKey, false)
-    val (unlockMethod) = rememberEnumPreference(AodUnlockMethodKey, AodUnlockMethod.SLIDE)
-    val (showClock) = rememberPreference(AodShowClockKey, true)
-    val (clockStyle) = rememberEnumPreference(AodClockStyleKey, AodClockStyle.BOLD_DIGITAL)
-    val (showBattery) = rememberPreference(AodShowBatteryKey, true)
-    val (pixelShiftEnabled) = rememberPreference(AodPixelShiftEnabledKey, true)
-    val (autoDimming) = rememberPreference(AodAutoDimmingKey, true)
-    val (autoDimTimeout) = rememberPreference(AodAutoDimTimeoutKey, 5)
-    val (gesturesEnabled) = rememberPreference(AodGesturesEnabledKey, true)
-    val (shakeToUnlock) = rememberPreference(AodShakeToUnlockKey, false)
-    val (autoLockEnabled) = rememberPreference(AodAutoLockEnabledKey, false)
-    val (autoLockTimeout) = rememberPreference(AodAutoLockTimeoutKey, 10)
-    val (marqueeTitles) = rememberPreference(AodMarqueeTitlesKey, false)
-    val (minimalLockedState) = rememberPreference(AodMinimalLockedStateKey, false)
-    val (trueAmbientModeEnabled) = rememberPreference(AodTrueAmbientModeKey, true)
-    val (aodBrightness) = rememberPreference(AodBrightnessKey, 0.15f)
-    val (proximityBlackoutEnabled) = rememberPreference(AodProximityBlackoutKey, false)
+    val touchLockEnabled = false
+    val unlockMethod = AodUnlockMethod.SLIDE
+    val showClock = true
+    val clockStyle = AodClockStyle.BOLD_DIGITAL
+    val showBattery = true
+    val pixelShiftEnabled = false
+    val autoDimming = false
+    val autoDimTimeout = 5
+    val gesturesEnabled = true
+    val shakeToUnlock = false
+    val autoLockEnabled = false
+    val autoLockTimeout = 10
+    val marqueeTitles = false
+    val minimalLockedState = false
+    val trueAmbientModeEnabled = false
+    val aodBrightness = 0.15f
+    val proximityBlackoutEnabled = false
 
     var isLocked by remember { mutableStateOf(touchLockEnabled) }
     var pixelShiftOffset by remember { mutableStateOf(IntOffset.Zero) }
@@ -460,12 +463,30 @@ fun AodPlayerScreen(
                         )
                     }
                 }
-                .aodBackground(
-                    style = backgroundStyle,
-                    accentColor = accentColor,
-                    ambientIntensity = ambientIntensity,
-                ),
+                .background(Color.Black),
     ) {
+        // Fixed reference backdrop: artwork fills the screen as a dim, blurred ambient layer.
+        if (!mediaMetadata.thumbnailUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = mediaMetadata.thumbnailUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(52.dp)
+                    .alpha(0.34f),
+            )
+        }
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.62f)))
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    Color.Black.copy(alpha = 0.16f),
+                    Color.Transparent,
+                    Color.Black.copy(alpha = 0.40f),
+                ),
+            ),
+        )
         if (showExitButton && !isLocked) {
             IconButton(
                 onClick = {
@@ -487,18 +508,18 @@ fun AodPlayerScreen(
         }
 
         Column(
-            horizontalAlignment = textHorizontalAlignment,
-            verticalArrangement = Arrangement.spacedBy(verticalSpacing.coerceIn(8f, 36f).dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
             modifier =
                 Modifier
-                    .align(contentAlignment)
-                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .fillMaxSize()
                     .offset { pixelShiftOffset }
                     .alpha(contentAlpha)
                     .statusBarsPadding()
                     .navigationBarsPadding()
-                    .padding(horizontal = horizontalPadding.coerceIn(16f, 72f).dp)
-                    .padding(vertical = 32.dp),
+                    .padding(horizontal = 30.dp)
+                    .padding(vertical = 24.dp),
         ) {
             AodClockWidget(
                 showClock = showClock,
