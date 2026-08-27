@@ -71,6 +71,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Brush
@@ -1532,7 +1533,7 @@ private const val PaletteCacheCapacity = 24
 @Composable
 private fun FrostSoulDynamicBackground(artworkUrl: String?) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    val saturationMatrix = ColorMatrix().apply { setToSaturation(0.82f) }
+    val saturationMatrix = ColorMatrix().apply { setToSaturation(1.0f) }
     Box(
         modifier =
             Modifier
@@ -1545,20 +1546,21 @@ private fun FrostSoulDynamicBackground(artworkUrl: String?) {
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 colorFilter = ColorFilter.colorMatrix(saturationMatrix),
-                modifier = Modifier.fillMaxSize().blur(90.dp),
+                modifier = Modifier.fillMaxSize().blur(90.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded),
             )
         }
         Box(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        if (isLightTheme) {
-                            Color.White.copy(alpha = 0.70f)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = if (isLightTheme) {
+                            listOf(Color.White.copy(alpha = 0.38f), Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.34f))
                         } else {
-                            Color.Black.copy(alpha = 0.48f)
+                            listOf(Color.Black.copy(alpha = 0.18f), Color.Transparent, Color.Black.copy(alpha = 0.30f))
                         },
                     ),
+                ),
         )
     }
 }
