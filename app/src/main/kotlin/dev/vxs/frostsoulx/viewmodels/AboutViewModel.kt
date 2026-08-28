@@ -415,13 +415,13 @@ class AboutViewModel
                             id = "github",
                             iconResId = R.drawable.github,
                             labelResId = R.string.about_content_desc_github,
-                            url = "https://github.com/rukamori/ArchiveTune",
+                            url = "https://github.com/sakuraDev31/frostsoulx",
                         ),
                         AboutLinkUiModel(
                             id = "website",
                             iconResId = R.drawable.website,
                             labelResId = R.string.about_content_desc_website,
-                            url = "https://archivetune.koiiverse.cloud",
+                            url = "https://sakuradev31.github.io/frostsoulx/",
                         ),
                         AboutLinkUiModel(
                             id = "telegram",
