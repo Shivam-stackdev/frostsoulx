@@ -7,8 +7,6 @@
 
 package dev.vxs.frostsoulx.ui.screens
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,7 +28,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -82,14 +79,17 @@ import dev.vxs.frostsoulx.ui.frostsoul.FSArtistCard
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSChip
 import dev.vxs.frostsoulx.ui.frostsoul.FSEmptyState
-import dev.vxs.frostsoulx.ui.frostsoul.FSGlassCard
 import dev.vxs.frostsoulx.ui.frostsoul.FSIconButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSTextField
-import dev.vxs.frostsoulx.ui.frostsoul.FSListItem
 import dev.vxs.frostsoulx.ui.frostsoul.FSLoading
 import dev.vxs.frostsoulx.ui.frostsoul.FSSectionHeader
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
-import dev.vxs.frostsoulx.ui.frostsoul.SearchTheme
+import dev.vxs.frostsoulx.ui.premium.PremiumCard
+import dev.vxs.frostsoulx.ui.premium.PremiumHeroBanner
+import dev.vxs.frostsoulx.ui.premium.PremiumListRow
+import dev.vxs.frostsoulx.ui.premium.PremiumSearchBar
+import dev.vxs.frostsoulx.ui.premium.PremiumSegmentedTabs
+import dev.vxs.frostsoulx.ui.premium.PremiumTopBar
 import dev.vxs.frostsoulx.ui.frostsoul.frostSoulScreenBackground
 import dev.vxs.frostsoulx.ui.player.frostsoul.asFrostSoulTime
 import coil3.compose.AsyncImage
@@ -270,12 +270,12 @@ internal fun FrostSoulHomeFeed(
                 )
             }
             item(key = "frostsoul_recently_played") {
-                FSGlassCard(
+                PremiumCard(
                     modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
                     contentPadding = PaddingValues(vertical = FrostSoulTheme.spacing.small),
                 ) {
                     recentItems.forEach { item ->
-                        FSListItem(
+                        PremiumListRow(
                             title = item.title,
                             subtitle = item.frostSoulSubtitle(),
                             artworkUrl = item.frostSoulArtwork(),
@@ -330,7 +330,7 @@ internal fun FrostSoulHomeFeed(
                 )
             }
             item(key = "frostsoul_recommendation_${recommendation.title.id}") {
-                FSGlassCard(
+                PremiumCard(
                     modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
                     contentPadding = PaddingValues(vertical = FrostSoulTheme.spacing.small),
                 ) {
@@ -354,7 +354,7 @@ internal fun FrostSoulHomeFeed(
                 FSSectionHeader(title = section.title, eyebrow = "EXPLORE")
             }
             item(key = "frostsoul_remote_$sectionKey") {
-                FSGlassCard(
+                PremiumCard(
                     modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
                     contentPadding = PaddingValues(vertical = FrostSoulTheme.spacing.small),
                 ) {
@@ -410,7 +410,7 @@ private fun FrostSoulBannerCarousel(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(songs, key = { "banner_${it.id}" }) { song ->
-            FSGlassCard(
+            PremiumCard(
                 modifier = Modifier.width(185.dp).height(123.dp),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
                 contentPadding = PaddingValues(0.dp),
@@ -469,7 +469,7 @@ private fun FrostSoulEveryoneListening(
             playerConnection.playQueue(ListQueue(items = songs.map { it.toMediaItem() }))
         })
         songs.forEach { song ->
-            FSListItem(
+            PremiumListRow(
                 title = song.title,
                 subtitle = song.artists.joinToString(" • ") { it.name },
                 artworkUrl = song.song.thumbnailUrl,
@@ -485,7 +485,7 @@ private fun FrostSoulEveryoneListening(
 
 @Composable
 private fun FrostSoulPreferencePrompt(onClick: () -> Unit) {
-    FSGlassCard(
+    PremiumCard(
         modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page).fillMaxWidth(),
         shape = FrostSoulTheme.shapes.large,
         contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
@@ -511,7 +511,7 @@ private fun FrostSoulRecommendationList(
     ) {
         items(songs, key = { "quick_card_${it.id}" }) { song ->
             val isCurrent = song.id == mediaMetadata?.id
-            FSGlassCard(
+            PremiumCard(
                 modifier = Modifier.width(148.dp).height(184.dp),
                 shape = FrostSoulTheme.shapes.medium,
                 contentPadding = PaddingValues(10.dp),
@@ -556,43 +556,10 @@ private fun FrostSoulRecommendationList(
 
 @Composable
 private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
-    val shape = RoundedCornerShape(12.dp)
-    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    val searchSurface = if (isLightTheme) SearchTheme.SearchBarBackgroundLight else SearchTheme.SearchBarBackground
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .height(46.dp)
-                .clip(shape)
-                .background(searchSurface)
-                .border(
-                    width = 0.5.dp,
-                    color = FrostSoulTheme.colors.onSurfaceMuted.copy(alpha = 0.24f),
-                    shape = shape,
-                ).clickable(onClick = onOpenSearch)
-                .padding(horizontal = 14.dp),
-    ) {
-        FSIcon(
-            painter = painterResource(R.drawable.search),
-            contentDescription = "Search Icon",
-            tint = FrostSoulTheme.colors.onSurfaceMuted,
-            modifier = Modifier.size(18.dp),
-        )
-        FSText(
-            text = "Search songs, albums, artists...",
-            style =
-                SearchTheme.InputTextStyle.copy(
-                    color = FrostSoulTheme.colors.onSurfaceMuted,
-                    fontSize = 14.sp,
-                ),
-            modifier = Modifier.padding(start = 12.dp),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
+    PremiumSearchBar(
+        onClick = onOpenSearch,
+        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page, vertical = FrostSoulTheme.spacing.small),
+    )
 }
 
 @Composable
@@ -610,50 +577,24 @@ private fun FrostSoulHomeHeader(
         }
     val firstName = accountName.trim().substringBefore(' ').takeIf { it.isNotBlank() }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.statusBarsPadding().padding(horizontal = FrostSoulTheme.spacing.page, vertical = 8.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+    PremiumTopBar(
+        title = if (firstName == null) timeOfDay else "$timeOfDay, $firstName",
+        eyebrow = "FROSTSOUL",
+        modifier = Modifier.statusBarsPadding(),
+        trailingContent = {
+            FSIconButton(
+                onClick = onOpenRecent,
+                contentDescription = "Recently played",
+                modifier = Modifier.size(44.dp),
+            ) {
                 FSIcon(
-                    painter = painterResource(R.drawable.about_appbar),
-                    contentDescription = "FrostSoul",
-                    tint = FrostSoulTheme.colors.accentBright,
-                    modifier = Modifier.size(30.dp),
-                )
-                FSText(
-                    text = "F R O S T S O U L",
-                    color = FrostSoulTheme.colors.accentBright,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.4.sp,
-                    modifier = Modifier.padding(start = 10.dp),
+                    painter = painterResource(R.drawable.history),
+                    contentDescription = null,
+                    tint = FrostSoulTheme.colors.onSurface,
                 )
             }
-            Box {
-                FSIconButton(
-                    onClick = onOpenRecent,
-                    contentDescription = "Recently played",
-                    modifier = Modifier.size(44.dp),
-                ) {
-                    FSIcon(
-                        painter = painterResource(R.drawable.history),
-                        contentDescription = null,
-                        tint = FrostSoulTheme.colors.onSurface,
-                    )
-                }
-            }
-        }
-        FSText(
-            text = if (firstName == null) timeOfDay else "$timeOfDay, $firstName",
-            color = FrostSoulTheme.colors.onSurface,
-            style = FrostSoulTheme.typography.display,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
+        },
+    )
 }
 
 @Composable
@@ -666,56 +607,12 @@ private fun FrostSoulHomeTabs(
 
     val selectedEndpoint = selectedChip?.endpoint
     val selectedIndex = chips.indexOfFirst { it.endpoint == selectedEndpoint }.let { if (it < 0) 0 else it }
-    val listState = rememberLazyListState()
-
-    LaunchedEffect(selectedEndpoint, chips) {
-        val targetIndex = chips.indexOfFirst { it.endpoint == selectedEndpoint }.let { if (it < 0) 0 else it }
-        val targetIsVisible = listState.layoutInfo.visibleItemsInfo.any { it.index == targetIndex }
-        if (!targetIsVisible) {
-            listState.animateScrollToItem(targetIndex)
-        }
-    }
-
-    LazyRow(
-        state = listState,
-        contentPadding = PaddingValues(horizontal = FrostSoulTheme.spacing.page),
-        horizontalArrangement = Arrangement.spacedBy(26.dp),
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-    ) {
-        itemsIndexed(chips, key = { index, chip -> chip.endpoint?.toString() ?: "home-chip-$index" }) { index, chip ->
-            val selected = if (selectedEndpoint == null) index == selectedIndex else chip.endpoint == selectedEndpoint
-            val indicatorWidth by animateDpAsState(
-                targetValue = if (selected) 28.dp else 0.dp,
-                animationSpec = tween(durationMillis = 220),
-                label = "frostsoul-home-tab-indicator",
-            )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier =
-                    Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(enabled = !selected) { onChipSelected(chip) }
-                        .padding(horizontal = 2.dp, vertical = 8.dp),
-            ) {
-                FSText(
-                    text = chip.title,
-                    color = if (selected) FrostSoulTheme.colors.onSurface else FrostSoulTheme.colors.onSurfaceMuted,
-                    style = FrostSoulTheme.typography.label,
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Box(
-                    modifier =
-                        Modifier
-                            .padding(top = 8.dp)
-                            .width(indicatorWidth)
-                            .height(2.dp)
-                            .background(FrostSoulTheme.colors.accentBright),
-                )
-            }
-        }
-    }
+    PremiumSegmentedTabs(
+        labels = chips.map { it.title },
+        selectedIndex = selectedIndex,
+        onSelected = { index -> onChipSelected(chips[index]) },
+        modifier = Modifier.heightIn(min = 56.dp),
+    )
 }
 
 @Composable
@@ -728,97 +625,17 @@ private fun FrostSoulHomeHero(
     onPlayPause: () -> Unit,
 ) {
     val progress = if (durationMs > 0L) (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f) else 0f
-    FSGlassCard(
-        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page).fillMaxWidth(),
-        shape = FrostSoulTheme.shapes.extraLarge,
-        contentPadding = PaddingValues(0.dp),
-    ) {
-        Box(modifier = Modifier.fillMaxWidth().height(208.dp)) {
-            track?.thumbnailUrl?.let { artworkUrl ->
-                AsyncImage(
-                    model = artworkUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.horizontalGradient(
-                        listOf(Color.Black.copy(alpha = 0.98f), Color.Black.copy(alpha = 0.68f), Color.Transparent),
-                    ),
-                ),
-            )
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.72f))),
-                ),
-            )
-            Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
-                FSText(
-                    text = "NOW PLAYING",
-                    color = FrostSoulTheme.colors.accentBright,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.4.sp,
-                )
-                Spacer(Modifier.height(10.dp))
-                FSText(
-                    text = track?.title ?: "Nothing playing",
-                    color = FrostSoulTheme.colors.onSurface,
-                    fontSize = 23.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                FSText(
-                    text = track?.artists?.joinToString(separator = " • ") { it.name } ?: "Choose a song to begin",
-                    color = FrostSoulTheme.colors.onSurfaceMuted,
-                    fontSize = 15.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 3.dp),
-                )
-                if (track != null) {
-                    FSText(
-                        text = "FLAC",
-                        color = FrostSoulTheme.colors.accentBright,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.2.sp,
-                        modifier = Modifier.padding(top = 12.dp),
-                    )
-                }
-                Spacer(Modifier.weight(1f))
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().height(3.dp).background(FrostSoulTheme.colors.onSurfaceMuted.copy(alpha = 0.34f), FrostSoulTheme.shapes.pill),
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(progress).height(3.dp).background(FrostSoulTheme.colors.accentBright, FrostSoulTheme.shapes.pill),
-                            )
-                        }
-                        Row(modifier = Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                            FSText(positionMs.asFrostSoulTime(), color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 11.sp)
-                            FSText(durationMs.asFrostSoulTime(), color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 11.sp)
-                        }
-                    }
-                    FSIconButton(
-                        onClick = if (track != null) onPlayPause else onQuickSearch,
-                        highlighted = true,
-                        modifier = Modifier.padding(start = 16.dp),
-                    ) {
-                        FSIcon(
-                            painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
-                            contentDescription = if (isPlaying) "Pause" else "Play",
-                            tint = FrostSoulTheme.colors.accentBright,
-                        )
-                    }
-                }
-            }
-        }
-    }
+    PremiumHeroBanner(
+        artworkUrl = track?.thumbnailUrl,
+        title = track?.title ?: "Nothing playing",
+        subtitle = track?.artists?.joinToString(separator = " • ") { it.name } ?: "Choose a song to begin",
+        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
+        isPlaying = isPlaying,
+        progress = progress,
+        positionLabel = positionMs.asFrostSoulTime(),
+        durationLabel = durationMs.asFrostSoulTime(),
+        onPlayPause = if (track != null) onPlayPause else onQuickSearch,
+    )
 }
 
 @Composable
@@ -865,7 +682,7 @@ private fun FrostSoulOfflineMixShelf(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(mixes, key = { it.id }) { mix ->
-            FSGlassCard(
+            PremiumCard(
                 modifier = Modifier.width(196.dp).height(86.dp),
                 shape = FrostSoulTheme.shapes.large,
                 contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),

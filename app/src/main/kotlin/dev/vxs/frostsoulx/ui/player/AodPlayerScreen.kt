@@ -67,7 +67,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -138,6 +137,7 @@ import dev.vxs.frostsoulx.constants.AodUnlockMethod
 import dev.vxs.frostsoulx.constants.AodUnlockMethodKey
 import dev.vxs.frostsoulx.constants.AodVerticalSpacingKey
 import dev.vxs.frostsoulx.constants.EnableHapticFeedbackKey
+import dev.vxs.frostsoulx.lyrics.LyricsUtils
 import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import dev.vxs.frostsoulx.ui.utils.toComposeShape
@@ -374,6 +374,17 @@ fun AodPlayerScreen(
     }
 
     val dominantArtworkColor = extractedArtworkColors.firstOrNull() ?: MaterialTheme.colorScheme.primary
+    val lyricsEntries = remember(lyricsText) {
+        lyricsText?.takeIf { it.isNotBlank() }?.let { raw ->
+            runCatching { LyricsUtils.parseLyrics(raw) }.getOrDefault(emptyList())
+        } ?: emptyList()
+    }
+    val currentLyricIndex = remember(lyricsEntries, position) {
+        if (lyricsEntries.isEmpty()) -1 else LyricsUtils.findCurrentLineIndex(lyricsEntries, position)
+    }
+    val currentLyricLine = lyricsEntries.getOrNull(currentLyricIndex)?.text?.takeIf { it.isNotBlank() }
+    val nextLyricLine = lyricsEntries.getOrNull(currentLyricIndex + 1)?.text?.takeIf { it.isNotBlank() }
+
     val targetAccentColor =
         if (accentStyle == AodAccentStyle.THEME) dominantArtworkColor else Color.White
 
@@ -387,11 +398,7 @@ fun AodPlayerScreen(
             cornerRadius = thumbnailCornerRadius,
             startAngle = thumbnailShapeRotation,
         )
-    val configuration = LocalConfiguration.current
-    val artworkSizeDp =
-        (configuration.screenWidthDp.toFloat() - (horizontalPadding * 2f + 20f))
-            .coerceIn(160f, 340f)
-    val artworkSize = artworkSizeDp.dp
+    val artworkSize = thumbnailSize.coerceIn(160f, 340f).dp
     val artworkSizePx = with(density) { artworkSize.roundToPx().coerceAtLeast(1) }
     val imageRequest =
         remember(context, mediaMetadata.thumbnailUrl, artworkSizePx) {
@@ -466,7 +473,8 @@ fun AodPlayerScreen(
                 }
                 .background(Color.Black),
     ) {
-        // Fixed reference backdrop: artwork fills the screen as a dim, blurred ambient layer.
+        // Artwork-tinted scrim keeps the backdrop reading as the cover itself, darkened,
+        // instead of a flat black screen with a separate image layer.
         if (!mediaMetadata.thumbnailUrl.isNullOrBlank()) {
             AsyncImage(
                 model = mediaMetadata.thumbnailUrl,
@@ -474,7 +482,7 @@ fun AodPlayerScreen(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .blur(42.dp, edgeTreatment = androidx.compose.ui.draw.BlurredEdgeTreatment.Unbounded)
+                    .blur(42.dp)
                     .alpha(0.34f),
             )
         }
@@ -482,9 +490,20 @@ fun AodPlayerScreen(
             modifier = Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        dominantArtworkColor.copy(alpha = 0.34f),
-                        dominantArtworkColor.copy(alpha = 0.14f),
-                        Color.Black.copy(alpha = 0.76f),
+                        dominantArtworkColor.copy(alpha = 0.38f),
+                        Color.Black.copy(alpha = 0.72f),
+                        Color.Black.copy(alpha = 0.85f),
+                    ),
+                ),
+            ),
+        )
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Black.copy(alpha = 0.16f),
+                        Color.Transparent,
+                        Color.Black.copy(alpha = 0.40f),
                     ),
                 ),
             ),
@@ -530,9 +549,8 @@ fun AodPlayerScreen(
                 accentColor = accentColor,
             )
 
-            val showFullContent = !isLocked || !minimalLockedState
             AnimatedVisibility(
-                visible = showThumbnail && showFullContent,
+                visible = showThumbnail && (!isLocked || !minimalLockedState),
                 enter = fadeIn(tween(300)),
                 exit = fadeOut(tween(300)),
             ) {
@@ -540,71 +558,90 @@ fun AodPlayerScreen(
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .size(artworkSize),
+                            .size(artworkSize + 48.dp),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        // A slightly enlarged, softly blurred copy bridges the sharp cover
-                        // into the ambient backdrop and removes the visible card boundary.
+                        // A soft copy of the cover bridges the sharp artwork into the blurred
+                        // backdrop without the detached card-like glow/shadow effect.
                         AsyncImage(
                             model = imageRequest,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(artworkSize + 40.dp)
-                                .align(Alignment.Center)
-                                .blur(24.dp, edgeTreatment = androidx.compose.ui.draw.BlurredEdgeTreatment.Unbounded)
-                                .alpha(0.72f)
+                                .size(artworkSize + 48.dp)
+                                .blur(24.dp)
+                                .alpha(0.55f)
                                 .clip(thumbnailShape),
                         )
-                        AsyncImage(
-                            model = imageRequest,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(thumbnailShape),
-                        )
+
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color.Transparent,
-                                            Color.Transparent,
-                                            Color.Black.copy(alpha = 0.62f),
-                                        ),
-                                    ),
-                                ),
-                        )
-                        androidx.compose.animation.AnimatedVisibility(
-                            visible = showLyricTicker && !lyricsText.isNullOrBlank(),
-                            enter = fadeIn(tween(220)),
-                            exit = fadeOut(tween(220)),
-                            modifier = Modifier.align(Alignment.BottomCenter),
+                                .size(artworkSize)
+                                .clip(thumbnailShape),
                         ) {
-                            if (showLyricTicker && !lyricsText.isNullOrBlank()) {
-                                Text(
-                                    text = lyricsText,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.White.copy(alpha = 0.96f),
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                    textAlign = TextAlign.Center,
+                            AsyncImage(
+                                model = imageRequest,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+
+                            if (showLyricTicker && (currentLyricLine != null || nextLyricLine != null)) {
+                                Box(
                                     modifier = Modifier
+                                        .align(Alignment.BottomCenter)
                                         .fillMaxWidth()
-                                        .padding(horizontal = 14.dp, vertical = 14.dp),
-                                )
+                                        .background(
+                                            Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color.Transparent,
+                                                    Color.Black.copy(alpha = 0.55f),
+                                                ),
+                                            ),
+                                        )
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                                        modifier = Modifier.fillMaxWidth(),
+                                    ) {
+                                        currentLyricLine?.let {
+                                            Text(
+                                                text = it,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = Color.White,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.fillMaxWidth(),
+                                            )
+                                        }
+                                        nextLyricLine?.let {
+                                            Text(
+                                                text = it,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = White65,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.fillMaxWidth(),
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
+            } 
 
             Column(
                 horizontalAlignment = textHorizontalAlignment,
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
+                val showFullContent = !isLocked || !minimalLockedState
+
                 Text(
                     text = mediaMetadata.title,
                     style = MaterialTheme.typography.titleLarge,

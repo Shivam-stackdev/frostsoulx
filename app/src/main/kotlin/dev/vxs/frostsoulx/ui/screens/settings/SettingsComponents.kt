@@ -63,6 +63,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import dev.vxs.frostsoulx.R
+import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
+import dev.vxs.frostsoulx.ui.premium.PremiumCard
+import dev.vxs.frostsoulx.ui.premium.PremiumIconAvatar
 
 @Composable
 fun SettingsProfileHeader(
@@ -359,21 +362,15 @@ fun SettingsGroupCard(
                 ),
         )
 
-        Card(
-            shape = RoundedCornerShape(SettingsDimensions.GroupCardCornerRadius),
-            colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        PremiumCard(
+            shape = FrostSoulTheme.shapes.medium,
+            contentPadding = PaddingValues(0.dp),
         ) {
-            Column {
-                group.items.forEachIndexed { index, item ->
-                    SettingsRow(
-                        item = item,
-                        showDivider = index < group.items.size - 1,
-                    )
-                }
+            group.items.forEachIndexed { index, item ->
+                SettingsRow(
+                    item = item,
+                    showDivider = index < group.items.size - 1,
+                )
             }
         }
     }
@@ -425,38 +422,33 @@ fun SettingsRow(
                     ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                modifier =
-                    Modifier
-                        .size(SettingsDimensions.RowIconSize)
-                        .clip(CircleShape)
-                        .background(effectiveAccent.copy(alpha = 0.12f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                if (item.showUpdateIndicator) {
-                    BadgedBox(
-                        badge = {
-                            Badge(
-                                containerColor = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(8.dp),
-                            )
-                        },
-                    ) {
-                        Icon(
-                            painter = item.icon,
-                            contentDescription = null,
-                            tint = effectiveAccent,
-                            modifier = Modifier.size(SettingsDimensions.RowIconInnerSize),
+            if (item.showUpdateIndicator) {
+                BadgedBox(
+                    badge = {
+                        Badge(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(8.dp),
                         )
-                    }
-                } else {
-                    Icon(
+                    },
+                ) {
+                    PremiumIconAvatar(
                         painter = item.icon,
                         contentDescription = null,
+                        size = SettingsDimensions.RowIconSize,
+                        iconSize = SettingsDimensions.RowIconInnerSize,
                         tint = effectiveAccent,
-                        modifier = Modifier.size(SettingsDimensions.RowIconInnerSize),
+                        containerColor = effectiveAccent.copy(alpha = 0.12f),
                     )
                 }
+            } else {
+                PremiumIconAvatar(
+                    painter = item.icon,
+                    contentDescription = null,
+                    size = SettingsDimensions.RowIconSize,
+                    iconSize = SettingsDimensions.RowIconInnerSize,
+                    tint = effectiveAccent,
+                    containerColor = effectiveAccent.copy(alpha = 0.12f),
+                )
             }
 
             Spacer(modifier = Modifier.width(14.dp))
