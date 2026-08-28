@@ -1,8 +1,7 @@
 # FrostSoulX
-https://github.com/sakuraDev31/frostsoulx.git -- 
-link to my repo if you like the app then star it 
-for latest apk download use this this ---
- https://github.com/sakuraDev31/frostsoulx/releases/download/V14.0.2/app-gms-mobile-arm64-debug.apk 
+[frostsoulx repo](https://github.com/sakuraDev31/frostsoulx.git)
+
+[Download APK v14.0.2](https://github.com/sakuraDev31/frostsoulx/releases/download/V14.0.2/app-gms-mobile-arm64-debug.apk)
  
  **A clean, focused Android music player for people who care about the listening experience.**
 
