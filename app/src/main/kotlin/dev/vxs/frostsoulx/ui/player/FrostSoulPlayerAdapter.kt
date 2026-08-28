@@ -109,6 +109,7 @@ internal fun FrostSoulPlayerAdapter(
                 .take(4)
         }
     }
+    val repeatMode by playerConnection.repeatMode.collectAsState()
     val currentFormat by playerConnection.currentFormat.collectAsState(initial = null)
     val outputDevice by playerConnection.service.activeAudioDevice.collectAsStateWithLifecycle()
     val audioQualityBadge =
@@ -168,6 +169,7 @@ internal fun FrostSoulPlayerAdapter(
             downloadProgress,
             isRefetchingLyrics,
             sleepTimerActive,
+            repeatMode,
             blurRadius,
             palette,
             playerBackgroundStyle,
@@ -194,6 +196,8 @@ internal fun FrostSoulPlayerAdapter(
                 audioTechnicalInfo = audioTechnicalInfo,
                 outputDevice = outputDevice,
                 downloadProgress = downloadProgress,
+                sleepTimerActive = sleepTimerActive,
+                repeatMode = repeatMode,
                 blurRadius = blurRadius,
                 palette = palette,
                 playerBackgroundStyle = playerBackgroundStyle,

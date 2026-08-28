@@ -109,7 +109,12 @@ internal fun FSIconButton(
 ) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     val baseTint = if (isLightTheme) FrostSoulTheme.colors.onSurface else Color.White
-    val iconTint = if (enabled) baseTint else baseTint.copy(alpha = 0.28f)
+    val iconTint =
+        when {
+            !enabled -> baseTint.copy(alpha = 0.28f)
+            active -> FrostSoulTheme.colors.accentBright
+            else -> baseTint
+        }
     val background =
         if (active) {
             baseTint.copy(alpha = if (isLightTheme) 0.10f else 0.14f)

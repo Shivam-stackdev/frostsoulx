@@ -130,7 +130,7 @@ fun FSButton(
         FSText(
             text = label,
             style = FrostSoulTheme.typography.label,
-            color = if (emphasized) Color(0xFF001416) else colors.onSurface,
+            color = if (emphasized) colors.surface else colors.onSurface,
             maxLines = 1,
         )
         trailing?.invoke()

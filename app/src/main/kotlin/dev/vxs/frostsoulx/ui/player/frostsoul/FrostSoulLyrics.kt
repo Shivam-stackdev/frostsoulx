@@ -456,7 +456,7 @@ private fun BoxScope.FrostSoulLyricsBottomControls(
             Icon(
                 painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
                 contentDescription = "Play or pause",
-                tint = Color.Black,
+                tint = FrostSoulTheme.colors.surface,
                 modifier = Modifier.size(19.dp),
             )
         }

@@ -74,6 +74,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Shadow
@@ -590,9 +591,16 @@ internal fun FSPlayerControls(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             FSIconButton(
-                painter = painterResource(R.drawable.repeat),
+                painter = painterResource(
+                    if (state.repeatMode == androidx.media3.common.Player.REPEAT_MODE_ONE) {
+                        R.drawable.repeat_one
+                    } else {
+                        R.drawable.repeat
+                    },
+                ),
                 contentDescription = "Toggle repeat mode",
                 onClick = actions.onToggleRepeat,
+                active = state.repeatMode != androidx.media3.common.Player.REPEAT_MODE_OFF,
                 buttonSize = 32.dp,
                 iconSize = 24.dp,
                 showContainer = false,
@@ -699,6 +707,8 @@ private fun FSPlayButton(
         animationSpec = spring(dampingRatio = 0.66f, stiffness = 540f),
         label = "fs-play-button-scale",
     )
+    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
+    val iconTint = if (isLightTheme) FrostSoulTheme.colors.onSurface else Color.White
     Box(
         contentAlignment = Alignment.Center,
         modifier =
@@ -713,7 +723,7 @@ private fun FSPlayButton(
         Icon(
             painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
             contentDescription = if (isPlaying) "Pause" else "Play",
-            tint = Color.White,
+            tint = iconTint,
             modifier = Modifier.size(if (isBuffering) 24.dp else 30.dp).alpha(if (isBuffering) 0.54f else 1f),
         )
     }
@@ -1021,8 +1031,8 @@ private fun FrostSoulAlbumPage(
             FrostSoulMainLyricPreview(
                 uiState = uiState,
                 onlyCurrentLine = true,
-                horizontalPadding = 8.dp,
-                modifier = Modifier.align(Alignment.Start).padding(bottom = 18.dp),
+                horizontalPadding = 0.dp,
+                modifier = Modifier.align(Alignment.Start).padding(bottom = 28.dp),
             )
             FSPlayerControls(
                     state = uiState,
@@ -1061,7 +1071,8 @@ private fun FrostSoulArtworkBlurAlbumPage(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight),
+                    .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight)
+                    .clipToBounds(),
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
                     // Artwork Blur only: use an enlarged, low-opacity duplicate as an ambient
