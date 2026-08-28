@@ -1,4 +1,5 @@
 # FrostSoulX
+https://github.com/sakuraDev31/frostsoulx.git link to my repo if you like the app then star it 
 
 **A clean, focused Android music player for people who care about the listening experience.**
 
