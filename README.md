@@ -1,7 +1,9 @@
 # FrostSoulX
-https://github.com/sakuraDev31/frostsoulx.git link to my repo if you like the app then star it 
-
-**A clean, focused Android music player for people who care about the listening experience.**
+https://github.com/sakuraDev31/frostsoulx.git -- link to my repo if you like the app then star it 
+for latest apk download use this this ---
+https://github.com/sakuraDev31/frostsoulx/releases/download/V14.0.2/app-gms-mobile-arm64-debug.apk 
+ 
+ **A clean, focused Android music player for people who care about the listening experience.**
 
 [![Branch](https://img.shields.io/badge/default%20branch-frostsoul--reboot-111827?style=for-the-badge)](https://github.com/sakuraDev31/frostsoulx/tree/frostsoul-reboot)
 [![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
