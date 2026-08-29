@@ -548,6 +548,7 @@ internal fun FSPlayerControls(
     actions: FrostSoulPlayerActions,
     onOpenQueue: () -> Unit,
     modifier: Modifier = Modifier,
+    immersive: Boolean = false,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -574,8 +575,10 @@ internal fun FSPlayerControls(
             FrostSoulOutputDeviceButton(
                 device = state.outputDevice,
                 onClick = actions.onOpenAudioOutput,
+                immersive = immersive,
+                immersiveColor = state.palette.artworkPrimary.copy(alpha = 0.56f),
             )
-            FSTwoDotButton(onClick = actions.onOpenOptions)
+            FSTwoDotButton(onClick = actions.onOpenOptions, immersive = immersive)
         }
         FSSeekbar(
             progress = state.progress,
@@ -696,17 +699,23 @@ private fun FSDownloadButton(
 }
 
 @Composable
-private fun FSTwoDotButton(onClick: () -> Unit) {
+private fun FSTwoDotButton(
+    onClick: () -> Unit,
+    immersive: Boolean = false,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.size(36.dp).clickable(onClick = onClick),
+        modifier = Modifier.size(if (immersive) 40.dp else 36.dp).clickable(onClick = onClick),
     ) {
         repeat(2) {
             Box(
                 modifier = Modifier
-                    .size(5.dp)
-                    .background(FrostSoulTheme.colors.onSurface, androidx.compose.foundation.shape.CircleShape),
+                    .size(if (immersive) 7.dp else 5.dp)
+                    .background(
+                        if (immersive) Color.White else FrostSoulTheme.colors.onSurface,
+                        androidx.compose.foundation.shape.CircleShape,
+                    ),
             )
         }
     }
@@ -1058,6 +1067,7 @@ private fun FrostSoulAlbumPage(
                     actions = actions,
                     onOpenQueue = onOpenQueue,
                     modifier = Modifier.padding(top = 2.dp),
+                    immersive = false,
             )
         }
     }
@@ -1188,6 +1198,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
             modifier = Modifier
                 .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)
                 .padding(top = 18.dp),
+            immersive = true,
         )
     }
 }
@@ -1197,22 +1208,24 @@ private fun FrostSoulOutputDeviceButton(
     device: dev.vxs.frostsoulx.models.ActiveOutputDevice,
     onClick: () -> Unit,
     immersive: Boolean = false,
+    immersiveColor: Color = FrostSoulTheme.colors.surfaceGlass,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(7.dp),
         modifier = Modifier
-         .clip(RoundedCornerShape(22.dp))
-         .background(
-        FrostSoulTheme.colors.surface.copy(alpha = 0.58f)
-)
-
+            .clip(RoundedCornerShape(22.dp))
+            .background(
+                if (immersive) immersiveColor else FrostSoulTheme.colors.surface.copy(alpha = 0.58f),
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 9.dp),
     ) {
         androidx.compose.material3.Icon(
             imageVector = device.type.imageVector,
             contentDescription = "Audio output device",
             tint = FrostSoulTheme.colors.onSurface,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(if (immersive) 22.dp else 20.dp),
         )
         Text(
             text = device.name,
