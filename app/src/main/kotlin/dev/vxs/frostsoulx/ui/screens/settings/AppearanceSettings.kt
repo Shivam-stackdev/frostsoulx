@@ -488,7 +488,7 @@ fun AppearanceSettings(navController: NavController) {
                         valueText = {
                             when (it) {
                                 PlayerDesignStyle.FROSTSOUL -> "Vinyl player"
-                                PlayerDesignStyle.ARTWORK_BLUR -> "Artwork blur player"
+                                PlayerDesignStyle.ARTWORK_BLUR -> "Immersive"
                                 else -> it.name
                             }
                         },

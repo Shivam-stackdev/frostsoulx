@@ -75,9 +75,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -1095,74 +1097,30 @@ private fun FrostSoulArtworkBlurAlbumPage(
                     .clipToBounds(),
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
-                    // Artwork Blur only: use an enlarged, low-opacity duplicate as an ambient
-                    // canvas so the sharp cover never reads as a floating rectangle.
-                    Box(
+                    // The blurred artwork is already rendered full-screen underneath this header.
+                    // Mask the sharp cover at its lower edge instead of painting a black fade over
+                    // it; this lets the two layers actually dissolve into one another like the
+                    // original ArchiveTune Immersive Extended player.
+                    AsyncImage(
+                        model = uiState.track.artworkUrl,
+                        contentDescription = "Album artwork",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(
-                                Brush.radialGradient(
-                                    colors = listOf(
-                                        uiState.palette.artworkPrimary.copy(alpha = 0.52f),
-                                        uiState.palette.artworkSecondary.copy(alpha = 0.34f),
-                                        Color.Black.copy(alpha = 0.82f),
+                            .drawWithContent {
+                                drawContent()
+                                drawRect(
+                                    brush = Brush.verticalGradient(
+                                        0.00f to Color.White,
+                                        0.58f to Color.White,
+                                        0.78f to Color.White.copy(alpha = 0.82f),
+                                        0.94f to Color.White.copy(alpha = 0.20f),
+                                        1.00f to Color.Transparent,
                                     ),
-                                    radius = 920f,
-                                ),
-                            ),
-                    ) {
-                        AsyncImage(
-                            model = uiState.track.artworkUrl,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .graphicsLayer {
-                                    scaleX = 1.18f
-                                    scaleY = 1.18f
-                                    alpha = 0.62f
-                                }
-                                .blur(
-                                    artworkHeaderBlur.dp,
-                                    edgeTreatment = BlurredEdgeTreatment.Unbounded,
-                                ),
-                        )
-                        // Low-opacity matte keeps the bright duplicate from overpowering text.
-                        Box(
-                            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.22f)),
-                        )
-                        AsyncImage(
-                            model = uiState.track.artworkUrl,
-                            contentDescription = "Album artwork",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                        // Bottom fade blends the cover into the page with no visible seam.
-                        Box(
-                            modifier = Modifier.fillMaxSize().background(
-                                Brush.verticalGradient(
-                                    0.00f to Color.Black.copy(alpha = 0.42f),
-                                    0.14f to Color.Transparent,
-                                    0.54f to Color.Transparent,
-                                    0.78f to Color.Black.copy(alpha = 0.60f),
-                                    1.00f to Color.Black.copy(alpha = 0.98f),
-                                ),
-                            ),
-                        )
-                        // Stronger horizontal edge fade removes visible rectangular side cuts.
-                        Box(
-                            modifier = Modifier.fillMaxSize().background(
-                                Brush.horizontalGradient(
-                                    0.00f to Color.Black.copy(alpha = 0.62f),
-                                    0.12f to Color.Black.copy(alpha = 0.18f),
-                                    0.25f to Color.Transparent,
-                                    0.75f to Color.Transparent,
-                                    0.88f to Color.Black.copy(alpha = 0.18f),
-                                    1.00f to Color.Black.copy(alpha = 0.62f),
-                                ),
-                            ),
-                        )
-                    }
+                                    blendMode = BlendMode.DstIn,
+                                )
+                            },
+                    )
                 } else {
                     Box(
                         modifier = Modifier.fillMaxSize().background(
