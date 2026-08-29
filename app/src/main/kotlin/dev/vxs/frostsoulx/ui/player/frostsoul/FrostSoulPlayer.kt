@@ -1127,23 +1127,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
                         ),
                     )
                 }
-                Text(
-                    text = uiState.track.album.ifBlank { "Now playing" },
-                    color = Color.White.copy(alpha = 0.86f),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 1.3.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(
-                            start = PlayerLayoutTokens.MasterHorizontalPadding,
-                            end = PlayerLayoutTokens.MasterHorizontalPadding,
-                            bottom = 14.dp,
-                        ),
-                )
-            }
+                
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
