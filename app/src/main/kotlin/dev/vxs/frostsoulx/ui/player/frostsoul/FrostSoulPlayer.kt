@@ -1085,13 +1085,15 @@ private fun FrostSoulArtworkBlurAlbumPage(
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Full-bleed artwork header: the image spans the whole width with no card
-            // inset, and fades edge-to-edge into the page background so the thumbnail
+       // inset, and fades edge-to-edge into the page background so the thumbnail
             // reads as one seamless surface (QQ Music "immersive cover" behaviour).
             Box(
+                
+                
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight)
-                    .clipToBounds(),
+               .fillMaxWidth(),
+               .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight + 110.dp)
+               .clipToBounds()
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
                     // The blurred artwork is already rendered full-screen underneath this header.
@@ -1109,9 +1111,10 @@ private fun FrostSoulArtworkBlurAlbumPage(
                                 drawRect(
                                     brush = Brush.verticalGradient(
                                         0.00f to Color.White,
-                                        0.58f to Color.White,
-                                        0.78f to Color.White.copy(alpha = 0.82f),
-                                        0.94f to Color.White.copy(alpha = 0.20f),
+                                        0.48f to Color.White,
+                                        0.68f to Color.White.copy(alpha = 0.96f),
+                                        0.82f to Color.White.copy(alpha = 0.72f),
+                                        0.93f to Color.White.copy(alpha = 0.28f),
                                         1.00f to Color.Transparent,
                                     ),
                                     blendMode = BlendMode.DstIn,
@@ -1120,7 +1123,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
                     )
                 } else {
                     Box(
-                        modifier = Modifier.fillMaxSize().background(
+                        modifier = Modifier.fillMaxwidth().background(
                             Brush.verticalGradient(
                                 colors = listOf(uiState.palette.artworkPrimary, uiState.palette.artworkSecondary),
                             ),
@@ -1128,8 +1131,8 @@ private fun FrostSoulArtworkBlurAlbumPage(
                     )
                 }
                 
-
-            Row(
+   
+          Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
