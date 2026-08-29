@@ -1,4 +1,4 @@
-/*
+by/*
  * ArchiveTune (2026)
  * © Rukamori — github.com/rukamori
  * GPL-3.0 License | Contributors: see git history
@@ -1196,6 +1196,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
 private fun FrostSoulOutputDeviceButton(
     device: dev.vxs.frostsoulx.models.ActiveOutputDevice,
     onClick: () -> Unit,
+    immersive: Boolean = false,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -1203,7 +1204,7 @@ private fun FrostSoulOutputDeviceButton(
         modifier = Modifier
          .clip(RoundedCornerShape(22.dp))
          .background(
-        FrostSoulTheme.colors.surface.copy(alpha = 0.42f)
+        FrostSoulTheme.colors.surface.copy(alpha = 0.58f)
 )
 
     ) {
