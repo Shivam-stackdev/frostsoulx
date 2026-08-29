@@ -1123,7 +1123,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
                     )
                 } else {
                     Box(
-                        modifier = Modifier.fillMaxwidth().background(
+                        modifier = Modifier.fillMaxWidth().background(
                             Brush.verticalGradient(
                                 colors = listOf(uiState.palette.artworkPrimary, uiState.palette.artworkSecondary),
                             ),
