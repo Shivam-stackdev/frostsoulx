@@ -256,18 +256,7 @@ return results.first()
                 reportException(e)
                 null
             }
-        { private fun scoreSyncedLyrics(
-    lyrics: String,
-    durationMs: Int,
-): Double {
-    ...
-}
-
-private fun extractLyricTimestamps(
-    lyrics: String
-): List<Long> {
-    ...
-}
+        l
 
 private suspend fun orderedProviders(): List<LyricsProvider> {
         private suspend fun orderedProviders(): List<LyricsProvider> {
