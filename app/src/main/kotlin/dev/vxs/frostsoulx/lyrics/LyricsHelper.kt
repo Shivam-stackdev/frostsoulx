@@ -336,21 +336,54 @@ class LyricsHelper
             val normalizedArtists = artists.split(Regex("\\s*[,•;|/]\\s*"), limit = 0).map { normalizeIdentity(it) }
             val normalizedTaggedTitle = titleTag?.let(::normalizeIdentity)
             val normalizedTaggedArtist = artistTag?.let(::normalizeIdentity)
+            fun matchesTitle(candidate: String): Boolean =
+                normalizedTitle.isNotBlank() &&
+                    candidate.isNotBlank() &&
+                    (candidate == normalizedTitle ||
+                        candidate.contains(normalizedTitle) ||
+                        normalizedTitle.contains(candidate))
+            fun matchesArtist(candidate: String): Boolean =
+                normalizedArtists.any { expected ->
+                    expected.isNotBlank() &&
+                        candidate.isNotBlank() &&
+                        (candidate == expected || candidate.contains(expected) || expected.contains(candidate))
+                }
+
             val titleConflict =
                 normalizedTaggedTitle != null &&
-                    normalizedTitle.isNotBlank() &&
-                    normalizedTaggedTitle != normalizedTitle &&
-                    !normalizedTaggedTitle.contains(normalizedTitle) &&
-                    !normalizedTitle.contains(normalizedTaggedTitle)
+                    normalizedTaggedTitle.isNotBlank() &&
+                    !matchesTitle(normalizedTaggedTitle)
             val artistConflict =
                 normalizedTaggedArtist != null &&
+                    normalizedTaggedArtist.isNotBlank() &&
                     normalizedArtists.isNotEmpty() &&
-                    normalizedArtists.none {
-                        it == normalizedTaggedArtist ||
-                            it.contains(normalizedTaggedArtist) ||
-                            normalizedTaggedArtist.contains(it)
-                    }
-            return titleConflict || artistConflict
+                    !matchesArtist(normalizedTaggedArtist)
+
+            // Some providers return a plain-text header instead of [ti]/[ar] tags. For example:
+            // "Janam Janam - Pritam/Arijit Singh/Antara Mitra". Treat that first-line title as
+            // authoritative when its artist matches the current track; otherwise a valid result
+            // for another song can be accepted for the currently playing track.
+            val firstContentLine =
+                lyrics.lineSequence()
+                    .map { line ->
+                        line.replace(
+                            Regex("^\\s*(?:\\[\\d{1,2}:\\d{2}(?:[.:]\\d{1,3})?\\]\\s*)+"),
+                            "",
+                        ).trim()
+                    }.firstOrNull { line -> line.isNotBlank() && !line.startsWith("[") }
+            val plainHeader =
+                firstContentLine?.let {
+                    Regex("^(.{2,100}?)\\s+[-–—:]\\s+(.{2,160})$").matchEntire(it)
+                }
+            val plainHeaderTitle = plainHeader?.groupValues?.getOrNull(1)?.let(::normalizeIdentity)
+            val plainHeaderArtist = plainHeader?.groupValues?.getOrNull(2)?.let(::normalizeIdentity)
+            val plainHeaderConflict =
+                plainHeaderTitle != null &&
+                    plainHeaderArtist != null &&
+                    !matchesTitle(plainHeaderTitle) &&
+                    matchesArtist(plainHeaderArtist)
+
+            return titleConflict || artistConflict || plainHeaderConflict
         }
 
         companion object {

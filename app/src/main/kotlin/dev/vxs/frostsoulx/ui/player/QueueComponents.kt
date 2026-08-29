@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -471,8 +472,16 @@ fun SleepTimerDialog(
 
                 Spacer(Modifier.height(8.dp))
 
-                OutlinedButton(onClick = onEndOfSong, shapes = ButtonDefaults.shapes()) {
-                    Text(stringResource(R.string.end_of_song))
+                OutlinedButton(
+                    onClick = onEndOfSong,
+                    shapes = ButtonDefaults.shapes(),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.end_of_song),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         },

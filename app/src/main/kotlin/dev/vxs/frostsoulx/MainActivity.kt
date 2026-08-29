@@ -84,6 +84,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -265,7 +266,6 @@ import dev.vxs.frostsoulx.ui.screens.LOGIN_URL_ARGUMENT
 import dev.vxs.frostsoulx.ui.screens.Screens
 import dev.vxs.frostsoulx.ui.screens.buildLoginRoute
 import dev.vxs.frostsoulx.ui.screens.navigationBuilder
-import dev.vxs.frostsoulx.ui.screens.onboarding.OnboardingRoute
 import dev.vxs.frostsoulx.ui.screens.search.LocalSearchScreen
 import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResultArgument
 import dev.vxs.frostsoulx.ui.screens.search.OnlineSearchResultRoutePrefix
@@ -628,20 +628,22 @@ class MainActivity : ComponentActivity() {
 
                 val onboardingViewModel: OnboardingViewModel = hiltViewModel()
                 val onboardingState by onboardingViewModel.screenState.collectAsStateWithLifecycle()
-                val shouldShowOnboarding =
-                    when (val state = onboardingState) {
-                        // Keep the normal home shell visible during cold-start loading so the
-                        // home screen's FrostSoul loader is shown instead of a separate splash.
-                        OnboardingScreenState.Loading -> false
-                        OnboardingScreenState.Empty -> true
-                        is OnboardingScreenState.Error -> false
-                        is OnboardingScreenState.Success -> state.uiState.shouldShowOnboarding
+                                if (onboardingState is OnboardingScreenState.Loading) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .background(if (pureBlack) Color.Black else FrostSoulTheme.colors.background),
+                    ) {
+                        LoadingIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(48.dp),
+                        )
                     }
-
-                if (shouldShowOnboarding) {
-                    OnboardingRoute(viewModel = onboardingViewModel)
                     return@ArchiveTuneTheme
                 }
+
 
                 BoxWithConstraints(
                     modifier =
@@ -925,16 +927,10 @@ class MainActivity : ComponentActivity() {
 
                     var yearInMusicSavedPlayerAnchor by rememberSaveable { mutableStateOf(-1) }
 
-                    val shouldHideStatusBars =
-                        isYearInMusicScreen ||
-                            (
-                                playerBottomSheetState.isExpanded &&
-                                    (
-                                        playerDesignStyle == PlayerDesignStyle.V7 ||
-                                            playerDesignStyle == PlayerDesignStyle.FROSTSOUL ||
-                                            playerDesignStyle == PlayerDesignStyle.ARTWORK_BLUR
-                                    )
-                            )
+                    // Status-bar visibility must not drive player-sheet expansion. Keep this
+                    // independent from the main player state so inset changes cannot auto-expand
+                    // either player design.
+                    val shouldHideStatusBars = isYearInMusicScreen
 
                     LaunchedEffect(shouldHideStatusBars, aodModeEnabled) {
                         if (aodModeEnabled) return@LaunchedEffect

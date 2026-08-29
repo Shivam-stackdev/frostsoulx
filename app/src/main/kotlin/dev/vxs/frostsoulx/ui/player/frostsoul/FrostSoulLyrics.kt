@@ -7,6 +7,8 @@
 
 package dev.vxs.frostsoulx.ui.player.frostsoul
 
+import dev.vxs.frostsoulx.ui.player.LyricsZoomContainer
+
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -230,17 +232,20 @@ internal fun FSLyrics(
                 // Lyric column: text begins flush with the page gutter on the left and keeps a
                 // wider right inset, so long lines wrap instead of appearing to slide under the
                 // right screen edge (QQ Music lyric-sheet behaviour).
-                LazyColumn(
-                    state = listState,
-                    contentPadding = PaddingValues(
-                        start = PlayerLayoutTokens.LyricsTextStartInset,
-                        end = PlayerLayoutTokens.LyricsTextEndInset,
-                        top = 4.dp,
-                        bottom = PlayerLayoutTokens.LyricsBottomControlsReserve,
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(PlayerLayoutTokens.LyricsLineSpacing),
+                LyricsZoomContainer(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                 ) {
+                    LazyColumn(
+                        state = listState,
+                        contentPadding = PaddingValues(
+                            start = PlayerLayoutTokens.LyricsTextStartInset,
+                            end = PlayerLayoutTokens.LyricsTextEndInset,
+                            top = 4.dp,
+                            bottom = PlayerLayoutTokens.LyricsBottomControlsReserve,
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(PlayerLayoutTokens.LyricsLineSpacing),
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
                     itemsIndexed(
                         items = lines,
                         key = { _, line -> "${line.startMs}-${line.endMs}-${line.text}" },
@@ -261,6 +266,7 @@ internal fun FSLyrics(
                             onSeek = onSeek,
                         )
                     }
+                }
                 }
             }
         }

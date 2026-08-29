@@ -106,6 +106,8 @@ internal fun FSIconButton(
     buttonSize: Dp = if (compact) 42.dp else 50.dp,
     iconSize: Dp = if (compact) 20.dp else 23.dp,
     showContainer: Boolean = true,
+    forceWhite: Boolean = false,
+    dimBackdrop: Boolean = true,
 ) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     // Containerless icons (showContainer = false) sit directly on the artwork / ambient-blur
@@ -116,10 +118,14 @@ internal fun FSIconButton(
     val baseTint =
         if (isLightTheme && showContainer) FrostSoulTheme.colors.onSurface else Color.White
     val iconTint =
-        when {
-            !enabled -> baseTint.copy(alpha = 0.28f)
-            active -> FrostSoulTheme.colors.accentBright
-            else -> baseTint
+        if (forceWhite) {
+            Color.White
+        } else {
+            when {
+                !enabled -> baseTint.copy(alpha = 0.28f)
+                active -> FrostSoulTheme.colors.accentBright
+                else -> baseTint
+            }
         }
     val background =
         if (active) {
@@ -129,18 +135,22 @@ internal fun FSIconButton(
         }
     val buttonModifier = modifier.size(buttonSize)
     val styledModifier =
-        if (showContainer) {
+        if (forceWhite) {
+            buttonModifier
+        } else if (showContainer) {
             buttonModifier
                 .clip(CircleShape)
                 .background(background)
                 .border(1.dp, iconTint.copy(alpha = if (active) 0.52f else 0.15f), CircleShape)
-        } else {
+        } else if (dimBackdrop) {
             // No chip behind the icon, so give it a faint dark scrim disc instead — enough to
             // guarantee contrast over bright artwork or a light-themed backdrop without
             // looking like a full button, matching the reference UI's soft icon shadowing.
             buttonModifier
                 .clip(CircleShape)
                 .background(Color.Black.copy(alpha = if (active) 0.0f else 0.16f))
+        } else {
+            buttonModifier
         }
 
     Box(

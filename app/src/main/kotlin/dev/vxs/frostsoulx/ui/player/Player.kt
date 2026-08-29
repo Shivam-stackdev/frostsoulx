@@ -52,6 +52,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -67,7 +68,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -726,13 +727,18 @@ fun BottomSheetPlayer(
                         steps = (120 - 5) / 5 - 1,
                     )
 
-                    OutlinedIconButton(
+                    OutlinedButton(
                         onClick = {
                             showSleepTimerDialog = false
                             playerConnection.service.sleepTimer.start(-1)
                         },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                     ) {
-                        Text(stringResource(R.string.end_of_song))
+                        Text(
+                            text = stringResource(R.string.end_of_song),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                 }
             },
@@ -1276,6 +1282,7 @@ if (!aodModeEnabled) {
                         }
                     },
                     onSearchTrack = {
+                        state.collapseSoft()
                         navController.navigate(onlineSearchResultRoute(metadata.title))
                     },
                     onOpenAlbum = {

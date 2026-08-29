@@ -772,16 +772,17 @@ private fun AppleMusicLyricsPane(
     lyricsSyncOffset: Int,
     modifier: Modifier = Modifier,
 ) {
-    LyricsContent(
-        lyricsMode = lyricsMode,
-        sliderPositionProvider = sliderPositionProvider,
-        lyricsSyncOffset = lyricsSyncOffset,
-        modifier =
-            modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp),
-        textColor = foregroundColor,
-    )
+    LyricsZoomContainer(
+        modifier = modifier.fillMaxSize().padding(horizontal = 24.dp),
+    ) {
+        LyricsContent(
+            lyricsMode = lyricsMode,
+            sliderPositionProvider = sliderPositionProvider,
+            lyricsSyncOffset = lyricsSyncOffset,
+            modifier = Modifier.fillMaxSize(),
+            textColor = foregroundColor,
+        )
+    }
 }
 
 @Composable

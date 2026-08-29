@@ -505,6 +505,7 @@ internal fun FSMiniPlayer(
                 buttonSize = 24.dp,
                 iconSize = 24.dp,
                 showContainer = false,
+                dimBackdrop = false,
                 modifier = Modifier.padding(end = 18.dp),
             )
             FSIconButton(
@@ -515,6 +516,7 @@ internal fun FSMiniPlayer(
                 buttonSize = 28.dp,
                 iconSize = 28.dp,
                 showContainer = false,
+                dimBackdrop = false,
                 modifier = Modifier.padding(end = 18.dp),
             )
             onQueueClick?.let { openQueue ->
@@ -525,6 +527,7 @@ internal fun FSMiniPlayer(
                     buttonSize = 24.dp,
                     iconSize = 24.dp,
                     showContainer = false,
+                    dimBackdrop = false,
                 )
             }
         }
@@ -612,9 +615,10 @@ internal fun FSPlayerControls(
                 contentDescription = "Toggle repeat mode",
                 onClick = actions.onToggleRepeat,
                 active = state.repeatMode != androidx.media3.common.Player.REPEAT_MODE_OFF,
-                buttonSize = 40.dp,
-                iconSize = 24.dp,
-                showContainer = true,
+                buttonSize = 36.dp,
+                iconSize = 19.dp,
+                showContainer = false,
+                forceWhite = true,
             )
             FSIconButton(
                 painter = painterResource(R.drawable.skip_previous),
@@ -624,12 +628,12 @@ internal fun FSPlayerControls(
                 buttonSize = 44.dp,
                 iconSize = 34.dp,
                 showContainer = false,
+                forceWhite = true,
             )
             FSPlayButton(
                 isPlaying = state.isPlaying,
                 isBuffering = state.isBuffering,
                 onClick = actions.onTogglePlayPause,
-                accent = state.palette.accent,
             )
             FSIconButton(
                 painter = painterResource(R.drawable.skip_next),
@@ -639,14 +643,16 @@ internal fun FSPlayerControls(
                 buttonSize = 44.dp,
                 iconSize = 34.dp,
                 showContainer = false,
+                forceWhite = true,
             )
             FSIconButton(
                 painter = painterResource(R.drawable.queue_music),
                 contentDescription = "Open playback queue",
                 onClick = onOpenQueue,
-                buttonSize = 40.dp,
-                iconSize = 24.dp,
-                showContainer = true,
+                buttonSize = 36.dp,
+                iconSize = 19.dp,
+                showContainer = false,
+                forceWhite = true,
             )
         }
     }
@@ -711,37 +717,28 @@ private fun FSPlayButton(
     isPlaying: Boolean,
     isBuffering: Boolean,
     onClick: () -> Unit,
-    accent: Color,
 ) {
     val scale by animateFloatAsState(
         targetValue = if (isPlaying) 1f else 0.94f,
         animationSpec = spring(dampingRatio = 0.66f, stiffness = 540f),
         label = "fs-play-button-scale",
     )
-    // Filled circular background (previously a bare icon with no chip, which also made it a
-    // light-mode visibility casualty since its tint used to flip to a dark color with nothing
-    // solid behind it). The fill uses the track's accent color so it stays visible over any
-    // artwork and in either app theme; icon tint is derived from the fill's own luminance so it
-    // always has real contrast against its own button, matching the reference design.
-    val iconTint = if (accent.luminance() > 0.5f) Color.Black else Color.White
     Box(
         contentAlignment = Alignment.Center,
         modifier =
             Modifier
-                .size(68.dp)
+                .size(64.dp)
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
                 }
-                .clip(androidx.compose.foundation.shape.CircleShape)
-                .background(accent)
                 .clickable(onClick = onClick),
     ) {
         Icon(
             painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
             contentDescription = if (isPlaying) "Pause" else "Play",
-            tint = iconTint,
-            modifier = Modifier.size(if (isBuffering) 26.dp else 32.dp).alpha(if (isBuffering) 0.54f else 1f),
+            tint = Color.White,
+            modifier = Modifier.size(if (isBuffering) 36.dp else 44.dp).alpha(if (isBuffering) 0.54f else 1f),
         )
     }
 }
@@ -831,11 +828,11 @@ private fun FrostSoulArtistDialog(
                                 },
                         ) {
                             if (artist.artworkUrl.isNullOrBlank()) {
-                                Text(
-                                    text = artist.name.take(1).uppercase(),
-                                    color = FrostSoulOnSurface,
-                                    fontSize = 17.sp,
-                                    fontWeight = FontWeight.Bold,
+                                Icon(
+                                    painter = painterResource(R.drawable.artist),
+                                    contentDescription = null,
+                                    tint = FrostSoulOnSurface.copy(alpha = 0.72f),
+                                    modifier = Modifier.size(24.dp),
                                 )
                             } else {
                                 AsyncImage(
