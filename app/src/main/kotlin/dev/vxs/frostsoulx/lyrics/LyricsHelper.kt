@@ -209,13 +209,16 @@ class LyricsHelper
 
             if (results.isEmpty()) return LYRICS_NOT_FOUND
 
-            // 1. Prioritize synced/karaoke LRC lyrics across providers
-            results.firstOrNull { LyricsUtils.isLineSyncedLrc(it) }?.let { return it }
+            val syncedResults = results.filter { LyricsUtils.isLineSyncedLrc(it) }
 
-            // 2. Fallback to first available plain lyrics
-            return results.first()
+if (syncedResults.isNotEmpty()) {
+    return syncedResults.maxByOrNull {
+        scoreSyncedLyrics(it, mediaMetadata.duration)
+    } ?: syncedResults.first()
+}
+
+return results.first() 
         }
-
         private suspend fun fetchProviderLyrics(
             provider: LyricsProvider,
             mediaMetadata: MediaMetadata,
@@ -253,7 +256,20 @@ class LyricsHelper
                 reportException(e)
                 null
             }
+        { private fun scoreSyncedLyrics(
+    lyrics: String,
+    durationMs: Int,
+): Double {
+    ...
+}
 
+private fun extractLyricTimestamps(
+    lyrics: String
+): List<Long> {
+    ...
+}
+
+private suspend fun orderedProviders(): List<LyricsProvider> {
         private suspend fun orderedProviders(): List<LyricsProvider> {
             val orderStr = context.dataStore.data.first()[LyricsProviderOrderKey]
             val orderedEnums = deserializeLyricsProviderOrder(orderStr)
