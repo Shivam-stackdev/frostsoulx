@@ -256,7 +256,33 @@ return results.first()
                 reportException(e)
                 null
             }
-        l
+        private fun scoreSyncedLyrics(
+    lyrics: String,
+    durationMs: Int,
+): Double {
+    val normalized = LyricsUtils.normalizeLyricsText(lyrics)
+
+    val entries = runCatching {
+        LyricsUtils.parseLyrics(normalized)
+    }.getOrElse {
+        emptyList()
+    }
+
+    if (entries.isEmpty()) return 0.0
+
+    val lastTimestamp = entries.maxOfOrNull { it.time } ?: 0L
+    val duration = durationMs.toLong().coerceAtLeast(1L)
+
+    val coverage =
+        (lastTimestamp.toDouble() / duration.toDouble())
+            .coerceIn(0.0, 1.0)
+
+    val lineScore =
+        (entries.size.toDouble() / 200.0)
+            .coerceAtMost(1.0)
+
+    return (coverage * 100.0) + (lineScore * 25.0)
+        }
 
 private suspend fun orderedProviders(): List<LyricsProvider> {
         private suspend fun orderedProviders(): List<LyricsProvider> {
