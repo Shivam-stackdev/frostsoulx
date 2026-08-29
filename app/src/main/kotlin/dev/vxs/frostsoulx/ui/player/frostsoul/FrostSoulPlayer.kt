@@ -1201,11 +1201,11 @@ private fun FrostSoulOutputDeviceButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(7.dp),
         modifier = Modifier
-            .clip(RoundedCornerShape(22.dp))
-            .background(FrostSoulTheme.colors.surfaceGlass)
-            .border(1.dp, FrostSoulTheme.colors.outline.copy(alpha = 0.82f), RoundedCornerShape(22.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 9.dp),
+         .clip(RoundedCornerShape(22.dp))
+         .background(
+        FrostSoulTheme.colors.surface.copy(alpha = 0.42f)
+)
+
     ) {
         androidx.compose.material3.Icon(
             imageVector = device.type.imageVector,
