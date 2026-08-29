@@ -200,6 +200,12 @@ internal fun FrostSoulPlayer(
                     .fillMaxSize()
                     .windowInsetsPadding(WindowInsets.systemBars),
         ) {
+            // Status bar is fully hidden (immersive) for this style while the player is
+            // expanded — see MainActivity.shouldHideStatusBars, which now also covers
+            // FROSTSOUL/ARTWORK_BLUR alongside V7. With the bar actually hidden (not just
+            // drawn behind), WindowInsets.systemBars collapses to ~0 here, so this Column and
+            // the artwork header below it already reach the true top edge of the screen with
+            // no extra offset/overlay tricks needed.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -590,6 +596,9 @@ internal fun FSPlayerControls(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Repeat and queue are toggle-style controls, so they keep a soft container to make
+            // their active/inactive state readable at a glance (also bumped up in size for a
+            // sturdier touch target, matching the reference design).
             FSIconButton(
                 painter = painterResource(
                     if (state.repeatMode == androidx.media3.common.Player.REPEAT_MODE_ONE) {
@@ -601,17 +610,17 @@ internal fun FSPlayerControls(
                 contentDescription = "Toggle repeat mode",
                 onClick = actions.onToggleRepeat,
                 active = state.repeatMode != androidx.media3.common.Player.REPEAT_MODE_OFF,
-                buttonSize = 32.dp,
+                buttonSize = 40.dp,
                 iconSize = 24.dp,
-                showContainer = false,
+                showContainer = true,
             )
             FSIconButton(
                 painter = painterResource(R.drawable.skip_previous),
                 contentDescription = "Previous track",
                 onClick = actions.onSkipPrevious,
                 enabled = state.canSkipPrevious,
-                buttonSize = 32.dp,
-                iconSize = 32.dp,
+                buttonSize = 44.dp,
+                iconSize = 34.dp,
                 showContainer = false,
             )
             FSPlayButton(
@@ -625,17 +634,17 @@ internal fun FSPlayerControls(
                 contentDescription = "Next track",
                 onClick = actions.onSkipNext,
                 enabled = state.canSkipNext,
-                buttonSize = 32.dp,
-                iconSize = 32.dp,
+                buttonSize = 44.dp,
+                iconSize = 34.dp,
                 showContainer = false,
             )
             FSIconButton(
                 painter = painterResource(R.drawable.queue_music),
                 contentDescription = "Open playback queue",
                 onClick = onOpenQueue,
-                buttonSize = 32.dp,
+                buttonSize = 40.dp,
                 iconSize = 24.dp,
-                showContainer = false,
+                showContainer = true,
             )
         }
     }
@@ -707,24 +716,30 @@ private fun FSPlayButton(
         animationSpec = spring(dampingRatio = 0.66f, stiffness = 540f),
         label = "fs-play-button-scale",
     )
-    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    val iconTint = if (isLightTheme) FrostSoulTheme.colors.onSurface else Color.White
+    // Filled circular background (previously a bare icon with no chip, which also made it a
+    // light-mode visibility casualty since its tint used to flip to a dark color with nothing
+    // solid behind it). The fill uses the track's accent color so it stays visible over any
+    // artwork and in either app theme; icon tint is derived from the fill's own luminance so it
+    // always has real contrast against its own button, matching the reference design.
+    val iconTint = if (accent.luminance() > 0.5f) Color.Black else Color.White
     Box(
         contentAlignment = Alignment.Center,
         modifier =
             Modifier
-                .size(64.dp)
+                .size(68.dp)
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
                 }
+                .clip(androidx.compose.foundation.shape.CircleShape)
+                .background(accent)
                 .clickable(onClick = onClick),
     ) {
         Icon(
             painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
             contentDescription = if (isPlaying) "Pause" else "Play",
             tint = iconTint,
-            modifier = Modifier.size(if (isBuffering) 24.dp else 30.dp).alpha(if (isBuffering) 0.54f else 1f),
+            modifier = Modifier.size(if (isBuffering) 26.dp else 32.dp).alpha(if (isBuffering) 0.54f else 1f),
         )
     }
 }
@@ -848,6 +863,11 @@ private fun FrostSoulArtistDialog(
 private fun FrostSoulMainLyricPreview(
     uiState: FrostSoulPlayerUiState,
     onlyCurrentLine: Boolean = false,
+    // The artwork-blur player wants exactly the current 2-line block, bigger and more
+    // prominent, with no extra trailing preview lines below it (reference: a clean 2-line
+    // block only). The vinyl page still uses onlyCurrentLine = true (single line) and is
+    // unaffected by this flag.
+    showExtraPreviewLines: Boolean = !onlyCurrentLine,
     horizontalPadding: Dp = PlayerLayoutTokens.MasterHorizontalPadding,
     modifier: Modifier = Modifier,
 ) {
@@ -855,7 +875,7 @@ private fun FrostSoulMainLyricPreview(
     if (currentLine == null && uiState.lyricPreviewLines.isEmpty()) return
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = horizontalPadding),
@@ -867,25 +887,25 @@ private fun FrostSoulMainLyricPreview(
                     wordProgress = uiState.currentWordProgress,
                     lineProgress = uiState.currentLineProgress,
                 ),
-                color = FrostSoulOnSurface.copy(alpha = 0.92f),
-                fontSize = 17.sp,
-                lineHeight = 23.sp,
-                fontWeight = FontWeight.SemiBold,
+                color = FrostSoulOnSurface.copy(alpha = 0.96f),
+                fontSize = if (onlyCurrentLine) 17.sp else 21.sp,
+                lineHeight = if (onlyCurrentLine) 23.sp else 28.sp,
+                fontWeight = FontWeight.Bold,
                 maxLines = if (onlyCurrentLine) 1 else 2,
                 overflow = TextOverflow.Ellipsis,
             )
         } ?: uiState.currentLyricLine?.takeIf { it.isNotBlank() }?.let { line ->
             Text(
                 text = line,
-                color = FrostSoulOnSurface.copy(alpha = 0.92f),
-                fontSize = 17.sp,
-                lineHeight = 23.sp,
-                fontWeight = FontWeight.SemiBold,
+                color = FrostSoulOnSurface.copy(alpha = 0.96f),
+                fontSize = if (onlyCurrentLine) 17.sp else 21.sp,
+                lineHeight = if (onlyCurrentLine) 23.sp else 28.sp,
+                fontWeight = FontWeight.Bold,
                 maxLines = if (onlyCurrentLine) 1 else 2,
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        if (!onlyCurrentLine) {
+        if (showExtraPreviewLines) {
             uiState.lyricPreviewLines.drop(1).take(3).forEach { line ->
                 Text(
                     text = line,
@@ -1216,7 +1236,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 )
             }
 
-            FrostSoulMainLyricPreview(uiState = uiState)
+            FrostSoulMainLyricPreview(uiState = uiState, showExtraPreviewLines = false)
         }
 
         FSPlayerControls(
@@ -1409,13 +1429,16 @@ private fun FrostSoulRecommendationsPage(
                 .toMap()
         }
     }
-    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    val primaryText = if (isLightTheme) FrostSoulTheme.colors.onSurface else FrostSoulOnSurface
-    val mutedText = if (isLightTheme) FrostSoulTheme.colors.onSurfaceMuted else FrostSoulOnSurfaceMuted
-    val chipText = if (isLightTheme) Color.Black else Color.White
-    val chipSurface = if (isLightTheme) Color.Black.copy(alpha = 0.08f) else Color.White.copy(alpha = 0.08f)
-    val chipOutline = if (isLightTheme) Color.Black.copy(alpha = 0.16f) else Color.White.copy(alpha = 0.18f)
-    val cardSurface = if (isLightTheme) Color.Black.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.07f)
+    // This page renders directly over FrostSoulDynamicBackground's ambient blurred artwork,
+    // which stays dark in both app themes — so text/chip colors stay white-based regardless of
+    // the app's light/dark theme setting (fixes FS-BUG-LIGHTMODE: text was flipping to
+    // near-black here and disappearing against the still-dark backdrop in light theme).
+    val primaryText = FrostSoulOnSurface
+    val mutedText = FrostSoulOnSurfaceMuted
+    val chipText = Color.White
+    val chipSurface = Color.White.copy(alpha = 0.08f)
+    val chipOutline = Color.White.copy(alpha = 0.18f)
+    val cardSurface = Color.White.copy(alpha = 0.07f)
 
     Column(
         modifier = Modifier
@@ -1977,7 +2000,6 @@ private fun FrostSoulDynamicBackground(
     palette: FrostSoulPalette,
     moodSeed: String,
 ) {
-    val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     val isVinyl = playerDesignStyle == PlayerDesignStyle.FROSTSOUL
     val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
     val isStaticGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW
@@ -2004,11 +2026,16 @@ private fun FrostSoulDynamicBackground(
             0.5f
         }
     val glowPhase = if (isAnimatedGlow) animatedGlowPhase else 0.5f
+    // The ambient backdrop stays a dark, moody canvas regardless of the app's light/dark theme
+    // setting — matching the reference design — so text and icons drawn on top of it never need
+    // to flip to a dark tint (see FS-BUG-LIGHTMODE fix in FSIconButton). A stronger minimum blur
+    // floor is applied below for a cleaner "ambient" look instead of a barely-blurred backdrop.
+    val ambientBlurRadius = (blurRadius.coerceIn(0f, 120f)).coerceAtLeast(36f)
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(if (isLightTheme) FrostSoulTheme.colors.background else Color.Black),
+                .background(Color.Black),
     ) {
         if (shouldBlurArtwork && !artworkUrl.isNullOrBlank()) {
             val saturationMatrix = ColorMatrix().apply { setToSaturation(1.0f) }
@@ -2019,8 +2046,9 @@ private fun FrostSoulDynamicBackground(
                 colorFilter = ColorFilter.colorMatrix(saturationMatrix),
                 modifier = Modifier
                     .fillMaxSize()
+                    .graphicsLayer { scaleX = 1.12f; scaleY = 1.12f }
                     .blur(
-                        blurRadius.coerceIn(0f, 120f).dp,
+                        ambientBlurRadius.dp,
                         edgeTreatment = BlurredEdgeTreatment.Unbounded,
                     ),
             )
@@ -2067,27 +2095,28 @@ private fun FrostSoulDynamicBackground(
                 ),
             )
         } else {
+            // Previously switched to a white wash in light theme, which fought with the final
+            // dark readability scrim below and left inconsistent contrast behind text/icons.
+            // Kept as one consistent dark ambient tone in both themes (fixes FS-BUG-LIGHTMODE
+            // for text drawn on this backdrop, e.g. Recommendations page).
             Box(
                 modifier = Modifier.fillMaxSize().background(
                     Brush.verticalGradient(
-                        colors = if (isLightTheme && !isVinyl) {
-                            listOf(Color.White.copy(alpha = 0.38f), Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.34f))
-                        } else {
-                            listOf(Color.Black.copy(alpha = 0.18f), Color.Transparent, Color.Black.copy(alpha = 0.30f))
-                        },
+                        colors = listOf(Color.Black.copy(alpha = 0.22f), Color.Transparent, Color.Black.copy(alpha = 0.34f)),
                     ),
                 ),
             )
         }
         // Keep lyric text readable when artwork contains bright whites or skin tones. This is
         // deliberately the final backdrop layer so animated glow cannot wash out lyric text.
+        // Alphas raised slightly for a moodier, more legible "dark ambient" backdrop.
         Box(
             modifier = Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color.Black.copy(alpha = 0.24f),
-                        Color.Black.copy(alpha = 0.14f),
-                        Color.Black.copy(alpha = 0.42f),
+                        Color.Black.copy(alpha = 0.30f),
+                        Color.Black.copy(alpha = 0.18f),
+                        Color.Black.copy(alpha = 0.50f),
                     ),
                 ),
             ),

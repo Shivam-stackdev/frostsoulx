@@ -29,7 +29,9 @@ internal object PlayerLayoutTokens {
     val TurntableRestPegSize = 13.dp
     val TurntableSpindleSize = 11.dp
 
-    /** Artwork-blur header height, kept full-bleed so it melts into the page. */
+    /** Artwork-blur header height, kept full-bleed so it melts into the page. Reverted to the
+     * original dimension per request — the real fix for "seamless to the top" is the immersive
+     * status-bar-hide in MainActivity.shouldHideStatusBars, not a taller header. */
     val ArtworkBlurHeaderHeight = 342.dp
 
     /** Lyrics typography and rhythm, tuned against the QQ Music lyric sheet. */

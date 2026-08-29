@@ -108,7 +108,13 @@ internal fun FSIconButton(
     showContainer: Boolean = true,
 ) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
-    val baseTint = if (isLightTheme) FrostSoulTheme.colors.onSurface else Color.White
+    // Containerless icons (showContainer = false) sit directly on the artwork / ambient-blur
+    // backdrop, which stays dark-ish regardless of the app's light/dark theme setting. Only
+    // let the theme flip the tint to a dark color when there is an actual background chip
+    // behind the icon (showContainer = true) that also flips color for contrast — otherwise
+    // always keep it near-white so it never disappears in light theme. See FS-BUG-LIGHTMODE.
+    val baseTint =
+        if (isLightTheme && showContainer) FrostSoulTheme.colors.onSurface else Color.White
     val iconTint =
         when {
             !enabled -> baseTint.copy(alpha = 0.28f)
@@ -117,9 +123,9 @@ internal fun FSIconButton(
         }
     val background =
         if (active) {
-            baseTint.copy(alpha = if (isLightTheme) 0.10f else 0.14f)
+            baseTint.copy(alpha = if (isLightTheme && showContainer) 0.10f else 0.14f)
         } else {
-            if (isLightTheme) FrostSoulTheme.colors.surfaceRaised else Color.White.copy(alpha = 0.08f)
+            if (isLightTheme && showContainer) FrostSoulTheme.colors.surfaceRaised else Color.White.copy(alpha = 0.08f)
         }
     val buttonModifier = modifier.size(buttonSize)
     val styledModifier =
@@ -129,7 +135,12 @@ internal fun FSIconButton(
                 .background(background)
                 .border(1.dp, iconTint.copy(alpha = if (active) 0.52f else 0.15f), CircleShape)
         } else {
+            // No chip behind the icon, so give it a faint dark scrim disc instead — enough to
+            // guarantee contrast over bright artwork or a light-themed backdrop without
+            // looking like a full button, matching the reference UI's soft icon shadowing.
             buttonModifier
+                .clip(CircleShape)
+                .background(Color.Black.copy(alpha = if (active) 0.0f else 0.16f))
         }
 
     Box(
