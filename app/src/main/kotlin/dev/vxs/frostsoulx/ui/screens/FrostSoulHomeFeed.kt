@@ -177,7 +177,7 @@ internal fun FrostSoulHomeFeed(
                 )
             }
             item(key = "frostsoul_preference_prompt") {
-                FrostSoulPreferencePrompt(onClick = { navController.navigate("settings") })
+                FrostSoulPreferencePrompt(onClick = { navController.navigate("settings/content") })
             }
         }
 
