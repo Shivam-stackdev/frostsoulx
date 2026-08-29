@@ -630,7 +630,9 @@ class MainActivity : ComponentActivity() {
                 val onboardingState by onboardingViewModel.screenState.collectAsStateWithLifecycle()
                 val shouldShowOnboarding =
                     when (val state = onboardingState) {
-                        OnboardingScreenState.Loading -> true
+                        // Keep the normal home shell visible during cold-start loading so the
+                        // home screen's FrostSoul loader is shown instead of a separate splash.
+                        OnboardingScreenState.Loading -> false
                         OnboardingScreenState.Empty -> true
                         is OnboardingScreenState.Error -> false
                         is OnboardingScreenState.Success -> state.uiState.shouldShowOnboarding
