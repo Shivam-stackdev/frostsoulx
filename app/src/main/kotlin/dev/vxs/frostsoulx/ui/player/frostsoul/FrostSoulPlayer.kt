@@ -100,6 +100,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.palette.graphics.Palette
@@ -524,10 +525,11 @@ internal fun FSMiniPlayer(
                     painter = painterResource(R.drawable.queue_music),
                     contentDescription = "Open queue",
                     onClick = openQueue,
-                    buttonSize = 24.dp,
+                    buttonSize = 48.dp,
                     iconSize = 24.dp,
                     showContainer = false,
                     dimBackdrop = false,
+                    modifier = Modifier.zIndex(2f),
                 )
             }
         }
