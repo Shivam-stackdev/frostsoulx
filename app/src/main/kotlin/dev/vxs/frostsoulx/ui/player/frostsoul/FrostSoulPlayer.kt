@@ -25,6 +25,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.combinedClickable
@@ -426,7 +427,6 @@ internal fun FSMiniPlayer(
     val backgroundColor = FrostSoulTheme.colors.surface
     val primaryTextColor = if (isLightTheme) FrostSoulTheme.colors.onSurface else FrostSoulOnSurface
     val mutedTextColor = if (isLightTheme) FrostSoulTheme.colors.onSurfaceMuted else FrostSoulOnSurfaceMuted
-    val progressColor = if (isLightTheme) FrostSoulTheme.colors.accentBright else palette.accent
 
     Box(
         modifier =
@@ -450,25 +450,53 @@ internal fun FSMiniPlayer(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 6.dp),
         ) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(artworkSize).clip(RoundedCornerShape(8.dp)).background(FrostSoulSurface),
+                modifier = Modifier.size(artworkSize + 10.dp),
             ) {
-                AsyncImage(
-                    model = track.artworkUrl,
-                    contentDescription = "Album artwork for ${track.title}",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-                if (track.artworkUrl.isNullOrBlank()) {
-                    Icon(
-                        painter = painterResource(R.drawable.music_note),
-                        contentDescription = null,
-                        tint = mutedTextColor,
-                        modifier = Modifier.size(22.dp),
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    val strokeWidth = 2.5.dp.toPx()
+                    val inset = strokeWidth / 2f
+                    val ringSize = androidx.compose.ui.geometry.Size(size.width - strokeWidth, size.height - strokeWidth)
+                    val ringOffset = androidx.compose.ui.geometry.Offset(inset, inset)
+                    val timelineColor = if (isLightTheme) Color.Black else Color.White
+                    drawRoundRect(
+                        color = timelineColor.copy(alpha = 0.22f),
+                        topLeft = ringOffset,
+                        size = ringSize,
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(10.dp.toPx()),
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth),
                     )
+                    drawArc(
+                        color = timelineColor,
+                        startAngle = -90f,
+                        sweepAngle = 360f * progress,
+                        useCenter = false,
+                        topLeft = ringOffset,
+                        size = ringSize,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(artworkSize).clip(RoundedCornerShape(8.dp)).background(FrostSoulSurface),
+                ) {
+                    AsyncImage(
+                        model = track.artworkUrl,
+                        contentDescription = "Album artwork for ${track.title}",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    if (track.artworkUrl.isNullOrBlank()) {
+                        Icon(
+                            painter = painterResource(R.drawable.music_note),
+                            contentDescription = null,
+                            tint = mutedTextColor,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
                 }
             }
             Spacer(Modifier.width(12.dp))
@@ -495,52 +523,45 @@ internal fun FSMiniPlayer(
                     }
                 },
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f).padding(end = 18.dp),
+                softWrap = false,
+                overflow = TextOverflow.Clip,
+                modifier = Modifier.weight(1f).basicMarquee(iterations = Int.MAX_VALUE),
             )
-            FSIconButton(
-                painter = painterResource(if (track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                contentDescription = if (track.isLiked) "Remove from favorites" else "Add to favorites",
-                onClick = onToggleLike,
-                active = track.isLiked,
-                buttonSize = 24.dp,
-                iconSize = 24.dp,
-                showContainer = false,
-                dimBackdrop = false,
-                modifier = Modifier.padding(end = 18.dp),
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(42.dp).zIndex(1f).clickable(onClick = onToggleLike),
+            ) {
+                Icon(
+                    painter = painterResource(if (track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
+                    contentDescription = if (track.isLiked) "Remove from favorites" else "Add to favorites",
+                    tint = if (track.isLiked) Color(0xFFFF3B4D) else primaryTextColor,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
             FSIconButton(
                 painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
                 contentDescription = if (isPlaying) "Pause" else "Play",
                 onClick = onTogglePlayPause,
-                active = isPlaying,
-                buttonSize = 28.dp,
-                iconSize = 28.dp,
+                active = false,
+                buttonSize = 42.dp,
+                iconSize = 24.dp,
                 showContainer = false,
                 dimBackdrop = false,
-                modifier = Modifier.padding(end = 18.dp),
+                modifier = Modifier.zIndex(1f),
             )
             onQueueClick?.let { openQueue ->
                 FSIconButton(
                     painter = painterResource(R.drawable.queue_music),
                     contentDescription = "Open queue",
                     onClick = openQueue,
-                    buttonSize = 48.dp,
+                    buttonSize = 42.dp,
                     iconSize = 24.dp,
                     showContainer = false,
                     dimBackdrop = false,
-                    modifier = Modifier.zIndex(2f),
+                    modifier = Modifier.zIndex(1f),
                 )
             }
         }
-        Box(
-            modifier =
-                Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth(progress)
-                    .height(if (peeked) 3.dp else 2.dp)
-                    .background(progressColor),
-        )
     }
 }
 
