@@ -1161,9 +1161,9 @@ private fun FrostSoulArtworkBlurAlbumPage(
                         ),
                     )
                 }
-                
-   
-          Row(
+            }
+
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
