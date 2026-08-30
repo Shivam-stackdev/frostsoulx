@@ -29,6 +29,7 @@ import dev.vxs.frostsoulx.utils.NetworkConnectivityObserver
 import dev.vxs.frostsoulx.utils.dataStore
 import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
+import kotlin.math.abs
 
 class LyricsHelper
     @Inject
@@ -209,15 +210,9 @@ class LyricsHelper
 
             if (results.isEmpty()) return LYRICS_NOT_FOUND
 
-            val syncedResults = results.filter { LyricsUtils.isLineSyncedLrc(it) }
-
-if (syncedResults.isNotEmpty()) {
-    return syncedResults.maxByOrNull {
-        scoreSyncedLyrics(it, mediaMetadata.duration)
-    } ?: syncedResults.first()
-}
-
-return results.first() 
+            return results.maxByOrNull {
+                scoreLyricsQuality(it, mediaMetadata.duration)
+            } ?: results.first()
         }
         private suspend fun fetchProviderLyrics(
             provider: LyricsProvider,
@@ -256,35 +251,43 @@ return results.first()
                 reportException(e)
                 null
             }
-        private fun scoreSyncedLyrics(
-    lyrics: String,
-    durationMs: Int,
-): Double {
-    val normalized = LyricsUtils.normalizeLyricsText(lyrics)
+        private fun scoreLyricsQuality(
+            lyrics: String,
+            durationMs: Int,
+        ): Double {
+            val normalized = LyricsUtils.normalizeLyricsText(lyrics)
+            val visibleText = LyricsUtils.displayLyricsText(normalized)
+            val visibleLineCount = visibleText.lineSequence().count { it.isNotBlank() }
+            val characterScore = (visibleText.length.toDouble() / 1800.0).coerceAtMost(1.0)
+            val isTtmlLyrics = LyricsUtils.isTtml(normalized)
+            val isLineSynced = LyricsUtils.isLineSyncedLrc(normalized)
 
-    val entries = runCatching {
-        LyricsUtils.parseLyrics(normalized)
-    }.getOrElse {
-        emptyList()
-    }
+            if (!isTtmlLyrics && !isLineSynced) {
+                return (visibleLineCount.toDouble() / 40.0).coerceAtMost(1.0) * 45.0 + characterScore * 35.0
+            }
 
-    if (entries.isEmpty()) return 0.0
+            val entries =
+                runCatching {
+                    if (isTtmlLyrics) LyricsUtils.parseTtml(normalized) else LyricsUtils.parseLyrics(normalized)
+                }.getOrElse { emptyList() }
+            if (entries.isEmpty()) return characterScore * 10.0
 
-    val lastTimestamp = entries.maxOfOrNull { it.time } ?: 0L
-    val duration = durationMs.toLong().coerceAtLeast(1L)
+            val firstTimestamp = entries.minOfOrNull { it.time } ?: 0L
+            val lastTimestamp = entries.maxOfOrNull { it.time } ?: 0L
+            val duration = durationMs.toLong().takeIf { it > 0L }
+            val coverageScore =
+                duration?.let { (lastTimestamp.toDouble() / it.toDouble()).coerceIn(0.0, 1.0) * 20.0 } ?: 10.0
+            val durationFitScore =
+                duration?.let {
+                    (1.0 - abs(lastTimestamp - it).toDouble() / it.toDouble()).coerceIn(0.0, 1.0) * 10.0
+                } ?: 5.0
+            val lineScore = (entries.size.toDouble() / 45.0).coerceAtMost(1.0) * 30.0
+            val startsNearBeginning = if (firstTimestamp <= 15_000L) 5.0 else 0.0
 
-    val coverage =
-        (lastTimestamp.toDouble() / duration.toDouble())
-            .coerceIn(0.0, 1.0)
-
-    val lineScore =
-        (entries.size.toDouble() / 200.0)
-            .coerceAtMost(1.0)
-
-    return (coverage * 100.0) + (lineScore * 25.0)
+            // Synced lyrics get a modest bonus, but completeness and duration coverage dominate.
+            return 20.0 + coverageScore + durationFitScore + lineScore + characterScore * 15.0 + startsNearBeginning
         }
 
-private suspend fun orderedProviders(): List<LyricsProvider> {
         private suspend fun orderedProviders(): List<LyricsProvider> {
             val orderStr = context.dataStore.data.first()[LyricsProviderOrderKey]
             val orderedEnums = deserializeLyricsProviderOrder(orderStr)

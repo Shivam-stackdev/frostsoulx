@@ -176,7 +176,6 @@ private const val ArchiveTune_AUTO_SCROLL_DURATION = 1500L
 private const val ArchiveTune_INITIAL_SCROLL_DURATION = 1000L
 private const val ArchiveTune_SEEK_DURATION = 800L
 private const val ArchiveTune_FAST_SEEK_DURATION = 600L
-private const val LyricsWordSyncLeadMs = 300L
 
 val LyricsPreviewTime = 2.seconds
 
@@ -540,15 +539,6 @@ fun Lyrics(
     val lyricsGlowColor = if (useDarkTheme || playerBackground != PlayerBackgroundStyle.DEFAULT) Color.White else Color.Black
     val textColor = lyricsBaseColor
 
-    val wordSyncLeadMs =
-        remember(lyrics) {
-            if (lyrics != null && isTtml(lyrics)) 0L else LyricsWordSyncLeadMs
-        }
-    val lineSyncLeadMs =
-        remember(lyrics) {
-            if (lyrics != null && isTtml(lyrics)) 0L else LyricsWordSyncLeadMs
-        }
-
     var currentLineIndex by remember {
         mutableIntStateOf(-1)
     }
@@ -667,11 +657,11 @@ fun Lyrics(
                 isSeeking = seekingNow
             }
             val position = sliderPosition ?: playerConnection.player.currentPosition
-            val syncedPosition = (position + wordSyncLeadMs + lyricsSyncOffset.toLong()).coerceAtLeast(0L)
+            val syncedPosition = (position + lyricsSyncOffset.toLong()).coerceAtLeast(0L)
             if (currentPlaybackPosition != syncedPosition) {
                 currentPlaybackPosition = syncedPosition
             }
-            val newLineIndex = findCurrentLineIndex(lines, position + lyricsSyncOffset.toLong(), leadMs = lineSyncLeadMs)
+            val newLineIndex = findCurrentLineIndex(lines, position + lyricsSyncOffset.toLong(), leadMs = 0L)
             if (currentLineIndex != newLineIndex) {
                 currentLineIndex = newLineIndex
             }

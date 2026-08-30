@@ -149,13 +149,6 @@ import kotlin.math.abs
 // Constants
 // ──────────────────────────────────────────────────────────────────────
 
-/** Lead time offset for LRC-style line-synced lyrics (ms). */
-private const val LRC_LEAD_MS = 300L
-
-/** Lead time offset for TTML word-synced lyrics (ms). */
-private const val TTML_LEAD_MS = 0L
-
-private const val LYRIC_VISUAL_TUNING_OFFSET_MS = 150L
 
 /** Seconds to wait before auto-scroll resumes after manual scroll. */
 private const val MANUAL_SCROLL_TIMEOUT_MS = 3000L
@@ -344,12 +337,11 @@ fun LyricsV2(
     }
 
     // ── Playback position tracking ──
-    val leadMs = if (isTtmlFormat) TTML_LEAD_MS else LRC_LEAD_MS
     var currentPositionMs by remember { mutableLongStateOf(0L) }
     var playbackPositionMs by remember { mutableLongStateOf(0L) }
     var currentLineIndex by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(entriesWithWords, isSynced, leadMs, lyricsSyncOffset) {
+    LaunchedEffect(entriesWithWords, isSynced, lyricsSyncOffset) {
         if (!isSynced || entriesWithWords.isEmpty()) return@LaunchedEffect
         val pollIntervalMs = if (isTtmlFormat) 16L else 50L
         while (isActive) {
@@ -357,7 +349,9 @@ fun LyricsV2(
             val pos = sliderPos ?: player.currentPosition
 
             playbackPositionMs = (pos + lyricsSyncOffset.toLong()).coerceAtLeast(0L)
-            currentPositionMs = (playbackPositionMs + leadMs + LYRIC_VISUAL_TUNING_OFFSET_MS).coerceAtLeast(0L)
+            // Apply only the user-selected offset; do not add an invisible provider/visual lead.
+            // This keeps the highlighted line aligned with the actual playback position.
+            currentPositionMs = playbackPositionMs
 
             currentLineIndex = findCurrentLineIndex(entriesWithWords, currentPositionMs, 0L)
             delay(pollIntervalMs)
