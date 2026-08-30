@@ -979,6 +979,7 @@ private fun FrostSoulMainLyricPreview(
     // block only). The vinyl page still uses onlyCurrentLine = true (single line) and is
     // unaffected by this flag.
     showExtraPreviewLines: Boolean = !onlyCurrentLine,
+    maxLinesPerLyric: Int = 2,
     horizontalPadding: Dp = PlayerLayoutTokens.MasterHorizontalPadding,
     modifier: Modifier = Modifier,
 ) {
@@ -1002,7 +1003,7 @@ private fun FrostSoulMainLyricPreview(
                 fontSize = if (onlyCurrentLine) 17.sp else 21.sp,
                 lineHeight = if (onlyCurrentLine) 23.sp else 28.sp,
                 fontWeight = FontWeight.Bold,
-                maxLines = if (onlyCurrentLine) 1 else 2,
+                maxLines = if (onlyCurrentLine) 1 else maxLinesPerLyric,
                 overflow = TextOverflow.Ellipsis,
             )
         } ?: uiState.currentLyricLine?.takeIf { it.isNotBlank() }?.let { line ->
@@ -1012,12 +1013,12 @@ private fun FrostSoulMainLyricPreview(
                 fontSize = if (onlyCurrentLine) 17.sp else 21.sp,
                 lineHeight = if (onlyCurrentLine) 23.sp else 28.sp,
                 fontWeight = FontWeight.Bold,
-                maxLines = if (onlyCurrentLine) 1 else 2,
+                maxLines = if (onlyCurrentLine) 1 else maxLinesPerLyric,
                 overflow = TextOverflow.Ellipsis,
             )
         }
         if (showExtraPreviewLines) {
-            uiState.lyricPreviewLines.drop(1).take(3).forEach { line ->
+            uiState.lyricPreviewLines.drop(1).take(1).forEach { line ->
                 Text(
                     text = line,
                     color = FrostSoulOnSurfaceMuted.copy(alpha = 0.58f),
@@ -1205,7 +1206,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight + 110.dp)
+                    .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight)
                     .clipToBounds(),
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
@@ -1305,7 +1306,8 @@ private fun FrostSoulArtworkBlurAlbumPage(
 
             FrostSoulMainLyricPreview(
                 uiState = uiState,
-                showExtraPreviewLines = false,
+                showExtraPreviewLines = true,
+                maxLinesPerLyric = 1,
                 modifier = Modifier.heightIn(min = 60.dp),
             )
         }
