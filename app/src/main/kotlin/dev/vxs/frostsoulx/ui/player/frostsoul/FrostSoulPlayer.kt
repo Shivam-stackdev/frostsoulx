@@ -83,6 +83,8 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
@@ -462,22 +464,40 @@ internal fun FSMiniPlayer(
                     val ringSize = androidx.compose.ui.geometry.Size(size.width - strokeWidth, size.height - strokeWidth)
                     val ringOffset = androidx.compose.ui.geometry.Offset(inset, inset)
                     val timelineColor = if (isLightTheme) Color.Black else Color.White
-                    drawRoundRect(
+                    val perimeterPath = Path().apply {
+                        addRoundRect(
+                            androidx.compose.ui.geometry.RoundRect(
+                                rect = androidx.compose.ui.geometry.Rect(ringOffset, ringSize),
+                                cornerRadius = androidx.compose.ui.geometry.CornerRadius(10.dp.toPx()),
+                            ),
+                        )
+                    }
+                    val perimeterMeasure = PathMeasure()
+                    perimeterMeasure.setPath(perimeterPath, forceClosed = true)
+                    val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
+                        width = strokeWidth,
+                        cap = StrokeCap.Round,
+                        join = androidx.compose.ui.graphics.StrokeJoin.Round,
+                    )
+                    drawPath(
+                        path = perimeterPath,
                         color = timelineColor.copy(alpha = 0.22f),
-                        topLeft = ringOffset,
-                        size = ringSize,
-                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(10.dp.toPx()),
-                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth),
+                        style = stroke,
                     )
-                    drawArc(
-                        color = timelineColor,
-                        startAngle = -90f,
-                        sweepAngle = 360f * progress,
-                        useCenter = false,
-                        topLeft = ringOffset,
-                        size = ringSize,
-                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth, cap = StrokeCap.Round),
-                    )
+                    if (progress > 0f) {
+                        val progressPath = Path()
+                        perimeterMeasure.getSegment(
+                            startDistance = 0f,
+                            stopDistance = perimeterMeasure.length * progress,
+                            destination = progressPath,
+                            startWithMoveTo = true,
+                        )
+                        drawPath(
+                            path = progressPath,
+                            color = timelineColor,
+                            style = stroke,
+                        )
+                    }
                 }
                 Box(
                     contentAlignment = Alignment.Center,
