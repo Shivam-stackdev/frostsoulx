@@ -1121,12 +1121,10 @@ private fun FrostSoulArtworkBlurAlbumPage(
        // inset, and fades edge-to-edge into the page background so the thumbnail
             // reads as one seamless surface (QQ Music "immersive cover" behaviour).
             Box(
-                
-                
                 modifier = Modifier
-               .fillMaxWidth(),
-               .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight + 110.dp)
-               .clipToBounds()
+                    .fillMaxWidth()
+                    .height(PlayerLayoutTokens.ArtworkBlurHeaderHeight + 110.dp)
+                    .clipToBounds(),
             ) {
                 if (!uiState.track.artworkUrl.isNullOrBlank()) {
                     // The blurred artwork is already rendered full-screen underneath this header.
