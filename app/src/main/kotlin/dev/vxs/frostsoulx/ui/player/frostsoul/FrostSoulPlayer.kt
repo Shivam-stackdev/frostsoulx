@@ -1067,7 +1067,7 @@ private fun FrostSoulAlbumPage(
                     actions = actions,
                     onOpenQueue = onOpenQueue,
                     modifier = Modifier.padding(top = 2.dp),
-                    immersive = false,
+                    immersive = true,
             )
         }
     }
