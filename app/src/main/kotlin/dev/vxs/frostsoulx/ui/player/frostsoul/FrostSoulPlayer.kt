@@ -43,6 +43,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -79,6 +80,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -150,6 +152,12 @@ internal fun FrostSoulPlayer(
     var queueVisible by remember { mutableStateOf(false) }
     var showArtistDialog by remember(uiState.track.id) { mutableStateOf(false) }
     var showPagerDots by remember { mutableStateOf(true) }
+    // While the seekbar is being dragged, the pager's own horizontal-swipe gesture must not
+    // compete with it — otherwise a horizontal drag on the seekbar can get interpreted as a
+    // page-change swipe instead of a seek. Disabling userScrollEnabled for the duration of the
+    // drag is the reliable fix (plain pointerInput consumption on the seekbar alone doesn't
+    // reliably win against the pager's own scrollable gesture detection).
+    var isSeekbarDragging by remember { mutableStateOf(false) }
     var downwardDragDistance by remember { mutableFloatStateOf(0f) }
     val settledDragOffset by animateFloatAsState(
         targetValue = downwardDragDistance,
@@ -157,6 +165,13 @@ internal fun FrostSoulPlayer(
         label = "frostsoul-player-dismiss-drag",
     )
     val collapseFraction = (settledDragOffset / 280f).coerceIn(0f, 1f)
+    // On the ARTWORK_BLUR ("Immersive") style, the main player page wants its artwork to
+    // reach the true top of the screen (behind the already-hidden status bar), with the
+    // collapse chevron + pager dots floating over the artwork instead of sitting in their
+    // own reserved row above it. Other pages/styles keep the reserved row untouched.
+    val isImmersiveArtworkMainPage =
+        playerDesignStyle == dev.vxs.frostsoulx.constants.PlayerDesignStyle.ARTWORK_BLUR &&
+            pages.getOrNull(pagerState.currentPage) == FrostSoulPage.MainPlayer
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         showPagerDots = true
         if (!pagerState.isScrollInProgress) {
@@ -212,10 +227,16 @@ internal fun FrostSoulPlayer(
             // drawn behind), WindowInsets.systemBars collapses to ~0 here, so this Column and
             // the artwork header below it already reach the true top edge of the screen with
             // no extra offset/overlay tricks needed.
+            //
+            // On the Immersive main player page this row drops to 0dp height so the pager
+            // below reclaims the space (letting the artwork header start at the true y=0),
+            // while zIndex keeps the chevron/dots painted above the artwork instead of
+            // being drawn underneath it.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(42.dp)
+                    .height(if (isImmersiveArtworkMainPage) 0.dp else 42.dp)
+                    .zIndex(if (isImmersiveArtworkMainPage) 12f else 0f)
                     .padding(
                         start = PlayerLayoutTokens.MasterHorizontalPadding,
                         end = PlayerLayoutTokens.MasterHorizontalPadding,
@@ -249,6 +270,7 @@ internal fun FrostSoulPlayer(
                 state = pagerState,
                 key = { index -> pages[index].name },
                 beyondViewportPageCount = 1,
+                userScrollEnabled = !isSeekbarDragging,
                 modifier = Modifier.weight(1f),
             ) { pageIndex ->
                 val pageDistance = (pagerState.currentPage - pageIndex) + pagerState.currentPageOffsetFraction
@@ -290,6 +312,7 @@ internal fun FrostSoulPlayer(
                                     onOpenOptions = actions.onOpenOptions,
                                     onSearchTrack = onSearchTrack,
                                     onShowArtists = { showArtistDialog = true },
+                                    onSeekDraggingChanged = { isSeekbarDragging = it },
                                 )
                             } else {
                                 FrostSoulAlbumPage(
@@ -299,6 +322,7 @@ internal fun FrostSoulPlayer(
                                     onOpenOptions = actions.onOpenOptions,
                                     onSearchTrack = onSearchTrack,
                                     onShowArtists = { showArtistDialog = true },
+                                    onSeekDraggingChanged = { isSeekbarDragging = it },
                                 )
                             }
                         FrostSoulPage.Recommendations -> FrostSoulRecommendationsPage(uiState = uiState, actions = actions)
@@ -461,16 +485,50 @@ internal fun FSMiniPlayer(
                 Canvas(modifier = Modifier.matchParentSize()) {
                     val strokeWidth = 2.5.dp.toPx()
                     val inset = strokeWidth / 2f
-                    val ringSize = androidx.compose.ui.geometry.Size(size.width - strokeWidth, size.height - strokeWidth)
-                    val ringOffset = androidx.compose.ui.geometry.Offset(inset, inset)
+                    val left = inset
+                    val top = inset
+                    val right = size.width - inset
+                    val bottom = size.height - inset
+                    val cornerRadius = 10.dp.toPx().coerceAtMost((minOf(size.width, size.height) / 2f) - inset)
+                    val topMidX = (left + right) / 2f
                     val timelineColor = if (isLightTheme) Color.Black else Color.White
+                    // Built by hand (instead of Path.addRoundRect, whose start point sits near a
+                    // corner and which Compose defaults to counter-clockwise) so distance=0 on
+                    // this path is exactly the middle of the top edge and the path winds
+                    // clockwise from there — matching the requested start point/direction for
+                    // the progress sweep below.
                     val perimeterPath = Path().apply {
-                        addRoundRect(
-                            androidx.compose.ui.geometry.RoundRect(
-                                rect = androidx.compose.ui.geometry.Rect(ringOffset, ringSize),
-                                cornerRadius = androidx.compose.ui.geometry.CornerRadius(10.dp.toPx()),
-                            ),
+                        moveTo(topMidX, top)
+                        lineTo(right - cornerRadius, top)
+                        arcTo(
+                            rect = androidx.compose.ui.geometry.Rect(right - 2 * cornerRadius, top, right, top + 2 * cornerRadius),
+                            startAngleDegrees = -90f,
+                            sweepAngleDegrees = 90f,
+                            forceMoveTo = false,
                         )
+                        lineTo(right, bottom - cornerRadius)
+                        arcTo(
+                            rect = androidx.compose.ui.geometry.Rect(right - 2 * cornerRadius, bottom - 2 * cornerRadius, right, bottom),
+                            startAngleDegrees = 0f,
+                            sweepAngleDegrees = 90f,
+                            forceMoveTo = false,
+                        )
+                        lineTo(left + cornerRadius, bottom)
+                        arcTo(
+                            rect = androidx.compose.ui.geometry.Rect(left, bottom - 2 * cornerRadius, left + 2 * cornerRadius, bottom),
+                            startAngleDegrees = 90f,
+                            sweepAngleDegrees = 90f,
+                            forceMoveTo = false,
+                        )
+                        lineTo(left, top + cornerRadius)
+                        arcTo(
+                            rect = androidx.compose.ui.geometry.Rect(left, top, left + 2 * cornerRadius, top + 2 * cornerRadius),
+                            startAngleDegrees = 180f,
+                            sweepAngleDegrees = 90f,
+                            forceMoveTo = false,
+                        )
+                        lineTo(topMidX, top)
+                        close()
                     }
                     val perimeterMeasure = PathMeasure()
                     perimeterMeasure.setPath(perimeterPath, forceClosed = true)
@@ -592,6 +650,7 @@ internal fun FSPlayerControls(
     onOpenQueue: () -> Unit,
     modifier: Modifier = Modifier,
     immersive: Boolean = false,
+    onSeekDraggingChanged: (Boolean) -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -628,6 +687,7 @@ internal fun FSPlayerControls(
             durationMs = state.safeDurationMs,
             onSeek = actions.onSeek,
             accent = state.palette.accent,
+            onDraggingChanged = onSeekDraggingChanged,
         )
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
@@ -1043,6 +1103,7 @@ private fun FrostSoulAlbumPage(
     onOpenOptions: () -> Unit,
     onSearchTrack: () -> Unit,
     onShowArtists: () -> Unit,
+    onSeekDraggingChanged: (Boolean) -> Unit = {},
 ) {
     val titleScrollState = rememberScrollState()
     Box(modifier = Modifier.fillMaxSize().padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)) {
@@ -1111,6 +1172,7 @@ private fun FrostSoulAlbumPage(
                     onOpenQueue = onOpenQueue,
                     modifier = Modifier.padding(top = 2.dp),
                     immersive = true,
+                    onSeekDraggingChanged = onSeekDraggingChanged,
             )
         }
     }
@@ -1124,6 +1186,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
     onOpenOptions: () -> Unit,
     onSearchTrack: () -> Unit,
     onShowArtists: () -> Unit,
+    onSeekDraggingChanged: (Boolean) -> Unit = {},
 ) {
     val titleScrollState = rememberScrollState()
     val artworkHeaderBlur =
@@ -1134,7 +1197,6 @@ private fun FrostSoulArtworkBlurAlbumPage(
         }
     Column(
         modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Full-bleed artwork header: the image spans the whole width with no card
@@ -1157,6 +1219,18 @@ private fun FrostSoulArtworkBlurAlbumPage(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
+                            // FS-BUG-IMMERSIVE-BORDER: BlendMode.DstIn only combines correctly
+                            // with what's *already inside this composable's own layer*. Without
+                            // an explicit offscreen layer here, this image shares the pager
+                            // page's layer, and DstIn ends up cutting into whatever else is
+                            // already drawn there instead of just fading this image's own alpha
+                            // to transparent — which is exactly why the header shows a hard
+                            // rectangular edge (the "border line square") while settled on the
+                            // current page. It only looked fixed mid-drag because the pager's
+                            // own alpha-fade on adjacent pages happened to force an offscreen
+                            // layer at that moment. Forcing it here directly makes the fade
+                            // isolated and consistent regardless of pager/drag state.
+                            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                             .drawWithContent {
                                 drawContent()
                                 drawRect(
@@ -1181,9 +1255,9 @@ private fun FrostSoulArtworkBlurAlbumPage(
                         ),
                     )
                 }
-                
-   
-          Row(
+            }
+
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1229,8 +1303,14 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 )
             }
 
-            FrostSoulMainLyricPreview(uiState = uiState, showExtraPreviewLines = false)
+            FrostSoulMainLyricPreview(
+                uiState = uiState,
+                showExtraPreviewLines = false,
+                modifier = Modifier.heightIn(min = 60.dp),
+            )
         }
+
+        Spacer(modifier = Modifier.weight(1f))
 
         FSPlayerControls(
             state = uiState,
@@ -1240,6 +1320,7 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)
                 .padding(top = 18.dp),
             immersive = true,
+            onSeekDraggingChanged = onSeekDraggingChanged,
         )
     }
 }

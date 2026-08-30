@@ -438,6 +438,7 @@ internal fun FSSeekbar(
     modifier: Modifier = Modifier,
     accent: Color = Color.White,
     isEnabled: Boolean = durationMs > 0L,
+    onDraggingChanged: (Boolean) -> Unit = {},
 ) {
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
     var dragProgress by remember { mutableFloatStateOf(progress) }
@@ -464,10 +465,17 @@ internal fun FSSeekbar(
                     detectDragGestures(
                         onDragStart = { offset ->
                             isDragging = true
+                            onDraggingChanged(true)
                             seekAt(offset.x)
                         },
-                        onDragEnd = { isDragging = false },
-                        onDragCancel = { isDragging = false },
+                        onDragEnd = {
+                            isDragging = false
+                            onDraggingChanged(false)
+                        },
+                        onDragCancel = {
+                            isDragging = false
+                            onDraggingChanged(false)
+                        },
                         onDrag = { change, _ ->
                             change.consume()
                             seekAt(change.position.x)

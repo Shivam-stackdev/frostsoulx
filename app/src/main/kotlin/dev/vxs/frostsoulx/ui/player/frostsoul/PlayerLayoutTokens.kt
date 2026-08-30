@@ -29,10 +29,12 @@ internal object PlayerLayoutTokens {
     val TurntableRestPegSize = 13.dp
     val TurntableSpindleSize = 11.dp
 
-    /** Artwork-blur header height, kept full-bleed so it melts into the page. Reverted to the
-     * original dimension per request — the real fix for "seamless to the top" is the immersive
-     * status-bar-hide in MainActivity.shouldHideStatusBars, not a taller header. */
-    val ArtworkBlurHeaderHeight = 342.dp
+    /** Artwork-blur header height, kept full-bleed so it melts into the page. Base dimension is
+     * 342.dp; +42.dp accounts for the collapse-row height now reclaimed by the pager on the
+     * Immersive main player page (see FrostSoulPlayer's isImmersiveArtworkMainPage), so the
+     * artwork's top edge extends to the true screen top while its bottom edge — and everything
+     * below it — stays exactly where it was before. */
+    val ArtworkBlurHeaderHeight = 342.dp + 42.dp
 
     /** Lyrics typography and rhythm, tuned against the QQ Music lyric sheet. */
     val LyricsActiveFontSize = 21.sp
