@@ -464,7 +464,7 @@ class AboutViewModel
                                 ),
                             ),
                     ),
-                collaborators = TeamMemberCollection.Empty,
+                collaborators = TeamMemberCollection.of(),
                 respecters =
                     TeamMemberCollection.of(
                         TeamMember(
