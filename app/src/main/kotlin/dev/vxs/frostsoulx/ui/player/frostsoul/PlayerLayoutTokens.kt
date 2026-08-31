@@ -19,15 +19,26 @@ internal object PlayerLayoutTokens {
     val VinylDiscSize = 310.dp
     val CenterAlbumArtSize = 190.dp
 
-    /** Turntable geometry — the platter is inset inside the deck card, QQ-style. */
+    /** Turntable geometry — the platter is inset inside the deck card, QQ-style.
+     *
+     * The record is a pressed vinyl: a dark grooved annulus wrapped around a bright circular
+     * label, and the track artwork is clipped *inside* that circular label (never a floating
+     * square). Tonearm parts are sized against the deck card so the whole assembly scales with
+     * whatever width the player page hands to FSAlbumArt. */
     val TurntableCardSize = 330.dp
-    val TurntablePlatterSize = 262.dp
-    val TurntablePolaroidOuterSize = 128.dp
-    val TurntablePolaroidInnerSize = 104.dp
-    val TurntableTonearmMountSize = 34.dp
-    val TurntableTonearmElbowSize = 11.dp
-    val TurntableRestPegSize = 13.dp
-    val TurntableSpindleSize = 11.dp
+    val TurntablePlatterSize = 268.dp
+
+    /** White circular label pressed onto the record, and the circular artwork inside it. */
+    val TurntableLabelSize = 126.dp
+    val TurntableLabelArtSize = 114.dp
+
+    /** Tonearm assembly: pivot housing, counterweight barrel, headshell and the parking post. */
+    val TurntableTonearmMountSize = 30.dp
+    val TurntableTonearmBaseSize = 46.dp
+    val TurntableCounterweightSize = 15.dp
+    val TurntableHeadshellSize = 11.dp
+    val TurntableRestPegSize = 15.dp
+    val TurntableSpindleSize = 9.dp
 
     /** Artwork-blur header height, kept full-bleed so it melts into the page. Base dimension is
      * 342.dp; +42.dp accounts for the collapse-row height now reclaimed by the pager on the
