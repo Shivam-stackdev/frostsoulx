@@ -108,6 +108,7 @@ internal fun FSIconButton(
     showContainer: Boolean = true,
     forceWhite: Boolean = false,
     dimBackdrop: Boolean = true,
+    tintOverride: Color? = null,
 ) {
     val isLightTheme = FrostSoulTheme.colors.background.luminance() > 0.5f
     // Containerless icons (showContainer = false) sit directly on the artwork / ambient-blur
@@ -118,7 +119,7 @@ internal fun FSIconButton(
     val baseTint =
         if (isLightTheme && showContainer) FrostSoulTheme.colors.onSurface else Color.White
     val iconTint =
-        if (forceWhite) {
+        tintOverride ?: if (forceWhite) {
             Color.White
         } else {
             when {
