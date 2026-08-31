@@ -1362,15 +1362,13 @@ private fun FrostSoulFullPlayerLikeButton(
             tint = tint,
             modifier = Modifier.size(25.dp),
         )
-        likeCount?.let { count ->
-            Text(
-                text = formatLikeCount(count),
-                color = tint,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(start = 4.dp),
-            )
-        }
+        Text(
+            text = formatLikeCount(likeCount ?: 0),
+            color = tint,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
+        )
     }
 }
 
