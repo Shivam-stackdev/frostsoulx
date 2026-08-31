@@ -625,6 +625,7 @@ internal fun FSMiniPlayer(
                 iconSize = 24.dp,
                 showContainer = false,
                 dimBackdrop = false,
+                tintOverride = if (isLightTheme) Color.Black else Color.White,
                 modifier = Modifier.zIndex(1f),
             )
             onQueueClick?.let { openQueue ->
@@ -636,6 +637,7 @@ internal fun FSMiniPlayer(
                     iconSize = 24.dp,
                     showContainer = false,
                     dimBackdrop = false,
+                    tintOverride = if (isLightTheme) Color.Black else Color.White,
                     modifier = Modifier.zIndex(1f),
                 )
             }
@@ -1133,6 +1135,9 @@ private fun FrostSoulAlbumPage(
                     onClick = actions.onToggleLike,
                     active = uiState.track.isLiked,
                     compact = true,
+                    tintOverride = if (uiState.track.isLiked) Color(0xFFFF3B4D) else {
+                        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
+                    },
                 )
             }
             Column(
@@ -1300,6 +1305,9 @@ private fun FrostSoulArtworkBlurAlbumPage(
                     onClick = actions.onToggleLike,
                     active = uiState.track.isLiked,
                     compact = true,
+                    tintOverride = if (uiState.track.isLiked) Color(0xFFFF3B4D) else {
+                        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
+                    },
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }
