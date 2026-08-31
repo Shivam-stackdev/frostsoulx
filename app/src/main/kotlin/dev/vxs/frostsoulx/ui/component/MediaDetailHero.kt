@@ -296,6 +296,9 @@ public fun MediaDetailPrimaryActions(
     modifier: Modifier = Modifier,
     additionalActions: (@Composable RowScope.(Color) -> Unit)? = null,
 ) {
+    val isLightTheme = MaterialTheme.colorScheme.surface.luminance() > 0.5f
+    val playContainerColor = if (isLightTheme) Color.White else Color.Black
+    val playContentColor = if (isLightTheme) Color.Black else Color.White
     val secondaryButtonColors =
         IconButtonDefaults.filledTonalIconButtonColors(
             containerColor = contentColor.copy(alpha = 0.16f),
@@ -360,8 +363,8 @@ public fun MediaDetailPrimaryActions(
                         shape = RoundedCornerShape(percent = 50),
                         colors =
                             ButtonDefaults.buttonColors(
-                                containerColor = contentColor,
-                                contentColor = contrastingColor,
+                                containerColor = playContainerColor,
+                                contentColor = playContentColor,
                             ),
                         contentPadding = ButtonDefaults.contentPaddingFor(playButtonHeight, hasStartIcon = true),
                         modifier =
