@@ -640,14 +640,12 @@ fun PlayerTopActions(
                         tint = likeTint,
                         modifier = Modifier.size(24.dp),
                     )
-                    fetchedLikeCount?.let { count ->
-                        Text(
-                            text = formatLikeCount(count),
-                            color = likeTint,
-                            style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(start = 4.dp),
-                        )
-                    }
+                    Text(
+                        text = formatLikeCount(fetchedLikeCount ?: 0),
+                        color = likeTint,
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
+                    )
                 }
 
                 Surface(
