@@ -1133,15 +1133,10 @@ private fun FrostSoulAlbumPage(
                 horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp, end = 4.dp),
             ) {
-                FSIconButton(
-                    painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                    contentDescription = if (uiState.track.isLiked) "Unlike track" else "Like track",
+                FrostSoulFullPlayerLikeButton(
+                    videoId = uiState.track.id,
+                    isLiked = uiState.track.isLiked,
                     onClick = actions.onToggleLike,
-                    active = uiState.track.isLiked,
-                    compact = true,
-                    tintOverride = if (uiState.track.isLiked) Color(0xFFFF3B4D) else {
-                        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
-                    },
                 )
             }
             Column(
@@ -1303,15 +1298,10 @@ private fun FrostSoulArtworkBlurAlbumPage(
                         modifier = Modifier.padding(top = 4.dp).clickable(onClick = onShowArtists),
                     )
                 }
-                FSIconButton(
-                    painter = painterResource(if (uiState.track.isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                    contentDescription = if (uiState.track.isLiked) "Unlike track" else "Like track",
+                FrostSoulFullPlayerLikeButton(
+                    videoId = uiState.track.id,
+                    isLiked = uiState.track.isLiked,
                     onClick = actions.onToggleLike,
-                    active = uiState.track.isLiked,
-                    compact = true,
-                    tintOverride = if (uiState.track.isLiked) Color(0xFFFF3B4D) else {
-                        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
-                    },
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }
@@ -1336,6 +1326,51 @@ private fun FrostSoulArtworkBlurAlbumPage(
             immersive = true,
             onSeekDraggingChanged = onSeekDraggingChanged,
         )
+    }
+}
+
+private fun formatLikeCount(count: Int): String = when {
+    count >= 1_000_000 -> "${(count / 1_000_000f).toString().trimEnd('0').trimEnd('.')}M"
+    count >= 1_000 -> "${(count / 1_000f).toString().trimEnd('0').trimEnd('.')}K"
+    else -> count.toString()
+}
+
+@Composable
+private fun FrostSoulFullPlayerLikeButton(
+    videoId: String,
+    isLiked: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var likeCount by remember(videoId) { mutableStateOf<Int?>(null) }
+    LaunchedEffect(videoId) {
+        if (videoId.isNotBlank()) likeCount = YouTube.getMediaInfo(videoId).getOrNull()?.like
+    }
+    val tint = if (isLiked) Color(0xFFFF3B4D) else {
+        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .height(42.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp),
+    ) {
+        Icon(
+            painter = painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
+            contentDescription = if (isLiked) "Unlike track" else "Like track",
+            tint = tint,
+            modifier = Modifier.size(25.dp),
+        )
+        likeCount?.let { count ->
+            Text(
+                text = formatLikeCount(count),
+                color = tint,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(start = 4.dp),
+            )
+        }
     }
 }
 

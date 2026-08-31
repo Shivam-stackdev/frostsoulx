@@ -62,8 +62,10 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -123,6 +125,7 @@ import dev.vxs.frostsoulx.ui.menu.PlayerMenu
 import dev.vxs.frostsoulx.ui.theme.PlayerBackgroundColorUtils
 import dev.vxs.frostsoulx.ui.theme.PlayerSliderColors
 import dev.vxs.frostsoulx.ui.utils.ShowMediaInfo
+import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.ui.utils.highRes
 import dev.vxs.frostsoulx.utils.makeTimeString
 import dev.vxs.frostsoulx.utils.rememberLowDataModeActive
@@ -623,38 +626,26 @@ fun PlayerTopActions(
                     }
                 }
 
-                Surface(
-                    onClick = { playerConnection.toggleLike() },
-                    shape = RoundedCornerShape(50),
-                    color =
-                        if (currentSongLiked) {
-                            MaterialTheme.colorScheme.error.copy(alpha = 0.18f)
-                        } else {
-                            textBackgroundColor.copy(alpha = 0.12f)
-                        },
-                    modifier =
-                        Modifier
-                            .height(42.dp)
-                            .width(42.dp),
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .height(42.dp)
+                        .clickable { playerConnection.toggleLike() }
+                        .padding(horizontal = 4.dp),
                 ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Icon(
-                            painter =
-                                painterResource(
-                                    if (currentSongLiked) {
-                                        R.drawable.favorite
-                                    } else {
-                                        R.drawable.favorite_border
-                                    },
-                                ),
-                            contentDescription = null,
-                            tint =
-                                if (currentSongLiked) {
-                                    MaterialTheme.colorScheme.error
-                                } else {
-                                    textBackgroundColor
-                                },
-                            modifier = Modifier.size(20.dp),
+                    val likeTint = if (currentSongLiked) MaterialTheme.colorScheme.error else textBackgroundColor
+                    Icon(
+                        painter = painterResource(if (currentSongLiked) R.drawable.favorite else R.drawable.favorite_border),
+                        contentDescription = if (currentSongLiked) "Unlike" else "Like",
+                        tint = likeTint,
+                        modifier = Modifier.size(24.dp),
+                    )
+                    fetchedLikeCount?.let { count ->
+                        Text(
+                            text = formatLikeCount(count),
+                            color = likeTint,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(start = 4.dp),
                         )
                     }
                 }
@@ -831,6 +822,12 @@ fun StyledPlaybackSlider(
     }
 }
 
+private fun formatLikeCount(count: Int): String = when {
+    count >= 1_000_000 -> "${(count / 1_000_000f).toString().trimEnd('0').trimEnd('.')}M"
+    count >= 1_000 -> "${(count / 1_000f).toString().trimEnd('0').trimEnd('.')}K"
+    else -> count.toString()
+}
+
 @Composable
 fun PlayerTimeLabel(
     sliderPosition: Long?,
@@ -901,7 +898,12 @@ fun PlayerPlaybackControls(
     playPauseRoundness: androidx.compose.ui.unit.Dp,
     playerConnection: PlayerConnection,
     currentSongLiked: Boolean,
+    videoId: String = "",
 ) {
+    var fetchedLikeCount by remember(videoId) { mutableStateOf<Int?>(null) }
+    LaunchedEffect(videoId) {
+        if (videoId.isNotBlank()) fetchedLikeCount = YouTube.getMediaInfo(videoId).getOrNull()?.like
+    }
     val haptic = LocalHapticFeedback.current
     val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsState()
     val view = LocalView.current
@@ -1923,6 +1925,7 @@ fun PlayerControlsContent(
         playPauseRoundness = playPauseRoundness,
         playerConnection = playerConnection,
         currentSongLiked = currentSongLiked,
+        videoId = mediaMetadata.id,
     )
 }
 
