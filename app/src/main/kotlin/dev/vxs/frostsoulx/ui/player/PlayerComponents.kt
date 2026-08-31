@@ -45,6 +45,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
@@ -264,6 +265,15 @@ fun PlayerTopActions(
     context: Context,
     currentSongLiked: Boolean,
 ) {
+    var fetchedLikeCount by remember(mediaMetadata.id) { mutableStateOf<Int?>(null) }
+    LaunchedEffect(mediaMetadata.id) {
+        fetchedLikeCount =
+            if (mediaMetadata.id.isNotBlank()) {
+                YouTube.getMediaInfo(mediaMetadata.id).getOrNull()?.like
+            } else {
+                null
+            }
+    }
     val haptic = LocalHapticFeedback.current
     val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsState()
 
@@ -898,10 +908,6 @@ fun PlayerPlaybackControls(
     currentSongLiked: Boolean,
     videoId: String = "",
 ) {
-    var fetchedLikeCount by remember(videoId) { mutableStateOf<Int?>(null) }
-    LaunchedEffect(videoId) {
-        if (videoId.isNotBlank()) fetchedLikeCount = YouTube.getMediaInfo(videoId).getOrNull()?.like
-    }
     val haptic = LocalHapticFeedback.current
     val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsState()
     val view = LocalView.current
