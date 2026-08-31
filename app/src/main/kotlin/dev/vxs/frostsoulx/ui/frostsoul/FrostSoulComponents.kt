@@ -331,7 +331,7 @@ fun FSAlbumCard(
                             .align(Alignment.Center)
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(FrostSoulTheme.colors.accentBright.copy(alpha = 0.92f)),
+                            .background(Color.White.copy(alpha = 0.92f)),
                 ) {
                     FSIcon(
                         painter = painterResource(R.drawable.play),
@@ -370,6 +370,7 @@ fun FSAlbumCard(
                 style = FrostSoulTheme.typography.bodyMuted,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(start = 2.dp),
             )
         }
     }
