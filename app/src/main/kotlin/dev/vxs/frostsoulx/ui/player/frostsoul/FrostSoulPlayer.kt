@@ -629,17 +629,21 @@ internal fun FSMiniPlayer(
                 modifier = Modifier.zIndex(1f),
             )
             onQueueClick?.let { openQueue ->
-                FSIconButton(
-                    painter = painterResource(R.drawable.queue_music),
-                    contentDescription = "Open queue",
-                    onClick = openQueue,
-                    buttonSize = 42.dp,
-                    iconSize = 24.dp,
-                    showContainer = false,
-                    dimBackdrop = false,
-                    tintOverride = if (isLightTheme) Color.Black else Color.White,
-                    modifier = Modifier.zIndex(1f),
-                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .zIndex(2f)
+                            .clickable(onClick = openQueue),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.queue_music),
+                        contentDescription = "Open queue",
+                        tint = if (isLightTheme) Color.Black else Color.White,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
             }
         }
     }

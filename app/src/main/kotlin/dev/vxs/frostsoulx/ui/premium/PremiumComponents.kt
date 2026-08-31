@@ -230,6 +230,7 @@ fun PremiumListRow(
                     color = FrostSoulTheme.colors.onSurfaceMuted,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(start = 2.dp),
                 )
             }
         }

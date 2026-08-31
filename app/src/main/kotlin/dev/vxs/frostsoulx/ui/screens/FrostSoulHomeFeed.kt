@@ -437,7 +437,7 @@ private fun FrostSoulBannerCarousel(
                         Text("FEATURED FOR YOU", color = FrostSoulTheme.colors.accentBright, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
                         Spacer(Modifier.weight(1f))
                         Text(song.title, color = FrostSoulTheme.colors.onSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(song.artists.joinToString(" • ") { it.name }, color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 3.dp))
+                        Text(song.artists.joinToString(" • ") { it.name }, color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 2.dp, top = 3.dp))
                     }
                     FSIconButton(
                         onClick = {
@@ -541,7 +541,7 @@ private fun FrostSoulRecommendationList(
                     fontSize = 11.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 3.dp),
+                    modifier = Modifier.padding(start = 2.dp, top = 3.dp),
                 )
                 FSIcon(
                     painter = painterResource(if (isCurrent && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play),
