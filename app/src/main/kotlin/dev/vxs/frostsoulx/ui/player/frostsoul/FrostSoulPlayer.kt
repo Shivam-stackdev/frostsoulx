@@ -13,7 +13,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.spring
@@ -41,6 +40,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -71,6 +71,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -78,10 +79,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shadow
@@ -91,8 +89,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
@@ -123,7 +119,6 @@ import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
 import dev.vxs.frostsoulx.constants.PlayerDesignStyle
 import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 import dev.vxs.frostsoulx.innertube.YouTube
-import dev.vxs.frostsoulx.utils.LikeCountCache
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.MinimalistMetadataChip
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
@@ -1346,17 +1341,9 @@ private fun FrostSoulFullPlayerLikeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    var likeCount by remember(videoId) {
-        mutableStateOf(LikeCountCache.get(context, videoId))
-    }
+    var likeCount by remember(videoId) { mutableStateOf<Int?>(null) }
     LaunchedEffect(videoId) {
-        if (videoId.isNotBlank()) {
-            YouTube.getMediaInfo(videoId).getOrNull()?.like?.let { count ->
-                likeCount = count
-                LikeCountCache.put(context, videoId, count)
-            }
-        }
+        if (videoId.isNotBlank()) likeCount = YouTube.getMediaInfo(videoId).getOrNull()?.like
     }
     val tint = if (isLiked) Color(0xFFFF3B4D) else {
         if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
@@ -1374,15 +1361,13 @@ private fun FrostSoulFullPlayerLikeButton(
             tint = tint,
             modifier = Modifier.size(25.dp),
         )
-        likeCount?.let { count ->
-            Text(
-                text = formatLikeCount(count),
-                color = tint,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
-            )
-        }
+        Text(
+            text = formatLikeCount(likeCount ?: 0),
+            color = tint,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
+        )
     }
 }
 
@@ -2130,6 +2115,69 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 
 private const val PaletteCacheCapacity = 24
 
+/**
+ * Fraction of the screen height the ambient glow is allowed to occupy, anchored to the bottom.
+ *
+ * The glow used to be a full-screen radial gradient that drifted across the entire backdrop,
+ * which lit up the vinyl deck, washed out the artwork and — because every frame re-blended a
+ * screen-sized translucent layer — was the single most expensive thing on the GPU. It is now
+ * confined to the bottom band around the seek bar and transport controls, fading out just above
+ * them, so the turntable area above stays a dark, moody canvas.
+ */
+private const val GlowHeightFraction = 0.46f
+
+/** Slow "breathing" cycle for the glow, in milliseconds. Ambient, not attention-grabbing. */
+private const val GlowBreathDurationMs = 7_000
+
+/**
+ * Pixel size the ambient backdrop artwork is decoded at. The image is blurred into a soft wash,
+ * so full-resolution detail is thrown away anyway — decoding a small bitmap and letting it scale
+ * up costs a fraction of the memory and bandwidth, and lets the blur radius drop sharply.
+ */
+private const val AmbientArtworkSampleSize = 192
+
+/**
+ * Background styles that paint a palette-tinted gradient over the blurred artwork.
+ * Hoisted to file scope so the set is allocated once rather than on every recomposition.
+ */
+private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
+    java.util.EnumSet.of(
+        PlayerBackgroundStyle.GRADIENT,
+        PlayerBackgroundStyle.COLORING,
+        PlayerBackgroundStyle.BLUR_GRADIENT,
+        PlayerBackgroundStyle.GLOW,
+        PlayerBackgroundStyle.GLOW_ANIMATED,
+    )
+
+/**
+ * Single consolidated scrim for the glow styles.
+ *
+ * This one brush replaces what used to be three stacked full-screen layers (a radial vignette, a
+ * neutral ambient tone and a final readability scrim). Keeping the top ~60% deliberately dark is
+ * what makes the vinyl deck read as "slightly dark" like the reference player, while the lower
+ * stops stay lighter so the glow underneath can show through around the controls.
+ */
+private val GlowModeScrim =
+    Brush.verticalGradient(
+        colors = listOf(
+            Color.Black.copy(alpha = 0.62f),
+            Color.Black.copy(alpha = 0.55f),
+            Color.Black.copy(alpha = 0.40f),
+            Color.Black.copy(alpha = 0.30f),
+            Color.Black.copy(alpha = 0.46f),
+        ),
+    )
+
+/** Equivalent consolidated scrim for the non-glow styles. */
+private val PlainModeScrim =
+    Brush.verticalGradient(
+        colors = listOf(
+            Color.Black.copy(alpha = 0.34f),
+            Color.Black.copy(alpha = 0.16f),
+            Color.Black.copy(alpha = 0.44f),
+        ),
+    )
+
 @Composable
 private fun FrostSoulDynamicBackground(
     artworkUrl: String?,
@@ -2142,58 +2190,58 @@ private fun FrostSoulDynamicBackground(
     val isVinyl = playerDesignStyle == PlayerDesignStyle.FROSTSOUL
     val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
     val isStaticGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW
+    val isGlowMode = isAnimatedGlow || isStaticGlow
     // Keep the selected artwork present behind every player mode. Vinyl's Gradient/Glow
     // variants tint this same blurred image instead of replacing it with a flat color.
     val shouldBlurArtwork = !artworkUrl.isNullOrBlank()
-    // GLOW / GLOW_ANIMATED own their look via the cached ambient-pool renderer below, so they
-    // no longer stack the heavy full-screen vertical wash used by the other gradient modes.
-    val shouldUseGradient = isVinyl && playerBackgroundStyle in setOf(
-        PlayerBackgroundStyle.GRADIENT,
-        PlayerBackgroundStyle.COLORING,
-        PlayerBackgroundStyle.BLUR_GRADIENT,
-    )
+    val shouldUseGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
     val moodAccent = remember(moodSeed, palette) { resolveVinylMoodAccent(moodSeed, palette) }
-    // Two cached dominant "pools" driving the QQ-style ambient glow: a cool pool anchored at the
-    // bottom-left and a warm pool at the bottom-right. Derived once per palette/mood — never per
-    // frame — so no artwork-derived work happens during animation.
-    val coolPool = remember(moodAccent, palette) { pickCoolPool(moodAccent, palette) }
-    val warmPool = remember(moodAccent, palette) { pickWarmPool(moodAccent, palette) }
-    // Single lightweight animated float. Slow (11s), fluid, linear-reversing "breathing" phase in
-    // 0..1. It is read ONLY inside the draw phase to modulate opacity + a tiny vertical drift, so
-    // it never triggers recomposition, relayout, or brush reallocation.
-    val glowPhase =
+
+    // The breathing phase is kept as a State and only read inside graphicsLayer, i.e. during the
+    // draw phase. Previously `.value` was read straight into composition, so the infinite glow
+    // animation recomposed this whole background — including the full-screen blurred AsyncImage —
+    // on every single frame. That recomposition storm was the main source of the stutter.
+    val glowBreath: State<Float>? =
         if (isAnimatedGlow) {
             rememberInfiniteTransition(label = "vinyl-glow-transition").animateFloat(
                 initialValue = 0f,
                 targetValue = 1f,
-                animationSpec = infiniteRepeatable(tween(11_000, easing = LinearEasing), RepeatMode.Reverse),
+                animationSpec = infiniteRepeatable(tween(GlowBreathDurationMs), RepeatMode.Reverse),
                 label = "vinyl-glow-phase",
-            ).value
+            )
         } else {
-            0.5f
+            null
         }
-    // The ambient backdrop stays a dark, moody canvas regardless of the app's light/dark theme
-    // setting — matching the reference design — so text and icons drawn on top of it never need
-    // to flip to a dark tint (see FS-BUG-LIGHTMODE fix in FSIconButton). A stronger minimum blur
-    // floor is applied below for a cleaner "ambient" look instead of a barely-blurred backdrop.
-    val ambientBlurRadius = (blurRadius.coerceIn(0f, 120f)).coerceAtLeast(36f)
+
+    // Because the ambient artwork is decoded small and scaled up, it is already very soft — so a
+    // far smaller blur radius reproduces the old look. Blur cost scales with radius, and the old
+    // 36..120dp range over a full-screen layer was extremely expensive on mid-range GPUs.
+    val ambientBlurRadius = (blurRadius * 0.34f).coerceIn(10f, 26f)
+
+    val context = LocalContext.current
+    val ambientArtworkRequest = remember(artworkUrl, context) {
+        artworkUrl?.takeIf { it.isNotBlank() }?.let { url ->
+            ImageRequest.Builder(context)
+                .data(url)
+                .size(Size(AmbientArtworkSampleSize, AmbientArtworkSampleSize))
+                .build()
+        }
+    }
+
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(Color.Black),
     ) {
-        // The GLOW / GLOW_ANIMATED vinyl modes now render a fully cached, GPU-cheap ambient
-        // gradient (see the isAnimatedGlow/isStaticGlow branch below) instead of a per-frame
-        // blurred bitmap. Only the other artwork-backed modes keep the real blurred image.
-        if (shouldBlurArtwork && !artworkUrl.isNullOrBlank() && !isAnimatedGlow && !isStaticGlow) {
-            // Cache the saturation ColorFilter so it is not reallocated on every recomposition.
-            val saturationFilter = remember { ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(1.0f) }) }
+        if (shouldBlurArtwork && ambientArtworkRequest != null) {
+            // The previous implementation also applied ColorFilter.colorMatrix with
+            // setToSaturation(1.0f) — an identity matrix. It changed nothing visually while
+            // forcing an extra full-screen color-filter pass every frame, so it is gone.
             AsyncImage(
-                model = artworkUrl,
+                model = ambientArtworkRequest,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                colorFilter = saturationFilter,
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer { scaleX = 1.12f; scaleY = 1.12f }
@@ -2203,102 +2251,56 @@ private fun FrostSoulDynamicBackground(
                     ),
             )
         }
+
         if (shouldUseGradient) {
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            palette.artworkPrimary.copy(alpha = 0.48f),
-                            palette.artworkSecondary.copy(alpha = 0.30f),
-                            Color.Black.copy(alpha = 0.92f),
-                        ),
-                    ),
-                ),
-            )
-        }
-        if (isAnimatedGlow || isStaticGlow) {
-            // QQ-Music-style ambient album-art glow: two soft, heavily-diffused color pools bleeding
-            // up from the bottom corners (cool bottom-left, warm bottom-right) into near-black.
-            //
-            // Performance: everything expensive is cached inside drawWithCache and rebuilt ONLY when
-            // the layout size or pool colors change. The infinite animation feeds a single float
-            // (glowPhase) that is read inside onDrawBehind to modulate layer alpha and a tiny drift.
-            // No per-frame bitmap work, no Brush/Shader reallocation, no recomposition, no relayout.
-            val baseAlpha = if (isAnimatedGlow) 0.62f else 0.5f
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .drawWithCache {
-                        val w = size.width
-                        val h = size.height
-                        // Pools sit just below the bottom edge so only their soft top fades in,
-                        // reaching ~30% up the screen — matching the reference wash.
-                        val poolRadius = w * 0.95f
-                        val coolCenter = Offset(w * 0.14f, h * 1.02f)
-                        val warmCenter = Offset(w * 0.9f, h * 1.06f)
-                        // Cached radial brushes (built once per size/color change).
-                        val coolBrush = Brush.radialGradient(
-                            colors = listOf(coolPool, coolPool.copy(alpha = 0f)),
-                            center = coolCenter,
-                            radius = poolRadius,
-                        )
-                        val warmBrush = Brush.radialGradient(
-                            colors = listOf(warmPool, warmPool.copy(alpha = 0f)),
-                            center = warmCenter,
-                            radius = poolRadius * 0.92f,
-                        )
-                        // Cached vignette that keeps the top of the screen deep black for contrast.
-                        val vignette = Brush.verticalGradient(
-                            colors = listOf(Color.Black.copy(alpha = 0.34f), Color.Transparent),
-                            startY = 0f,
-                            endY = h * 0.55f,
-                        )
-                        onDrawBehind {
-                            // Slow breathing: glowPhase in 0..1 -> subtle opacity + a few-px vertical
-                            // drift applied cheaply via translation. Static glow stays fixed.
-                            val breathe = if (isAnimatedGlow) 0.85f + 0.15f * glowPhase else 1f
-                            val drift = if (isAnimatedGlow) (glowPhase - 0.5f) * h * 0.03f else 0f
-                            drawRect(color = Color.Black)
-                            translate(top = drift) {
-                                drawRect(brush = coolBrush, alpha = (baseAlpha * breathe).coerceIn(0f, 1f))
-                            }
-                            translate(top = -drift) {
-                                drawRect(brush = warmBrush, alpha = (baseAlpha * (2f - breathe)).coerceIn(0f, 1f))
-                            }
-                            drawRect(brush = vignette)
-                        }
-                    },
-            )
-        } else {
-            // Previously switched to a white wash in light theme, which fought with the final
-            // dark readability scrim below and left inconsistent contrast behind text/icons.
-            // Kept as one consistent dark ambient tone in both themes (fixes FS-BUG-LIGHTMODE
-            // for text drawn on this backdrop, e.g. Recommendations page).
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color.Black.copy(alpha = 0.22f), Color.Transparent, Color.Black.copy(alpha = 0.34f)),
-                    ),
-                ),
-            )
-        }
-        // Keep lyric text readable when artwork contains bright whites or skin tones. This is
-        // deliberately the final backdrop layer so animated glow cannot wash out lyric text.
-        // For the glow modes the bottom of this scrim is kept lighter so the ambient pools stay
-        // visible behind the controls (matching the QQ reference); other modes keep the moodier,
-        // more legible dark backdrop.
-        val bottomScrimAlpha = if (isAnimatedGlow || isStaticGlow) 0.22f else 0.50f
-        Box(
-            modifier = Modifier.fillMaxSize().background(
+            // Brush depends only on the palette, so it is cached instead of being rebuilt (with
+            // its Color list) on every frame.
+            val gradientBrush = remember(palette) {
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color.Black.copy(alpha = 0.30f),
-                        Color.Black.copy(alpha = 0.18f),
-                        Color.Black.copy(alpha = bottomScrimAlpha),
+                        palette.artworkPrimary.copy(alpha = 0.42f),
+                        palette.artworkSecondary.copy(alpha = 0.26f),
+                        Color.Black.copy(alpha = 0.92f),
                     ),
-                ),
-            ),
-        )
+                )
+            }
+            Box(modifier = Modifier.fillMaxSize().background(gradientBrush))
+        }
+
+        // One consolidated scrim instead of the old three stacked full-screen layers. This is
+        // what keeps the turntable area above the glow "halka dark" like the reference player.
+        Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
+
+        if (isGlowMode) {
+            // Bottom-anchored glow band. Only ~46% of the screen is blended here rather than the
+            // whole canvas, and the layer is bottom-aligned so it sits around the seek bar and
+            // transport controls, easing out to fully transparent just above them.
+            val glowBrush = remember(moodAccent, palette, isAnimatedGlow) {
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        moodAccent.copy(alpha = if (isAnimatedGlow) 0.14f else 0.11f),
+                        moodAccent.copy(alpha = if (isAnimatedGlow) 0.30f else 0.24f),
+                        palette.artworkPrimary.copy(alpha = if (isAnimatedGlow) 0.34f else 0.27f),
+                    ),
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .fillMaxHeight(GlowHeightFraction)
+                    // Animation is consumed in the draw phase only: alpha "breathes" and the
+                    // focal point drifts laterally via translation. Using graphicsLayer instead
+                    // of Modifier.offset also means no layout pass is triggered per frame.
+                    .graphicsLayer {
+                        val breath = glowBreath?.value ?: 0.5f
+                        alpha = 0.72f + breath * 0.28f
+                        translationX = (breath - 0.5f) * 46f * density
+                    }
+                    .background(glowBrush),
+            )
+        }
     }
 }
 
@@ -2310,65 +2312,4 @@ private fun resolveVinylMoodAccent(seed: String, palette: FrostSoulPalette): Col
         listOf("party", "dance", "energy", "rock", "remix", "beat").any { keyword -> mood.contains(keyword) } -> Color(0xFFF09A58)
         else -> palette.artworkPrimary
     }
-}
-
-// --- QQ-Music-style ambient glow pool colors -------------------------------------------------
-// Both pools are derived once from the already-cached palette + mood accent (no bitmap work).
-// They are gently normalized (mid brightness, moderate saturation) and returned pre-multiplied
-// with a low alpha so the resulting glow stays soft, subtle and premium rather than a bold wash.
-
-private const val GlowPoolAlpha = 0.5f
-
-/** Cool ambient pool (bottom-left). Prefers the cooler of the two available dominant colors. */
-private fun pickCoolPool(moodAccent: Color, palette: FrostSoulPalette): Color {
-    val a = palette.artworkPrimary
-    val b = palette.artworkSecondary
-    val cool = if (colorWarmth(a) <= colorWarmth(b)) a else b
-    // Blend a touch of the mood accent so themed moods still tint the glow.
-    return normalizeGlow(blendColors(cool, moodAccent, 0.25f))
-}
-
-/** Warm ambient pool (bottom-right). Prefers the warmer of the two available dominant colors. */
-private fun pickWarmPool(moodAccent: Color, palette: FrostSoulPalette): Color {
-    val a = palette.artworkPrimary
-    val b = palette.artworkSecondary
-    val warm = if (colorWarmth(a) >= colorWarmth(b)) a else b
-    return normalizeGlow(blendColors(warm, moodAccent, 0.18f))
-}
-
-/** Rough warmth metric: red-vs-blue difference. Higher = warmer. */
-private fun colorWarmth(c: Color): Float = c.red - c.blue
-
-private fun blendColors(base: Color, other: Color, t: Float): Color {
-    val k = t.coerceIn(0f, 1f)
-    return Color(
-        red = base.red + (other.red - base.red) * k,
-        green = base.green + (other.green - base.green) * k,
-        blue = base.blue + (other.blue - base.blue) * k,
-        alpha = 1f,
-    )
-}
-
-/**
- * Keep pools in a pleasant mid-tone range: lift very dark colors, tame very bright ones, and
- * pull extreme saturation toward a softer value so the glow reads as ambient light, not paint.
- * Returns the color pre-multiplied with [GlowPoolAlpha].
- */
-private fun normalizeGlow(c: Color): Color {
-    val luma = 0.299f * c.red + 0.587f * c.green + 0.114f * c.blue
-    // Target luminance band ~0.30..0.62.
-    val target = luma.coerceIn(0.30f, 0.62f)
-    val scale = if (luma <= 0.001f) 1f else target / luma
-    val r = (c.red * scale).coerceIn(0f, 1f)
-    val g = (c.green * scale).coerceIn(0f, 1f)
-    val b = (c.blue * scale).coerceIn(0f, 1f)
-    // Soften saturation by mixing 22% toward the color's own grey.
-    val grey = 0.299f * r + 0.587f * g + 0.114f * b
-    val soft = 0.22f
-    return Color(
-        red = r + (grey - r) * soft,
-        green = g + (grey - g) * soft,
-        blue = b + (grey - b) * soft,
-        alpha = GlowPoolAlpha,
-    )
 }
