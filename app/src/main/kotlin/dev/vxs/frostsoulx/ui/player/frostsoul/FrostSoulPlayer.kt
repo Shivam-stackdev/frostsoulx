@@ -212,7 +212,6 @@ internal fun FrostSoulPlayer(
                 playerBackgroundStyle = uiState.playerBackgroundStyle,
                 blurRadius = uiState.blurRadius,
                 palette = uiState.palette,
-                moodSeed = "${uiState.track.title} ${uiState.track.artist} ${uiState.track.album}",
             )
             Column(
             modifier =
@@ -2185,7 +2184,6 @@ private fun FrostSoulDynamicBackground(
     playerBackgroundStyle: PlayerBackgroundStyle,
     blurRadius: Float,
     palette: FrostSoulPalette,
-    moodSeed: String,
 ) {
     val isVinyl = playerDesignStyle == PlayerDesignStyle.FROSTSOUL
     val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
@@ -2197,7 +2195,8 @@ private fun FrostSoulDynamicBackground(
     val hasArtwork = !artworkUrl.isNullOrBlank()
     val shouldBlurArtwork = hasArtwork && (playerBackgroundStyle == PlayerBackgroundStyle.BLUR_GRADIENT || isGlowMode)
     val shouldUseGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
-    val moodAccent = remember(moodSeed, palette) { resolveVinylMoodAccent(moodSeed, palette) }
+    val artworkPrimary = palette.artworkPrimary
+    val artworkSecondary = palette.artworkSecondary
 
     // The breathing phase is kept as a State and only read inside graphicsLayer, i.e. during the
     // draw phase. Previously `.value` was read straight into composition, so the infinite glow
@@ -2287,13 +2286,13 @@ private fun FrostSoulDynamicBackground(
             // Bottom-anchored glow band. Only ~46% of the screen is blended here rather than the
             // whole canvas, and the layer is bottom-aligned so it sits around the seek bar and
             // transport controls, easing out to fully transparent just above them.
-            val glowBrush = remember(moodAccent, palette, isAnimatedGlow) {
+            val glowBrush = remember(artworkPrimary, artworkSecondary, isAnimatedGlow) {
                 Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        moodAccent.copy(alpha = if (isAnimatedGlow) 0.14f else 0.11f),
-                        moodAccent.copy(alpha = if (isAnimatedGlow) 0.30f else 0.24f),
-                        palette.artworkPrimary.copy(alpha = if (isAnimatedGlow) 0.34f else 0.27f),
+                        artworkSecondary.copy(alpha = if (isAnimatedGlow) 0.14f else 0.11f),
+                        artworkPrimary.copy(alpha = if (isAnimatedGlow) 0.30f else 0.24f),
+                        artworkPrimary.copy(alpha = if (isAnimatedGlow) 0.34f else 0.27f),
                     ),
                 )
             }
@@ -2313,15 +2312,5 @@ private fun FrostSoulDynamicBackground(
                     .background(glowBrush),
             )
         }
-    }
-}
-
-private fun resolveVinylMoodAccent(seed: String, palette: FrostSoulPalette): Color {
-    val mood = seed.lowercase()
-    return when {
-        listOf("sad", "alone", "cry", "night", "broken", "dard", "udaas").any { keyword -> mood.contains(keyword) } -> Color(0xFF6D8FD6)
-        listOf("love", "romance", "heart", "ishq", "pyaar", "romantic").any { keyword -> mood.contains(keyword) } -> Color(0xFFE27B93)
-        listOf("party", "dance", "energy", "rock", "remix", "beat").any { keyword -> mood.contains(keyword) } -> Color(0xFFF09A58)
-        else -> palette.artworkPrimary
     }
 }
