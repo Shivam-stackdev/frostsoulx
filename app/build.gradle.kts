@@ -52,6 +52,7 @@ android {
         targetSdk = 37
         versionCode = 144
         // Release workflow must package the exact commit containing this version.
+        // Keep this file in the trigger path so every feature-tip release gets rebuilt.
         versionName = "14.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
