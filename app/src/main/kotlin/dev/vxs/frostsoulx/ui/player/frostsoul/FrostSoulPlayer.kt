@@ -79,6 +79,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -2294,33 +2295,54 @@ private fun FrostSoulDynamicBackground(
         Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
 
         if (isGlowMode) {
-            // Bottom-anchored glow band. Only ~46% of the screen is blended here rather than the
-            // whole canvas, and the layer is bottom-aligned so it sits around the seek bar and
-            // transport controls, easing out to fully transparent just above them.
-            val glowBrush = remember(artworkPrimary, artworkSecondary, isAnimatedGlow) {
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        artworkSecondary.copy(alpha = if (isAnimatedGlow) 0.14f else 0.11f),
-                        artworkPrimary.copy(alpha = if (isAnimatedGlow) 0.30f else 0.24f),
-                        artworkPrimary.copy(alpha = if (isAnimatedGlow) 0.34f else 0.27f),
-                    ),
-                )
-            }
+            // Restore the soft QQ-style ambient pools that were visible around the vinyl controls,
+            // but keep them in a bottom band and cache the radial brushes. This preserves the blur
+            // appearance without bringing back the old full-screen, high-radius GPU path.
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .fillMaxHeight(GlowHeightFraction)
-                    // Animation is consumed in the draw phase only: alpha "breathes" and the
-                    // focal point drifts laterally via translation. Using graphicsLayer instead
-                    // of Modifier.offset also means no layout pass is triggered per frame.
                     .graphicsLayer {
                         val breath = glowBreath?.value ?: 0.5f
-                        alpha = 0.72f + breath * 0.28f
-                        translationX = (breath - 0.5f) * 46f * density
+                        alpha = 0.78f + breath * 0.22f
+                        translationX = (breath - 0.5f) * 38f * density
                     }
-                    .background(glowBrush),
+                    .drawWithCache {
+                        val poolRadius = size.width * 0.92f
+                        val cool = if (artworkPrimary.red - artworkPrimary.blue <= artworkSecondary.red - artworkSecondary.blue) {
+                            artworkPrimary
+                        } else {
+                            artworkSecondary
+                        }
+                        val warm = if (artworkPrimary.red - artworkPrimary.blue >= artworkSecondary.red - artworkSecondary.blue) {
+                            artworkPrimary
+                        } else {
+                            artworkSecondary
+                        }
+                        val coolBrush = Brush.radialGradient(
+                            colors = listOf(
+                                cool.copy(alpha = if (isAnimatedGlow) 0.42f else 0.32f),
+                                cool.copy(alpha = 0f),
+                            ),
+                            center = androidx.compose.ui.geometry.Offset(size.width * 0.14f, size.height * 1.08f),
+                            radius = poolRadius,
+                        )
+                        val warmBrush = Brush.radialGradient(
+                            colors = listOf(
+                                warm.copy(alpha = if (isAnimatedGlow) 0.38f else 0.28f),
+                                warm.copy(alpha = 0f),
+                            ),
+                            center = androidx.compose.ui.geometry.Offset(size.width * 0.88f, size.height * 1.10f),
+                            radius = poolRadius * 0.92f,
+                        )
+                        onDrawBehind {
+                            drawRect(brush = coolBrush)
+                            drawRect(brush = warmBrush)
+                        }
+                    }
+                    // The blur is limited to the 46% control band, not the full player canvas.
+                    .blur(12.dp),
             )
         }
     }
