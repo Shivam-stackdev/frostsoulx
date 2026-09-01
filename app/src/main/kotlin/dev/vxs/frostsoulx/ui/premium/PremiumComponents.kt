@@ -54,6 +54,7 @@ fun PremiumTopBar(
     title: String,
     modifier: Modifier = Modifier,
     eyebrow: String? = null,
+    subtitle: String? = null,
     navigationIcon: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
 ) {
@@ -84,6 +85,15 @@ fun PremiumTopBar(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            subtitle?.takeIf { it.isNotBlank() }?.let {
+                Text(
+                    text = it,
+                    style = FrostSoulTheme.typography.body,
+                    color = FrostSoulTheme.colors.onSurfaceMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
         trailingContent?.invoke(this)
     }
