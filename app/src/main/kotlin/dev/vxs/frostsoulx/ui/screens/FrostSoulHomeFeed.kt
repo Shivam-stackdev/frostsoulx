@@ -13,10 +13,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -405,49 +407,78 @@ private fun FrostSoulBannerCarousel(
     mediaMetadata: MediaMetadata?,
     playerConnection: PlayerConnection,
 ) {
-    LazyRow(
-        contentPadding = FrostSoulShelfItemPadding,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        items(songs, key = { "banner_${it.id}" }) { song ->
-            PremiumCard(
-                modifier = Modifier.width(185.dp).height(123.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
-                contentPadding = PaddingValues(0.dp),
-                onClick = {
-                    if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
-                    else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
-                },
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val cardWidth = (maxWidth * 0.78f).coerceIn(280.dp, 520.dp)
+        val cardHeight = cardWidth * 1.12f
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            FSSectionHeader(title = "Featured for you")
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.height(cardHeight),
             ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    AsyncImage(
-                        model = song.song.thumbnailUrl,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    Box(
-                        modifier = Modifier.fillMaxSize().background(
-                            Brush.horizontalGradient(
-                                listOf(Color.Black.copy(alpha = 0.92f), Color.Transparent),
-                            ),
-                        ),
-                    )
-                    Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
-                        Text("FEATURED FOR YOU", color = FrostSoulTheme.colors.accentBright, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
-                        Spacer(Modifier.weight(1f))
-                        Text(song.title, color = FrostSoulTheme.colors.onSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(song.artists.joinToString(" • ") { it.name }, color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 2.dp, top = 3.dp))
-                    }
-                    FSIconButton(
+                items(songs, key = { "banner_${it.id}" }) { song ->
+                    PremiumCard(
+                        modifier = Modifier.width(cardWidth).fillMaxHeight(),
+                        shape = RoundedCornerShape(28.dp),
+                        contentPadding = PaddingValues(0.dp),
                         onClick = {
                             if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
                             else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
                         },
-                        highlighted = true,
-                        modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
                     ) {
-                        FSIcon(painterResource(if (song.id == mediaMetadata?.id && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play), contentDescription = "Play ${song.title}", tint = FrostSoulTheme.colors.accentBright)
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            AsyncImage(
+                                model = song.song.thumbnailUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                            Box(
+                                modifier = Modifier.fillMaxSize().background(
+                                    Brush.verticalGradient(
+                                        0f to Color.Transparent,
+                                        0.55f to Color.Transparent,
+                                        1f to Color.Black.copy(alpha = 0.86f),
+                                    ),
+                                ),
+                            )
+                            Column(
+                                verticalArrangement = Arrangement.Bottom,
+                                modifier = Modifier.fillMaxSize().padding(20.dp),
+                            ) {
+                                Text(
+                                    text = song.title,
+                                    color = Color.White,
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    text = song.artists.joinToString(" • ") { it.name },
+                                    color = Color.White.copy(alpha = 0.82f),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(top = 4.dp),
+                                )
+                            }
+                            FSIconButton(
+                                onClick = {
+                                    if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
+                                    else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
+                                },
+                                highlighted = true,
+                                modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
+                            ) {
+                                FSIcon(
+                                    painterResource(if (song.id == mediaMetadata?.id && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play),
+                                    contentDescription = "Play ${song.title}",
+                                    tint = FrostSoulTheme.colors.accentBright,
+                                )
+                            }
+                        }
                     }
                 }
             }
