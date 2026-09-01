@@ -51,6 +51,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 144
+        // Release workflow must package the exact commit containing this version.
         versionName = "14.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
