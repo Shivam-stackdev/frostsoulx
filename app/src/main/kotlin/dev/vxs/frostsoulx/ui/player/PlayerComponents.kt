@@ -128,6 +128,7 @@ import dev.vxs.frostsoulx.ui.theme.PlayerSliderColors
 import dev.vxs.frostsoulx.ui.utils.ShowMediaInfo
 import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.ui.utils.highRes
+import dev.vxs.frostsoulx.utils.LikeCountCache
 import dev.vxs.frostsoulx.utils.makeTimeString
 import dev.vxs.frostsoulx.utils.rememberLowDataModeActive
 import dev.vxs.frostsoulx.utils.rememberPreference
@@ -265,10 +266,15 @@ fun PlayerTopActions(
     context: Context,
     currentSongLiked: Boolean,
 ) {
-    var fetchedLikeCount by remember(mediaMetadata.id) { mutableStateOf<Int?>(null) }
+    var fetchedLikeCount by remember(mediaMetadata.id) {
+        mutableStateOf(LikeCountCache.get(context, mediaMetadata.id))
+    }
     LaunchedEffect(mediaMetadata.id) {
         if (mediaMetadata.id.isNotBlank()) {
-            fetchedLikeCount = YouTube.getMediaInfo(mediaMetadata.id).getOrNull()?.like
+            YouTube.getMediaInfo(mediaMetadata.id).getOrNull()?.like?.let { count ->
+                fetchedLikeCount = count
+                LikeCountCache.put(context, mediaMetadata.id, count)
+            }
         }
     }
     val haptic = LocalHapticFeedback.current
@@ -647,12 +653,14 @@ fun PlayerTopActions(
                         tint = likeTint,
                         modifier = Modifier.size(24.dp),
                     )
-                    Text(
-                        text = formatLikeCount(fetchedLikeCount ?: 0),
-                        color = likeTint,
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
-                    )
+                    fetchedLikeCount?.let { count ->
+                        Text(
+                            text = formatLikeCount(count),
+                            color = likeTint,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
+                        )
+                    }
                 }
 
                 Surface(

@@ -123,6 +123,7 @@ import dev.vxs.frostsoulx.constants.PlayerBackgroundStyle
 import dev.vxs.frostsoulx.constants.PlayerDesignStyle
 import dev.vxs.frostsoulx.lyrics.core.LyricsLine
 import dev.vxs.frostsoulx.innertube.YouTube
+import dev.vxs.frostsoulx.utils.LikeCountCache
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.MinimalistMetadataChip
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
@@ -1345,9 +1346,17 @@ private fun FrostSoulFullPlayerLikeButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var likeCount by remember(videoId) { mutableStateOf<Int?>(null) }
+    val context = LocalContext.current
+    var likeCount by remember(videoId) {
+        mutableStateOf(LikeCountCache.get(context, videoId))
+    }
     LaunchedEffect(videoId) {
-        if (videoId.isNotBlank()) likeCount = YouTube.getMediaInfo(videoId).getOrNull()?.like
+        if (videoId.isNotBlank()) {
+            YouTube.getMediaInfo(videoId).getOrNull()?.like?.let { count ->
+                likeCount = count
+                LikeCountCache.put(context, videoId, count)
+            }
+        }
     }
     val tint = if (isLiked) Color(0xFFFF3B4D) else {
         if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
@@ -1365,13 +1374,15 @@ private fun FrostSoulFullPlayerLikeButton(
             tint = tint,
             modifier = Modifier.size(25.dp),
         )
-        Text(
-            text = formatLikeCount(likeCount ?: 0),
-            color = tint,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
-        )
+        likeCount?.let { count ->
+            Text(
+                text = formatLikeCount(count),
+                color = tint,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
+            )
+        }
     }
 }
 
