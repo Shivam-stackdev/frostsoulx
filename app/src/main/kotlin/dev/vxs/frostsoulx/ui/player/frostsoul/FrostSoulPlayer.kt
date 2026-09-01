@@ -40,12 +40,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.systemBars
@@ -71,6 +71,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -88,8 +89,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
@@ -2116,6 +2115,69 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 
 private const val PaletteCacheCapacity = 24
 
+/**
+ * Fraction of the screen height the ambient glow is allowed to occupy, anchored to the bottom.
+ *
+ * The glow used to be a full-screen radial gradient that drifted across the entire backdrop,
+ * which lit up the vinyl deck, washed out the artwork and — because every frame re-blended a
+ * screen-sized translucent layer — was the single most expensive thing on the GPU. It is now
+ * confined to the bottom band around the seek bar and transport controls, fading out just above
+ * them, so the turntable area above stays a dark, moody canvas.
+ */
+private const val GlowHeightFraction = 0.46f
+
+/** Slow "breathing" cycle for the glow, in milliseconds. Ambient, not attention-grabbing. */
+private const val GlowBreathDurationMs = 7_000
+
+/**
+ * Pixel size the ambient backdrop artwork is decoded at. The image is blurred into a soft wash,
+ * so full-resolution detail is thrown away anyway — decoding a small bitmap and letting it scale
+ * up costs a fraction of the memory and bandwidth, and lets the blur radius drop sharply.
+ */
+private const val AmbientArtworkSampleSize = 192
+
+/**
+ * Background styles that paint a palette-tinted gradient over the blurred artwork.
+ * Hoisted to file scope so the set is allocated once rather than on every recomposition.
+ */
+private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
+    java.util.EnumSet.of(
+        PlayerBackgroundStyle.GRADIENT,
+        PlayerBackgroundStyle.COLORING,
+        PlayerBackgroundStyle.BLUR_GRADIENT,
+        PlayerBackgroundStyle.GLOW,
+        PlayerBackgroundStyle.GLOW_ANIMATED,
+    )
+
+/**
+ * Single consolidated scrim for the glow styles.
+ *
+ * This one brush replaces what used to be three stacked full-screen layers (a radial vignette, a
+ * neutral ambient tone and a final readability scrim). Keeping the top ~60% deliberately dark is
+ * what makes the vinyl deck read as "slightly dark" like the reference player, while the lower
+ * stops stay lighter so the glow underneath can show through around the controls.
+ */
+private val GlowModeScrim =
+    Brush.verticalGradient(
+        colors = listOf(
+            Color.Black.copy(alpha = 0.62f),
+            Color.Black.copy(alpha = 0.55f),
+            Color.Black.copy(alpha = 0.40f),
+            Color.Black.copy(alpha = 0.30f),
+            Color.Black.copy(alpha = 0.46f),
+        ),
+    )
+
+/** Equivalent consolidated scrim for the non-glow styles. */
+private val PlainModeScrim =
+    Brush.verticalGradient(
+        colors = listOf(
+            Color.Black.copy(alpha = 0.34f),
+            Color.Black.copy(alpha = 0.16f),
+            Color.Black.copy(alpha = 0.44f),
+        ),
+    )
+
 @Composable
 private fun FrostSoulDynamicBackground(
     artworkUrl: String?,
@@ -2128,47 +2190,58 @@ private fun FrostSoulDynamicBackground(
     val isVinyl = playerDesignStyle == PlayerDesignStyle.FROSTSOUL
     val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
     val isStaticGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW
+    val isGlowMode = isAnimatedGlow || isStaticGlow
     // Keep the selected artwork present behind every player mode. Vinyl's Gradient/Glow
     // variants tint this same blurred image instead of replacing it with a flat color.
     val shouldBlurArtwork = !artworkUrl.isNullOrBlank()
-    val shouldUseGradient = isVinyl && playerBackgroundStyle in setOf(
-        PlayerBackgroundStyle.GRADIENT,
-        PlayerBackgroundStyle.COLORING,
-        PlayerBackgroundStyle.BLUR_GRADIENT,
-        PlayerBackgroundStyle.GLOW,
-        PlayerBackgroundStyle.GLOW_ANIMATED,
-    )
+    val shouldUseGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
     val moodAccent = remember(moodSeed, palette) { resolveVinylMoodAccent(moodSeed, palette) }
-    val animatedGlowPhase =
+
+    // The breathing phase is kept as a State and only read inside graphicsLayer, i.e. during the
+    // draw phase. Previously `.value` was read straight into composition, so the infinite glow
+    // animation recomposed this whole background — including the full-screen blurred AsyncImage —
+    // on every single frame. That recomposition storm was the main source of the stutter.
+    val glowBreath: State<Float>? =
         if (isAnimatedGlow) {
             rememberInfiniteTransition(label = "vinyl-glow-transition").animateFloat(
                 initialValue = 0f,
                 targetValue = 1f,
-                animationSpec = infiniteRepeatable(tween(8_000), RepeatMode.Reverse),
+                animationSpec = infiniteRepeatable(tween(GlowBreathDurationMs), RepeatMode.Reverse),
                 label = "vinyl-glow-phase",
-            ).value
+            )
         } else {
-            0.5f
+            null
         }
-    val glowPhase = if (isAnimatedGlow) animatedGlowPhase else 0.5f
-    // The ambient backdrop stays a dark, moody canvas regardless of the app's light/dark theme
-    // setting — matching the reference design — so text and icons drawn on top of it never need
-    // to flip to a dark tint (see FS-BUG-LIGHTMODE fix in FSIconButton). A stronger minimum blur
-    // floor is applied below for a cleaner "ambient" look instead of a barely-blurred backdrop.
-    val ambientBlurRadius = (blurRadius.coerceIn(0f, 120f)).coerceAtLeast(36f)
+
+    // Because the ambient artwork is decoded small and scaled up, it is already very soft — so a
+    // far smaller blur radius reproduces the old look. Blur cost scales with radius, and the old
+    // 36..120dp range over a full-screen layer was extremely expensive on mid-range GPUs.
+    val ambientBlurRadius = (blurRadius * 0.34f).coerceIn(10f, 26f)
+
+    val context = LocalContext.current
+    val ambientArtworkRequest = remember(artworkUrl, context) {
+        artworkUrl?.takeIf { it.isNotBlank() }?.let { url ->
+            ImageRequest.Builder(context)
+                .data(url)
+                .size(Size(AmbientArtworkSampleSize, AmbientArtworkSampleSize))
+                .build()
+        }
+    }
+
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(Color.Black),
     ) {
-        if (shouldBlurArtwork && !artworkUrl.isNullOrBlank()) {
-            val saturationMatrix = ColorMatrix().apply { setToSaturation(1.0f) }
+        if (shouldBlurArtwork && ambientArtworkRequest != null) {
+            // The previous implementation also applied ColorFilter.colorMatrix with
+            // setToSaturation(1.0f) — an identity matrix. It changed nothing visually while
+            // forcing an extra full-screen color-filter pass every frame, so it is gone.
             AsyncImage(
-                model = artworkUrl,
+                model = ambientArtworkRequest,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                colorFilter = ColorFilter.colorMatrix(saturationMatrix),
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer { scaleX = 1.12f; scaleY = 1.12f }
@@ -2178,74 +2251,56 @@ private fun FrostSoulDynamicBackground(
                     ),
             )
         }
-        if (shouldUseGradient) {
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            palette.artworkPrimary.copy(alpha = 0.48f),
-                            palette.artworkSecondary.copy(alpha = 0.30f),
-                            Color.Black.copy(alpha = 0.92f),
-                        ),
-                    ),
-                ),
-            )
-        }
-        if (isAnimatedGlow || isStaticGlow) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .offset(
-                        x = ((glowPhase - 0.5f) * 180f).dp,
-                        y = ((0.5f - glowPhase) * 120f).dp,
-                    )
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(
-                                moodAccent.copy(alpha = if (isAnimatedGlow) 0.54f else 0.38f),
-                                palette.artworkPrimary.copy(alpha = 0.18f),
-                                Color.Transparent,
-                            ),
-                            radius = 900f,
-                        ),
-                    ),
-            )
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.radialGradient(
-                        colors =                                 listOf(Color.Transparent, Color.Black.copy(alpha = 0.54f)),
 
-                        radius = 1_250f,
-                    ),
-                ),
-            )
-        } else {
-            // Previously switched to a white wash in light theme, which fought with the final
-            // dark readability scrim below and left inconsistent contrast behind text/icons.
-            // Kept as one consistent dark ambient tone in both themes (fixes FS-BUG-LIGHTMODE
-            // for text drawn on this backdrop, e.g. Recommendations page).
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color.Black.copy(alpha = 0.22f), Color.Transparent, Color.Black.copy(alpha = 0.34f)),
-                    ),
-                ),
-            )
-        }
-        // Keep lyric text readable when artwork contains bright whites or skin tones. This is
-        // deliberately the final backdrop layer so animated glow cannot wash out lyric text.
-        // Alphas raised slightly for a moodier, more legible "dark ambient" backdrop.
-        Box(
-            modifier = Modifier.fillMaxSize().background(
+        if (shouldUseGradient) {
+            // Brush depends only on the palette, so it is cached instead of being rebuilt (with
+            // its Color list) on every frame.
+            val gradientBrush = remember(palette) {
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color.Black.copy(alpha = 0.30f),
-                        Color.Black.copy(alpha = 0.18f),
-                        Color.Black.copy(alpha = 0.50f),
+                        palette.artworkPrimary.copy(alpha = 0.42f),
+                        palette.artworkSecondary.copy(alpha = 0.26f),
+                        Color.Black.copy(alpha = 0.92f),
                     ),
-                ),
-            ),
-        )
+                )
+            }
+            Box(modifier = Modifier.fillMaxSize().background(gradientBrush))
+        }
+
+        // One consolidated scrim instead of the old three stacked full-screen layers. This is
+        // what keeps the turntable area above the glow "halka dark" like the reference player.
+        Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
+
+        if (isGlowMode) {
+            // Bottom-anchored glow band. Only ~46% of the screen is blended here rather than the
+            // whole canvas, and the layer is bottom-aligned so it sits around the seek bar and
+            // transport controls, easing out to fully transparent just above them.
+            val glowBrush = remember(moodAccent, palette, isAnimatedGlow) {
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        moodAccent.copy(alpha = if (isAnimatedGlow) 0.14f else 0.11f),
+                        moodAccent.copy(alpha = if (isAnimatedGlow) 0.30f else 0.24f),
+                        palette.artworkPrimary.copy(alpha = if (isAnimatedGlow) 0.34f else 0.27f),
+                    ),
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .fillMaxHeight(GlowHeightFraction)
+                    // Animation is consumed in the draw phase only: alpha "breathes" and the
+                    // focal point drifts laterally via translation. Using graphicsLayer instead
+                    // of Modifier.offset also means no layout pass is triggered per frame.
+                    .graphicsLayer {
+                        val breath = glowBreath?.value ?: 0.5f
+                        alpha = 0.72f + breath * 0.28f
+                        translationX = (breath - 0.5f) * 46f * density
+                    }
+                    .background(glowBrush),
+            )
+        }
     }
 }
 
