@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -43,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +55,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
@@ -82,6 +85,7 @@ import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSChip
 import dev.vxs.frostsoulx.ui.frostsoul.FSEmptyState
 import dev.vxs.frostsoulx.ui.frostsoul.FSIconButton
+import dev.vxs.frostsoulx.ui.frostsoul.FSGlassCard
 import dev.vxs.frostsoulx.ui.frostsoul.FSTextField
 import dev.vxs.frostsoulx.ui.frostsoul.FSLoading
 import dev.vxs.frostsoulx.ui.frostsoul.FSSectionHeader
@@ -94,6 +98,7 @@ import dev.vxs.frostsoulx.ui.premium.PremiumSegmentedTabs
 import dev.vxs.frostsoulx.ui.premium.PremiumTopBar
 import dev.vxs.frostsoulx.ui.frostsoul.frostSoulScreenBackground
 import dev.vxs.frostsoulx.ui.player.frostsoul.asFrostSoulTime
+import dev.vxs.frostsoulx.utils.UserGreetingPreferences
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import java.util.Calendar
@@ -115,6 +120,12 @@ internal fun FrostSoulHomeFeed(
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    var greetingName by remember(context) { mutableStateOf(UserGreetingPreferences.getName(context)) }
+    var showGreetingNameDialog by remember(context) {
+        mutableStateOf(!UserGreetingPreferences.hasPrompted(context))
+    }
+    var greetingNameDraft by rememberSaveable { mutableStateOf("") }
     val albums = remember(uiState.speedDialItems) { uiState.speedDialItems.filterIsInstance<Album>() }
     val artists = remember(uiState.speedDialItems) { uiState.speedDialItems.filterIsInstance<Artist>() }
     val recentItems = remember(uiState.keepListening) { uiState.keepListening.take(6) }
@@ -135,7 +146,8 @@ internal fun FrostSoulHomeFeed(
     ) {
         item(key = "frostsoul_home_header") {
             FrostSoulHomeHeader(
-                accountName = uiState.accountName,
+                userName = greetingName,
+                currentSong = mediaMetadata,
                 onOpenRecent = { navController.navigate("history") },
             )
         }
@@ -399,6 +411,65 @@ internal fun FrostSoulHomeFeed(
             }
         }
     }
+
+    if (showGreetingNameDialog) {
+        Dialog(
+            onDismissRequest = {
+                UserGreetingPreferences.skip(context)
+                showGreetingNameDialog = false
+            },
+        ) {
+            FSGlassCard(
+                modifier = Modifier.widthIn(max = 420.dp),
+                shape = FrostSoulTheme.shapes.extraLarge,
+            ) {
+                FSText(
+                    text = "Make FrostSoul yours",
+                    style = FrostSoulTheme.typography.title,
+                    color = FrostSoulTheme.colors.onSurface,
+                )
+                Spacer(Modifier.height(FrostSoulTheme.spacing.small))
+                FSText(
+                    text = "What should we call you on the home screen?",
+                    style = FrostSoulTheme.typography.body,
+                    color = FrostSoulTheme.colors.onSurfaceMuted,
+                )
+                Spacer(Modifier.height(FrostSoulTheme.spacing.medium))
+                FSTextField(
+                    value = greetingNameDraft,
+                    onValueChange = { greetingNameDraft = it.take(40) },
+                    placeholder = "Your name",
+                )
+                Spacer(Modifier.height(FrostSoulTheme.spacing.medium))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(FrostSoulTheme.spacing.small),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    FSButton(
+                        label = "Not now",
+                        onClick = {
+                            UserGreetingPreferences.skip(context)
+                            showGreetingNameDialog = false
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    FSButton(
+                        label = "Save",
+                        onClick = {
+                            val name = greetingNameDraft.trim()
+                            if (name.isNotBlank()) {
+                                UserGreetingPreferences.save(context, name)
+                                greetingName = name
+                                showGreetingNameDialog = false
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        emphasized = true,
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -595,7 +666,8 @@ private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
 
 @Composable
 private fun FrostSoulHomeHeader(
-    accountName: String,
+    userName: String?,
+    currentSong: MediaMetadata?,
     onOpenRecent: () -> Unit,
 ) {
     val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
@@ -606,10 +678,10 @@ private fun FrostSoulHomeHeader(
             in 17..21 -> "Good Evening"
             else -> "Good Night"
         }
-    val firstName = accountName.trim().substringBefore(' ').takeIf { it.isNotBlank() }
+        PremiumTopBar(
 
-    PremiumTopBar(
-        title = if (firstName == null) timeOfDay else "$timeOfDay, $firstName",
+        title = timeOfDay,
+        subtitle = userName?.let { "$it ${moodEmoji(currentSong)}" },
         eyebrow = "FROSTSOUL",
         modifier = Modifier.statusBarsPadding(),
         trailingContent = {
@@ -626,6 +698,22 @@ private fun FrostSoulHomeHeader(
             }
         },
     )
+}
+
+private fun moodEmoji(currentSong: MediaMetadata?): String {
+    val text = buildString {
+        append(currentSong?.title.orEmpty())
+        append(' ')
+        append(currentSong?.artists?.joinToString(" ") { it.name }.orEmpty())
+    }.lowercase()
+    return when {
+        text.contains(Regex("love|romance|heart|ishq|pyaar|mohabbat")) -> "💖"
+        text.contains(Regex("sad|alone|cry|broken|dard|udaas|tanha")) -> "💙"
+        text.contains(Regex("party|dance|club|celebration|nach")) -> "🕺"
+        text.contains(Regex("chill|calm|relax|lofi|sleep")) -> "🌙"
+        text.contains(Regex("devotion|bhajan|prayer|allah|ram|krishna")) -> "🙏"
+        else -> "🎶"
+    }
 }
 
 @Composable
