@@ -2191,9 +2191,11 @@ private fun FrostSoulDynamicBackground(
     val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
     val isStaticGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW
     val isGlowMode = isAnimatedGlow || isStaticGlow
-    // Keep the selected artwork present behind every player mode. Vinyl's Gradient/Glow
-    // variants tint this same blurred image instead of replacing it with a flat color.
-    val shouldBlurArtwork = !artworkUrl.isNullOrBlank()
+    // Only blur when the selected style needs a soft artwork layer. Glow mode gets a tiny blur
+    // because the low-resolution source image already provides most of the softness; avoiding a
+    // full-screen high-radius blur is important on mid-range Samsung GPUs.
+    val hasArtwork = !artworkUrl.isNullOrBlank()
+    val shouldBlurArtwork = hasArtwork && (playerBackgroundStyle == PlayerBackgroundStyle.BLUR_GRADIENT || isGlowMode)
     val shouldUseGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
     val moodAccent = remember(moodSeed, palette) { resolveVinylMoodAccent(moodSeed, palette) }
 
@@ -2216,7 +2218,11 @@ private fun FrostSoulDynamicBackground(
     // Because the ambient artwork is decoded small and scaled up, it is already very soft — so a
     // far smaller blur radius reproduces the old look. Blur cost scales with radius, and the old
     // 36..120dp range over a full-screen layer was extremely expensive on mid-range GPUs.
-    val ambientBlurRadius = (blurRadius * 0.34f).coerceIn(10f, 26f)
+    val ambientBlurRadius = when {
+        isGlowMode -> 8f
+        playerBackgroundStyle == PlayerBackgroundStyle.BLUR_GRADIENT -> (blurRadius * 0.28f).coerceIn(12f, 22f)
+        else -> 0f
+    }
 
     val context = LocalContext.current
     val ambientArtworkRequest = remember(artworkUrl, context) {
@@ -2245,9 +2251,15 @@ private fun FrostSoulDynamicBackground(
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer { scaleX = 1.12f; scaleY = 1.12f }
-                    .blur(
-                        ambientBlurRadius.dp,
-                        edgeTreatment = BlurredEdgeTreatment.Unbounded,
+                    .then(
+                        if (ambientBlurRadius > 0f) {
+                            Modifier.blur(
+                                ambientBlurRadius.dp,
+                                edgeTreatment = BlurredEdgeTreatment.Unbounded,
+                            )
+                        } else {
+                            Modifier
+                        },
                     ),
             )
         }
