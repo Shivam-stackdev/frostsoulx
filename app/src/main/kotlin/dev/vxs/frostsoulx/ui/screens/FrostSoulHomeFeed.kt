@@ -646,7 +646,7 @@ private fun FrostSoulRecommendationList(
                             translationX = -pageDistance * 8.dp.toPx()
                             cameraDistance = 12f * density
                             transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
-                            shape = FrostSoulTheme.shapes.medium
+                            shape = RoundedCornerShape(16.dp)
                             clip = true
                         }
                     },
