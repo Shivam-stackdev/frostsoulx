@@ -76,6 +76,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
@@ -2116,18 +2117,14 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 private const val PaletteCacheCapacity = 24
 
 /**
- * Fraction of the screen height the ambient glow is allowed to occupy, anchored to the bottom.
- *
- * The glow used to be a full-screen radial gradient that drifted across the entire backdrop,
- * which lit up the vinyl deck, washed out the artwork and — because every frame re-blended a
- * screen-sized translucent layer — was the single most expensive thing on the GPU. It is now
- * confined to the bottom band around the seek bar and transport controls, fading out just above
- * them, so the turntable area above stays a dark, moody canvas.
+ * Fixed geometry shared by Main, Lyrics, and Recommendations vinyl pages. The band sits just above
+ * the seek/time bar and never covers the turntable deck or bottom navigation.
  */
-private const val GlowHeightFraction = 0.46f
+private val SeekGlowBandHeight = 142.dp
+private val SeekGlowBottomPadding = 82.dp
 
-/** Slow "breathing" cycle for the glow, in milliseconds. Ambient, not attention-grabbing. */
-private const val GlowBreathDurationMs = 7_000
+/** Reference-style breathing cycle: subtle and slow, without per-frame layout work. */
+private const val GlowBreathDurationMs = 3_600
 
 /**
  * Pixel size the ambient backdrop artwork is decoded at. The image is blurred into a soft wash,
@@ -2146,7 +2143,6 @@ private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
         PlayerBackgroundStyle.COLORING,
         PlayerBackgroundStyle.BLUR_GRADIENT,
         PlayerBackgroundStyle.GLOW,
-        PlayerBackgroundStyle.GLOW_ANIMATED,
     )
 
 /**
@@ -2195,7 +2191,6 @@ private fun FrostSoulDynamicBackground(
     // variants tint this same blurred image instead of replacing it with a flat color.
     val shouldBlurArtwork = !artworkUrl.isNullOrBlank()
     val shouldUseGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
-    val moodAccent = remember(moodSeed, palette) { resolveVinylMoodAccent(moodSeed, palette) }
 
     // The breathing phase is kept as a State and only read inside graphicsLayer, i.e. during the
     // draw phase. Previously `.value` was read straight into composition, so the infinite glow
@@ -2272,44 +2267,35 @@ private fun FrostSoulDynamicBackground(
         Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
 
         if (isGlowMode) {
-            // Bottom-anchored glow band. Only ~46% of the screen is blended here rather than the
-            // whole canvas, and the layer is bottom-aligned so it sits around the seek bar and
-            // transport controls, easing out to fully transparent just above them.
-            val glowBrush = remember(moodAccent, palette, isAnimatedGlow) {
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        moodAccent.copy(alpha = if (isAnimatedGlow) 0.14f else 0.11f),
-                        moodAccent.copy(alpha = if (isAnimatedGlow) 0.30f else 0.24f),
-                        palette.artworkPrimary.copy(alpha = if (isAnimatedGlow) 0.34f else 0.27f),
-                    ),
-                )
-            }
+            // One fixed layer is shared by Main, Lyrics, and Recommendations. It sits slightly
+            // above the seek/time bar and never reaches the turntable deck or bottom navigation.
+            // No blur modifier, full-screen animated gradient, or per-frame brush allocation.
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .fillMaxHeight(GlowHeightFraction)
-                    // Animation is consumed in the draw phase only: alpha "breathes" and the
-                    // focal point drifts laterally via translation. Using graphicsLayer instead
-                    // of Modifier.offset also means no layout pass is triggered per frame.
+                    .padding(bottom = SeekGlowBottomPadding)
+                    .fillMaxWidth(0.82f)
+                    .height(SeekGlowBandHeight)
                     .graphicsLayer {
                         val breath = glowBreath?.value ?: 0.5f
-                        alpha = 0.72f + breath * 0.28f
-                        translationX = (breath - 0.5f) * 46f * density
+                        alpha = 0.68f + breath * 0.32f
                     }
-                    .background(glowBrush),
+                    .drawWithCache {
+                        val center = androidx.compose.ui.geometry.Offset(size.width / 2f, size.height / 2f)
+                        val glowBrush = Brush.radialGradient(
+                            colors = listOf(
+                                palette.artworkPrimary.copy(alpha = 0.42f),
+                                palette.artworkSecondary.copy(alpha = 0.20f),
+                                Color.Transparent,
+                            ),
+                            center = center,
+                            radius = size.width * 0.62f,
+                        )
+                        onDrawBehind {
+                            drawRect(brush = glowBrush)
+                        }
+                    },
             )
         }
-    }
-}
-
-private fun resolveVinylMoodAccent(seed: String, palette: FrostSoulPalette): Color {
-    val mood = seed.lowercase()
-    return when {
-        listOf("sad", "alone", "cry", "night", "broken", "dard", "udaas").any { keyword -> mood.contains(keyword) } -> Color(0xFF6D8FD6)
-        listOf("love", "romance", "heart", "ishq", "pyaar", "romantic").any { keyword -> mood.contains(keyword) } -> Color(0xFFE27B93)
-        listOf("party", "dance", "energy", "rock", "remix", "beat").any { keyword -> mood.contains(keyword) } -> Color(0xFFF09A58)
-        else -> palette.artworkPrimary
     }
 }
