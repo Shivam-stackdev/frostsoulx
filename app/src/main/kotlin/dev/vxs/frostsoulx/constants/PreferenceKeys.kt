@@ -185,6 +185,7 @@ val EnableYouLyPlusLyricsKey = booleanPreferencesKey("enableYouLyPlusLyrics")
 val EnableSimpMusicLyricsKey = booleanPreferencesKey("enableSimpMusicLyrics")
 val EnableMegalobizLyricsKey = booleanPreferencesKey("enableMegalobizLyrics")
 val EnablePaxsenixLyricsKey = booleanPreferencesKey("enablePaxsenixLyrics")
+val EnableGeniusLyricsKey = booleanPreferencesKey("enableGeniusLyrics")
 val EnablePaxsenixAppleMusicLyricsKey = booleanPreferencesKey("enablePaxsenixAppleMusicLyrics")
 val EnablePaxsenixNeteaseLyricsKey = booleanPreferencesKey("enablePaxsenixNeteaseLyrics")
 val EnablePaxsenixSpotifyLyricsKey = booleanPreferencesKey("enablePaxsenixSpotifyLyrics")
@@ -588,6 +589,7 @@ enum class PreferredLyricsProvider {
     MEGALOBIZ,
     SIMPMUSIC,
     UNISON,
+    GENIUS,
     PAXSENIX_APPLE_MUSIC,
     PAXSENIX_NETEASE,
     PAXSENIX_SPOTIFY,
@@ -597,6 +599,9 @@ enum class PreferredLyricsProvider {
 
 val DefaultLyricsProviderOrder =
     listOf(
+        PreferredLyricsProvider.PAXSENIX_SPOTIFY,
+        PreferredLyricsProvider.GENIUS,
+        PreferredLyricsProvider.PAXSENIX_APPLE_MUSIC,
         PreferredLyricsProvider.BETTER_LYRICS,
         PreferredLyricsProvider.YOULY_PLUS,
         PreferredLyricsProvider.LRCLIB,
@@ -604,9 +609,7 @@ val DefaultLyricsProviderOrder =
         PreferredLyricsProvider.MEGALOBIZ,
         PreferredLyricsProvider.SIMPMUSIC,
         PreferredLyricsProvider.UNISON,
-        PreferredLyricsProvider.PAXSENIX_APPLE_MUSIC,
         PreferredLyricsProvider.PAXSENIX_NETEASE,
-        PreferredLyricsProvider.PAXSENIX_SPOTIFY,
         PreferredLyricsProvider.PAXSENIX_MUSIXMATCH,
         PreferredLyricsProvider.PAXSENIX_YOUTUBE,
     )

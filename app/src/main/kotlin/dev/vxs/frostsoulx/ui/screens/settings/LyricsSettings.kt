@@ -66,6 +66,7 @@ import androidx.navigation.NavController
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.constants.EnableBetterLyricsKey
+import dev.vxs.frostsoulx.constants.EnableGeniusLyricsKey
 import dev.vxs.frostsoulx.constants.EnableKugouKey
 import dev.vxs.frostsoulx.constants.EnableLrcLibKey
 import dev.vxs.frostsoulx.constants.EnableMegalobizLyricsKey
@@ -159,6 +160,7 @@ fun LyricsSettings(
     val (enableLrclib, onEnableLrclibChange) = rememberPreference(key = EnableLrcLibKey, defaultValue = true)
     val (enableKugou, onEnableKugouChange) = rememberPreference(key = EnableKugouKey, defaultValue = true)
     val (enableBetterLyrics, onEnableBetterLyricsChange) = rememberPreference(key = EnableBetterLyricsKey, defaultValue = true)
+    val (enableGeniusLyrics, onEnableGeniusLyricsChange) = rememberPreference(key = EnableGeniusLyricsKey, defaultValue = true)
     val (enableYouLyPlusLyrics, onEnableYouLyPlusLyricsChange) =
         rememberPreference(key = EnableYouLyPlusLyricsKey, defaultValue = true)
     val (enableSimpMusicLyrics, onEnableSimpMusicLyricsChange) = rememberPreference(key = EnableSimpMusicLyricsKey, defaultValue = true)
@@ -466,6 +468,15 @@ fun LyricsSettings(
 
             item {
                 SwitchPreference(
+                    title = { Text("Genius") },
+                    icon = { Icon(painterResource(R.drawable.lyrics), null) },
+                    checked = enableGeniusLyrics,
+                    onCheckedChange = onEnableGeniusLyricsChange,
+                )
+            }
+
+            item {
+                SwitchPreference(
                     title = { Text(stringResource(R.string.enable_youlyplus_lyrics)) },
                     icon = { Icon(painterResource(R.drawable.lyrics), null) },
                     checked = enableYouLyPlusLyrics,
@@ -695,6 +706,7 @@ private fun PreferredLyricsProvider.displayName(): String =
         PreferredLyricsProvider.KUGOU -> "KuGou"
         PreferredLyricsProvider.MEGALOBIZ -> "Megalobiz"
         PreferredLyricsProvider.BETTER_LYRICS -> "BetterLyrics"
+        PreferredLyricsProvider.GENIUS -> "Genius"
         PreferredLyricsProvider.YOULY_PLUS -> "YouLyPlus"
         PreferredLyricsProvider.SIMPMUSIC -> "SimpMusic"
         PreferredLyricsProvider.PAXSENIX_APPLE_MUSIC -> "Paxsenix: Apple Music"

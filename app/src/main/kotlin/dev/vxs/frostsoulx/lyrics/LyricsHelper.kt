@@ -29,7 +29,6 @@ import dev.vxs.frostsoulx.utils.NetworkConnectivityObserver
 import dev.vxs.frostsoulx.utils.dataStore
 import dev.vxs.frostsoulx.utils.reportException
 import javax.inject.Inject
-import kotlin.math.abs
 
 class LyricsHelper
     @Inject
@@ -40,6 +39,7 @@ class LyricsHelper
         private val baseProviders =
             listOf(
                 BetterLyricsProvider,
+                GeniusLyricsProvider,
                 YouLyPlusLyricsProvider,
                 LrcLibLyricsProvider,
                 KuGouLyricsProvider,
@@ -118,14 +118,7 @@ class LyricsHelper
             forceRefresh: Boolean = false,
             callback: (LyricsResult) -> Unit,
         ) {
-            val cacheKey =
-                lyricsCacheKey(
-                    mediaId = mediaId,
-                    title = songTitle,
-                    artists = songArtists,
-                    album = songAlbum,
-                    duration = duration,
-                )
+            val cacheKey = lyricsCacheKey(songTitle, songArtists)
             if (forceRefresh) {
                 invalidateCache(cacheKey)
             } else {
@@ -155,14 +148,7 @@ class LyricsHelper
                     try {
                         provider.getAllLyrics(mediaId, songTitle, songArtists, songAlbum, duration) lyricsCallback@{ lyrics ->
                             val normalizedLyrics = LyricsUtils.lyricsOrNotFound(lyrics)
-                            if (
-                                normalizedLyrics == LYRICS_NOT_FOUND ||
-                                    hasConflictingLrcMetadata(
-                                        normalizedLyrics,
-                                        title = songTitle,
-                                        artists = songArtists,
-                                    )
-                            ) return@lyricsCallback
+                            if (normalizedLyrics == LYRICS_NOT_FOUND) return@lyricsCallback
                             val result = LyricsResult(provider.name, normalizedLyrics)
                             allResult += result
                             callback(result)
@@ -184,23 +170,9 @@ class LyricsHelper
             if (providers.isEmpty()) return LYRICS_NOT_FOUND
 
             val artist = mediaMetadata.artists.joinToString { it.name }
-            // ID-aware providers are less likely to return a same-title remix or live version.
-            // Keep the user's ordering for the remaining providers.
-            val exactIdProviders =
-                listOf(
-                    SimpMusicLyricsProvider,
-                    UnisonLyricsProvider,
-                    YouTubeSubtitleLyricsProvider,
-                )
-            val prioritizedProviders =
-                if (mediaMetadata.id.isNotBlank()) {
-                    providers.filter { it in exactIdProviders } + providers.filterNot { it in exactIdProviders }
-                } else {
-                    providers
-                }
             val results =
                 supervisorScope {
-                    prioritizedProviders
+                    providers
                         .map { provider ->
                             async(Dispatchers.IO) {
                                 fetchProviderLyrics(provider, mediaMetadata, artist)
@@ -210,10 +182,11 @@ class LyricsHelper
 
             if (results.isEmpty()) return LYRICS_NOT_FOUND
 
-            return results.maxByOrNull {
-                scoreLyricsQuality(it, mediaMetadata.duration)
-            } ?: results.first()
+            results.firstOrNull { LyricsUtils.hasWordSyncedLyrics(it) }?.let { return it }
+            results.firstOrNull { LyricsUtils.isLineSyncedLrc(it) }?.let { return it }
+            return results.first()
         }
+
         private suspend fun fetchProviderLyrics(
             provider: LyricsProvider,
             mediaMetadata: MediaMetadata,
@@ -229,16 +202,7 @@ class LyricsHelper
                         mediaMetadata.duration,
                     ).fold(
                         onSuccess = { lyrics ->
-                            LyricsUtils
-                                .lyricsOrNotFound(lyrics)
-                                .takeIf {
-                                    it != LYRICS_NOT_FOUND &&
-                                        !hasConflictingLrcMetadata(
-                                            lyrics = it,
-                                            title = mediaMetadata.title,
-                                            artists = artist,
-                                        )
-                                }
+                            LyricsUtils.lyricsOrNotFound(lyrics).takeIf { it != LYRICS_NOT_FOUND }
                         },
                         onFailure = {
                             reportException(it)
@@ -251,42 +215,6 @@ class LyricsHelper
                 reportException(e)
                 null
             }
-        private fun scoreLyricsQuality(
-            lyrics: String,
-            durationMs: Int,
-        ): Double {
-            val normalized = LyricsUtils.normalizeLyricsText(lyrics)
-            val visibleText = LyricsUtils.displayLyricsText(normalized)
-            val visibleLineCount = visibleText.lineSequence().count { it.isNotBlank() }
-            val characterScore = (visibleText.length.toDouble() / 1800.0).coerceAtMost(1.0)
-            val isTtmlLyrics = LyricsUtils.isTtml(normalized)
-            val isLineSynced = LyricsUtils.isLineSyncedLrc(normalized)
-
-            if (!isTtmlLyrics && !isLineSynced) {
-                return (visibleLineCount.toDouble() / 40.0).coerceAtMost(1.0) * 45.0 + characterScore * 35.0
-            }
-
-            val entries =
-                runCatching {
-                    if (isTtmlLyrics) LyricsUtils.parseTtml(normalized) else LyricsUtils.parseLyrics(normalized)
-                }.getOrElse { emptyList() }
-            if (entries.isEmpty()) return characterScore * 10.0
-
-            val firstTimestamp = entries.minOfOrNull { it.time } ?: 0L
-            val lastTimestamp = entries.maxOfOrNull { it.time } ?: 0L
-            val duration = durationMs.toLong().takeIf { it > 0L }
-            val coverageScore =
-                duration?.let { (lastTimestamp.toDouble() / it.toDouble()).coerceIn(0.0, 1.0) * 20.0 } ?: 10.0
-            val durationFitScore =
-                duration?.let {
-                    (1.0 - abs(lastTimestamp - it).toDouble() / it.toDouble()).coerceIn(0.0, 1.0) * 10.0
-                } ?: 5.0
-            val lineScore = (entries.size.toDouble() / 45.0).coerceAtMost(1.0) * 30.0
-            val startsNearBeginning = if (firstTimestamp <= 15_000L) 5.0 else 0.0
-
-            // Synced lyrics get a modest bonus, but completeness and duration coverage dominate.
-            return 20.0 + coverageScore + durationFitScore + lineScore + characterScore * 15.0 + startsNearBeginning
-        }
 
         private suspend fun orderedProviders(): List<LyricsProvider> {
             val orderStr = context.dataStore.data.first()[LyricsProviderOrderKey]
@@ -297,6 +225,7 @@ class LyricsHelper
                     PreferredLyricsProvider.KUGOU to KuGouLyricsProvider,
                     PreferredLyricsProvider.MEGALOBIZ to MegalobizLyricsProvider,
                     PreferredLyricsProvider.BETTER_LYRICS to BetterLyricsProvider,
+                    PreferredLyricsProvider.GENIUS to GeniusLyricsProvider,
                     PreferredLyricsProvider.YOULY_PLUS to YouLyPlusLyricsProvider,
                     PreferredLyricsProvider.SIMPMUSIC to SimpMusicLyricsProvider,
                     PreferredLyricsProvider.PAXSENIX_APPLE_MUSIC to PaxsenixAppleMusicLyricsProvider,
@@ -326,99 +255,14 @@ class LyricsHelper
         private val MediaMetadata.lyricsCacheKey: String
             get() =
                 lyricsCacheKey(
-                    mediaId = id,
                     title = title,
                     artists = artists.joinToString { it.name },
-                    album = album?.title,
-                    duration = duration,
                 )
 
         private fun lyricsCacheKey(
-            mediaId: String,
             title: String,
             artists: String,
-            album: String?,
-            duration: Int,
-        ): String =
-            listOf(mediaId, title, artists, album.orEmpty(), duration.toString())
-                .joinToString("|") { normalizeIdentity(it) }
-
-        private fun normalizeIdentity(value: String): String =
-            value
-                .lowercase()
-                .replace("＆", "&")
-                .replace(Regex("[^a-z0-9]+"), " ")
-                .trim()
-                .replace(Regex("\\s+"), " ")
-
-        /** Reject only explicit provider metadata that contradicts the current track. */
-        fun isLikelyForTrack(lyrics: String, metadata: MediaMetadata): Boolean =
-            !hasConflictingLrcMetadata(
-                lyrics,
-                title = metadata.title,
-                artists = metadata.artists.joinToString { it.name },
-            )
-
-        private fun hasConflictingLrcMetadata(
-            lyrics: String,
-            title: String,
-            artists: String,
-        ): Boolean {
-            val titleTag = Regex("(?im)^\\s*\\[ti\\s*:\\s*([^]]+)]").find(lyrics)?.groupValues?.getOrNull(1)
-            val artistTag = Regex("(?im)^\\s*\\[ar\\s*:\\s*([^]]+)]").find(lyrics)?.groupValues?.getOrNull(1)
-            val normalizedTitle = normalizeIdentity(title)
-            val normalizedArtists = artists.split(Regex("\\s*[,•;|/]\\s*"), limit = 0).map { normalizeIdentity(it) }
-            val normalizedTaggedTitle = titleTag?.let(::normalizeIdentity)
-            val normalizedTaggedArtist = artistTag?.let(::normalizeIdentity)
-            fun matchesTitle(candidate: String): Boolean =
-                normalizedTitle.isNotBlank() &&
-                    candidate.isNotBlank() &&
-                    (candidate == normalizedTitle ||
-                        candidate.contains(normalizedTitle) ||
-                        normalizedTitle.contains(candidate))
-            fun matchesArtist(candidate: String): Boolean =
-                normalizedArtists.any { expected ->
-                    expected.isNotBlank() &&
-                        candidate.isNotBlank() &&
-                        (candidate == expected || candidate.contains(expected) || expected.contains(candidate))
-                }
-
-            val titleConflict =
-                normalizedTaggedTitle != null &&
-                    normalizedTaggedTitle.isNotBlank() &&
-                    !matchesTitle(normalizedTaggedTitle)
-            val artistConflict =
-                normalizedTaggedArtist != null &&
-                    normalizedTaggedArtist.isNotBlank() &&
-                    normalizedArtists.isNotEmpty() &&
-                    !matchesArtist(normalizedTaggedArtist)
-
-            // Some providers return a plain-text header instead of [ti]/[ar] tags. For example:
-            // "Janam Janam - Pritam/Arijit Singh/Antara Mitra". Treat that first-line title as
-            // authoritative when its artist matches the current track; otherwise a valid result
-            // for another song can be accepted for the currently playing track.
-            val firstContentLine =
-                lyrics.lineSequence()
-                    .map { line ->
-                        line.replace(
-                            Regex("^\\s*(?:\\[\\d{1,2}:\\d{2}(?:[.:]\\d{1,3})?\\]\\s*)+"),
-                            "",
-                        ).trim()
-                    }.firstOrNull { line -> line.isNotBlank() && !line.startsWith("[") }
-            val plainHeader =
-                firstContentLine?.let {
-                    Regex("^(.{2,100}?)\\s+[-–—:]\\s+(.{2,160})$").matchEntire(it)
-                }
-            val plainHeaderTitle = plainHeader?.groupValues?.getOrNull(1)?.let(::normalizeIdentity)
-            val plainHeaderArtist = plainHeader?.groupValues?.getOrNull(2)?.let(::normalizeIdentity)
-            val plainHeaderConflict =
-                plainHeaderTitle != null &&
-                    plainHeaderArtist != null &&
-                    !matchesTitle(plainHeaderTitle) &&
-                    matchesArtist(plainHeaderArtist)
-
-            return titleConflict || artistConflict || plainHeaderConflict
-        }
+        ): String = "$artists-$title".replace(" ", "")
 
         companion object {
             private const val MAX_CACHE_SIZE = 16
