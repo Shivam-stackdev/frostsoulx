@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
@@ -58,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.constants.MiniPlayerHeight
@@ -607,14 +609,47 @@ private fun FrostSoulRecommendationList(
     mediaMetadata: MediaMetadata?,
     playerConnection: PlayerConnection,
 ) {
+    val carouselState = rememberLazyListState()
+
     LazyRow(
+        state = carouselState,
         contentPadding = FrostSoulShelfItemPadding,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(songs, key = { "quick_card_${it.id}" }) { song ->
             val isCurrent = song.id == mediaMetadata?.id
             PremiumCard(
-                modifier = Modifier.width(148.dp).height(184.dp),
+                modifier = Modifier
+                    .width(148.dp)
+                    .height(184.dp)
+                    .graphicsLayer {
+                        // Scroll information is read in the layer so transforms update without
+                        // recomposing the complete recommendation section on every scroll tick.
+                        val item = carouselState.layoutInfo.visibleItemsInfo
+                            .firstOrNull { it.key == "quick_card_${song.id}" }
+                        if (item != null) {
+                            val viewportCenter = (
+                                carouselState.layoutInfo.viewportStartOffset +
+                                    carouselState.layoutInfo.viewportEndOffset
+                            ) / 2f
+                            val itemCenter = item.offset + item.size / 2f
+                            val pageDistance = ((itemCenter - viewportCenter) / item.size)
+                                .coerceIn(-1.25f, 1.25f)
+                            val distance = abs(pageDistance).coerceIn(0f, 1f)
+                            val focus = 1f - distance
+
+                            // Center card stays dominant; neighbors fan back with perspective.
+                            scaleX = 0.86f + 0.14f * focus
+                            scaleY = 0.86f + 0.14f * focus
+                            rotationY = -18f * pageDistance
+                            alpha = 0.64f + 0.36f * focus
+                            translationX = -pageDistance * 8.dp.toPx()
+                            cameraDistance = 12f * density
+                            transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
+                            shape = FrostSoulTheme.shapes.medium
+                            clip = true
+                        }
+                    },
                 shape = FrostSoulTheme.shapes.medium,
                 contentPadding = PaddingValues(10.dp),
                 onClick = {
