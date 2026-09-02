@@ -2120,8 +2120,8 @@ private const val PaletteCacheCapacity = 24
  * Fixed geometry shared by Main, Lyrics, and Recommendations vinyl pages. The band sits just above
  * the seek/time bar and never covers the turntable deck or bottom navigation.
  */
-private val SeekGlowBandHeight = 142.dp
-private val SeekGlowBottomPadding = 82.dp
+private val SeekGlowBandHeight = 180.dp
+private val SeekGlowBottomPadding = 28.dp
 
 /** Reference-style breathing cycle: subtle and slow, without per-frame layout work. */
 private const val GlowBreathDurationMs = 3_600
@@ -2267,32 +2267,37 @@ private fun FrostSoulDynamicBackground(
         Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
 
         if (isGlowMode) {
-            // One fixed layer is shared by Main, Lyrics, and Recommendations. It sits slightly
-            // above the seek/time bar and never reaches the turntable deck or bottom navigation.
-            // No blur modifier, full-screen animated gradient, or per-frame brush allocation.
+            // One fixed full-width wash is shared by Main, Lyrics, and Recommendations. It sits
+            // just above the seek/time-bar area and never becomes an oval or moving backdrop.
+            // Two cached vertical brushes are cross-faded in the draw phase so the color breathes
+            // between the active artwork's primary and secondary palette colors without allocating
+            // a new brush or recomposing the player on every frame.
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = SeekGlowBottomPadding)
-                    .fillMaxWidth(0.82f)
+                    .fillMaxWidth()
                     .height(SeekGlowBandHeight)
-                    .graphicsLayer {
-                        val breath = glowBreath?.value ?: 0.5f
-                        alpha = 0.68f + breath * 0.32f
-                    }
                     .drawWithCache {
-                        val center = androidx.compose.ui.geometry.Offset(size.width / 2f, size.height / 2f)
-                        val glowBrush = Brush.radialGradient(
+                        val primaryWash = Brush.verticalGradient(
                             colors = listOf(
-                                palette.artworkPrimary.copy(alpha = 0.42f),
-                                palette.artworkSecondary.copy(alpha = 0.20f),
                                 Color.Transparent,
+                                palette.artworkPrimary.copy(alpha = 0.42f),
+                                palette.artworkPrimary.copy(alpha = 0.24f),
                             ),
-                            center = center,
-                            radius = size.width * 0.62f,
+                        )
+                        val secondaryWash = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                palette.artworkSecondary.copy(alpha = 0.34f),
+                                palette.artworkSecondary.copy(alpha = 0.20f),
+                            ),
                         )
                         onDrawBehind {
-                            drawRect(brush = glowBrush)
+                            val breath = glowBreath?.value ?: 0.5f
+                            val secondaryWeight = (0.22f + breath * 0.56f).coerceIn(0f, 1f)
+                            drawRect(brush = primaryWash, alpha = 1f - secondaryWeight)
+                            drawRect(brush = secondaryWash, alpha = secondaryWeight)
                         }
                     },
             )
