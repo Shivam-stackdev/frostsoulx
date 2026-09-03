@@ -182,7 +182,6 @@ class LyricsHelper
 
             if (results.isEmpty()) return LYRICS_NOT_FOUND
 
-            results.firstOrNull { LyricsUtils.hasWordSyncedLyrics(it) }?.let { return it }
             results.firstOrNull { LyricsUtils.isLineSyncedLrc(it) }?.let { return it }
             return results.first()
         }
@@ -263,6 +262,49 @@ class LyricsHelper
             title: String,
             artists: String,
         ): String = "$artists-$title".replace(" ", "")
+
+        /** Reject only explicit provider metadata that contradicts the current track. */
+        fun isLikelyForTrack(lyrics: String, metadata: MediaMetadata): Boolean =
+            !hasConflictingLrcMetadata(
+                lyrics,
+                title = metadata.title,
+                artists = metadata.artists.joinToString { it.name },
+            )
+
+        private fun hasConflictingLrcMetadata(
+            lyrics: String,
+            title: String,
+            artists: String,
+        ): Boolean {
+            val titleTag = Regex("(?im)^\\s*\\[ti\\s*:\\s*([^]]+)]").find(lyrics)?.groupValues?.getOrNull(1)
+            val artistTag = Regex("(?im)^\\s*\\[ar\\s*:\\s*([^]]+)]").find(lyrics)?.groupValues?.getOrNull(1)
+            val normalized = { value: String ->
+                value.lowercase()
+                    .replace("＆", "&")
+                    .replace(Regex("[^a-z0-9]+"), " ")
+                    .trim()
+                    .replace(Regex("\\s+"), " ")
+            }
+            val normalizedTitle = normalized(title)
+            val normalizedArtists = artists.split(Regex("\\s*[,•;|/]\\s*"))
+                .map(::normalized)
+                .filter(String::isNotBlank)
+            val normalizedTaggedTitle = titleTag?.let(normalized)
+            val normalizedTaggedArtist = artistTag?.let(normalized)
+            val titleConflict = normalizedTaggedTitle != null &&
+                normalizedTitle.isNotBlank() &&
+                normalizedTaggedTitle != normalizedTitle &&
+                !normalizedTaggedTitle.contains(normalizedTitle) &&
+                !normalizedTitle.contains(normalizedTaggedTitle)
+            val artistConflict = normalizedTaggedArtist != null &&
+                normalizedArtists.isNotEmpty() &&
+                normalizedArtists.none {
+                    it == normalizedTaggedArtist ||
+                        it.contains(normalizedTaggedArtist) ||
+                        normalizedTaggedArtist.contains(it)
+                }
+            return titleConflict || artistConflict
+        }
 
         companion object {
             private const val MAX_CACHE_SIZE = 16
