@@ -1037,9 +1037,9 @@ private fun FrostSoulMainLyricPreview(
             uiState.lyricPreviewLines.drop(1).take(1).forEach { line ->
                 Text(
                     text = line,
-                    color = FrostSoulOnSurfaceMuted.copy(alpha = 0.58f),
-                    fontSize = 14.sp,
-                    lineHeight = 19.sp,
+                    color = FrostSoulOnSurfaceMuted.copy(alpha = 0.82f),
+                    fontSize = 18.sp,
+                    lineHeight = 24.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -1324,10 +1324,10 @@ private fun FrostSoulArtworkBlurAlbumPage(
             FrostSoulMainLyricPreview(
                 uiState = uiState,
                 showExtraPreviewLines = true,
-                maxLinesPerLyric = 1,
+                maxLinesPerLyric = 2,
                 modifier = Modifier
                     .heightIn(min = 60.dp)
-                    .graphicsLayer { translationY = -12.dp.toPx() },
+                    .padding(top = 14.dp),
             )
         }
 
