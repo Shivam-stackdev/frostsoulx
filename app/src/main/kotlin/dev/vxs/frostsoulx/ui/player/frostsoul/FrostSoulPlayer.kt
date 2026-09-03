@@ -109,6 +109,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.core.graphics.ColorUtils
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -2142,43 +2143,90 @@ private object GlowConstraints {
     val BandMaxHeight = 264.dp
 
     /**
-     * Peak coverage of the wash. Held below 1.0 so the blurred artwork still reads faintly
-     * through the glow and the white transport icons keep their contrast.
+     * Peak coverage of the wash. Held just below 1.0 so the white transport icons keep their
+     * contrast; the darkened backdrop underneath is what lets the glow read as light, not paint.
      */
-    const val PeakAlpha = 0.86f
+    const val PeakAlpha = 0.95f
 
     /**
      * Horizontal drift of the hue field, as a fraction of width. Measured by tracking the
-     * blue-minus-red centroid of the bottom rows: it swings between ~0.14w and ~0.33w, i.e. ±0.09w.
+     * warm-minus-cool centroid of the bottom rows: it swings ~±0.06w, but because the field now
+     * has real lobes (see [GlowHueStopAlphas]) the *local* brightness swing that produces is
+     * large — the reference's left edge goes from lum≈52 to lum≈110 within one cycle.
      */
-    const val DriftFraction = 0.09f
+    const val DriftFraction = 0.14f
 
     /**
      * The hue field is painted wider than the band by this fraction on each side. It is strictly
      * greater than [DriftFraction], which is what guarantees drift can never pull an unpainted
      * edge into view — the wash stays edgeless at every phase.
      */
-    const val BleedFraction = 0.14f
-
-    /** Measured brightness breathing: mean bottom luminance swings ~±5% around its average. */
-    const val BreathFraction = 0.053f
+    const val BleedFraction = 0.18f
 
     /**
-     * One full drift cycle. The reference centroid peaks 6.0 s apart; brightness peaks lead the
-     * drift by ~84°, which is reproduced exactly by taking sin/cos of the same phase.
+     * Brightness breathing. The reference's mean bottom luminance swings ~±10% around its
+     * average (78 → 96 on a 0–255 scale), clearly visible on top of the drift.
      */
-    const val CycleDurationMs = 6_400
+    const val BreathFraction = 0.10f
+
+    /**
+     * One full drift cycle. Reference luminance peaks land ~5.5–6.0 s apart; brightness peaks
+     * lead the drift by ~84°, which is reproduced by taking sin/cos of the same phase.
+     */
+    const val CycleDurationMs = 6_000
+
+    /**
+     * Lightness / saturation window (HSL) that every palette hue is pushed into before it is
+     * painted. This is the single most important constraint for visibility: the extracted
+     * `artworkSecondary` is frequently a near-black like `#30262B`, and painting a dark colour
+     * SrcOver a dark scrim *lowers* luminance — the old build measured −41 at the bottom edge
+     * where the reference measures +63. The reference's painted hues resolve to L≈0.45–0.55 with
+     * a moderate chroma once composited, so palette hues are lifted into that window here.
+     */
+    const val MinLightness = 0.56f
+    const val MaxLightness = 0.68f
+    const val MinSaturation = 0.30f
+    const val MaxSaturation = 0.55f
+
+    /** Below this saturation a swatch is treated as grey and keeps its (low) chroma. */
+    const val GreySaturationThreshold = 0.10f
+    const val GreyLiftedSaturation = 0.12f
+}
+
+/**
+ * Pushes an extracted palette colour into the [GlowConstraints] lightness / saturation window so
+ * it reads as *light* when painted over the darkened backdrop. Greys keep their neutral character
+ * (forcing chroma onto a grey would invent a hue); everything else gets a floor on saturation so
+ * the two lobes stay distinguishable after the alpha composite desaturates them.
+ */
+private fun Color.toGlowHue(): Color {
+    val hsl = FloatArray(3)
+    ColorUtils.colorToHSL(toArgb(), hsl)
+    hsl[1] =
+        if (hsl[1] < GlowConstraints.GreySaturationThreshold) {
+            GlowConstraints.GreyLiftedSaturation
+        } else {
+            hsl[1].coerceIn(GlowConstraints.MinSaturation, GlowConstraints.MaxSaturation)
+        }
+    hsl[2] = hsl[2].coerceIn(GlowConstraints.MinLightness, GlowConstraints.MaxLightness)
+    return Color(ColorUtils.HSLToColor(hsl))
 }
 
 /**
  * Horizontal stop positions and coverages of the measured hue field.
  *
- * The reference profile is: cool hue owning the left ~37%, its brightest point at x≈0.19, a
- * neutral crossover at x≈0.37, the warm hue peaking around x≈0.63, then a gentle decay into the
- * right edge. Two hues, one continuous ramp, no discrete shapes.
+ * The reference profile is two soft lobes on one continuous ramp: the primary hue peaks at
+ * x≈0.24, a dim crossover sits at x≈0.46, the secondary hue peaks at x≈0.66, and both ends decay
+ * toward the screen edges. No discrete shapes, just a ramp.
+ *
+ * The coverages are deliberately *not* flat. The previous 0.72–0.86 range produced a uniform
+ * tint, so sliding it sideways changed nothing on screen. Two pronounced lobes with dim troughs
+ * between and outside them are what make the drift and breath legible as moving light: with
+ * these stops a simulated cycle swings the left-edge luminance by ≈50–60 (0–255), matching the
+ * ≈58 swing measured in the reference recording.
  */
-private val GlowHueStopPositions = floatArrayOf(0f, 0.19f, 0.37f, 0.63f, 1f)
-private val GlowHueStopAlphas = floatArrayOf(0.72f, 0.86f, 0.78f, 0.68f, 0.52f)
+private val GlowHueStopPositions = floatArrayOf(0f, 0.10f, 0.24f, 0.46f, 0.66f, 0.84f, 1f)
+private val GlowHueStopAlphas = floatArrayOf(0.14f, 0.36f, 1.00f, 0.34f, 0.98f, 0.36f, 0.14f)
 
 /**
  * Eased vertical ramp of the wash, sampled from the reference at 0.02-screen steps and normalised
@@ -2189,12 +2237,12 @@ private val GlowHueStopAlphas = floatArrayOf(0.72f, 0.86f, 0.78f, 0.68f, 0.52f)
 private val GlowVerticalRamp =
     arrayOf(
         0.00f to 0.00f,
-        0.15f to 0.07f,
-        0.31f to 0.26f,
-        0.46f to 0.48f,
-        0.62f to 0.68f,
-        0.77f to 0.85f,
-        0.92f to 0.95f,
+        0.15f to 0.06f,
+        0.25f to 0.16f,
+        0.38f to 0.33f,
+        0.54f to 0.62f,
+        0.70f to 0.88f,
+        0.85f to 1.00f,
         1.00f to 1.00f,
     )
 
@@ -2224,18 +2272,23 @@ private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
  * Single consolidated scrim for the glow styles.
  *
  * This one brush replaces what used to be three stacked full-screen layers (a radial vignette, a
- * neutral ambient tone and a final readability scrim). Keeping the top ~60% deliberately dark is
- * what makes the vinyl deck read as "slightly dark" like the reference player, while the lower
- * stops stay lighter so the glow underneath can show through around the controls.
+ * neutral ambient tone and a final readability scrim).
+ *
+ * It is intentionally *heavy*. Sampling the reference shows its backdrop is a near-flat
+ * `#1C1C1C` (lum≈28) everywhere the glow is not — the blurred artwork is only a faint tint.
+ * That dark canvas is what gives the glow a +63 luminance lift to work with. The old scrim
+ * (0.62 → 0.30) left the artwork at lum≈80 and the bottom stop at 0.46 darkened the exact area
+ * the glow was supposed to light up, so the wash was painted onto an already brighter image and
+ * vanished. The bottom stop is now the *lightest* so the scrim never fights the wash.
  */
 private val GlowModeScrim =
     Brush.verticalGradient(
         colors = listOf(
-            Color.Black.copy(alpha = 0.62f),
-            Color.Black.copy(alpha = 0.55f),
-            Color.Black.copy(alpha = 0.40f),
-            Color.Black.copy(alpha = 0.30f),
-            Color.Black.copy(alpha = 0.46f),
+            Color.Black.copy(alpha = 0.80f),
+            Color.Black.copy(alpha = 0.80f),
+            Color.Black.copy(alpha = 0.78f),
+            Color.Black.copy(alpha = 0.76f),
+            Color.Black.copy(alpha = 0.74f),
         ),
     )
 
@@ -2363,6 +2416,11 @@ private fun FrostSoulDynamicBackground(
                 (LocalConfiguration.current.screenHeightDp * GlowConstraints.BandHeightFraction).dp
                     .coerceIn(GlowConstraints.BandMinHeight, GlowConstraints.BandMaxHeight)
 
+            // Normalised once per palette, not per frame: HSL round-trips are cheap but there is
+            // no reason to redo them inside the draw cache.
+            val glowPrimary = remember(palette.artworkPrimary) { palette.artworkPrimary.toGlowHue() }
+            val glowSecondary = remember(palette.artworkSecondary) { palette.artworkSecondary.toGlowHue() }
+
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -2382,11 +2440,13 @@ private fun FrostSoulDynamicBackground(
                         val bleed = bandWidth * GlowConstraints.BleedFraction
                         val fieldWidth = bandWidth + bleed * 2f
 
-                        // Cool → warm ramp across the whole field. Both palette hues live in one
-                        // brush, so they cross over smoothly instead of meeting as two objects.
+                        // Primary → secondary ramp across the whole field. Both palette hues live
+                        // in one brush, so they cross over smoothly instead of meeting as two
+                        // objects. Each hue is first lifted into the glow lightness window — see
+                        // Color.toGlowHue() — otherwise a dark swatch paints a shadow, not a glow.
                         val hueStops = Array(GlowHueStopPositions.size) { index ->
                             val position = GlowHueStopPositions[index]
-                            val hue = lerp(palette.artworkPrimary, palette.artworkSecondary, position)
+                            val hue = lerp(glowPrimary, glowSecondary, position)
                             position to hue.copy(alpha = GlowHueStopAlphas[index])
                         }
                         val hueField = Brush.horizontalGradient(
