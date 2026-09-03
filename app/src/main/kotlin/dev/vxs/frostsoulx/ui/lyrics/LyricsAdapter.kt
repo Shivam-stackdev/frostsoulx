@@ -9,10 +9,9 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.lyrics.LyricsEntry
-import dev.vxs.frostsoulx.utils.LyricsPreferences
 
 /**
- * RecyclerView adapter for synced lyrics with optional dark cyan highlight.
+ * RecyclerView adapter for synced lyrics.
  */
 class LyricsAdapter : RecyclerView.Adapter<LyricsAdapter.LyricViewHolder>() {
 
@@ -67,18 +66,8 @@ class LyricsAdapter : RecyclerView.Adapter<LyricsAdapter.LyricViewHolder>() {
         fun bind(entry: LyricsEntry, isActive: Boolean) {
             textView.text = entry.text
             val context = itemView.context
-            val highlightEnabled = LyricsPreferences.isDarkCyanHighlightEnabled(context)
-
             when {
-                isActive && highlightEnabled -> {
-                    // Dark Cyan highlight: #008B8B at ~20% opacity = #33008B8B
-                    itemView.setBackgroundColor(0x33008B8B)
-                    textView.setTextColor(ContextCompat.getColor(context, android.R.color.white))
-                    textView.setTypeface(null, Typeface.BOLD)
-                    textView.textSize = 18f
-                }
                 isActive -> {
-                    // Default active styling (no cyan, just bold/white)
                     itemView.setBackgroundColor(0x00000000)
                     textView.setTextColor(ContextCompat.getColor(context, android.R.color.white))
                     textView.setTypeface(null, Typeface.BOLD)

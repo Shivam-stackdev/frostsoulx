@@ -81,7 +81,6 @@ import dev.vxs.frostsoulx.constants.EnableUnisonLyricsKey
 import dev.vxs.frostsoulx.constants.EnableYouLyPlusLyricsKey
 import dev.vxs.frostsoulx.constants.LyricsClickKey
 import dev.vxs.frostsoulx.constants.LyricsLineBlurKey
-import dev.vxs.frostsoulx.constants.LyricsDarkCyanHighlightKey
 import dev.vxs.frostsoulx.constants.LyricsLineSpacingKey
 import dev.vxs.frostsoulx.constants.LyricsMode
 import dev.vxs.frostsoulx.constants.LyricsModeKey
@@ -202,8 +201,6 @@ fun LyricsSettings(
             deserializeLyricsProviderOrder(providerOrderStr)
         }
     val (lyricsLineBlur, onLyricsLineBlurChange) = rememberPreference(LyricsLineBlurKey, defaultValue = true)
-    val (lyricsDarkCyanHighlight, onLyricsDarkCyanHighlightChange) =
-    rememberPreference(LyricsDarkCyanHighlightKey, defaultValue = true)
     val (lyricsRomanizeJapanese, onLyricsRomanizeJapaneseChange) = rememberPreference(LyricsRomanizeJapaneseKey, defaultValue = true)
     val (lyricsRomanizeKorean, onLyricsRomanizeKoreanChange) = rememberPreference(LyricsRomanizeKoreanKey, defaultValue = true)
     val (lyricsRomanizeChinese, onLyricsRomanizeChineseChange) = rememberPreference(LyricsRomanizeChineseKey, defaultValue = true)
@@ -401,14 +398,6 @@ fun LyricsSettings(
                 )
             }
            
-            item {
-    SwitchPreference(
-        title = { Text(stringResource(R.string.lyrics_dark_cyan_highlight)) },
-        icon = { Icon(painterResource(R.drawable.lyrics), null) },
-        checked = lyricsDarkCyanHighlight,
-        onCheckedChange = onLyricsDarkCyanHighlightChange,
-    )
-            }
 
             item {
                 SwitchPreference(
