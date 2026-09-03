@@ -2125,7 +2125,7 @@ private val SeekGlowBandHeight = 180.dp
 private val SeekGlowBottomPadding = 28.dp
 
 /** Reference-style breathing cycle: subtle and slow, without per-frame layout work. */
-private const val GlowBreathDurationMs = 3_600
+private const val GlowBreathDurationMs = 5_200
 
 /**
  * Pixel size the ambient backdrop artwork is decoded at. The image is blurred into a soft wash,
@@ -2303,20 +2303,24 @@ private fun FrostSoulDynamicBackground(
                             radius = blobRadius,
                         )
                         onDrawBehind {
+                            // Anti-phase sway: one corner brightens while the other dims, matching
+                            // the measured QQ reference behavior instead of pulsing both together.
                             val breath = glowBreath?.value ?: 0.5f
-                            val pulse = 0.85f + breath * 0.15f
+                            val sway = (breath - 0.5f) * 2f
+                            val leftAlpha = (0.78f + sway * 0.22f).coerceIn(0.5f, 1f)
+                            val rightAlpha = (0.78f - sway * 0.22f).coerceIn(0.5f, 1f)
                             drawCircle(
                                 brush = leftBrush,
                                 radius = blobRadius,
                                 center = leftCenter,
-                                alpha = pulse,
+                                alpha = leftAlpha,
                                 blendMode = BlendMode.Plus,
                             )
                             drawCircle(
                                 brush = rightBrush,
                                 radius = blobRadius,
                                 center = rightCenter,
-                                alpha = pulse,
+                                alpha = rightAlpha,
                                 blendMode = BlendMode.Plus,
                             )
                         }
