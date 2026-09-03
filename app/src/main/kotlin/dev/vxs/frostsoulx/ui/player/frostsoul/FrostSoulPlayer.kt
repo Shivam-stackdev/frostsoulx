@@ -774,6 +774,7 @@ internal fun FSPlayerControls(
                 iconSize = 19.dp,
                 showContainer = false,
                 forceWhite = true,
+                tintOverride = Color(0xFFD7DBE0),
             )
         }
     }
@@ -792,14 +793,14 @@ private fun FSDownloadButton(
         normalizedProgress?.let { value ->
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawArc(
-                    color = Color.White.copy(alpha = 0.22f),
+                    color = Color(0xFFD7DBE0).copy(alpha = 0.22f),
                     startAngle = -90f,
                     sweepAngle = 360f,
                     useCenter = false,
                     style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.5.dp.toPx()),
                 )
                 drawArc(
-                    color = Color.White,
+                    color = Color(0xFFD7DBE0),
                     startAngle = -90f,
                     sweepAngle = 360f * value,
                     useCenter = false,
@@ -810,7 +811,7 @@ private fun FSDownloadButton(
         Icon(
             painter = painterResource(if (normalizedProgress == 1f) R.drawable.check else R.drawable.ic_download),
             contentDescription = if (normalizedProgress == null) "Download song" else "Download progress ${((normalizedProgress * 100f).toInt())}%",
-            tint = Color.White,
+            tint = Color(0xFFD7DBE0),
             modifier = Modifier.size(18.dp),
         )
     }
@@ -831,7 +832,7 @@ private fun FSTwoDotButton(
                 modifier = Modifier
                     .size(if (immersive) 7.dp else 5.dp)
                     .background(
-                        if (immersive) Color.White else FrostSoulTheme.colors.onSurface,
+                        if (immersive) Color(0xFFD7DBE0) else FrostSoulTheme.colors.onSurface,
                         androidx.compose.foundation.shape.CircleShape,
                     ),
             )
@@ -1351,7 +1352,7 @@ private fun FrostSoulFullPlayerLikeButton(
         if (videoId.isNotBlank()) likeCount = YouTube.getMediaInfo(videoId).getOrNull()?.like
     }
     val tint = if (isLiked) Color(0xFFFF3B4D) else {
-        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
+        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color(0xFFD7DBE0)
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
