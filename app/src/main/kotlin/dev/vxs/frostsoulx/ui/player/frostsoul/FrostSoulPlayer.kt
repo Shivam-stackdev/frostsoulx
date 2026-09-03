@@ -2278,16 +2278,22 @@ private fun FrostSoulDynamicBackground(
                     .padding(bottom = SeekGlowBottomPadding)
                     .fillMaxWidth()
                     .height(SeekGlowBandHeight)
+                    // Keep Plus blending isolated to this bounded glow layer. Without an offscreen
+                    // layer, the blend can be flattened against the parent and look like plain blur
+                    // on devices whose GPU compositor does not preserve the source blend mode.
+                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                     .drawWithCache {
                         val bandWidth = size.width
                         val bandHeight = size.height
-                        val blobRadius = bandWidth * 0.72f
-                        val leftCenter = Offset(bandWidth * 0.18f, bandHeight * 1.35f)
-                        val rightCenter = Offset(bandWidth * 0.82f, bandHeight * 1.35f)
+                        val blobRadius = bandWidth * 0.64f
+                        // Pull the centers slightly into the visible band so the glow is clearly
+                        // present above the seek bar instead of being clipped almost entirely away.
+                        val leftCenter = Offset(bandWidth * 0.18f, bandHeight * 1.12f)
+                        val rightCenter = Offset(bandWidth * 0.82f, bandHeight * 1.12f)
                         val leftBrush = Brush.radialGradient(
                             colors = listOf(
-                                palette.artworkPrimary.copy(alpha = 0.55f),
-                                palette.artworkPrimary.copy(alpha = 0.18f),
+                                palette.artworkPrimary.copy(alpha = 0.82f),
+                                palette.artworkPrimary.copy(alpha = 0.28f),
                                 Color.Transparent,
                             ),
                             center = leftCenter,
@@ -2295,8 +2301,8 @@ private fun FrostSoulDynamicBackground(
                         )
                         val rightBrush = Brush.radialGradient(
                             colors = listOf(
-                                palette.artworkSecondary.copy(alpha = 0.55f),
-                                palette.artworkSecondary.copy(alpha = 0.18f),
+                                palette.artworkSecondary.copy(alpha = 0.82f),
+                                palette.artworkSecondary.copy(alpha = 0.28f),
                                 Color.Transparent,
                             ),
                             center = rightCenter,
@@ -2307,8 +2313,8 @@ private fun FrostSoulDynamicBackground(
                             // the measured QQ reference behavior instead of pulsing both together.
                             val breath = glowBreath?.value ?: 0.5f
                             val sway = (breath - 0.5f) * 2f
-                            val leftAlpha = (0.78f + sway * 0.22f).coerceIn(0.5f, 1f)
-                            val rightAlpha = (0.78f - sway * 0.22f).coerceIn(0.5f, 1f)
+                            val leftAlpha = (0.92f + sway * 0.08f).coerceIn(0.78f, 1f)
+                            val rightAlpha = (0.92f - sway * 0.08f).coerceIn(0.78f, 1f)
                             drawCircle(
                                 brush = leftBrush,
                                 radius = blobRadius,
