@@ -7,11 +7,9 @@
 
 package dev.vxs.frostsoulx.ui.player.frostsoul
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -79,6 +77,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
+import kotlinx.coroutines.isActive
 
 /**
  * How far the tonearm swings off the record when playback stops.
@@ -207,18 +206,20 @@ internal fun FSAlbumArt(
     modifier: Modifier = Modifier,
     compact: Boolean = false,
 ) {
-    val rotationTransition = rememberInfiniteTransition(label = "fs-album-rotation")
-    val rotation by rotationTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(tween(durationMillis = 26_000, easing = LinearEasing)),
-        label = "fs-album-rotation-value",
-    )
-    var pausedRotation by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(isPlaying) {
-        if (!isPlaying) pausedRotation = rotation
+    // A cancellable Animatable is essential here. An infinite transition keeps advancing while
+    // paused, so snapshotting its value on pause makes resume jump to a later angle. Cancelling
+    // this animation preserves the exact in-flight value; the next play starts from that value.
+    val rotation = remember(artworkUrl) { Animatable(0f) }
+    LaunchedEffect(artworkUrl, isPlaying) {
+        if (isPlaying) {
+            while (isActive) {
+                rotation.animateTo(
+                    targetValue = rotation.value + 360f,
+                    animationSpec = tween(durationMillis = 26_000, easing = LinearEasing),
+                )
+            }
+        }
     }
-    val displayedRotation = if (isPlaying) rotation else pausedRotation
     // Playing → the stylus tracks a groove in the record's outer band (angle 0 = the resting
     // geometry authored below). Off → the arm swings OUTWARD to the right and parks on its
     // rest post, clear of the record, exactly like the reference deck.
@@ -301,7 +302,7 @@ internal fun FSAlbumArt(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize(platterFraction)
-                .graphicsLayer { rotationZ = displayedRotation },
+                .graphicsLayer { rotationZ = rotation.value },
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val platterRadius = size.minDimension / 2f
