@@ -416,18 +416,6 @@ internal fun FSAlbumArt(
                 )
             }
 
-            // Spindle pin punched through the label centre.
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(PlayerLayoutTokens.TurntableSpindleSize)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(Color(0xFF6E6E76), Color(0xFF15151A)),
-                        ),
-                    ),
-            )
         }
 
         // Anisotropic gloss, deliberately OUTSIDE the rotating layer: on a real deck the
