@@ -1179,13 +1179,18 @@ private fun FrostSoulAlbumPage(
                 uiState = uiState,
                 onlyCurrentLine = true,
                 horizontalPadding = 0.dp,
-                modifier = Modifier.align(Alignment.Start).padding(bottom = 28.dp),
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(bottom = 28.dp)
+                    .graphicsLayer { translationY = -12.dp.toPx() },
             )
             FSPlayerControls(
                     state = uiState,
                     actions = actions,
                     onOpenQueue = onOpenQueue,
-                    modifier = Modifier.padding(top = 2.dp),
+                    modifier = Modifier
+                        .padding(top = 2.dp)
+                        .graphicsLayer { translationY = -12.dp.toPx() },
                     immersive = true,
                     onSeekDraggingChanged = onSeekDraggingChanged,
             )
@@ -1320,7 +1325,9 @@ private fun FrostSoulArtworkBlurAlbumPage(
                 uiState = uiState,
                 showExtraPreviewLines = true,
                 maxLinesPerLyric = 1,
-                modifier = Modifier.heightIn(min = 60.dp),
+                modifier = Modifier
+                    .heightIn(min = 60.dp)
+                    .graphicsLayer { translationY = -12.dp.toPx() },
             )
         }
 
@@ -1332,7 +1339,8 @@ private fun FrostSoulArtworkBlurAlbumPage(
             onOpenQueue = onOpenQueue,
             modifier = Modifier
                 .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)
-                .padding(top = 18.dp),
+                .padding(top = 18.dp)
+                .graphicsLayer { translationY = -12.dp.toPx() },
             immersive = true,
             onSeekDraggingChanged = onSeekDraggingChanged,
         )
