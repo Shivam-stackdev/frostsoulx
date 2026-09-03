@@ -287,7 +287,7 @@ class LyricsHelper
             }
             val normalizedTitle = normalized(title)
             val normalizedArtists = artists.split(Regex("\\s*[,•;|/]\\s*"))
-                .map(::normalized)
+                .map { normalized(it) }
                 .filter(String::isNotBlank)
             val normalizedTaggedTitle = titleTag?.let(normalized)
             val normalizedTaggedArtist = artistTag?.let(normalized)
