@@ -13,16 +13,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,7 +43,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,8 +56,10 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.constants.MiniPlayerHeight
@@ -80,6 +87,7 @@ import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.FSChip
 import dev.vxs.frostsoulx.ui.frostsoul.FSEmptyState
 import dev.vxs.frostsoulx.ui.frostsoul.FSIconButton
+import dev.vxs.frostsoulx.ui.frostsoul.FSGlassCard
 import dev.vxs.frostsoulx.ui.frostsoul.FSTextField
 import dev.vxs.frostsoulx.ui.frostsoul.FSLoading
 import dev.vxs.frostsoulx.ui.frostsoul.FSSectionHeader
@@ -92,6 +100,7 @@ import dev.vxs.frostsoulx.ui.premium.PremiumSegmentedTabs
 import dev.vxs.frostsoulx.ui.premium.PremiumTopBar
 import dev.vxs.frostsoulx.ui.frostsoul.frostSoulScreenBackground
 import dev.vxs.frostsoulx.ui.player.frostsoul.asFrostSoulTime
+import dev.vxs.frostsoulx.utils.UserGreetingPreferences
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.CoroutineScope
 import java.util.Calendar
@@ -113,6 +122,12 @@ internal fun FrostSoulHomeFeed(
     onAction: (HomeAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    var greetingName by remember(context) { mutableStateOf(UserGreetingPreferences.getName(context)) }
+    var showGreetingNameDialog by remember(context) {
+        mutableStateOf(!UserGreetingPreferences.hasPrompted(context))
+    }
+    var greetingNameDraft by rememberSaveable { mutableStateOf("") }
     val albums = remember(uiState.speedDialItems) { uiState.speedDialItems.filterIsInstance<Album>() }
     val artists = remember(uiState.speedDialItems) { uiState.speedDialItems.filterIsInstance<Artist>() }
     val recentItems = remember(uiState.keepListening) { uiState.keepListening.take(6) }
@@ -133,7 +148,8 @@ internal fun FrostSoulHomeFeed(
     ) {
         item(key = "frostsoul_home_header") {
             FrostSoulHomeHeader(
-                accountName = uiState.accountName,
+                userName = greetingName,
+                currentSong = mediaMetadata,
                 onOpenRecent = { navController.navigate("history") },
             )
         }
@@ -397,6 +413,65 @@ internal fun FrostSoulHomeFeed(
             }
         }
     }
+
+    if (showGreetingNameDialog) {
+        Dialog(
+            onDismissRequest = {
+                UserGreetingPreferences.skip(context)
+                showGreetingNameDialog = false
+            },
+        ) {
+            FSGlassCard(
+                modifier = Modifier.widthIn(max = 420.dp),
+                shape = FrostSoulTheme.shapes.extraLarge,
+            ) {
+                FSText(
+                    text = "Make FrostSoul yours",
+                    style = FrostSoulTheme.typography.title,
+                    color = FrostSoulTheme.colors.onSurface,
+                )
+                Spacer(Modifier.height(FrostSoulTheme.spacing.small))
+                FSText(
+                    text = "What should we call you on the home screen?",
+                    style = FrostSoulTheme.typography.body,
+                    color = FrostSoulTheme.colors.onSurfaceMuted,
+                )
+                Spacer(Modifier.height(FrostSoulTheme.spacing.medium))
+                FSTextField(
+                    value = greetingNameDraft,
+                    onValueChange = { greetingNameDraft = it.take(40) },
+                    placeholder = "Your name",
+                )
+                Spacer(Modifier.height(FrostSoulTheme.spacing.medium))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(FrostSoulTheme.spacing.small),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    FSButton(
+                        label = "Not now",
+                        onClick = {
+                            UserGreetingPreferences.skip(context)
+                            showGreetingNameDialog = false
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    FSButton(
+                        label = "Save",
+                        onClick = {
+                            val name = greetingNameDraft.trim()
+                            if (name.isNotBlank()) {
+                                UserGreetingPreferences.save(context, name)
+                                greetingName = name
+                                showGreetingNameDialog = false
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        emphasized = true,
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -405,49 +480,78 @@ private fun FrostSoulBannerCarousel(
     mediaMetadata: MediaMetadata?,
     playerConnection: PlayerConnection,
 ) {
-    LazyRow(
-        contentPadding = FrostSoulShelfItemPadding,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        items(songs, key = { "banner_${it.id}" }) { song ->
-            PremiumCard(
-                modifier = Modifier.width(185.dp).height(123.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
-                contentPadding = PaddingValues(0.dp),
-                onClick = {
-                    if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
-                    else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
-                },
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val cardWidth = (maxWidth * 0.78f).coerceIn(280.dp, 520.dp)
+        val cardHeight = cardWidth * 1.12f
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            FSSectionHeader(title = "Featured for you")
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.height(cardHeight),
             ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    AsyncImage(
-                        model = song.song.thumbnailUrl,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    Box(
-                        modifier = Modifier.fillMaxSize().background(
-                            Brush.horizontalGradient(
-                                listOf(Color.Black.copy(alpha = 0.92f), Color.Transparent),
-                            ),
-                        ),
-                    )
-                    Column(modifier = Modifier.fillMaxSize().padding(12.dp)) {
-                        Text("FEATURED FOR YOU", color = FrostSoulTheme.colors.accentBright, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
-                        Spacer(Modifier.weight(1f))
-                        Text(song.title, color = FrostSoulTheme.colors.onSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(song.artists.joinToString(" • ") { it.name }, color = FrostSoulTheme.colors.onSurfaceMuted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 2.dp, top = 3.dp))
-                    }
-                    FSIconButton(
+                items(songs, key = { "banner_${it.id}" }) { song ->
+                    PremiumCard(
+                        modifier = Modifier.width(cardWidth).fillMaxHeight(),
+                        shape = RoundedCornerShape(28.dp),
+                        contentPadding = PaddingValues(0.dp),
                         onClick = {
                             if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
                             else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
                         },
-                        highlighted = true,
-                        modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
                     ) {
-                        FSIcon(painterResource(if (song.id == mediaMetadata?.id && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play), contentDescription = "Play ${song.title}", tint = FrostSoulTheme.colors.accentBright)
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            AsyncImage(
+                                model = song.song.thumbnailUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                            Box(
+                                modifier = Modifier.fillMaxSize().background(
+                                    Brush.verticalGradient(
+                                        0f to Color.Transparent,
+                                        0.55f to Color.Transparent,
+                                        1f to Color.Black.copy(alpha = 0.86f),
+                                    ),
+                                ),
+                            )
+                            Column(
+                                verticalArrangement = Arrangement.Bottom,
+                                modifier = Modifier.fillMaxSize().padding(20.dp),
+                            ) {
+                                Text(
+                                    text = song.title,
+                                    color = Color.White,
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    text = song.artists.joinToString(" • ") { it.name },
+                                    color = Color.White.copy(alpha = 0.82f),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(top = 4.dp),
+                                )
+                            }
+                            FSIconButton(
+                                onClick = {
+                                    if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
+                                    else playerConnection.playQueue(ListQueue(items = listOf(song.toMediaItem())))
+                                },
+                                highlighted = true,
+                                modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
+                            ) {
+                                FSIcon(
+                                    painterResource(if (song.id == mediaMetadata?.id && playerConnection.player.isPlaying) R.drawable.pause else R.drawable.play),
+                                    contentDescription = "Play ${song.title}",
+                                    tint = FrostSoulTheme.colors.accentBright,
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -505,14 +609,47 @@ private fun FrostSoulRecommendationList(
     mediaMetadata: MediaMetadata?,
     playerConnection: PlayerConnection,
 ) {
+    val carouselState = rememberLazyListState()
+
     LazyRow(
+        state = carouselState,
         contentPadding = FrostSoulShelfItemPadding,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(songs, key = { "quick_card_${it.id}" }) { song ->
             val isCurrent = song.id == mediaMetadata?.id
             PremiumCard(
-                modifier = Modifier.width(148.dp).height(184.dp),
+                modifier = Modifier
+                    .width(148.dp)
+                    .height(184.dp)
+                    .graphicsLayer {
+                        // Scroll information is read in the layer so transforms update without
+                        // recomposing the complete recommendation section on every scroll tick.
+                        val item = carouselState.layoutInfo.visibleItemsInfo
+                            .firstOrNull { it.key == "quick_card_${song.id}" }
+                        if (item != null) {
+                            val viewportCenter = (
+                                carouselState.layoutInfo.viewportStartOffset +
+                                    carouselState.layoutInfo.viewportEndOffset
+                            ) / 2f
+                            val itemCenter = item.offset + item.size / 2f
+                            val pageDistance = ((itemCenter - viewportCenter) / item.size)
+                                .coerceIn(-1.25f, 1.25f)
+                            val distance = abs(pageDistance).coerceIn(0f, 1f)
+                            val focus = 1f - distance
+
+                            // Center card stays dominant; neighbors fan back with perspective.
+                            scaleX = 0.86f + 0.14f * focus
+                            scaleY = 0.86f + 0.14f * focus
+                            rotationY = -18f * pageDistance
+                            alpha = 0.64f + 0.36f * focus
+                            translationX = -pageDistance * 8.dp.toPx()
+                            cameraDistance = 12f * density
+                            transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
+                            shape = RoundedCornerShape(16.dp)
+                            clip = true
+                        }
+                    },
                 shape = FrostSoulTheme.shapes.medium,
                 contentPadding = PaddingValues(10.dp),
                 onClick = {
@@ -564,7 +701,8 @@ private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
 
 @Composable
 private fun FrostSoulHomeHeader(
-    accountName: String,
+    userName: String?,
+    currentSong: MediaMetadata?,
     onOpenRecent: () -> Unit,
 ) {
     val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
@@ -575,10 +713,10 @@ private fun FrostSoulHomeHeader(
             in 17..21 -> "Good Evening"
             else -> "Good Night"
         }
-    val firstName = accountName.trim().substringBefore(' ').takeIf { it.isNotBlank() }
+        PremiumTopBar(
 
-    PremiumTopBar(
-        title = if (firstName == null) timeOfDay else "$timeOfDay, $firstName",
+        title = timeOfDay,
+        subtitle = userName?.let { "$it ${moodEmoji(currentSong)}" },
         eyebrow = "FROSTSOUL",
         modifier = Modifier.statusBarsPadding(),
         trailingContent = {
@@ -595,6 +733,22 @@ private fun FrostSoulHomeHeader(
             }
         },
     )
+}
+
+private fun moodEmoji(currentSong: MediaMetadata?): String {
+    val text = buildString {
+        append(currentSong?.title.orEmpty())
+        append(' ')
+        append(currentSong?.artists?.joinToString(" ") { it.name }.orEmpty())
+    }.lowercase()
+    return when {
+        text.contains(Regex("love|romance|heart|ishq|pyaar|mohabbat")) -> "💖"
+        text.contains(Regex("sad|alone|cry|broken|dard|udaas|tanha")) -> "💙"
+        text.contains(Regex("party|dance|club|celebration|nach")) -> "🕺"
+        text.contains(Regex("chill|calm|relax|lofi|sleep")) -> "🌙"
+        text.contains(Regex("devotion|bhajan|prayer|allah|ram|krishna")) -> "🙏"
+        else -> "🎶"
+    }
 }
 
 @Composable

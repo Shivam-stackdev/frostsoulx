@@ -10,9 +10,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
 import android.widget.RemoteViews
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
@@ -98,70 +96,34 @@ class ArchiveTuneMediaNotificationProvider(
         return MediaNotification(mediaNotification.notificationId, notification)
     }
 
-    /**
-     * Updates the expanded notification's current lyric line.
-     *
-     * When [highlightEnabled] and the entry has word-level timing, already-sung words are
-     * painted dark cyan. RemoteViews can't animate a live sweep like the in-app player does,
-     * so this is a stepped approximation: each word snaps to cyan once playback reaches it,
-     * re-rendered on the same ~400ms tick that drives this call.
-     */
+    /** Updates the expanded notification's current lyric line. */
     fun updateLyricsPosition(
         lyrics: List<LyricsEntry>?,
         positionMs: Long,
-        highlightEnabled: Boolean,
     ): Boolean {
         val newIndex = findCurrentIndex(lyrics, positionMs)
         val entry = lyrics?.getOrNull(newIndex)
-        val wordCount = if (highlightEnabled) countHighlightedWords(entry, positionMs) else -1
-        if (newIndex == lastActiveIndex && wordCount == lastActiveWordCount) return false
+        if (newIndex == lastActiveIndex) return false
         lastActiveIndex = newIndex
-        lastActiveWordCount = wordCount
+        lastActiveWordCount = -1
         setRenderedLyrics(
-            current = buildLyricLine(entry, positionMs, highlightEnabled),
+            current = entry?.text.orEmpty(),
             next = lyrics?.getOrNull(newIndex + 1)?.text,
         )
         return true
     }
 
-    fun updateLyricsState(
-        state: LyricsSyncState,
-        highlightEnabled: Boolean,
-    ): Boolean {
+    fun updateLyricsState(state: LyricsSyncState): Boolean {
         val line = state.currentLine
             ?: run {
                 lastActiveIndex = -1
                 lastActiveWordCount = -1
                 return setRenderedLyrics(current = "", next = null)
             }
-        val activeWords =
-            if (highlightEnabled) {
-                line.words.count { state.timestampMs >= it.startMs }
-            } else {
-                -1
-            }
-        if (state.currentLineIndex == lastActiveIndex && activeWords == lastActiveWordCount) return false
+        if (state.currentLineIndex == lastActiveIndex) return false
         lastActiveIndex = state.currentLineIndex
-        lastActiveWordCount = activeWords
-        val current =
-            if (highlightEnabled && line.words.isNotEmpty()) {
-                val builder = SpannableStringBuilder()
-                line.words.forEach { word ->
-                    val start = builder.length
-                    builder.append(word.text)
-                    if (state.timestampMs >= word.startMs) {
-                        builder.setSpan(
-                            ForegroundColorSpan(0xFF008B8B.toInt()),
-                            start,
-                            builder.length,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                        )
-                    }
-                }
-                builder
-            } else {
-                line.text
-            }
+        lastActiveWordCount = -1
+        val current = line.text
         setRenderedLyrics(current = current, next = state.nextLine?.text)
         return true
     }
@@ -187,36 +149,6 @@ class ArchiveTuneMediaNotificationProvider(
         return true
     }
 
-    private fun countHighlightedWords(entry: LyricsEntry?, positionMs: Long): Int {
-        val words = entry?.words ?: return -1
-        return words.count { positionMs >= (it.startTime * 1000).toLong() }
-    }
-
-    private fun buildLyricLine(
-        entry: LyricsEntry?,
-        positionMs: Long,
-        highlightEnabled: Boolean,
-    ): CharSequence {
-        if (entry == null) return ""
-        val words = entry.words
-        if (!highlightEnabled || words.isNullOrEmpty()) return entry.text
-
-        val builder = SpannableStringBuilder()
-        for (word in words) {
-            val start = builder.length
-            builder.append(word.text)
-            val wordStartMs = (word.startTime * 1000).toLong()
-            if (positionMs >= wordStartMs) {
-                builder.setSpan(
-                    ForegroundColorSpan(0xFF008B8B.toInt()),
-                    start,
-                    builder.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
-                )
-            }
-        }
-        return builder
-    }
 
     private fun findCurrentIndex(lyrics: List<LyricsEntry>?, positionMs: Long): Int {
         if (lyrics.isNullOrEmpty()) return -1

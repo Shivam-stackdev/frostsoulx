@@ -66,6 +66,7 @@ import androidx.navigation.NavController
 import dev.vxs.frostsoulx.LocalPlayerAwareWindowInsets
 import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.constants.EnableBetterLyricsKey
+import dev.vxs.frostsoulx.constants.EnableGeniusLyricsKey
 import dev.vxs.frostsoulx.constants.EnableKugouKey
 import dev.vxs.frostsoulx.constants.EnableLrcLibKey
 import dev.vxs.frostsoulx.constants.EnableMegalobizLyricsKey
@@ -80,7 +81,6 @@ import dev.vxs.frostsoulx.constants.EnableUnisonLyricsKey
 import dev.vxs.frostsoulx.constants.EnableYouLyPlusLyricsKey
 import dev.vxs.frostsoulx.constants.LyricsClickKey
 import dev.vxs.frostsoulx.constants.LyricsLineBlurKey
-import dev.vxs.frostsoulx.constants.LyricsDarkCyanHighlightKey
 import dev.vxs.frostsoulx.constants.LyricsLineSpacingKey
 import dev.vxs.frostsoulx.constants.LyricsMode
 import dev.vxs.frostsoulx.constants.LyricsModeKey
@@ -159,6 +159,7 @@ fun LyricsSettings(
     val (enableLrclib, onEnableLrclibChange) = rememberPreference(key = EnableLrcLibKey, defaultValue = true)
     val (enableKugou, onEnableKugouChange) = rememberPreference(key = EnableKugouKey, defaultValue = true)
     val (enableBetterLyrics, onEnableBetterLyricsChange) = rememberPreference(key = EnableBetterLyricsKey, defaultValue = true)
+    val (enableGeniusLyrics, onEnableGeniusLyricsChange) = rememberPreference(key = EnableGeniusLyricsKey, defaultValue = true)
     val (enableYouLyPlusLyrics, onEnableYouLyPlusLyricsChange) =
         rememberPreference(key = EnableYouLyPlusLyricsKey, defaultValue = true)
     val (enableSimpMusicLyrics, onEnableSimpMusicLyricsChange) = rememberPreference(key = EnableSimpMusicLyricsKey, defaultValue = true)
@@ -200,8 +201,6 @@ fun LyricsSettings(
             deserializeLyricsProviderOrder(providerOrderStr)
         }
     val (lyricsLineBlur, onLyricsLineBlurChange) = rememberPreference(LyricsLineBlurKey, defaultValue = true)
-    val (lyricsDarkCyanHighlight, onLyricsDarkCyanHighlightChange) =
-    rememberPreference(LyricsDarkCyanHighlightKey, defaultValue = true)
     val (lyricsRomanizeJapanese, onLyricsRomanizeJapaneseChange) = rememberPreference(LyricsRomanizeJapaneseKey, defaultValue = true)
     val (lyricsRomanizeKorean, onLyricsRomanizeKoreanChange) = rememberPreference(LyricsRomanizeKoreanKey, defaultValue = true)
     val (lyricsRomanizeChinese, onLyricsRomanizeChineseChange) = rememberPreference(LyricsRomanizeChineseKey, defaultValue = true)
@@ -399,14 +398,6 @@ fun LyricsSettings(
                 )
             }
            
-            item {
-    SwitchPreference(
-        title = { Text(stringResource(R.string.lyrics_dark_cyan_highlight)) },
-        icon = { Icon(painterResource(R.drawable.lyrics), null) },
-        checked = lyricsDarkCyanHighlight,
-        onCheckedChange = onLyricsDarkCyanHighlightChange,
-    )
-            }
 
             item {
                 SwitchPreference(
@@ -461,6 +452,15 @@ fun LyricsSettings(
                     icon = { Icon(painterResource(R.drawable.lyrics), null) },
                     checked = enableBetterLyrics,
                     onCheckedChange = onEnableBetterLyricsChange,
+                )
+            }
+
+            item {
+                SwitchPreference(
+                    title = { Text("Genius") },
+                    icon = { Icon(painterResource(R.drawable.lyrics), null) },
+                    checked = enableGeniusLyrics,
+                    onCheckedChange = onEnableGeniusLyricsChange,
                 )
             }
 
@@ -695,6 +695,7 @@ private fun PreferredLyricsProvider.displayName(): String =
         PreferredLyricsProvider.KUGOU -> "KuGou"
         PreferredLyricsProvider.MEGALOBIZ -> "Megalobiz"
         PreferredLyricsProvider.BETTER_LYRICS -> "BetterLyrics"
+        PreferredLyricsProvider.GENIUS -> "Genius"
         PreferredLyricsProvider.YOULY_PLUS -> "YouLyPlus"
         PreferredLyricsProvider.SIMPMUSIC -> "SimpMusic"
         PreferredLyricsProvider.PAXSENIX_APPLE_MUSIC -> "Paxsenix: Apple Music"

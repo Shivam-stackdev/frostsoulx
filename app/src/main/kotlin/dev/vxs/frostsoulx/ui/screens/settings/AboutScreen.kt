@@ -712,16 +712,6 @@ private fun AboutSuccessContent(
             }
         }
 
-        item(key = "team", contentType = "about_team_section") {
-            AboutContentContainer {
-                TeamMemberSection(
-                    title = stringResource(R.string.about_archive_tune_team),
-                    members = model.collaborators,
-                    onOpenUri = onOpenUri,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
 
         item(key = "respecters", contentType = "about_team_section") {
             AboutContentContainer {
@@ -734,17 +724,6 @@ private fun AboutSuccessContent(
             }
         }
 
-        item(key = "contributors", contentType = "about_contributors") {
-            AboutContentContainer {
-                ContributorsSection(
-                    state = model.contributorsState,
-                    readMoreUrl = model.contributorsReadMoreUrl,
-                    onOpenProfile = onOpenUri,
-                    onRetry = onRetryContributors,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
     }
 }
 

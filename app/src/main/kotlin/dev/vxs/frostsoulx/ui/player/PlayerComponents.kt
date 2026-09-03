@@ -45,6 +45,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
@@ -127,6 +128,7 @@ import dev.vxs.frostsoulx.ui.theme.PlayerSliderColors
 import dev.vxs.frostsoulx.ui.utils.ShowMediaInfo
 import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.ui.utils.highRes
+import dev.vxs.frostsoulx.utils.LikeCountCache
 import dev.vxs.frostsoulx.utils.makeTimeString
 import dev.vxs.frostsoulx.utils.rememberLowDataModeActive
 import dev.vxs.frostsoulx.utils.rememberPreference
@@ -264,6 +266,17 @@ fun PlayerTopActions(
     context: Context,
     currentSongLiked: Boolean,
 ) {
+    var fetchedLikeCount by remember(mediaMetadata.id) {
+        mutableStateOf(LikeCountCache.get(context, mediaMetadata.id))
+    }
+    LaunchedEffect(mediaMetadata.id) {
+        if (mediaMetadata.id.isNotBlank()) {
+            YouTube.getMediaInfo(mediaMetadata.id).getOrNull()?.like?.let { count ->
+                fetchedLikeCount = count
+                LikeCountCache.put(context, mediaMetadata.id, count)
+            }
+        }
+    }
     val haptic = LocalHapticFeedback.current
     val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsState()
 
@@ -640,12 +653,14 @@ fun PlayerTopActions(
                         tint = likeTint,
                         modifier = Modifier.size(24.dp),
                     )
-                    Text(
-                        text = formatLikeCount(fetchedLikeCount ?: 0),
-                        color = likeTint,
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
-                    )
+                    fetchedLikeCount?.let { count ->
+                        Text(
+                            text = formatLikeCount(count),
+                            color = likeTint,
+                            style = MaterialTheme.typography.labelMedium,
+                            modifier = Modifier.padding(start = 4.dp).widthIn(min = 24.dp),
+                        )
+                    }
                 }
 
                 Surface(
@@ -898,10 +913,6 @@ fun PlayerPlaybackControls(
     currentSongLiked: Boolean,
     videoId: String = "",
 ) {
-    var fetchedLikeCount by remember(videoId) { mutableStateOf<Int?>(null) }
-    LaunchedEffect(videoId) {
-        if (videoId.isNotBlank()) fetchedLikeCount = YouTube.getMediaInfo(videoId).getOrNull()?.like
-    }
     val haptic = LocalHapticFeedback.current
     val shuffleModeEnabled by playerConnection.shuffleModeEnabled.collectAsState()
     val view = LocalView.current

@@ -184,7 +184,6 @@ import dev.vxs.frostsoulx.constants.ScrobbleDelayPercentKey
 import dev.vxs.frostsoulx.constants.ScrobbleDelaySecondsKey
 import dev.vxs.frostsoulx.constants.ScrobbleMinSongDurationKey
 import dev.vxs.frostsoulx.constants.ShowLyricsKey
-import dev.vxs.frostsoulx.constants.LyricsDarkCyanHighlightKey
 import dev.vxs.frostsoulx.constants.SkipSilenceKey
 import dev.vxs.frostsoulx.constants.SmartTrimmerKey
 import dev.vxs.frostsoulx.constants.StopMusicOnTaskClearKey
@@ -548,9 +547,7 @@ class MusicService :
     private lateinit var lyricsNotificationProvider: ArchiveTuneMediaNotificationProvider
     private val lyricsHandler = Handler(Looper.getMainLooper())
     private var lyricsUpdateRunnable: Runnable? = null
-        @Volatile
-private var lyricsNotificationHighlightEnabled = true
-    private var lyricsDocumentMediaId: String? = null
+        private var lyricsDocumentMediaId: String? = null
     private var lyricsLoadRequestMediaId: String? = null
 
     private val secondaryCrossfadeListener =
@@ -1067,11 +1064,6 @@ private var lyricsNotificationHighlightEnabled = true
         super.onCreate()
         equalizerPlaybackController.attach(this)
         ensureScopesActive()
-
-        dataStore.data
-            .map { it[LyricsDarkCyanHighlightKey] ?: true }
-            .distinctUntilChanged()
-            .collectLatest(ioScope) { lyricsNotificationHighlightEnabled = it }
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -6901,7 +6893,6 @@ private var lyricsNotificationHighlightEnabled = true
             ::lyricsNotificationProvider.isInitialized &&
                 lyricsNotificationProvider.updateLyricsState(
                     state = lyricsSynchronizationEngine.state.value,
-                    highlightEnabled = lyricsNotificationHighlightEnabled,
                 )
         ) {
             refreshPlaybackNotification()
@@ -8355,7 +8346,6 @@ private var lyricsNotificationHighlightEnabled = true
             ::lyricsNotificationProvider.isInitialized &&
                 lyricsNotificationProvider.updateLyricsState(
                     state = lyricsSynchronizationEngine.state.value,
-                    highlightEnabled = lyricsNotificationHighlightEnabled,
                 )
         ) {
             refreshPlaybackNotification()

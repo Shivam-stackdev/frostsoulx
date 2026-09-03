@@ -46,6 +46,7 @@ import dev.vxs.frostsoulx.scrobbling.LastFmServiceConfig
 import dev.vxs.frostsoulx.storage.StorageFolderKind
 import dev.vxs.frostsoulx.storage.StorageLocationRepository
 import dev.vxs.frostsoulx.ui.player.CanvasArtworkPlaybackCache
+import dev.vxs.frostsoulx.utils.MetricsReporter
 import dev.vxs.frostsoulx.utils.MoriCipherUpdateScheduler
 import dev.vxs.frostsoulx.utils.PreferenceStore
 import dev.vxs.frostsoulx.utils.ProxyUtils
@@ -99,6 +100,7 @@ class App :
         }
         BotGuardTokenGenerator.initialize(this)
         PreferenceStore.start(this)
+        MetricsReporter.initialize(this, applicationScope)
         Timber.plant(Timber.DebugTree())
         try {
             Timber.plant(
