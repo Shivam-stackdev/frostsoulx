@@ -6,6 +6,7 @@
  */
 
 package dev.vxs.frostsoulx.ui.player.frostsoul
+import dev.vxs.frostsoulx.ui.utils.formatLikeCount
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -1336,11 +1337,6 @@ private fun FrostSoulArtworkBlurAlbumPage(
     }
 }
 
-private fun formatLikeCount(count: Int): String = when {
-    count >= 1_000_000 -> "${(count / 1_000_000f).toString().trimEnd('0').trimEnd('.')}M"
-    count >= 1_000 -> "${(count / 1_000f).toString().trimEnd('0').trimEnd('.')}K"
-    else -> count.toString()
-}
 
 @Composable
 private fun FrostSoulFullPlayerLikeButton(

@@ -125,6 +125,7 @@ import dev.vxs.frostsoulx.ui.component.ResizableIconButton
 import dev.vxs.frostsoulx.ui.menu.PlayerMenu
 import dev.vxs.frostsoulx.ui.theme.PlayerBackgroundColorUtils
 import dev.vxs.frostsoulx.ui.theme.PlayerSliderColors
+import dev.vxs.frostsoulx.ui.utils.formatLikeCount
 import dev.vxs.frostsoulx.ui.utils.ShowMediaInfo
 import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.ui.utils.highRes
@@ -835,11 +836,6 @@ fun StyledPlaybackSlider(
     }
 }
 
-private fun formatLikeCount(count: Int): String = when {
-    count >= 1_000_000 -> "${(count / 1_000_000f).toString().trimEnd('0').trimEnd('.')}M"
-    count >= 1_000 -> "${(count / 1_000f).toString().trimEnd('0').trimEnd('.')}K"
-    else -> count.toString()
-}
 
 @Composable
 fun PlayerTimeLabel(

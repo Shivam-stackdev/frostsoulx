@@ -8,6 +8,8 @@
 package dev.vxs.frostsoulx.ui.utils
 
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 import kotlin.math.absoluteValue
 import kotlin.math.floor
 
@@ -46,6 +48,20 @@ fun numberFormatter(n: Int) =
     DecimalFormat("#,###")
         .format(n)
         .replace(",", ".")
+
+fun formatLikeCount(count: Int): String {
+    val safeCount = count.coerceAtLeast(0)
+    return when {
+        safeCount >= 999_500 -> formatLikeValue(safeCount / 1_000_000.0, "M")
+        safeCount >= 1_000 -> formatLikeValue(safeCount / 1_000.0, "K")
+        else -> safeCount.toString()
+    }
+}
+
+private fun formatLikeValue(value: Double, suffix: String): String {
+    val formatted = DecimalFormat("0.##", DecimalFormatSymbols(Locale.US)).format(value)
+    return "$formatted$suffix"
+}
 
 fun formatCompactCount(count: Long): String {
     val abs = count.absoluteValue
