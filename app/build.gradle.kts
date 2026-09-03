@@ -51,7 +51,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 144
-        versionName = "14.0.5"
+        versionName = "14.0.5" // Release provenance: lyrics helper contracts fixed at 51ee3b31e
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
