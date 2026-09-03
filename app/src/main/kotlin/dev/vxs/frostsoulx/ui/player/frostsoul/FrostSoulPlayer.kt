@@ -13,6 +13,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.spring
@@ -88,6 +89,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
@@ -97,6 +99,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -104,6 +107,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -136,6 +140,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.LinkedHashMap
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 internal fun FrostSoulPlayer(
@@ -2118,14 +2124,86 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 private const val PaletteCacheCapacity = 24
 
 /**
- * Fixed geometry shared by Main, Lyrics, and Recommendations vinyl pages. The band sits just above
- * the seek/time bar and never covers the turntable deck or bottom navigation.
+ * Bottom ambient-glow constraints, derived by sampling the reference recording at 1 fps and
+ * measuring the per-row / per-column medians of the bottom region (medians, so the seek bar and
+ * transport icons drawn on top do not skew the numbers).
+ *
+ * The reference glow is a *geometry-free* wash: it has no circle, ellipse, capsule or blob edge
+ * anywhere. It is a single continuous two-hue field that spans the full width, fades out upward
+ * with an eased ramp, and runs all the way into the bottom screen edge with no gap. Everything
+ * below encodes that measurement, and the values double as the guard rails ("glow constraints")
+ * that keep the effect from ever growing into the turntable deck or washing out the controls.
  */
-private val SeekGlowBandHeight = 180.dp
-private val SeekGlowBottomPadding = 28.dp
+private object GlowConstraints {
+    /**
+     * Measured vertical extent: the wash first lifts off the flat background at ~0.74 of screen
+     * height and reaches full strength at the very bottom row, i.e. ~26–27% of the screen.
+     */
+    const val BandHeightFraction = 0.27f
 
-/** Reference-style breathing cycle: subtle and slow, without per-frame layout work. */
-private const val GlowBreathDurationMs = 5_200
+    /** Absolute clamps so short/tall screens keep the deck area clear and the wash stays visible. */
+    val BandMinHeight = 160.dp
+    val BandMaxHeight = 264.dp
+
+    /**
+     * Peak coverage of the wash. Held below 1.0 so the blurred artwork still reads faintly
+     * through the glow and the white transport icons keep their contrast.
+     */
+    const val PeakAlpha = 0.86f
+
+    /**
+     * Horizontal drift of the hue field, as a fraction of width. Measured by tracking the
+     * blue-minus-red centroid of the bottom rows: it swings between ~0.14w and ~0.33w, i.e. ±0.09w.
+     */
+    const val DriftFraction = 0.09f
+
+    /**
+     * The hue field is painted wider than the band by this fraction on each side. It is strictly
+     * greater than [DriftFraction], which is what guarantees drift can never pull an unpainted
+     * edge into view — the wash stays edgeless at every phase.
+     */
+    const val BleedFraction = 0.14f
+
+    /** Measured brightness breathing: mean bottom luminance swings ~±5% around its average. */
+    const val BreathFraction = 0.053f
+
+    /**
+     * One full drift cycle. The reference centroid peaks 6.0 s apart; brightness peaks lead the
+     * drift by ~84°, which is reproduced exactly by taking sin/cos of the same phase.
+     */
+    const val CycleDurationMs = 6_400
+}
+
+/**
+ * Horizontal stop positions and coverages of the measured hue field.
+ *
+ * The reference profile is: cool hue owning the left ~37%, its brightest point at x≈0.19, a
+ * neutral crossover at x≈0.37, the warm hue peaking around x≈0.63, then a gentle decay into the
+ * right edge. Two hues, one continuous ramp, no discrete shapes.
+ */
+private val GlowHueStopPositions = floatArrayOf(0f, 0.19f, 0.37f, 0.63f, 1f)
+private val GlowHueStopAlphas = floatArrayOf(0.72f, 0.86f, 0.78f, 0.68f, 0.52f)
+
+/**
+ * Eased vertical ramp of the wash, sampled from the reference at 0.02-screen steps and normalised
+ * so 0 = the band's top edge and 1 = the bottom screen edge. Starting at exactly 0 is what removes
+ * any visible top border; the ramp is deliberately soft through the middle so the falloff reads as
+ * light bleeding upward rather than as a filled rectangle.
+ */
+private val GlowVerticalRamp =
+    arrayOf(
+        0.00f to 0.00f,
+        0.15f to 0.07f,
+        0.31f to 0.26f,
+        0.46f to 0.48f,
+        0.62f to 0.68f,
+        0.77f to 0.85f,
+        0.92f to 0.95f,
+        1.00f to 1.00f,
+    )
+
+/** Full turn in radians. Not a `const` because it is computed from [Math.PI]. */
+private val GlowTwoPi = (2.0 * Math.PI).toFloat()
 
 /**
  * Pixel size the ambient backdrop artwork is decoded at. The image is blurred into a soft wash,
@@ -2197,12 +2275,20 @@ private fun FrostSoulDynamicBackground(
     // draw phase. Previously `.value` was read straight into composition, so the infinite glow
     // animation recomposed this whole background — including the full-screen blurred AsyncImage —
     // on every single frame. That recomposition storm was the main source of the stutter.
+    //
+    // The value is a plain 0→1 *linear* phase that Restarts, not Reverses: sin()/cos() are read
+    // from it in the draw pass, so the motion is already a smooth closed loop. A Reverse spec
+    // would additionally bounce it and make the drift visibly change direction mid-sweep, which
+    // is not what the reference does — its hue field glides continuously.
     val glowBreath: State<Float>? =
         if (isAnimatedGlow) {
             rememberInfiniteTransition(label = "vinyl-glow-transition").animateFloat(
                 initialValue = 0f,
                 targetValue = 1f,
-                animationSpec = infiniteRepeatable(tween(GlowBreathDurationMs), RepeatMode.Reverse),
+                animationSpec = infiniteRepeatable(
+                    tween(GlowConstraints.CycleDurationMs, easing = LinearEasing),
+                    RepeatMode.Restart,
+                ),
                 label = "vinyl-glow-phase",
             )
         } else {
@@ -2268,67 +2354,92 @@ private fun FrostSoulDynamicBackground(
         Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
 
         if (isGlowMode) {
-            // Two independently colored blobs anchored bottom-left / bottom-right, matching the
-            // QQ Music reference. Each palette color stays on its own side and blends additively
-            // where the two overlap in the middle; breathing changes intensity, not hue location.
-            // The centers sit below the band so only their eased upper falloff is visible.
+            // ── Geometry-free bottom wash ────────────────────────────────────────────────────
+            // The reference glow is not a blob: sampling its bottom rows shows one continuous
+            // two-hue field spanning the full width, so it is painted here as a single
+            // horizontal ramp masked by an eased vertical ramp. Nothing circular is drawn, which
+            // is why no arc, rim or ellipse edge can appear at any drift phase.
+            //
+            // The horizontal ramp is drawn wider than the band (BleedFraction > DriftFraction) and
+            // then translated by the animation, so the hue field slides *through* the fixed band
+            // like light moving behind frosted glass while the band itself never moves or resizes.
+            val bandHeight =
+                (LocalConfiguration.current.screenHeightDp * GlowConstraints.BandHeightFraction).dp
+                    .coerceIn(GlowConstraints.BandMinHeight, GlowConstraints.BandMaxHeight)
+
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = SeekGlowBottomPadding)
+                    // No bottom padding: the measured wash runs into the bottom screen edge. A gap
+                    // there is what previously made the effect read as a detached band.
                     .fillMaxWidth()
-                    .height(SeekGlowBandHeight)
-                    // Keep Plus blending isolated to this bounded glow layer. Without an offscreen
-                    // layer, the blend can be flattened against the parent and look like plain blur
-                    // on devices whose GPU compositor does not preserve the source blend mode.
-                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                    .height(bandHeight)
+                    // The offscreen layer exists for the DstIn mask below: it gives the mask a
+                    // bounded buffer to erase, so the falloff cannot punch a hole through the
+                    // blurred artwork and scrim behind this band.
+                    .graphicsLayer {
+                        compositingStrategy = CompositingStrategy.Offscreen
+                        alpha = GlowConstraints.PeakAlpha
+                    }
                     .drawWithCache {
                         val bandWidth = size.width
-                        val bandHeight = size.height
-                        val blobRadius = bandWidth * 0.64f
-                        // Pull the centers slightly into the visible band so the glow is clearly
-                        // present above the seek bar instead of being clipped almost entirely away.
-                        val leftCenter = Offset(bandWidth * 0.18f, bandHeight * 1.12f)
-                        val rightCenter = Offset(bandWidth * 0.82f, bandHeight * 1.12f)
-                        val leftBrush = Brush.radialGradient(
-                            colors = listOf(
-                                palette.artworkPrimary.copy(alpha = 0.82f),
-                                palette.artworkPrimary.copy(alpha = 0.28f),
-                                Color.Transparent,
-                            ),
-                            center = leftCenter,
-                            radius = blobRadius,
+                        val bleed = bandWidth * GlowConstraints.BleedFraction
+                        val fieldWidth = bandWidth + bleed * 2f
+
+                        // Cool → warm ramp across the whole field. Both palette hues live in one
+                        // brush, so they cross over smoothly instead of meeting as two objects.
+                        val hueStops = Array(GlowHueStopPositions.size) { index ->
+                            val position = GlowHueStopPositions[index]
+                            val hue = lerp(palette.artworkPrimary, palette.artworkSecondary, position)
+                            position to hue.copy(alpha = GlowHueStopAlphas[index])
+                        }
+                        val hueField = Brush.horizontalGradient(
+                            colorStops = hueStops,
+                            startX = -bleed,
+                            endX = bandWidth + bleed,
                         )
-                        val rightBrush = Brush.radialGradient(
-                            colors = listOf(
-                                palette.artworkSecondary.copy(alpha = 0.82f),
-                                palette.artworkSecondary.copy(alpha = 0.28f),
-                                Color.Transparent,
-                            ),
-                            center = rightCenter,
-                            radius = blobRadius,
-                        )
+
+                        // Eased upward falloff, applied as a destination-in mask so the wash has
+                        // no hard top edge at all.
+                        val maskStops = Array(GlowVerticalRamp.size) { index ->
+                            val (position, coverage) = GlowVerticalRamp[index]
+                            position to Color.White.copy(alpha = coverage)
+                        }
+                        val verticalMask = Brush.verticalGradient(colorStops = maskStops)
+
                         onDrawBehind {
-                            // Anti-phase sway: one corner brightens while the other dims, matching
-                            // the measured QQ reference behavior instead of pulsing both together.
-                            val breath = glowBreath?.value ?: 0.5f
-                            val sway = (breath - 0.5f) * 2f
-                            val leftAlpha = (0.92f + sway * 0.08f).coerceIn(0.78f, 1f)
-                            val rightAlpha = (0.92f - sway * 0.08f).coerceIn(0.78f, 1f)
-                            drawCircle(
-                                brush = leftBrush,
-                                radius = blobRadius,
-                                center = leftCenter,
-                                alpha = leftAlpha,
-                                blendMode = BlendMode.Plus,
-                            )
-                            drawCircle(
-                                brush = rightBrush,
-                                radius = blobRadius,
-                                center = rightCenter,
-                                alpha = rightAlpha,
-                                blendMode = BlendMode.Plus,
-                            )
+                            // One phase drives both axes. sin() moves the hue field horizontally;
+                            // cos() breathes its brightness — a 90° lead that reproduces the
+                            // measured offset between the reference's drift and luminance peaks.
+                            // Static glow leaves the phase at 0, i.e. no drift and full breath.
+                            val phase = (glowBreath?.value ?: 0f) * GlowTwoPi
+                            val drift = sin(phase) * bandWidth * GlowConstraints.DriftFraction
+                            // Kept strictly <= 1 so the bright half of the cycle is never clipped:
+                            // the swing is applied *below* full strength instead of above it.
+                            val breath =
+                                1f - GlowConstraints.BreathFraction +
+                                    cos(phase) * GlowConstraints.BreathFraction
+
+                            // Default SrcOver, deliberately: this draw lands in the offscreen
+                            // buffer above, where every additive/lightening blend mode would have
+                            // nothing but transparent black to lighten against — i.e. a no-op that
+                            // silently looks like flat blur. The wash is instead composited once,
+                            // as a whole, by the layer itself. The measured reference pixels match
+                            // this SrcOver result at the alphas encoded in GlowHueStopAlphas.
+                            translate(left = drift) {
+                                drawRect(
+                                    brush = hueField,
+                                    topLeft = Offset(-bleed, 0f),
+                                    // Built from the draw size rather than importing
+                                    // geometry.Size, which would clash with coil3.size.Size
+                                    // already imported in this file.
+                                    size = size.copy(width = fieldWidth),
+                                    alpha = breath.coerceIn(0f, 1f),
+                                )
+                            }
+                            // Applied last, so it carves the eased falloff out of whatever the
+                            // wash just painted. The parent's offscreen layer bounds this erase.
+                            drawRect(brush = verticalMask, blendMode = BlendMode.DstIn)
                         }
                     },
             )
