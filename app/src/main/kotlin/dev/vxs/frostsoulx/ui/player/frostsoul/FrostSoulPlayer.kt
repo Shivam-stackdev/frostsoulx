@@ -73,6 +73,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
@@ -2267,11 +2268,10 @@ private fun FrostSoulDynamicBackground(
         Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
 
         if (isGlowMode) {
-            // One fixed full-width wash is shared by Main, Lyrics, and Recommendations. It sits
-            // just above the seek/time-bar area and never becomes an oval or moving backdrop.
-            // Two cached vertical brushes are cross-faded in the draw phase so the color breathes
-            // between the active artwork's primary and secondary palette colors without allocating
-            // a new brush or recomposing the player on every frame.
+            // Two independently colored blobs anchored bottom-left / bottom-right, matching the
+            // QQ Music reference. Each palette color stays on its own side and blends additively
+            // where the two overlap in the middle; breathing changes intensity, not hue location.
+            // The centers sit below the band so only their eased upper falloff is visible.
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -2279,25 +2279,46 @@ private fun FrostSoulDynamicBackground(
                     .fillMaxWidth()
                     .height(SeekGlowBandHeight)
                     .drawWithCache {
-                        val primaryWash = Brush.verticalGradient(
+                        val bandWidth = size.width
+                        val bandHeight = size.height
+                        val blobRadius = bandWidth * 0.72f
+                        val leftCenter = Offset(bandWidth * 0.18f, bandHeight * 1.35f)
+                        val rightCenter = Offset(bandWidth * 0.82f, bandHeight * 1.35f)
+                        val leftBrush = Brush.radialGradient(
                             colors = listOf(
+                                palette.artworkPrimary.copy(alpha = 0.55f),
+                                palette.artworkPrimary.copy(alpha = 0.18f),
                                 Color.Transparent,
-                                palette.artworkPrimary.copy(alpha = 0.42f),
-                                palette.artworkPrimary.copy(alpha = 0.24f),
                             ),
+                            center = leftCenter,
+                            radius = blobRadius,
                         )
-                        val secondaryWash = Brush.verticalGradient(
+                        val rightBrush = Brush.radialGradient(
                             colors = listOf(
+                                palette.artworkSecondary.copy(alpha = 0.55f),
+                                palette.artworkSecondary.copy(alpha = 0.18f),
                                 Color.Transparent,
-                                palette.artworkSecondary.copy(alpha = 0.34f),
-                                palette.artworkSecondary.copy(alpha = 0.20f),
                             ),
+                            center = rightCenter,
+                            radius = blobRadius,
                         )
                         onDrawBehind {
                             val breath = glowBreath?.value ?: 0.5f
-                            val secondaryWeight = (0.22f + breath * 0.56f).coerceIn(0f, 1f)
-                            drawRect(brush = primaryWash, alpha = 1f - secondaryWeight)
-                            drawRect(brush = secondaryWash, alpha = secondaryWeight)
+                            val pulse = 0.85f + breath * 0.15f
+                            drawCircle(
+                                brush = leftBrush,
+                                radius = blobRadius,
+                                center = leftCenter,
+                                alpha = pulse,
+                                blendMode = BlendMode.Plus,
+                            )
+                            drawCircle(
+                                brush = rightBrush,
+                                radius = blobRadius,
+                                center = rightCenter,
+                                alpha = pulse,
+                                blendMode = BlendMode.Plus,
+                            )
                         }
                     },
             )
