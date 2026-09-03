@@ -309,15 +309,47 @@ internal fun FSAlbumArt(
                 val labelRadius = platterRadius *
                     (PlayerLayoutTokens.TurntableLabelSize.value / PlayerLayoutTokens.TurntablePlatterSize.value)
 
-                // Pressed-vinyl body. Dark, with a soft falloff toward the rim.
+                // Metallic platter body: a cool graphite/silver material rather than a flat
+                // black disc. The fixed colour stops are intentional; they form the reference's
+                // precomputed metal response without allocating or animating a new brush per
+                // frame.
                 drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(Color(0xFF34343A), Color(0xFF212126), Color(0xFF101013)),
-                        center = center,
-                        radius = platterRadius,
+                    brush = Brush.linearGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color(0xFF56606B),
+                            0.16f to Color(0xFFB9C1CA),
+                            0.31f to Color(0xFF707B87),
+                            0.48f to Color(0xFFD5DAE0),
+                            0.66f to Color(0xFF626D79),
+                            0.82f to Color(0xFF9EA8B3),
+                            1.00f to Color(0xFF454E59),
+                        ),
+                        start = Offset(0f, platterRadius * 0.12f),
+                        end = Offset(size.width, platterRadius * 0.92f),
                     ),
                     radius = platterRadius,
                     center = center,
+                )
+
+                // Precalculated anisotropic reflection inside the rotating disc. It is subtle
+                // enough to keep the grooves readable, but gives the platter the brushed-metal
+                // sweep visible in the reference instead of a painted white arc.
+                drawCircle(
+                    brush = Brush.sweepGradient(
+                        0.00f to Color.Transparent,
+                        0.10f to Color.White.copy(alpha = 0.16f),
+                        0.18f to Color.Transparent,
+                        0.43f to Color.Transparent,
+                        0.52f to Color.White.copy(alpha = 0.11f),
+                        0.62f to Color.Transparent,
+                        0.84f to Color.Transparent,
+                        0.91f to Color.Black.copy(alpha = 0.13f),
+                        1.00f to Color.Transparent,
+                        center = center,
+                    ),
+                    radius = platterRadius * 0.84f,
+                    center = center,
+                    style = Stroke(width = platterRadius * 0.16f),
                 )
 
                 // Fine concentric grooves. Low contrast and crowding toward the rim, so the
