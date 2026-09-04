@@ -12,6 +12,10 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -73,6 +77,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -116,7 +123,6 @@ import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.MinimalistMetadataChip
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
-import dev.vxs.frostsoulx.ui.player.SharedColorWash
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -205,6 +211,7 @@ internal fun FrostSoulPlayer(
                 artworkUrl = uiState.track.artworkUrl,
                 playerDesignStyle = playerDesignStyle,
                 playerBackgroundStyle = uiState.playerBackgroundStyle,
+                blurRadius = uiState.blurRadius,
                 palette = uiState.palette,
                 moodSeed = "${uiState.track.title} ${uiState.track.artist} ${uiState.track.album}",
             )
@@ -2120,62 +2127,32 @@ private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
         PlayerBackgroundStyle.GRADIENT,
         PlayerBackgroundStyle.COLORING,
         PlayerBackgroundStyle.BLUR_GRADIENT,
-        PlayerBackgroundStyle.GLOW,
     )
 
-/**
- * Single consolidated scrim for the glow styles.
- *
- * This one brush replaces what used to be three stacked full-screen layers (a radial vignette, a
- * neutral ambient tone and a final readability scrim).
- *
- * It is intentionally *heavy*. Sampling the reference shows its backdrop is a near-flat
- * `#1C1C1C` (lum≈28) everywhere the glow is not — the blurred artwork is only a faint tint.
- * That dark canvas is what gives the glow a +63 luminance lift to work with. The old scrim
- * (0.62 → 0.30) left the artwork at lum≈80 and the bottom stop at 0.46 darkened the exact area
- * the glow was supposed to light up, so the wash was painted onto an already brighter image and
- * vanished. The bottom stop is now the *lightest* so the scrim never fights the wash.
- */
-private val GlowModeScrim =
-    Brush.verticalGradient(
-        colors = listOf(
-            Color.Black.copy(alpha = 0.80f),
-            Color.Black.copy(alpha = 0.80f),
-            Color.Black.copy(alpha = 0.78f),
-            Color.Black.copy(alpha = 0.76f),
-            Color.Black.copy(alpha = 0.74f),
-        ),
-    )
-
-/** Equivalent consolidated scrim for the non-glow styles. */
-private val PlainModeScrim =
-    Brush.verticalGradient(
-        colors = listOf(
-            Color.Black.copy(alpha = 0.34f),
-            Color.Black.copy(alpha = 0.16f),
-            Color.Black.copy(alpha = 0.44f),
-        ),
-    )
+private const val AmbientArtworkSampleSize = 192
+private const val GlowBandFraction = 0.29f
+private const val GlowCycleDurationMs = 5_600
 
 @Composable
 private fun FrostSoulDynamicBackground(
     artworkUrl: String?,
     playerDesignStyle: PlayerDesignStyle,
     playerBackgroundStyle: PlayerBackgroundStyle,
+    blurRadius: Float,
     palette: FrostSoulPalette,
     moodSeed: String,
 ) {
     val isVinyl = playerDesignStyle == PlayerDesignStyle.FROSTSOUL
     val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
     val isStaticGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW
-    val isGlowMode = isAnimatedGlow || isStaticGlow
-    // Keep the selected artwork present behind every player mode. Vinyl's Gradient/Glow
-    // variants tint this low-contrast image instead of replacing it with a flat color.
-    val shouldShowArtwork = !artworkUrl.isNullOrBlank()
-    val shouldUseGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
-
+    val isGlow = isAnimatedGlow || isStaticGlow
+    val isBlur = isVinyl && (
+        playerBackgroundStyle == PlayerBackgroundStyle.BLUR ||
+            playerBackgroundStyle == PlayerBackgroundStyle.BLUR_GRADIENT
+    )
+    val isGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
     val context = LocalContext.current
-    val ambientArtworkRequest = remember(artworkUrl, context) {
+    val artworkRequest = remember(artworkUrl, context) {
         artworkUrl?.takeIf { it.isNotBlank() }?.let { url ->
             ImageRequest.Builder(context)
                 .data(url)
@@ -2184,50 +2161,82 @@ private fun FrostSoulDynamicBackground(
         }
     }
 
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-    ) {
-        if (shouldShowArtwork && ambientArtworkRequest != null) {
-            // The previous implementation also applied ColorFilter.colorMatrix with
-            // setToSaturation(1.0f) — an identity matrix. It changed nothing visually while
-            // forcing an extra full-screen color-filter pass every frame, so it is gone.
+    var breath = 0.35f
+    if (isAnimatedGlow) {
+        val transition = rememberInfiniteTransition(label = "vinyl-wash-breath")
+        val animatedBreath by transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(GlowCycleDurationMs, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "vinyl-wash-intensity",
+        )
+        breath = animatedBreath
+    }
+
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        if (isBlur && artworkRequest != null) {
             AsyncImage(
-                model = ambientArtworkRequest,
+                model = artworkRequest,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer { scaleX = 1.12f; scaleY = 1.12f }
-                    .alpha(0.12f),
+                    .graphicsLayer { scaleX = 1.08f; scaleY = 1.08f }
+                    .blur(
+                        radius = blurRadius.coerceIn(0f, 64f).dp,
+                        edgeTreatment = BlurredEdgeTreatment.Unbounded,
+                    )
+                    .alpha(0.72f),
             )
+            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.38f)))
         }
 
-        if (shouldUseGradient) {
-            // Brush depends only on the palette, so it is cached instead of being rebuilt (with
-            // its Color list) on every frame.
-            val gradientBrush = remember(palette) {
+        if (isGradient) {
+            val gradient = remember(palette) {
                 Brush.verticalGradient(
                     colors = listOf(
-                        palette.artworkPrimary.copy(alpha = 0.42f),
-                        palette.artworkSecondary.copy(alpha = 0.26f),
                         Color.Black.copy(alpha = 0.92f),
+                        palette.artworkPrimary.copy(alpha = 0.34f),
+                        palette.artworkSecondary.copy(alpha = 0.24f),
+                        Color.Black.copy(alpha = 0.84f),
                     ),
                 )
             }
-            Box(modifier = Modifier.fillMaxSize().background(gradientBrush))
+            Box(modifier = Modifier.fillMaxSize().background(gradient))
         }
 
-        // One consolidated scrim instead of the old three stacked full-screen layers. This is
-        // what keeps the turntable area above the glow "halka dark" like the reference player.
-        Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
-
-        if (isGlowMode) {
-                        SharedColorWash(
-                colors = listOf(palette.artworkPrimary, palette.artworkSecondary),
-                modifier = Modifier.fillMaxSize(),
+        if (isGlow) {
+            val bandHeight = (LocalConfiguration.current.screenHeightDp * GlowBandFraction)
+                .dp.coerceIn(170.dp, 280.dp)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(bandHeight)
+                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                    .drawWithCache {
+                        val wash = Brush.horizontalGradient(
+                            colors = listOf(
+                                palette.artworkSecondary.copy(alpha = 0.30f),
+                                palette.artworkPrimary.copy(alpha = 0.56f),
+                                palette.artworkSecondary.copy(alpha = 0.42f),
+                            ),
+                        )
+                        val mask = Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.28f to Color.White.copy(alpha = 0.10f),
+                            0.62f to Color.White.copy(alpha = 0.66f),
+                            1f to Color.White,
+                        )
+                        onDrawBehind {
+                            val alpha = (0.34f + breath * 0.18f).coerceIn(0f, 0.52f)
+                            drawRect(brush = wash, alpha = alpha)
+                            drawRect(brush = mask, blendMode = BlendMode.DstIn)
+                        }
+                    },
             )
         }
     }
