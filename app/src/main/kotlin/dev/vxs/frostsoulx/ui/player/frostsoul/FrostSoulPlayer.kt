@@ -2264,6 +2264,7 @@ private fun FrostSoulDynamicBackground(
                         // Four oversized, pre-softened fields overlap in the lower band. Their
                         // large radial falloffs provide a blur-like ambient pool without running
                         // Modifier.blur over the whole player or allocating a canvas per frame.
+                        val mixed = lerp(primary, secondary, 0.5f)
                         val leftField = Brush.radialGradient(
                             colors = listOf(
                                 primary.copy(alpha = 0.48f),
