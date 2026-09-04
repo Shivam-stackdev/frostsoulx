@@ -125,6 +125,69 @@ fun AodSlideToLockButton(
 }
 
 @Composable
+fun AodSlideToExitButton(
+    accentColor: Color,
+    onExit: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val haptic = LocalHapticFeedback.current
+    var slideOffsetPx by remember { mutableFloatStateOf(0f) }
+    val maxSlidePx = 300f
+    val animatedSlideOffset by animateFloatAsState(
+        targetValue = slideOffsetPx,
+        animationSpec = tween(durationMillis = if (slideOffsetPx == 0f) 200 else 0),
+        label = "exitSlideOffset",
+    )
+
+    Box(
+        modifier = modifier
+            .width(260.dp)
+            .height(50.dp)
+            .clip(RoundedCornerShape(25.dp))
+            .background(Color.White.copy(alpha = 0.12f))
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        if (slideOffsetPx >= maxSlidePx * 0.70f) {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onExit()
+                        }
+                        slideOffsetPx = 0f
+                    },
+                    onDragCancel = { slideOffsetPx = 0f },
+                    onHorizontalDrag = { _, dragAmount ->
+                        slideOffsetPx = (slideOffsetPx + dragAmount).coerceIn(0f, maxSlidePx)
+                    },
+                )
+            },
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Text(
+            text = "Slide to Exit  >>>",
+            style = MaterialTheme.typography.labelLarge,
+            color = Color.White.copy(alpha = 0.65f),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(animatedSlideOffset.roundToInt(), 0) }
+                .padding(3.dp)
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(accentColor),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = ">",
+                color = Color.Black,
+                style = MaterialTheme.typography.titleLarge,
+            )
+        }
+    }
+}
+
+@Composable
 fun AodTouchLockOverlay(
     isLocked: Boolean,
     unlockMethod: AodUnlockMethod,

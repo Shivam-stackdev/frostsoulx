@@ -169,9 +169,6 @@ class AodDreamService : DreamService(), LifecycleOwner, SavedStateRegistryOwner 
                             }
                         },
                         onToggleRepeat = { conn?.player?.toggleRepeatMode() },
-                        // A dream cannot host the full queue screen; leave AOD cleanly when
-                        // the queue affordance is pressed rather than making it a dead button.
-                        onOpenQueue = { finish() },
                     )
                 }
             }

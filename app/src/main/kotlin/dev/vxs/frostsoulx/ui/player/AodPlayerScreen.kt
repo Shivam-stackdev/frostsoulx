@@ -179,7 +179,6 @@ fun AodPlayerScreen(
     onToggleLike: () -> Unit = {},
     onToggleShuffle: () -> Unit = {},
     onToggleRepeat: () -> Unit = {},
-    onOpenQueue: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -191,7 +190,7 @@ fun AodPlayerScreen(
     val showThumbnail = true
     val showArtist = true
     val showAlbum = false
-    val showProgress = true
+    val showProgress = false
     val showTimeLabels = true
     val showControls = true
     val showExitButton = true
@@ -651,25 +650,12 @@ fun AodPlayerScreen(
                 onToggleLike = { resetInteraction(); onToggleLike() },
                 onToggleShuffle = { resetInteraction(); onToggleShuffle() },
                 onToggleRepeat = { resetInteraction(); onToggleRepeat() },
-                onOpenQueue = { resetInteraction(); onOpenQueue() },
             )
 
-            if (showProgress && showFullContent) {
-                AodSliderSection(
-                    position = position,
-                    duration = duration,
-                    sliderPosition = sliderPosition,
+            if (showExitButton && !isAmbient) {
+                AodSlideToExitButton(
                     accentColor = accentColor,
-                    showTimeLabels = showTimeLabels,
-                    onSeek = { resetInteraction(); onSeek(it) },
-                    onSeekFinished = { resetInteraction(); onSeekFinished() },
-                )
-            }
-
-            if (showExitButton && !isLocked && !isAmbient) {
-                AodSlideToLockButton(
-                    accentColor = accentColor,
-                    onLock = { resetInteraction(); isLocked = true },
+                    onExit = { resetInteraction(); onExit() },
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                 )
             }
@@ -678,12 +664,6 @@ fun AodPlayerScreen(
         if (isCovered && proximityBlackoutEnabled) {
             Box(modifier = Modifier.fillMaxSize().background(Color.Black).zIndex(999f))
         }
-        AodTouchLockOverlay(
-            isLocked = isLocked,
-            unlockMethod = unlockMethod,
-            accentColor = accentColor,
-            onUnlock = { resetInteraction(); isLocked = false },
-        )
     }
 }
 
@@ -702,7 +682,6 @@ private fun AodReferenceControls(
     onToggleLike: () -> Unit,
     onToggleShuffle: () -> Unit,
     onToggleRepeat: () -> Unit,
-    onOpenQueue: () -> Unit,
 ) {
     val outline = Color.White.copy(alpha = 0.78f)
     Column(
@@ -759,11 +738,6 @@ private fun AodReferenceControls(
                 },
                 tint = if (repeatMode == 0) outline.copy(alpha = 0.60f) else accentColor,
                 onClick = onToggleRepeat,
-            )
-            AodUtilityIconButton(
-                icon = R.drawable.queue_music,
-                tint = outline,
-                onClick = onOpenQueue,
             )
         }
     }
