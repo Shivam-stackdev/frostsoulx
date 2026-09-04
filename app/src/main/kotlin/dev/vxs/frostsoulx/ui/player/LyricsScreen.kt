@@ -619,84 +619,15 @@ private fun AppleMusicBackground(
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.18f)),
         )
-        BottomColorWash(
-            colors = colors,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.36f)
-                    .align(Alignment.BottomCenter),
+        SharedColorWash(
+            colors = colors.take(2),
+            modifier = Modifier.fillMaxSize(),
         )
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .background(bottomScrim),
-        )
-    }
-}
-
-@Composable
-private fun BottomColorWash(
-    colors: List<Color>,
-    modifier: Modifier = Modifier,
-) {
-    val transition = rememberInfiniteTransition(label = "lyrics-bottom-color-wash")
-    val breath by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(6500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "lyrics-bottom-color-breath",
-    )
-    val drift by transition.animateFloat(
-        initialValue = -1f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(11000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "lyrics-bottom-color-drift",
-    )
-    val left = colors.getOrElse(0) { AppleMusicFallbackGradient[0] }
-    val center = colors.getOrElse(1) { AppleMusicFallbackGradient[1] }
-    val right = colors.getOrElse(2) { AppleMusicFallbackGradient[2] }
-
-    Canvas(modifier = modifier.alpha(0.9f)) {
-        val bottom = size.height
-        val baseRadius = size.width * (0.52f + breath * 0.08f)
-        val verticalCenter = bottom * (1.12f + breath * 0.03f)
-        val horizontalDrift = size.width * 0.1f * drift
-        val glowAlpha = 0.06f + breath * 0.12f
-
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(left.copy(alpha = glowAlpha), left.copy(alpha = 0f)),
-                center = Offset(size.width * 0.08f + horizontalDrift, verticalCenter),
-                radius = baseRadius,
-            ),
-            radius = baseRadius,
-            center = Offset(size.width * 0.08f + horizontalDrift, verticalCenter),
-        )
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(center.copy(alpha = glowAlpha + 0.04f), center.copy(alpha = 0f)),
-                center = Offset(size.width * 0.52f + horizontalDrift * 0.35f, verticalCenter),
-                radius = baseRadius * 1.08f,
-            ),
-            radius = baseRadius * 1.08f,
-            center = Offset(size.width * 0.52f + horizontalDrift * 0.35f, verticalCenter),
-        )
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = listOf(right.copy(alpha = glowAlpha), right.copy(alpha = 0f)),
-                center = Offset(size.width * 0.96f + horizontalDrift, verticalCenter),
-                radius = baseRadius,
-            ),
-            radius = baseRadius,
-            center = Offset(size.width * 0.96f + horizontalDrift, verticalCenter),
         )
     }
 }

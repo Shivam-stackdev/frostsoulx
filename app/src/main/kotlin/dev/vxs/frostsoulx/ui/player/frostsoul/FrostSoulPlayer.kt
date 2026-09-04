@@ -11,12 +11,7 @@ import dev.vxs.frostsoulx.ui.utils.formatLikeCount
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -90,7 +85,6 @@ import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -102,7 +96,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
-import androidx.core.graphics.ColorUtils
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -123,6 +116,7 @@ import dev.vxs.frostsoulx.innertube.YouTube
 import dev.vxs.frostsoulx.ui.frostsoul.FSButton
 import dev.vxs.frostsoulx.ui.frostsoul.MinimalistMetadataChip
 import dev.vxs.frostsoulx.ui.frostsoul.FrostSoulTheme
+import dev.vxs.frostsoulx.ui.player.SharedColorWash
 import dev.vxs.frostsoulx.ui.theme.PlayerColorExtractor
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -135,7 +129,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.LinkedHashMap
-import kotlin.math.sin
 
 @Composable
 internal fun FrostSoulPlayer(
@@ -1549,7 +1542,7 @@ private fun FrostSoulRecommendationsPage(
                 .toMap()
         }
     }
-    // This page renders directly over FrostSoulDynamicBackground's ambient blurred artwork,
+    // This page renders directly over FrostSoulDynamicBackground's low-contrast artwork.
     // which stays dark in both app themes — so text/chip colors stay white-based regardless of
     // the app's light/dark theme setting (fixes FS-BUG-LIGHTMODE: text was flipping to
     // near-black here and disappearing against the still-dark backdrop in light theme).
@@ -2112,61 +2105,6 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 private const val PaletteCacheCapacity = 24
 
 /**
- * Bottom ambient-glow constraints, derived by sampling the reference recording at 1 fps and
- * measuring the per-row / per-column medians of the bottom region (medians, so the seek bar and
- * transport icons drawn on top do not skew the numbers).
- *
- * The reference glow is a *geometry-free* wash: it has no circle, ellipse, capsule or blob edge
- * anywhere. It is a single continuous two-hue field that spans the full width, fades out upward
- * with an eased ramp, and runs all the way into the bottom screen edge with no gap. Everything
- * below encodes that measurement, and the values double as the guard rails ("glow constraints")
- * that keep the effect from ever growing into the turntable deck or washing out the controls.
- */
-private object GlowConstraints {
-    /** One complete, slow breathing cycle for the lower-screen color wash. */
-    const val CycleDurationMs = 6_000
-
-    /**
-     * Lightness / saturation window (HSL) that every palette hue is pushed into before it is
-     * painted. This is the single most important constraint for visibility: the extracted
-     * `artworkSecondary` is frequently a near-black like `#30262B`, and painting a dark colour
-     * SrcOver a dark scrim *lowers* luminance — the old build measured −41 at the bottom edge
-     * where the reference measures +63. The reference's painted hues resolve to L≈0.45–0.55 with
-     * a moderate chroma once composited, so palette hues are lifted into that window here.
-     */
-    const val MinLightness = 0.56f
-    const val MaxLightness = 0.68f
-    const val MinSaturation = 0.30f
-    const val MaxSaturation = 0.55f
-
-    /** Below this saturation a swatch is treated as grey and keeps its (low) chroma. */
-    const val GreySaturationThreshold = 0.10f
-    const val GreyLiftedSaturation = 0.12f
-}
-
-/**
- * Pushes an extracted palette colour into the [GlowConstraints] lightness / saturation window so
- * it reads as *light* when painted over the darkened backdrop. Greys keep their neutral character
- * (forcing chroma onto a grey would invent a hue); everything else gets a floor on saturation so
- * the two lobes stay distinguishable after the alpha composite desaturates them.
- */
-private fun Color.toGlowHue(): Color {
-    val hsl = FloatArray(3)
-    ColorUtils.colorToHSL(toArgb(), hsl)
-    hsl[1] =
-        if (hsl[1] < GlowConstraints.GreySaturationThreshold) {
-            GlowConstraints.GreyLiftedSaturation
-        } else {
-            hsl[1].coerceIn(GlowConstraints.MinSaturation, GlowConstraints.MaxSaturation)
-        }
-    hsl[2] = hsl[2].coerceIn(GlowConstraints.MinLightness, GlowConstraints.MaxLightness)
-    return Color(ColorUtils.HSLToColor(hsl))
-}
-
-
-/** Full turn in radians. Not a `const` because it is computed from [Math.PI]. */
-private val GlowTwoPi = (2.0 * Math.PI).toFloat()
-
 /**
  * Pixel size for the low-contrast ambient artwork layer. Keeping this small avoids decoding a
  * full-resolution album image behind the player controls.
@@ -2236,25 +2174,6 @@ private fun FrostSoulDynamicBackground(
     val shouldShowArtwork = !artworkUrl.isNullOrBlank()
     val shouldUseGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
 
-    // The breathing phase is kept as a State and read only by the lightweight draw pass below.
-    //
-    // A linear phase keeps the brightness transition smooth and avoids direction-change jumps.
-    val glowBreath: State<Float>? =
-        if (isAnimatedGlow) {
-            rememberInfiniteTransition(label = "vinyl-glow-transition").animateFloat(
-                initialValue = 0f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    tween(GlowConstraints.CycleDurationMs, easing = LinearEasing),
-                    RepeatMode.Restart,
-                ),
-                label = "vinyl-glow-phase",
-            )
-        } else {
-            null
-        }
-
-
     val context = LocalContext.current
     val ambientArtworkRequest = remember(artworkUrl, context) {
         artworkUrl?.takeIf { it.isNotBlank() }?.let { url ->
@@ -2306,60 +2225,9 @@ private fun FrostSoulDynamicBackground(
         Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
 
         if (isGlowMode) {
-                        // The wash begins below the vinyl and fills the entire lower portion of the screen.
-            // It is deliberately black at its upper edge, then gradually reveals two artwork
-            // colors. There is no horizontal translation, blur, offscreen layer, or mask pass.
-            val bandHeight =
-                (LocalConfiguration.current.screenHeightDp * 0.43f).dp
-                    .coerceIn(280.dp, 620.dp)
-            val glowPrimary = remember(palette.artworkPrimary) { palette.artworkPrimary.toGlowHue() }
-            val glowSecondary = remember(palette.artworkSecondary) { palette.artworkSecondary.toGlowHue() }
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(bandHeight)
-                    .drawBehind {
-                        val phase = (glowBreath?.value ?: 0f) * GlowTwoPi
-                        val breath = 0.5f + 0.5f * sin(phase)
-                        val dominantAlpha = 0.07f + breath * 0.17f
-                        val secondaryAlpha = dominantAlpha * 0.58f
-                        val radius = size.width * (0.92f + breath * 0.10f)
-                        val primaryCenter = Offset(size.width * 0.28f, size.height * 1.08f)
-                        val secondaryCenter = Offset(size.width * 0.78f, size.height * 1.10f)
-
-                        drawRect(
-                            color = Color.Black.copy(alpha = 0.18f),
-                            size = size,
-                        )
-                        drawCircle(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    glowPrimary.copy(alpha = dominantAlpha),
-                                    glowPrimary.copy(alpha = dominantAlpha * 0.42f),
-                                    glowPrimary.copy(alpha = 0f),
-                                ),
-                                center = primaryCenter,
-                                radius = radius,
-                            ),
-                            radius = radius,
-                            center = primaryCenter,
-                        )
-                        drawCircle(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    glowSecondary.copy(alpha = secondaryAlpha),
-                                    glowSecondary.copy(alpha = secondaryAlpha * 0.36f),
-                                    glowSecondary.copy(alpha = 0f),
-                                ),
-                                center = secondaryCenter,
-                                radius = radius * 0.92f,
-                            ),
-                            radius = radius * 0.92f,
-                            center = secondaryCenter,
-                        )
-                    },
+                        SharedColorWash(
+                colors = listOf(palette.artworkPrimary, palette.artworkSecondary),
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }
