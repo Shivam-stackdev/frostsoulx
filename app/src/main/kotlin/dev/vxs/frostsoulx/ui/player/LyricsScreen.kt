@@ -13,10 +13,16 @@ import android.content.res.Configuration
 import android.view.HapticFeedbackConstants
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -63,6 +69,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -614,11 +621,80 @@ private fun AppleMusicBackground(
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.18f)),
         )
+        BottomColorWash(
+            colors = colors,
+            modifier = Modifier.fillMaxSize(),
+        )
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .background(bottomScrim),
+        )
+    }
+}
+
+@Composable
+private fun BottomColorWash(
+    colors: List<Color>,
+    modifier: Modifier = Modifier,
+) {
+    val transition = rememberInfiniteTransition(label = "lyrics-bottom-color-wash")
+    val breath by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(6500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "lyrics-bottom-color-breath",
+    )
+    val drift by transition.animateFloat(
+        initialValue = -1f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(11000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "lyrics-bottom-color-drift",
+    )
+    val left = colors.getOrElse(0) { AppleMusicFallbackGradient[0] }
+    val center = colors.getOrElse(1) { AppleMusicFallbackGradient[1] }
+    val right = colors.getOrElse(2) { AppleMusicFallbackGradient[2] }
+
+    Canvas(modifier = modifier.alpha(0.92f)) {
+        val bottom = size.height
+        val baseRadius = size.width * (0.48f + breath * 0.08f)
+        val verticalCenter = bottom * (0.99f + breath * 0.015f)
+        val horizontalDrift = size.width * 0.12f * drift
+        val glowAlpha = 0.24f + breath * 0.12f
+
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(left.copy(alpha = glowAlpha), left.copy(alpha = 0f)),
+                center = Offset(size.width * 0.08f + horizontalDrift, verticalCenter),
+                radius = baseRadius,
+            ),
+            radius = baseRadius,
+            center = Offset(size.width * 0.08f + horizontalDrift, verticalCenter),
+        )
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(center.copy(alpha = glowAlpha + 0.04f), center.copy(alpha = 0f)),
+                center = Offset(size.width * 0.52f + horizontalDrift * 0.35f, verticalCenter),
+                radius = baseRadius * 1.08f,
+            ),
+            radius = baseRadius * 1.08f,
+            center = Offset(size.width * 0.52f + horizontalDrift * 0.35f, verticalCenter),
+        )
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(right.copy(alpha = glowAlpha), right.copy(alpha = 0f)),
+                center = Offset(size.width * 0.96f + horizontalDrift, verticalCenter),
+                radius = baseRadius,
+            ),
+            radius = baseRadius,
+            center = Offset(size.width * 0.96f + horizontalDrift, verticalCenter),
         )
     }
 }
