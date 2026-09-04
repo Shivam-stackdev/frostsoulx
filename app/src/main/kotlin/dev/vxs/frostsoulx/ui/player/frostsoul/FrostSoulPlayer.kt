@@ -2132,8 +2132,8 @@ private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
         PlayerBackgroundStyle.BLUR_GRADIENT,
     )
 
-private const val GlowBandFraction = 0.29f
-private const val GlowCycleDurationMs = 5_600
+private const val GlowBandFraction = 0.35f
+private const val GlowCycleDurationMs = 7_200
 
 @Composable
 private fun FrostSoulDynamicBackground(
@@ -2212,7 +2212,7 @@ private fun FrostSoulDynamicBackground(
 
         if (isGlow) {
             val bandHeight = (LocalConfiguration.current.screenHeightDp * GlowBandFraction)
-                .dp.coerceIn(170.dp, 280.dp)
+                .dp.coerceIn(220.dp, 360.dp)
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -2222,9 +2222,9 @@ private fun FrostSoulDynamicBackground(
                     .drawWithCache {
                         val wash = Brush.horizontalGradient(
                             colors = listOf(
-                                palette.artworkSecondary.copy(alpha = 0.30f),
-                                palette.artworkPrimary.copy(alpha = 0.56f),
-                                palette.artworkSecondary.copy(alpha = 0.42f),
+                                palette.artworkSecondary.copy(alpha = 0.56f),
+                                palette.artworkPrimary.copy(alpha = 0.82f),
+                                palette.artworkSecondary.copy(alpha = 0.68f),
                             ),
                         )
                         val mask = Brush.verticalGradient(
@@ -2234,7 +2234,7 @@ private fun FrostSoulDynamicBackground(
                             1f to Color.White,
                         )
                         onDrawBehind {
-                            val alpha = (0.34f + breath * 0.18f).coerceIn(0f, 0.52f)
+                            val alpha = (0.52f + breath * 0.28f).coerceIn(0f, 0.82f)
                             drawRect(brush = wash, alpha = alpha)
                             drawRect(brush = mask, blendMode = BlendMode.DstIn)
                         }
