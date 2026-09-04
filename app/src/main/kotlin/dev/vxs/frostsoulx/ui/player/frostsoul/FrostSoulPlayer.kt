@@ -85,6 +85,7 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.BlendMode
@@ -2132,8 +2133,65 @@ private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
         PlayerBackgroundStyle.BLUR_GRADIENT,
     )
 
-private const val GlowBandFraction = 0.35f
-private const val GlowCycleDurationMs = 7_200
+private const val GlowBandFraction = 0.38f
+
+/**
+ * Primary breath period. The transition runs in [RepeatMode.Reverse], so the perceived
+ * peak-to-peak cadence is twice this value (~7.0s), matching the reference wash.
+ */
+private const val GlowBreathDurationMs = 3_500
+
+/**
+ * Secondary breath period for the additive core. Deliberately co-prime with
+ * [GlowBreathDurationMs] so the two waves beat against each other and the wash evolves
+ * organically instead of pulsing like a metronome.
+ */
+private const val GlowCoreDurationMs = 5_200
+
+/**
+ * Lateral drift period for the color lobes. Reverse mode yields a ~9.6s sweep-and-return,
+ * slow enough to feel ambient rather than scrolling.
+ */
+private const val GlowDriftDurationMs = 4_800
+
+/**
+ * Minimum saturation/value forced onto palette colors before they are painted.
+ *
+ * Album palettes are frequently near-black (the default secondary is `#30262B`, value ~0.16).
+ * Painting those directly over black and then scaling by alpha collapses the wash to a dim
+ * grey smear, which is exactly the "barely visible, colorless" failure mode. Lifting the tone
+ * into a bright, saturated band keeps the artwork's hue while guaranteeing it reads on screen.
+ *
+ * The saturation ceiling prevents already-vivid artwork from turning neon.
+ */
+private const val GlowMinSaturation = 0.34f
+private const val GlowMaxSaturation = 0.82f
+private const val GlowMinValue = 0.70f
+
+/**
+ * Saturation below which a palette color is treated as intentionally achromatic.
+ *
+ * Applying a saturation floor to a truly grey color would invent a hue out of nothing (grey has
+ * hue 0, so it would turn red). Below this threshold the color is only brightened, never tinted.
+ */
+private const val GlowAchromaticThreshold = 0.10f
+
+/**
+ * Lifts [color] into a vibrant tone suitable for an additive glow while preserving its hue.
+ *
+ * Hue is never modified, so the wash still reads as "this album's color". Only saturation and
+ * value are adjusted: this rescues dark or muddy palettes without over-saturating vivid ones,
+ * and leaves genuinely monochrome artwork looking monochrome.
+ */
+private fun glowTone(color: Color): Color {
+    val hsv = FloatArray(3)
+    android.graphics.Color.colorToHSV(color.toArgb(), hsv)
+    if (hsv[1] > GlowAchromaticThreshold) {
+        hsv[1] = hsv[1].coerceIn(GlowMinSaturation, GlowMaxSaturation)
+    }
+    hsv[2] = hsv[2].coerceAtLeast(GlowMinValue)
+    return Color(android.graphics.Color.HSVToColor(hsv))
+}
 
 @Composable
 private fun FrostSoulDynamicBackground(
@@ -2163,19 +2221,57 @@ private fun FrostSoulDynamicBackground(
         }
     }
 
-    var breath = 0.35f
+    // The three glow waves are kept as State objects rather than unwrapped floats. Reading them
+    // inside the draw lambda (instead of during composition) keeps the animation on the draw
+    // phase only: no recomposition and no brush reallocation per frame.
+    // Constant states for the non-animated path. mutableStateOf (not mutableFloatStateOf) is used
+    // deliberately: these are read as State<Float>, and the float-specialized type would trigger
+    // Compose's autoboxing lint on every .value read for no benefit on a never-changing value.
+    val staticBreath = remember { mutableStateOf(0.55f) }
+    val staticDrift = remember { mutableStateOf(0.5f) }
+    val staticCore = remember { mutableStateOf(0.5f) }
+    val breathState: State<Float>
+    val driftState: State<Float>
+    val coreState: State<Float>
     if (isAnimatedGlow) {
-        val transition = rememberInfiniteTransition(label = "vinyl-wash-breath")
-        val animatedBreath by transition.animateFloat(
+        val transition = rememberInfiniteTransition(label = "vinyl-wash")
+        // Intensity breath: the dominant "is it alive" cue. Reverse mode doubles the period,
+        // giving a ~7.0s peak-to-peak cadence.
+        breathState = transition.animateFloat(
             initialValue = 0f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
-                animation = tween(GlowCycleDurationMs, easing = FastOutSlowInEasing),
+                animation = tween(GlowBreathDurationMs, easing = FastOutSlowInEasing),
                 repeatMode = RepeatMode.Reverse,
             ),
             label = "vinyl-wash-intensity",
         )
-        breath = animatedBreath
+        // Lateral drift: slides the two color lobes across the band so the hotspot travels,
+        // matching the reference wash instead of pulsing in place.
+        driftState = transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(GlowDriftDurationMs, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "vinyl-wash-drift",
+        )
+        // Core bloom on a co-prime period so peaks rarely coincide with the breath.
+        coreState = transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(GlowCoreDurationMs, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "vinyl-wash-core",
+        )
+    } else {
+        // Static glow: hold the waves mid-travel so it looks like a paused frame of the animation.
+        breathState = staticBreath
+        driftState = staticDrift
+        coreState = staticCore
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
@@ -2212,31 +2308,100 @@ private fun FrostSoulDynamicBackground(
 
         if (isGlow) {
             val bandHeight = (LocalConfiguration.current.screenHeightDp * GlowBandFraction)
-                .dp.coerceIn(220.dp, 360.dp)
+                .dp.coerceIn(260.dp, 420.dp)
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .height(bandHeight)
+                    // Offscreen compositing is required so the vertical DstIn falloff mask only
+                    // erases this band and not the layers painted beneath it.
                     .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                     .drawWithCache {
-                        val wash = Brush.horizontalGradient(
-                            colors = listOf(
-                                palette.artworkSecondary.copy(alpha = 0.56f),
-                                palette.artworkPrimary.copy(alpha = 0.82f),
-                                palette.artworkSecondary.copy(alpha = 0.68f),
-                            ),
-                        )
-                        val mask = Brush.verticalGradient(
+                        // Hue-preserving, brightness-floored tones. Computed once per palette
+                        // (drawWithCache), never per frame.
+                        val primary = glowTone(palette.artworkPrimary)
+                        val secondary = glowTone(palette.artworkSecondary)
+                        // A tint pulled between the two palette tones supplies a third stop so
+                        // the wash reads as a color field rather than a two-color ramp.
+                        val mid = lerp(primary, secondary, 0.5f)
+
+                        // Vertical falloff: transparent at the top, fully opaque at the bottom
+                        // edge. Applied via DstIn so the wash dissolves into the black
+                        // background with no visible seam or banding.
+                        val falloff = Brush.verticalGradient(
                             0f to Color.Transparent,
-                            0.28f to Color.White.copy(alpha = 0.10f),
-                            0.62f to Color.White.copy(alpha = 0.66f),
+                            0.30f to Color.White.copy(alpha = 0.16f),
+                            0.58f to Color.White.copy(alpha = 0.54f),
+                            0.82f to Color.White.copy(alpha = 0.88f),
                             1f to Color.White,
                         )
+
                         onDrawBehind {
-                            val alpha = (0.52f + breath * 0.28f).coerceIn(0f, 0.82f)
-                            drawRect(brush = wash, alpha = alpha)
-                            drawRect(brush = mask, blendMode = BlendMode.DstIn)
+                            val breath = breathState.value
+                            val drift = driftState.value
+                            val core = coreState.value
+
+                            // ---- Layer 1: base color field -------------------------------
+                            // Lobe centers travel in opposite directions so the hotspot sweeps
+                            // laterally. Stops stay monotonic, so no gradient assertion risk.
+                            val sweep = (drift - 0.5f) * 0.34f
+                            val left = (0.28f + sweep).coerceIn(0.06f, 0.46f)
+                            val right = (0.72f + sweep).coerceIn(0.54f, 0.94f)
+                            drawRect(
+                                brush = Brush.horizontalGradient(
+                                    0f to secondary.copy(alpha = 0.42f),
+                                    left to primary.copy(alpha = 0.70f),
+                                    0.5f to mid.copy(alpha = 0.55f),
+                                    right to primary.copy(alpha = 0.64f),
+                                    1f to secondary.copy(alpha = 0.40f),
+                                ),
+                                // Breath modulates a high floor: the wash stays clearly visible
+                                // at its dimmest and blooms toward opaque at its brightest.
+                                alpha = 0.62f + breath * 0.30f,
+                            )
+
+                            // ---- Layer 2: additive bloom ---------------------------------
+                            // BlendMode.Plus emulates a light source, producing real perceived
+                            // brightness. This replaces the old blur-based bloom entirely:
+                            // gradients are rasterized by the GPU in one pass, whereas
+                            // Modifier.blur forces an offscreen render-target sample per frame.
+                            val hotspot = 0.5f + (drift - 0.5f) * 0.46f
+                            drawRect(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        primary.copy(alpha = 0.16f + core * 0.16f),
+                                        mid.copy(alpha = 0.06f + core * 0.08f),
+                                        Color.Transparent,
+                                    ),
+                                    center = Offset(size.width * hotspot, size.height * 1.02f),
+                                    radius = size.width * (0.62f + core * 0.16f),
+                                ),
+                                blendMode = BlendMode.Plus,
+                            )
+
+                            // ---- Layer 3: bottom-edge hot line ---------------------------
+                            // A thin, near-white band along the very bottom edge. This is the
+                            // single biggest visibility win: it gives the wash a defined
+                            // light-emitting source instead of a flat tinted rectangle.
+                            // A full-size rect is safe here: the gradient clamps to Transparent
+                            // above startY, so only the bottom 22% is actually lit. This also
+                            // avoids needing the geometry Size type, which is shadowed in this
+                            // file by coil3.size.Size.
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        primary.copy(alpha = 0.10f + breath * 0.12f),
+                                    ),
+                                    startY = size.height * 0.78f,
+                                    endY = size.height,
+                                ),
+                                blendMode = BlendMode.Plus,
+                            )
+
+                            // ---- Layer 4: vertical falloff mask --------------------------
+                            drawRect(brush = falloff, blendMode = BlendMode.DstIn)
                         }
                     },
             )
