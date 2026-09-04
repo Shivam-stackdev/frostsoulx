@@ -132,6 +132,7 @@ fun AodSlideToExitButton(
 ) {
     val haptic = LocalHapticFeedback.current
     var slideOffsetPx by remember { mutableFloatStateOf(0f) }
+    // Reference pill: approximately 740x90 px on a 1080x2400 screenshot at 3x density.
     val maxSlidePx = 300f
     val animatedSlideOffset by animateFloatAsState(
         targetValue = slideOffsetPx,
@@ -141,9 +142,9 @@ fun AodSlideToExitButton(
 
     Box(
         modifier = modifier
-            .width(260.dp)
-            .height(50.dp)
-            .clip(RoundedCornerShape(25.dp))
+            .width(247.dp)
+            .height(30.dp)
+            .clip(RoundedCornerShape(15.dp))
             .background(Color.White.copy(alpha = 0.12f))
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
@@ -172,8 +173,8 @@ fun AodSlideToExitButton(
         Box(
             modifier = Modifier
                 .offset { IntOffset(animatedSlideOffset.roundToInt(), 0) }
-                .padding(3.dp)
-                .size(44.dp)
+                .padding(2.dp)
+                .size(24.dp)
                 .clip(CircleShape)
                 .background(accentColor),
             contentAlignment = Alignment.Center,
@@ -181,7 +182,7 @@ fun AodSlideToExitButton(
             Text(
                 text = ">",
                 color = Color.Black,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
             )
         }
     }

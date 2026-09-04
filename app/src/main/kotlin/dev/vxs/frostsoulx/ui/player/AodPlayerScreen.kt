@@ -185,7 +185,8 @@ fun AodPlayerScreen(
     // AOD is intentionally a single, stable QQ-style surface. The former customization
     // settings are no longer read, so stale preferences cannot change its layout.
     val thumbnailShapeType = AodThumbnailShape.ROUNDED
-    val thumbnailSize = 300f
+    // Reference calibration at 1080x2400: artwork width ≈916 px / 3 = 305.3 dp.
+    val thumbnailSize = 306f
     val thumbnailShapeRotation = 0
     val showThumbnail = true
     val showArtist = true
@@ -570,7 +571,7 @@ fun AodPlayerScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .size(300.dp)
+                        .size(thumbnailSize.dp)
                         .align(Alignment.CenterHorizontally)
                         .clip(RoundedCornerShape(2.dp)),
                 ) {
@@ -686,7 +687,7 @@ private fun AodReferenceControls(
     val outline = Color.White.copy(alpha = 0.78f)
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -711,12 +712,15 @@ private fun AodReferenceControls(
                 onClick = onSkipNext,
                 enabled = canSkipNext,
             )
-            IconButton(onClick = onToggleLike, modifier = Modifier.size(58.dp)) {
+            IconButton(
+                onClick = onToggleLike,
+                modifier = Modifier.size(48.dp),
+            ) {
                 Icon(
                     painter = painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
                     contentDescription = null,
                     tint = if (isLiked) Color(0xFFFF7180) else outline,
-                    modifier = Modifier.size(30.dp),
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
@@ -755,14 +759,14 @@ private fun AodOutlinedIconButton(
         onClick = onClick,
         enabled = enabled,
         modifier = Modifier
-            .size(if (emphasized) 78.dp else 58.dp)
+            .size(if (emphasized) 57.dp else 46.dp)
             .border(1.5.dp, tint.copy(alpha = if (enabled) 0.9f else 0.35f), CircleShape),
     ) {
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
             tint = tint,
-            modifier = Modifier.size(if (emphasized) 30.dp else 26.dp),
+            modifier = Modifier.size(if (emphasized) 24.dp else 21.dp),
         )
     }
 }
@@ -773,12 +777,12 @@ private fun AodUtilityIconButton(
     tint: Color,
     onClick: () -> Unit,
 ) {
-    IconButton(onClick = onClick, modifier = Modifier.size(54.dp)) {
+    IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) {
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
             tint = tint,
-            modifier = Modifier.size(27.dp),
+            modifier = Modifier.size(24.dp),
         )
     }
 }
