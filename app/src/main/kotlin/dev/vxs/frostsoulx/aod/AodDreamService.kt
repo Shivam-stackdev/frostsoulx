@@ -41,6 +41,7 @@ import dev.vxs.frostsoulx.R
 import dev.vxs.frostsoulx.db.MusicDatabase
 import dev.vxs.frostsoulx.db.entities.LyricsEntity
 import dev.vxs.frostsoulx.extensions.togglePlayPause
+import dev.vxs.frostsoulx.extensions.toggleRepeatMode
 import dev.vxs.frostsoulx.models.MediaMetadata
 import dev.vxs.frostsoulx.playback.MusicService
 import dev.vxs.frostsoulx.playback.PlayerConnection
