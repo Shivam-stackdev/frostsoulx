@@ -100,8 +100,12 @@ class AodDreamService : DreamService(), LifecycleOwner, SavedStateRegistryOwner 
                     val conn = playerConnection
                     val fallbackMetadata = remember { MutableStateFlow<MediaMetadata?>(null) }
                     val fallbackPlaying = remember { MutableStateFlow(false) }
+                    val fallbackShuffle = remember { MutableStateFlow(false) }
+                    val fallbackRepeat = remember { MutableStateFlow(0) }
                     val mediaMetadata by (conn?.mediaMetadata ?: fallbackMetadata).collectAsStateWithLifecycle()
                     val isPlaying by (conn?.isPlaying ?: fallbackPlaying).collectAsStateWithLifecycle()
+                    val shuffleEnabled by (conn?.shuffleModeEnabled ?: fallbackShuffle).collectAsStateWithLifecycle()
+                    val repeatMode by (conn?.repeatMode ?: fallbackRepeat).collectAsStateWithLifecycle()
 
                     var currentPos by remember { mutableLongStateOf(0L) }
                     var songDuration by remember { mutableLongStateOf(0L) }
@@ -154,6 +158,19 @@ class AodDreamService : DreamService(), LifecycleOwner, SavedStateRegistryOwner 
                         },
                         onExit = { finish() },
                         lyricsText = currentLyricsEntity?.lyrics,
+                        isLiked = metadata.liked,
+                        shuffleEnabled = shuffleEnabled,
+                        repeatMode = repeatMode,
+                        onToggleLike = { conn?.toggleLike() },
+                        onToggleShuffle = {
+                            conn?.player?.let { player ->
+                                player.shuffleModeEnabled = !player.shuffleModeEnabled
+                            }
+                        },
+                        onToggleRepeat = { conn?.player?.toggleRepeatMode() },
+                        // A dream cannot host the full queue screen; leave AOD cleanly when
+                        // the queue affordance is pressed rather than making it a dead button.
+                        onOpenQueue = { finish() },
                     )
                 }
             }
