@@ -2158,31 +2158,21 @@ private object GlowConstraints {
     const val PeakAlpha = 0.95f
 
     /**
-     * Horizontal drift of the hue field, as a fraction of width. Measured by tracking the
-     * warm-minus-cool centroid of the bottom rows: it swings ~±0.06w, but because the field now
-     * has real lobes (see [GlowHueStopAlphas]) the *local* brightness swing that produces is
-     * large — the reference's left edge goes from lum≈52 to lum≈110 within one cycle.
-     */
-    const val DriftFraction = 0.14f
-
-    /**
-     * The hue field is painted wider than the band by this fraction on each side. It is strictly
-     * greater than [DriftFraction], which is what guarantees drift can never pull an unpainted
-     * edge into view — the wash stays edgeless at every phase.
+     * The hue field is painted slightly wider than the band on each side so its soft edge never
+     * becomes visible; the wash remains edgeless while its luminance breathes in place.
      */
     const val BleedFraction = 0.18f
 
     /**
-     * Brightness breathing. The reference's mean bottom luminance swings ~±10% around its
-     * average (78 → 96 on a 0–255 scale), clearly visible on top of the drift.
+     * Breathing intensity. The reference's mean bottom luminance swings ~±10% around its average,
+     * clearly visible as a slow color wash rather than a traveling gradient.
      */
     const val BreathFraction = 0.10f
 
     /**
-     * One full drift cycle. Re-measured across a clean 19s window of the reference recording
+     * One full breathing cycle. Re-measured across a clean 19s window of the reference recording
      * (corner-patch luminance peak-to-peak and trough-to-trough): consistent ~5.3–5.5s, not the
-     * earlier 6.0s estimate. Brightness peaks lead the drift by ~84°, reproduced by taking
-     * sin/cos of the same phase.
+     * earlier 6.0s estimate. The same phase drives the soft luminance expansion and contraction.
      */
     const val CycleDurationMs = 5_400
 
@@ -2223,18 +2213,18 @@ private fun Color.toGlowHue(): Color {
     return Color(ColorUtils.HSLToColor(hsl))
 }
 
-/**
- * Horizontal stop positions and coverages of the measured hue field.
+    /**
+     * Horizontal stop positions and coverages of the measured hue field. The field is intentionally
+     * stationary; the animation breathes its luminance in place instead of sliding the colors from
+     * left to right.
+     *
+     * The reference profile is two soft lobes on one continuous ramp: the primary hue peaks at
+     * x≈0.24, a dim crossover sits at x≈0.46, the secondary hue peaks at x≈0.66, and both ends decay
+     * toward the screen edges. No discrete shapes, just a ramp.
  *
- * The reference profile is two soft lobes on one continuous ramp: the primary hue peaks at
- * x≈0.24, a dim crossover sits at x≈0.46, the secondary hue peaks at x≈0.66, and both ends decay
- * toward the screen edges. No discrete shapes, just a ramp.
- *
- * The coverages are deliberately *not* flat. The previous 0.72–0.86 range produced a uniform
- * tint, so sliding it sideways changed nothing on screen. Two pronounced lobes with dim troughs
- * between and outside them are what make the drift and breath legible as moving light: with
- * these stops a simulated cycle swings the left-edge luminance by ≈50–60 (0–255), matching the
- * ≈58 swing measured in the reference recording.
+     * The coverages are deliberately *not* flat. The previous 0.72–0.86 range produced a uniform
+     * tint. Two pronounced lobes with dim troughs between and outside them preserve the artwork
+     * color separation while the whole lower wash breathes through its luminance.
  */
 private val GlowHueStopPositions = floatArrayOf(0f, 0.10f, 0.24f, 0.46f, 0.66f, 0.84f, 1f)
 private val GlowHueStopAlphas = floatArrayOf(0.14f, 0.36f, 1.00f, 0.34f, 0.98f, 0.36f, 0.14f)
@@ -2475,17 +2465,16 @@ private fun FrostSoulDynamicBackground(
                         val verticalMask = Brush.verticalGradient(colorStops = maskStops)
 
                         onDrawBehind {
-                            // One phase drives both axes. sin() moves the hue field horizontally;
-                            // cos() breathes its brightness — a 90° lead that reproduces the
-                            // measured offset between the reference's drift and luminance peaks.
-                            // Static glow leaves the phase at 0, i.e. no drift and full breath.
+                            // Keep the artwork colors anchored in the lower band. The reference
+                            // reads as a color wash that expands and contracts through luminance,
+                            // not as a colored strip travelling horizontally across the player.
+                            // The same low-frequency phase is used for a smooth, continuous breath.
                             val phase = (glowBreath?.value ?: 0f) * GlowTwoPi
-                            val drift = sin(phase) * bandWidth * GlowConstraints.DriftFraction
                             // Kept strictly <= 1 so the bright half of the cycle is never clipped:
-                            // the swing is applied *below* full strength instead of above it.
+                            // the wash breathes below full strength instead of flashing brighter.
                             val breath =
                                 1f - GlowConstraints.BreathFraction +
-                                    cos(phase) * GlowConstraints.BreathFraction
+                                    sin(phase) * GlowConstraints.BreathFraction
 
                             // Default SrcOver, deliberately: this draw lands in the offscreen
                             // buffer above, where every additive/lightening blend mode would have
@@ -2493,17 +2482,15 @@ private fun FrostSoulDynamicBackground(
                             // silently looks like flat blur. The wash is instead composited once,
                             // as a whole, by the layer itself. The measured reference pixels match
                             // this SrcOver result at the alphas encoded in GlowHueStopAlphas.
-                            translate(left = drift) {
-                                drawRect(
-                                    brush = hueField,
-                                    topLeft = Offset(-bleed, 0f),
-                                    // Built from the draw size rather than importing
-                                    // geometry.Size, which would clash with coil3.size.Size
-                                    // already imported in this file.
-                                    size = size.copy(width = fieldWidth),
-                                    alpha = breath.coerceIn(0f, 1f),
-                                )
-                            }
+                            drawRect(
+                                brush = hueField,
+                                topLeft = Offset(-bleed, 0f),
+                                // Built from the draw size rather than importing
+                                // geometry.Size, which would clash with coil3.size.Size
+                                // already imported in this file.
+                                size = size.copy(width = fieldWidth),
+                                alpha = breath.coerceIn(0f, 1f),
+                            )
                             // Applied last, so it carves the eased falloff out of whatever the
                             // wash just painted. The parent's offscreen layer bounds this erase.
                             drawRect(brush = verticalMask, blendMode = BlendMode.DstIn)
