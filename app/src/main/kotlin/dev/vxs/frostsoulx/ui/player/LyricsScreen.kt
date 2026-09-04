@@ -65,7 +65,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -565,13 +564,13 @@ private fun AppleMusicBackground(
     modifier: Modifier = Modifier,
 ) {
     val colors = if (gradientColors.isNotEmpty()) gradientColors else AppleMusicFallbackGradient
-    val backgroundBrush =
-        remember(colors) {
+    val neutralBackgroundBrush =
+        remember {
             Brush.verticalGradient(
                 listOf(
-                    colors.getOrElse(0) { AppleMusicFallbackGradient[0] }.copy(alpha = 0.88f),
-                    colors.getOrElse(1) { AppleMusicFallbackGradient[1] }.copy(alpha = 0.76f),
-                    colors.getOrElse(2) { AppleMusicFallbackGradient[2] }.copy(alpha = 0.96f),
+                    Color(0xFF1B1B1B),
+                    Color(0xFF151515),
+                    Color.Black,
                 ),
             )
         }
@@ -604,8 +603,7 @@ private fun AppleMusicBackground(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .blur(46.dp)
-                            .alpha(0.62f),
+                            .alpha(0.08f),
                 )
             }
         }
@@ -613,7 +611,7 @@ private fun AppleMusicBackground(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(backgroundBrush),
+                    .background(neutralBackgroundBrush),
         )
         Box(
             modifier =
@@ -623,7 +621,11 @@ private fun AppleMusicBackground(
         )
         BottomColorWash(
             colors = colors,
-            modifier = Modifier.fillMaxSize(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.36f)
+                    .align(Alignment.BottomCenter),
         )
         Box(
             modifier =
@@ -662,12 +664,12 @@ private fun BottomColorWash(
     val center = colors.getOrElse(1) { AppleMusicFallbackGradient[1] }
     val right = colors.getOrElse(2) { AppleMusicFallbackGradient[2] }
 
-    Canvas(modifier = modifier.alpha(0.92f)) {
+    Canvas(modifier = modifier.alpha(0.9f)) {
         val bottom = size.height
-        val baseRadius = size.width * (0.48f + breath * 0.08f)
-        val verticalCenter = bottom * (0.99f + breath * 0.015f)
-        val horizontalDrift = size.width * 0.12f * drift
-        val glowAlpha = 0.24f + breath * 0.12f
+        val baseRadius = size.width * (0.52f + breath * 0.08f)
+        val verticalCenter = bottom * (1.12f + breath * 0.03f)
+        val horizontalDrift = size.width * 0.1f * drift
+        val glowAlpha = 0.06f + breath * 0.12f
 
         drawCircle(
             brush = Brush.radialGradient(
