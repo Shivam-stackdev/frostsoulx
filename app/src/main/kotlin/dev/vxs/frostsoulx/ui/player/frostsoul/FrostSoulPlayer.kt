@@ -2179,10 +2179,12 @@ private object GlowConstraints {
     const val BreathFraction = 0.10f
 
     /**
-     * One full drift cycle. Reference luminance peaks land ~5.5–6.0 s apart; brightness peaks
-     * lead the drift by ~84°, which is reproduced by taking sin/cos of the same phase.
+     * One full drift cycle. Re-measured across a clean 19s window of the reference recording
+     * (corner-patch luminance peak-to-peak and trough-to-trough): consistent ~5.3–5.5s, not the
+     * earlier 6.0s estimate. Brightness peaks lead the drift by ~84°, reproduced by taking
+     * sin/cos of the same phase.
      */
-    const val CycleDurationMs = 6_000
+    const val CycleDurationMs = 5_400
 
     /**
      * Lightness / saturation window (HSL) that every palette hue is pushed into before it is

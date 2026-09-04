@@ -226,7 +226,7 @@ fun LyricsV2(
             )
         }
     val lyricsFontFamily = rememberArchiveTuneLyricsFontFamily()
-    val playerBackground by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.DEFAULT)
+    val playerBackground by rememberEnumPreference(PlayerBackgroundStyleKey, PlayerBackgroundStyle.GLOW_ANIMATED)
 
     // ── Text colour derived from background style ──
     val textColor =
