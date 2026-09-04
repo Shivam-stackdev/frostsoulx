@@ -77,6 +77,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
@@ -91,6 +92,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -2112,7 +2114,6 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 private const val PaletteCacheCapacity = 24
 
 /**
-/**
  * Pixel size for the low-contrast ambient artwork layer. Keeping this small avoids decoding a
  * full-resolution album image behind the player controls.
  */
@@ -2129,7 +2130,6 @@ private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
         PlayerBackgroundStyle.BLUR_GRADIENT,
     )
 
-private const val AmbientArtworkSampleSize = 192
 private const val GlowBandFraction = 0.29f
 private const val GlowCycleDurationMs = 5_600
 
