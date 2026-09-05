@@ -7,6 +7,23 @@
 
 package dev.vxs.frostsoulx.ui.screens
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import dev.vxs.frostsoulx.lyrics.LyricsUtils
+import dev.vxs.frostsoulx.db.entities.LyricsEntity
+import dev.vxs.frostsoulx.ui.menu.SongMenu
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -135,22 +152,27 @@ internal fun FrostSoulHomeFeed(
         navController.currentBackStackEntry?.savedStateHandle?.set("openSearch", true)
     }
     val pageSections = uiState.homePage?.sections.orEmpty()
+    var category by rememberSaveable { mutableStateOf<String?>(null) }
 
     LazyColumn(
         state = lazyListState,
         contentPadding =
             PaddingValues(
-                top = 8.dp,
+                top = 4.dp,
                 bottom = LocalPlayerAwareWindowInsets.current.asPaddingValues().calculateBottomPadding() + MiniPlayerHeight + 108.dp,
             ),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.fillMaxSize().frostSoulScreenBackground(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.fillMaxSize().background(Brush.verticalGradient(
+            0f to Color(0xFF131723), 0.16f to Color(0xFF211A25),
+            0.30f to Color(0xFF07090D), 1f to Color(0xFF07090D),
+        )).statusBarsPadding(),
     ) {
         item(key = "frostsoul_home_header") {
             FrostSoulHomeHeader(
                 userName = greetingName,
                 currentSong = mediaMetadata,
-                onOpenRecent = { navController.navigate("history") },
+                onOpenRecent = { navController.navigate(Screens.Settings.route) },
+                onSearch = openSearchPortal,
             )
         }
 
@@ -158,22 +180,26 @@ internal fun FrostSoulHomeFeed(
             FrostSoulQuickSearch(onOpenSearch = { openSearchPortal() })
         }
 
-        uiState.homePage?.chips.orEmpty().takeIf { it.isNotEmpty() }?.let { sourceChips ->
-            val categoryLabels = listOf("For You", "Quick Picks", "Albums", "Artists", "Discover")
-            val displayChips = sourceChips.take(categoryLabels.size).mapIndexed { index, chip ->
-                chip.copy(title = categoryLabels[index])
-            }
-            item(key = "frostsoul_home_tabs") {
-                FrostSoulHomeTabs(
-                    chips = displayChips,
-                    selectedChip = displayChips.firstOrNull { display ->
-                        display.endpoint == uiState.selectedChip?.endpoint
-                    },
-                    onChipSelected = { displayChip ->
-                        val sourceChip = sourceChips.firstOrNull { it.endpoint == displayChip.endpoint }
-                        onAction(HomeAction.SelectChip(sourceChip))
-                    },
-                )
+        item(key = "frostsoul_home_tabs") {
+            // These are real destinations, not arbitrary server chips relabelled by index.
+            LazyRow(contentPadding = FrostSoulShelfItemPadding, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(listOf("For You", "Quick Picks", "Albums", "Artists", "Genres")) { label ->
+                    val selected = label == (category ?: "For You")
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.heightIn(min = 48.dp)
+                        .clickable {
+                            when (label) {
+                                "For You" -> { category = null; onAction(HomeAction.SelectChip(null)) }
+                                "Genres" -> navController.navigate(Screens.MoodAndGenres.route)
+                                else -> category = label
+                            }
+                        }) {
+                        Text(label, color = if (selected) Color.Black else Color(0xFFB8B5C6), fontSize = 11.sp,
+                            modifier = Modifier.clip(CircleShape)
+                                .background(if (selected) Color.White else Color.White.copy(alpha = 0.04f))
+                                .border(1.dp, Color.White.copy(alpha = 0.13f), CircleShape)
+                                .padding(horizontal = 15.dp, vertical = 7.dp))
+                    }
+                }
             }
         }
 
@@ -182,9 +208,9 @@ internal fun FrostSoulHomeFeed(
                 track = mediaMetadata,
                 isPlaying = isPlaying,
                 onQuickSearch = { openSearchPortal() },
-                onPlayPause = { playerConnection.player.togglePlayPause() },
-                positionMs = playerConnection.player.currentPosition,
-                durationMs = playerConnection.player.duration,
+                playerConnection = playerConnection,
+                navController = navController,
+                menuState = menuState,
             )
         }
 
@@ -224,13 +250,6 @@ internal fun FrostSoulHomeFeed(
                     playerConnection = playerConnection,
                     badge = null,
                     spotlight = false,
-                )
-            }
-            item(key = "frostsoul_recommendation_list") {
-                FrostSoulRecommendationList(
-                    songs = uiState.quickPicks.take(5),
-                    mediaMetadata = mediaMetadata,
-                    playerConnection = playerConnection,
                 )
             }
         }
@@ -401,6 +420,34 @@ internal fun FrostSoulHomeFeed(
         }
     }
 
+    category?.let { selected ->
+        val categoryItems: List<LocalItem> = when (selected) {
+            "Quick Picks" -> uiState.quickPicks
+            "Albums" -> albums
+            else -> artists
+        }
+        AlertDialog(
+            onDismissRequest = { category = null },
+            title = { Text(selected, color = Color.White, fontSize = 22.sp) },
+            containerColor = Color(0xFF161920),
+            text = {
+                LazyColumn(Modifier.heightIn(max = 420.dp)) {
+                    if (categoryItems.isEmpty()) item {
+                        Text("No ${selected.lowercase()} yet. Explore music to build your collection.", color = Color.LightGray)
+                    }
+                    items(categoryItems, key = { "${it::class.simpleName}_${it.id}" }) { item ->
+                        PremiumListRow(title = item.title, subtitle = item.frostSoulSubtitle(),
+                            artworkUrl = item.frostSoulArtwork(), onClick = {
+                                category = null
+                                item.openFromFrostSoul(playerConnection, navController)
+                            })
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { category = null }) { Text("Close", color = Color.White) } },
+        )
+    }
+
     if (showGreetingNameDialog) {
         Dialog(
             onDismissRequest = {
@@ -468,19 +515,23 @@ private fun FrostSoulBannerCarousel(
     playerConnection: PlayerConnection,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        val cardWidth = (maxWidth - 48.dp).coerceAtLeast(280.dp)
-        val cardHeight = 190.dp
+        val cardWidth = (maxWidth - 32.dp).coerceAtLeast(240.dp)
+        val cardHeight = 120.dp
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FSSectionHeader(title = "Featured for you")
+            FSSectionHeader(title = "Featured for you", actionLabel = "Play all", onAction = {
+                playerConnection.playQueue(ListQueue(items = songs.map { it.toMediaItem() }))
+            })
+            Text("Because you love soulful melodies", color = Color(0xFFAAA7B5), fontSize = 10.sp,
+                modifier = Modifier.padding(horizontal = 16.dp))
             LazyRow(
-                contentPadding = PaddingValues(horizontal = 24.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.height(cardHeight),
             ) {
                 items(songs, key = { "banner_${it.id}" }) { song ->
                     PremiumCard(
                         modifier = Modifier.width(cardWidth).fillMaxHeight(),
-                        shape = RoundedCornerShape(28.dp),
+                        shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(0.dp),
                         onClick = {
                             if (song.id == mediaMetadata?.id) playerConnection.player.togglePlayPause()
@@ -492,7 +543,7 @@ private fun FrostSoulBannerCarousel(
                                 model = song.song.thumbnailUrl,
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize().blur(18.dp).alpha(0.72f),
+                                modifier = Modifier.fillMaxSize(),
                             )
                             Box(
                                 modifier = Modifier.fillMaxSize().background(
@@ -509,22 +560,24 @@ private fun FrostSoulBannerCarousel(
                                     .background(
                                         Brush.linearGradient(
                                             colors = listOf(
+                                                Color.Black.copy(alpha = 0.72f),
                                                 Color.Transparent,
-                                                FrostSoulTheme.colors.background.copy(alpha = 0.78f),
                                             ),
                                         ),
                                     ),
                             )
                             Column(
                                 verticalArrangement = Arrangement.Bottom,
-                                modifier = Modifier.fillMaxSize().padding(18.dp),
+                                modifier = Modifier.fillMaxSize().padding(14.dp),
                             ) {
+                                Text("FEATURED", color = Color.White.copy(alpha = 0.8f), fontSize = 7.sp)
                                 Text(
                                     text = song.title,
+                                    style = FrostSoulTheme.typography.display.copy(fontFamily = FontFamily.Serif),
                                     color = Color.White,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    maxLines = 2,
+                                    maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                                 Text(
@@ -533,8 +586,11 @@ private fun FrostSoulBannerCarousel(
                                     fontSize = 14.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.padding(top = 4.dp),
+                                    modifier = Modifier.padding(top = 2.dp),
                                 )
+                                Text("Play now", color = Color.White, fontSize = 10.sp,
+                                    modifier = Modifier.padding(top = 6.dp).border(1.dp, Color.White.copy(alpha = 0.5f), CircleShape)
+                                        .padding(horizontal = 12.dp, vertical = 4.dp))
                             }
                             FSIconButton(
                                 onClick = {
@@ -692,10 +748,16 @@ private fun FrostSoulRecommendationList(
 
 @Composable
 private fun FrostSoulQuickSearch(onOpenSearch: () -> Unit) {
-    PremiumSearchBar(
-        onClick = onOpenSearch,
-        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page, vertical = FrostSoulTheme.spacing.small),
-    )
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().height(48.dp)
+            .clip(CircleShape).background(Color.White.copy(alpha = 0.06f))
+            .border(1.dp, Color.White.copy(alpha = 0.13f), CircleShape)
+            .clickable(onClickLabel = "Search music", onClick = onOpenSearch).padding(horizontal = 16.dp)) {
+        FSIcon(painterResource(R.drawable.search), null, tint = Color(0xFFBAB6CC), modifier = Modifier.size(18.dp))
+        Text("Search songs, albums, artists...", color = Color(0xFFBAB6CC), fontSize = 11.sp,
+            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        FSIcon(painterResource(R.drawable.equalizer), null, tint = Color.White, modifier = Modifier.size(18.dp))
+    }
 }
 
 @Composable
@@ -703,50 +765,47 @@ private fun FrostSoulHomeHeader(
     userName: String?,
     currentSong: MediaMetadata?,
     onOpenRecent: () -> Unit,
+    onSearch: () -> Unit,
 ) {
-    val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
-    val timeOfDay =
-        when (hour) {
-            in 5..11 -> "Good Morning"
-            in 12..16 -> "Good Afternoon"
-            in 17..21 -> "Good Evening"
-            else -> "Good Night"
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    var hour by remember { mutableStateOf(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) }
+    LaunchedEffect(lifecycle) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) { hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY); delay(60_000) }
         }
-        PremiumTopBar(
-
-        title = timeOfDay,
-        subtitle = userName?.let { "$it ${moodEmoji(currentSong)}" },
-        eyebrow = "FROSTSOUL",
-        modifier = Modifier.padding(top = 10.dp),
-        trailingContent = {
-            FSIconButton(
-                onClick = onOpenRecent,
-                contentDescription = "Recently played",
-                modifier = Modifier.size(44.dp),
-            ) {
-                FSIcon(
-                    painter = painterResource(R.drawable.history),
-                    contentDescription = null,
-                    tint = FrostSoulTheme.colors.onSurface,
-                )
+    }
+    val greeting = when (hour) {
+        in 5..11 -> "Good Morning"
+        in 12..16 -> "Good Afternoon"
+        in 17..21 -> "Good Evening"
+        else -> "Good Night"
+    }
+    Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 10.dp), verticalAlignment = Alignment.Top) {
+        Column(Modifier.weight(1f)) {
+            Text("F R O S T S O U L", color = Color.White, fontSize = 9.sp, letterSpacing = 2.sp)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(greeting, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.SemiBold,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                Canvas(Modifier.size(22.dp)) {
+                    drawCircle(Color(0xFFFBE4B4))
+                    drawCircle(Color(0xFF171925), radius = size.width * 0.46f,
+                        center = Offset(size.width * 0.32f, size.height * 0.28f))
+                }
             }
-        },
-    )
-}
-
-private fun moodEmoji(currentSong: MediaMetadata?): String {
-    val text = buildString {
-        append(currentSong?.title.orEmpty())
-        append(' ')
-        append(currentSong?.artists?.joinToString(" ") { it.name }.orEmpty())
-    }.lowercase()
-    return when {
-        text.contains(Regex("love|romance|heart|ishq|pyaar|mohabbat")) -> "💖"
-        text.contains(Regex("sad|alone|cry|broken|dard|udaas|tanha")) -> "💙"
-        text.contains(Regex("party|dance|club|celebration|nach")) -> "🕺"
-        text.contains(Regex("chill|calm|relax|lofi|sleep")) -> "🌙"
-        text.contains(Regex("devotion|bhajan|prayer|allah|ram|krishna")) -> "🙏"
-        else -> "🎶"
+            Text(userName?.let { "$it, music feels better with you here." } ?: "Music feels better with you here.",
+                color = Color(0xFFA8A4B5), fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        FSIconButton(onClick = onSearch, contentDescription = "Search", modifier = Modifier.size(48.dp)) {
+            FSIcon(painterResource(R.drawable.search), null, tint = Color.White, modifier = Modifier.size(18.dp))
+        }
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.size(48.dp).clickable(onClickLabel = "Settings", onClick = onOpenRecent)) {
+            Box(Modifier.size(34.dp).clip(CircleShape).background(Color(0xFF1E334F))
+                .border(1.dp, Color(0xFF516487), CircleShape), contentAlignment = Alignment.Center) {
+                if (currentSong?.thumbnailUrl != null) AsyncImage(currentSong.thumbnailUrl, null,
+                    contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                else FSIcon(painterResource(R.drawable.person), null, tint = Color(0xFFB9CDEC), modifier = Modifier.size(22.dp))
+            }
+        }
     }
 }
 
@@ -772,23 +831,66 @@ private fun FrostSoulHomeTabs(
 private fun FrostSoulHomeHero(
     track: MediaMetadata?,
     isPlaying: Boolean,
-    positionMs: Long,
-    durationMs: Long,
     onQuickSearch: () -> Unit,
-    onPlayPause: () -> Unit,
+    playerConnection: PlayerConnection,
+    navController: NavController,
+    menuState: MenuState,
 ) {
-    val progress = if (durationMs > 0L) (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f) else 0f
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    var positionMs by remember(track?.id) { mutableLongStateOf(0L) }
+    var durationMs by remember(track?.id) { mutableLongStateOf(0L) }
+    val song by playerConnection.currentSong.collectAsStateWithLifecycle(initialValue = null)
+    val lyrics by playerConnection.currentLyrics.collectAsStateWithLifecycle(initialValue = null)
+    val shuffle by playerConnection.shuffleModeEnabled.collectAsStateWithLifecycle()
+    val previous by playerConnection.canSkipPrevious.collectAsStateWithLifecycle()
+    val next by playerConnection.canSkipNext.collectAsStateWithLifecycle()
+    var showLyrics by rememberSaveable(track?.id) { mutableStateOf(false) }
+    LaunchedEffect(playerConnection, track?.id, lifecycle) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) {
+                positionMs = playerConnection.player.currentPosition.coerceAtLeast(0L)
+                durationMs = playerConnection.player.duration.coerceAtLeast(0L)
+                delay(500)
+            }
+        }
+    }
+    val progress = if (durationMs > 0L) (positionMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
     PremiumHeroBanner(
         artworkUrl = track?.thumbnailUrl,
         title = track?.title ?: "Nothing playing",
-        subtitle = track?.artists?.joinToString(separator = " • ") { it.name } ?: "Choose a song to begin",
-        modifier = Modifier.padding(horizontal = FrostSoulTheme.spacing.page),
-        isPlaying = isPlaying,
-        progress = progress,
-        positionLabel = positionMs.asFrostSoulTime(),
-        durationLabel = durationMs.asFrostSoulTime(),
-        onPlayPause = if (track != null) onPlayPause else onQuickSearch,
+        subtitle = track?.artists?.joinToString(" • ") { it.name } ?: "Choose a song to begin",
+        modifier = Modifier.padding(horizontal = 16.dp),
+        isPlaying = isPlaying, progress = progress,
+        positionLabel = positionMs.asFrostSoulTime(), durationLabel = durationMs.asFrostSoulTime(),
+        onPlayPause = { if (track == null) onQuickSearch() else playerConnection.player.togglePlayPause() },
+        isLiked = song?.song?.liked == true, shuffleEnabled = shuffle,
+        canSkipPrevious = track != null && previous, canSkipNext = track != null && next,
+        onPrevious = playerConnection::seekToPrevious, onNext = playerConnection::seekToNext,
+        onShuffle = { playerConnection.player.shuffleModeEnabled = !shuffle },
+        onLike = { if (track != null) playerConnection.toggleLike() else onQuickSearch() },
+        onLyrics = if (track != null) ({ showLyrics = true }) else null,
+        onMore = song?.let { current -> { menuState.show { SongMenu(originalSong = current,
+            navController = navController, onDismiss = menuState::dismiss) } } },
     )
+    if (showLyrics) {
+        val lines = remember(lyrics) {
+            lyrics?.lyrics?.takeUnless { it == LyricsEntity.LYRICS_NOT_FOUND }?.let {
+                runCatching { LyricsUtils.parseLyrics(it) }.getOrDefault(emptyList())
+            }.orEmpty()
+        }
+        val activeIndex = LyricsUtils.findCurrentLineIndex(lines, positionMs)
+        AlertDialog(onDismissRequest = { showLyrics = false }, containerColor = Color(0xFF161920),
+            title = { Text(track?.title.orEmpty(), color = Color.White, fontSize = 20.sp) },
+            text = {
+                LazyColumn(Modifier.heightIn(max = 380.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (lines.isEmpty()) item { Text("Lyrics aren't available for this track yet.", color = Color.LightGray) }
+                    items(lines.size) { index -> Text(lines[index].text,
+                        color = if (index == activeIndex) Color(0xFFF7DEAF) else Color.LightGray, fontSize = 16.sp) }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showLyrics = false }) { Text("Close", color = Color.White) } },
+        )
+    }
 }
 
 @Composable
@@ -809,7 +911,7 @@ private fun FrostSoulSongShelf(
                 subtitle = song.artists.joinToString(separator = " • ") { it.name },
                 artworkUrl = song.song.thumbnailUrl,
                 badge = badge,
-                width = if (spotlight) 256.dp else 154.dp,
+                width = if (spotlight) 256.dp else 92.dp,
                 artworkAspectRatio = if (spotlight) 1.28f else 1f,
                 showPlayOverlay = true,
                 onClick = {
@@ -903,8 +1005,9 @@ private fun FrostSoulLocalShelf(
         items(items, key = { item -> "${item::class.simpleName}_${item.id}" }) { item ->
             FSAlbumCard(
                 title = item.title,
-                subtitle = item.frostSoulSubtitle(),
+                subtitle = null,
                 artworkUrl = item.frostSoulArtwork(),
+                width = 88.dp,
                 badge = badge,
                 showPlayOverlay = true,
                 onClick = {
