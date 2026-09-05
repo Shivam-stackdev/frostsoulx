@@ -718,7 +718,7 @@ private fun FrostSoulHomeHeader(
         title = timeOfDay,
         subtitle = userName?.let { "$it ${moodEmoji(currentSong)}" },
         eyebrow = "FROSTSOUL",
-        modifier = Modifier.statusBarsPadding(),
+        modifier = Modifier.padding(top = 10.dp),
         trailingContent = {
             FSIconButton(
                 onClick = onOpenRecent,
