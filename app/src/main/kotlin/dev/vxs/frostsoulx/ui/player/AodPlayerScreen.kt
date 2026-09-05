@@ -717,15 +717,18 @@ private fun AodReferenceControls(
         contentAlignment = Alignment.Center,
     ) {
         val scale = (maxWidth / 450.dp).coerceIn(0.65f, 1f)
-        val canvasWidth = 450.dp * scale
-        val circle = 49.dp * scale
+        val circle = 54.dp * scale
         val sideTouch = 44.dp * scale
         val stroke = 1.8.dp * scale
+        val centerGap = 26.dp * scale
 
-        Box(modifier = Modifier.width(canvasWidth).height(100.dp * scale)) {
+        Box(
+            modifier = Modifier.fillMaxWidth().height(100.dp * scale),
+            contentAlignment = Alignment.Center,
+        ) {
             Row(
                 modifier = Modifier.align(Alignment.Center),
-                horizontalArrangement = Arrangement.spacedBy(29.dp * scale),
+                horizontalArrangement = Arrangement.spacedBy(centerGap),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AodSpecCircleButton(R.drawable.skip_previous, "Previous track", accentColor, onSkipPrevious, canSkipPrevious, circle, stroke, 22.dp * scale)
