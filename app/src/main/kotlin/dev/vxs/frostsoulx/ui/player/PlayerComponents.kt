@@ -2660,7 +2660,7 @@ private fun V8MetadataActions(
             V8ActionButton(
                 iconRes = R.drawable.more_vert,
                 contentDescription = stringResource(R.string.more_options),
-                foreground = foreground,
+                foreground = foreground.copy(alpha = 0.84f),
                 containerColor = foreground.copy(alpha = 0.16f),
                 iconSize = 24.dp,
                 onClick = onMenuClick,
@@ -2668,7 +2668,7 @@ private fun V8MetadataActions(
             V8ActionButton(
                 iconRes = if (liked) R.drawable.favorite else R.drawable.favorite_border,
                 contentDescription = stringResource(R.string.action_like),
-                foreground = foreground,
+                foreground = foreground.copy(alpha = 0.84f),
                 containerColor = foreground.copy(alpha = 0.16f),
                 iconSize = 26.dp,
                 onClick = onToggleLike,
@@ -3439,7 +3439,7 @@ private fun V9Header(
                 iconRes = R.drawable.queue_music,
                 contentDescription = stringResource(R.string.queue),
                 containerColor = containerColor,
-                iconColor = iconColor,
+                iconColor = iconColor.copy(alpha = 0.84f),
                 shape = RoundedCornerShape(22.dp),
                 onClick = onQueueClick,
             )

@@ -771,6 +771,7 @@ internal fun FSPlayerControls(
                 iconSize = 19.dp,
                 showContainer = false,
                 forceWhite = true,
+                tintOverride = Color(0xFFD7DBE0),
             )
         }
     }
@@ -789,14 +790,14 @@ private fun FSDownloadButton(
         normalizedProgress?.let { value ->
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawArc(
-                    color = Color.White.copy(alpha = 0.22f),
+                    color = Color(0xFFD7DBE0).copy(alpha = 0.22f),
                     startAngle = -90f,
                     sweepAngle = 360f,
                     useCenter = false,
                     style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.5.dp.toPx()),
                 )
                 drawArc(
-                    color = Color.White,
+                    color = Color(0xFFD7DBE0),
                     startAngle = -90f,
                     sweepAngle = 360f * value,
                     useCenter = false,
@@ -807,7 +808,7 @@ private fun FSDownloadButton(
         Icon(
             painter = painterResource(if (normalizedProgress == 1f) R.drawable.check else R.drawable.ic_download),
             contentDescription = if (normalizedProgress == null) "Download song" else "Download progress ${((normalizedProgress * 100f).toInt())}%",
-            tint = Color.White,
+            tint = Color(0xFFD7DBE0),
             modifier = Modifier.size(18.dp),
         )
     }
@@ -828,7 +829,7 @@ private fun FSTwoDotButton(
                 modifier = Modifier
                     .size(if (immersive) 7.dp else 5.dp)
                     .background(
-                        if (immersive) Color.White else FrostSoulTheme.colors.onSurface,
+                        if (immersive) Color(0xFFD7DBE0) else FrostSoulTheme.colors.onSurface,
                         androidx.compose.foundation.shape.CircleShape,
                     ),
             )
@@ -1033,9 +1034,9 @@ private fun FrostSoulMainLyricPreview(
             uiState.lyricPreviewLines.drop(1).take(1).forEach { line ->
                 Text(
                     text = line,
-                    color = FrostSoulOnSurfaceMuted.copy(alpha = 0.58f),
-                    fontSize = 14.sp,
-                    lineHeight = 19.sp,
+                    color = FrostSoulOnSurfaceMuted.copy(alpha = 0.82f),
+                    fontSize = 18.sp,
+                    lineHeight = 24.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -1175,13 +1176,18 @@ private fun FrostSoulAlbumPage(
                 uiState = uiState,
                 onlyCurrentLine = true,
                 horizontalPadding = 0.dp,
-                modifier = Modifier.align(Alignment.Start).padding(bottom = 28.dp),
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(bottom = 28.dp)
+                    .graphicsLayer { translationY = -12.dp.toPx() },
             )
             FSPlayerControls(
                     state = uiState,
                     actions = actions,
                     onOpenQueue = onOpenQueue,
-                    modifier = Modifier.padding(top = 2.dp),
+                    modifier = Modifier
+                        .padding(top = 2.dp)
+                        .graphicsLayer { translationY = -12.dp.toPx() },
                     immersive = true,
                     onSeekDraggingChanged = onSeekDraggingChanged,
             )
@@ -1315,8 +1321,10 @@ private fun FrostSoulArtworkBlurAlbumPage(
             FrostSoulMainLyricPreview(
                 uiState = uiState,
                 showExtraPreviewLines = true,
-                maxLinesPerLyric = 1,
-                modifier = Modifier.heightIn(min = 60.dp),
+                maxLinesPerLyric = 2,
+                modifier = Modifier
+                    .heightIn(min = 60.dp)
+                    .padding(top = 14.dp),
             )
         }
 
@@ -1328,7 +1336,8 @@ private fun FrostSoulArtworkBlurAlbumPage(
             onOpenQueue = onOpenQueue,
             modifier = Modifier
                 .padding(horizontal = PlayerLayoutTokens.MasterHorizontalPadding)
-                .padding(top = 18.dp),
+                .padding(top = 18.dp)
+                .graphicsLayer { translationY = -12.dp.toPx() },
             immersive = true,
             onSeekDraggingChanged = onSeekDraggingChanged,
         )
@@ -1348,7 +1357,7 @@ private fun FrostSoulFullPlayerLikeButton(
         if (videoId.isNotBlank()) likeCount = YouTube.getMediaInfo(videoId).getOrNull()?.like
     }
     val tint = if (isLiked) Color(0xFFFF3B4D) else {
-        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color.White
+        if (FrostSoulTheme.colors.background.luminance() > 0.5f) Color.Black else Color(0xFFD7DBE0)
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -2118,8 +2127,140 @@ internal fun rememberFrostSoulPalette(artworkUrl: String?): FrostSoulPalette {
 private const val PaletteCacheCapacity = 24
 
 /**
- * Pixel size for the low-contrast ambient artwork layer. Keeping this small avoids decoding a
- * full-resolution album image behind the player controls.
+ * Bottom ambient-glow constraints, derived by sampling the reference recording at 1 fps and
+ * measuring the per-row / per-column medians of the bottom region (medians, so the seek bar and
+ * transport icons drawn on top do not skew the numbers).
+ *
+ * The reference glow is a *geometry-free* wash: it has no circle, ellipse, capsule or blob edge
+ * anywhere. It is a single continuous two-hue field that spans the full width, fades out upward
+ * with an eased ramp, and runs all the way into the bottom screen edge with no gap. Everything
+ * below encodes that measurement, and the values double as the guard rails ("glow constraints")
+ * that keep the effect from ever growing into the turntable deck or washing out the controls.
+ */
+private object GlowConstraints {
+    /**
+     * Measured vertical extent: the wash first lifts off the flat background at ~0.74 of screen
+     * height and reaches full strength at the very bottom row, i.e. ~26–27% of the screen.
+     */
+    const val BandHeightFraction = 0.27f
+
+    /** Absolute clamps so short/tall screens keep the deck area clear and the wash stays visible. */
+    val BandMinHeight = 160.dp
+    val BandMaxHeight = 264.dp
+
+    /**
+     * Peak coverage of the wash. Held just below 1.0 so the white transport icons keep their
+     * contrast; the darkened backdrop underneath is what lets the glow read as light, not paint.
+     */
+    const val PeakAlpha = 0.95f
+
+    /**
+     * Horizontal drift of the hue field, as a fraction of width. Measured by tracking the
+     * warm-minus-cool centroid of the bottom rows: it swings ~±0.06w, but because the field now
+     * has real lobes (see [GlowHueStopAlphas]) the *local* brightness swing that produces is
+     * large — the reference's left edge goes from lum≈52 to lum≈110 within one cycle.
+     */
+    const val DriftFraction = 0.14f
+
+    /**
+     * The hue field is painted wider than the band by this fraction on each side. It is strictly
+     * greater than [DriftFraction], which is what guarantees drift can never pull an unpainted
+     * edge into view — the wash stays edgeless at every phase.
+     */
+    const val BleedFraction = 0.18f
+
+    /**
+     * Brightness breathing. The reference's mean bottom luminance swings ~±10% around its
+     * average (78 → 96 on a 0–255 scale), clearly visible on top of the drift.
+     */
+    const val BreathFraction = 0.10f
+
+    /**
+     * One full drift cycle. Re-measured across a clean 19s window of the reference recording
+     * (corner-patch luminance peak-to-peak and trough-to-trough): consistent ~5.3–5.5s, not the
+     * earlier 6.0s estimate. Brightness peaks lead the drift by ~84°, reproduced by taking
+     * sin/cos of the same phase.
+     */
+    const val CycleDurationMs = 5_400
+
+    /**
+     * Lightness / saturation window (HSL) that every palette hue is pushed into before it is
+     * painted. This is the single most important constraint for visibility: the extracted
+     * `artworkSecondary` is frequently a near-black like `#30262B`, and painting a dark colour
+     * SrcOver a dark scrim *lowers* luminance — the old build measured −41 at the bottom edge
+     * where the reference measures +63. The reference's painted hues resolve to L≈0.45–0.55 with
+     * a moderate chroma once composited, so palette hues are lifted into that window here.
+     */
+    const val MinLightness = 0.56f
+    const val MaxLightness = 0.68f
+    const val MinSaturation = 0.30f
+    const val MaxSaturation = 0.55f
+
+    /** Below this saturation a swatch is treated as grey and keeps its (low) chroma. */
+    const val GreySaturationThreshold = 0.10f
+    const val GreyLiftedSaturation = 0.12f
+}
+
+/**
+ * Pushes an extracted palette colour into the [GlowConstraints] lightness / saturation window so
+ * it reads as *light* when painted over the darkened backdrop. Greys keep their neutral character
+ * (forcing chroma onto a grey would invent a hue); everything else gets a floor on saturation so
+ * the two lobes stay distinguishable after the alpha composite desaturates them.
+ */
+private fun Color.toGlowHue(): Color {
+    val hsl = FloatArray(3)
+    ColorUtils.colorToHSL(toArgb(), hsl)
+    hsl[1] =
+        if (hsl[1] < GlowConstraints.GreySaturationThreshold) {
+            GlowConstraints.GreyLiftedSaturation
+        } else {
+            hsl[1].coerceIn(GlowConstraints.MinSaturation, GlowConstraints.MaxSaturation)
+        }
+    hsl[2] = hsl[2].coerceIn(GlowConstraints.MinLightness, GlowConstraints.MaxLightness)
+    return Color(ColorUtils.HSLToColor(hsl))
+}
+
+/**
+ * Horizontal stop positions and coverages of the measured hue field.
+ *
+ * The reference profile is two soft lobes on one continuous ramp: the primary hue peaks at
+ * x≈0.24, a dim crossover sits at x≈0.46, the secondary hue peaks at x≈0.66, and both ends decay
+ * toward the screen edges. No discrete shapes, just a ramp.
+ *
+ * The coverages are deliberately *not* flat. The previous 0.72–0.86 range produced a uniform
+ * tint, so sliding it sideways changed nothing on screen. Two pronounced lobes with dim troughs
+ * between and outside them are what make the drift and breath legible as moving light: with
+ * these stops a simulated cycle swings the left-edge luminance by ≈50–60 (0–255), matching the
+ * ≈58 swing measured in the reference recording.
+ */
+private val GlowHueStopPositions = floatArrayOf(0f, 0.10f, 0.24f, 0.46f, 0.66f, 0.84f, 1f)
+private val GlowHueStopAlphas = floatArrayOf(0.14f, 0.36f, 1.00f, 0.34f, 0.98f, 0.36f, 0.14f)
+
+/**
+ * Eased vertical ramp of the wash, sampled from the reference at 0.02-screen steps and normalised
+ * so 0 = the band's top edge and 1 = the bottom screen edge. Starting at exactly 0 is what removes
+ * any visible top border; the ramp is deliberately soft through the middle so the falloff reads as
+ * light bleeding upward rather than as a filled rectangle.
+ */
+private val GlowVerticalRamp =
+    arrayOf(
+        0.00f to 0.00f,
+        0.15f to 0.06f,
+        0.25f to 0.16f,
+        0.38f to 0.33f,
+        0.54f to 0.62f,
+        0.70f to 0.88f,
+        0.85f to 1.00f,
+        1.00f to 1.00f,
+    )
+
+/** Full turn in radians. Not a `const` because it is computed from [Math.PI]. */
+private val GlowTwoPi = (2.0 * Math.PI).toFloat()
+
+/**
+ * Pixel size the ambient backdrop artwork is decoded at. The image is blurred into a soft wash,
+ * so full-resolution detail is thrown away anyway — decoding a small bitmap and letting it scale
+ * up costs a fraction of the memory and bandwidth, and lets the blur radius drop sharply.
  */
 private const val AmbientArtworkSampleSize = 192
 
