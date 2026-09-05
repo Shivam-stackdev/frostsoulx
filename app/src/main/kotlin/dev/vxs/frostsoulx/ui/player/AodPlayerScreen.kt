@@ -401,7 +401,7 @@ fun AodPlayerScreen(
     val nextLyricLine = lyricsEntries.getOrNull(currentLyricIndex + 1)?.text?.takeIf { it.isNotBlank() }
 
     val targetAccentColor =
-        Color(0xFF39D9A5)
+        Color(0xFF23F0B1)
 
     val accentColor by animateColorAsState(
         targetValue = targetAccentColor,
@@ -525,7 +525,7 @@ fun AodPlayerScreen(
                 .alpha(contentAlpha)
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 28.dp, vertical = 16.dp),
         ) {
             // Size against both axes: square on phones, never clipped on short displays.
             val landscape = maxWidth > maxHeight
@@ -541,14 +541,14 @@ fun AodPlayerScreen(
                     Text(
                         text = clockText,
                         color = Color.White,
-                        fontSize = 52.sp,
+                        fontSize = 72.sp,
                         fontWeight = FontWeight.Light,
-                        lineHeight = 54.sp,
+                        lineHeight = 74.sp,
                     )
                     Text(
                         text = dateText,
                         color = White65,
-                        fontSize = 14.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.Normal,
                         modifier = Modifier.padding(bottom = 8.dp),
                     )
@@ -556,7 +556,7 @@ fun AodPlayerScreen(
                 Text(
                     text = mediaMetadata.title,
                     color = White65,
-                    fontSize = 18.sp,
+                    fontSize = 23.sp,
                     fontWeight = FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Clip,
@@ -567,7 +567,7 @@ fun AodPlayerScreen(
                 Text(
                     text = artistText,
                     color = White65,
-                    fontSize = 17.sp,
+                    fontSize = 21.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -723,7 +723,7 @@ private fun AodReferenceControls(
             )
         }
         AodOutlinedIconButton(R.drawable.skip_previous, "Previous track", accentColor, onSkipPrevious, canSkipPrevious)
-        AodOutlinedIconButton(if (isPlaying) R.drawable.pause else R.drawable.play, if (isPlaying) "Pause" else "Play", accentColor, onPlayPause)
+        AodOutlinedIconButton(if (isPlaying) R.drawable.pause else R.drawable.play, if (isPlaying) "Pause" else "Play", accentColor, onPlayPause, isMain = true)
         AodOutlinedIconButton(R.drawable.skip_next, "Next track", accentColor, onSkipNext, canSkipNext)
         IconButton(onClick = onToggleLike, modifier = Modifier.size(48.dp)) {
             Icon(
@@ -743,14 +743,17 @@ private fun AodOutlinedIconButton(
     tint: Color,
     onClick: () -> Unit,
     enabled: Boolean = true,
+    isMain: Boolean = false,
 ) {
     val color = tint.copy(alpha = if (enabled) 1f else 0.3f)
+    val buttonSize = if (isMain) 74.dp else 68.dp
+    val iconSize = if (isMain) 32.dp else 30.dp
     IconButton(
         onClick = onClick,
         enabled = enabled,
-        modifier = Modifier.size(48.dp).border(1.5.dp, color, CircleShape),
+        modifier = Modifier.size(buttonSize).border(2.dp, color, CircleShape),
     ) {
-        Icon(painterResource(icon), description, tint = color, modifier = Modifier.size(23.dp))
+        Icon(painterResource(icon), description, tint = color, modifier = Modifier.size(iconSize))
     }
 }
 
