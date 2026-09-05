@@ -10,13 +10,14 @@ import dev.vxs.frostsoulx.ui.utils.formatLikeCount
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -60,6 +61,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import dev.vxs.frostsoulx.ui.frostsoul.FSIcon as Icon
 import dev.vxs.frostsoulx.ui.frostsoul.FSText as Text
@@ -78,25 +80,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
+import androidx.core.graphics.ColorUtils
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -108,8 +111,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.graphics.drawscope.translate
-import androidx.core.graphics.ColorUtils
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -142,8 +143,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.LinkedHashMap
-import kotlin.math.cos
-import kotlin.math.sin
 
 @Composable
 internal fun FrostSoulPlayer(
@@ -475,7 +474,7 @@ internal fun FSMiniPlayer(
                 }
                 .clip(shape)
                 .background(backgroundColor.copy(alpha = 0.94f))
-                .border(1.dp, palette.accent.copy(alpha = if (isPlaying) 0.48f else 0.20f), shape)
+                .border(1.dp, Color(0xFFB09A78).copy(alpha = if (isPlaying) 0.60f else 0.30f), shape)
                 .combinedClickable(
                     interactionSource = interactionSource,
                     indication = null,
@@ -483,89 +482,15 @@ internal fun FSMiniPlayer(
                     onLongClick = onLongPress,
                 ),
     ) {
+        Box(Modifier.align(Alignment.TopStart).fillMaxWidth(progress).height(1.dp).background(Color(0xFFF7DEAF)))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 6.dp),
         ) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(artworkSize + 10.dp),
+                modifier = Modifier.size(artworkSize),
             ) {
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    val strokeWidth = 2.5.dp.toPx()
-                    val inset = strokeWidth / 2f
-                    val left = inset
-                    val top = inset
-                    val right = size.width - inset
-                    val bottom = size.height - inset
-                    val cornerRadius = 10.dp.toPx().coerceAtMost((minOf(size.width, size.height) / 2f) - inset)
-                    val topMidX = (left + right) / 2f
-                    val timelineColor = if (isLightTheme) Color.Black else Color.White
-                    // Built by hand (instead of Path.addRoundRect, whose start point sits near a
-                    // corner and which Compose defaults to counter-clockwise) so distance=0 on
-                    // this path is exactly the middle of the top edge and the path winds
-                    // clockwise from there — matching the requested start point/direction for
-                    // the progress sweep below.
-                    val perimeterPath = Path().apply {
-                        moveTo(topMidX, top)
-                        lineTo(right - cornerRadius, top)
-                        arcTo(
-                            rect = androidx.compose.ui.geometry.Rect(right - 2 * cornerRadius, top, right, top + 2 * cornerRadius),
-                            startAngleDegrees = -90f,
-                            sweepAngleDegrees = 90f,
-                            forceMoveTo = false,
-                        )
-                        lineTo(right, bottom - cornerRadius)
-                        arcTo(
-                            rect = androidx.compose.ui.geometry.Rect(right - 2 * cornerRadius, bottom - 2 * cornerRadius, right, bottom),
-                            startAngleDegrees = 0f,
-                            sweepAngleDegrees = 90f,
-                            forceMoveTo = false,
-                        )
-                        lineTo(left + cornerRadius, bottom)
-                        arcTo(
-                            rect = androidx.compose.ui.geometry.Rect(left, bottom - 2 * cornerRadius, left + 2 * cornerRadius, bottom),
-                            startAngleDegrees = 90f,
-                            sweepAngleDegrees = 90f,
-                            forceMoveTo = false,
-                        )
-                        lineTo(left, top + cornerRadius)
-                        arcTo(
-                            rect = androidx.compose.ui.geometry.Rect(left, top, left + 2 * cornerRadius, top + 2 * cornerRadius),
-                            startAngleDegrees = 180f,
-                            sweepAngleDegrees = 90f,
-                            forceMoveTo = false,
-                        )
-                        lineTo(topMidX, top)
-                        close()
-                    }
-                    val perimeterMeasure = PathMeasure()
-                    perimeterMeasure.setPath(perimeterPath, forceClosed = true)
-                    val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
-                        width = strokeWidth,
-                        cap = StrokeCap.Round,
-                        join = androidx.compose.ui.graphics.StrokeJoin.Round,
-                    )
-                    drawPath(
-                        path = perimeterPath,
-                        color = timelineColor.copy(alpha = 0.22f),
-                        style = stroke,
-                    )
-                    if (progress > 0f) {
-                        val progressPath = Path()
-                        perimeterMeasure.getSegment(
-                            startDistance = 0f,
-                            stopDistance = perimeterMeasure.length * progress,
-                            destination = progressPath,
-                            startWithMoveTo = true,
-                        )
-                        drawPath(
-                            path = progressPath,
-                            color = timelineColor,
-                            style = stroke,
-                        )
-                    }
-                }
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.size(artworkSize).clip(RoundedCornerShape(8.dp)).background(FrostSoulSurface),
@@ -586,34 +511,13 @@ internal fun FSMiniPlayer(
                     }
                 }
             }
-            Spacer(Modifier.width(12.dp))
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(
-                        SpanStyle(
-                            color = primaryTextColor,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        ),
-                    ) {
-                        append(track.title)
-                    }
-                    if (track.artist.isNotBlank()) {
-                        withStyle(
-                            SpanStyle(
-                                color = mutedTextColor,
-                                fontSize = 13.sp,
-                            ),
-                        ) {
-                            append("  -  ${track.artist}")
-                        }
-                    }
-                },
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Clip,
-                modifier = Modifier.weight(1f).basicMarquee(iterations = Int.MAX_VALUE),
-            )
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(track.title, color = primaryTextColor, fontSize = 12.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
+                Text(track.artist, color = mutedTextColor, fontSize = 10.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
+            }
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(42.dp).zIndex(1f).clickable(onClick = onToggleLike),
@@ -635,7 +539,7 @@ internal fun FSMiniPlayer(
                 showContainer = false,
                 dimBackdrop = false,
                 tintOverride = if (isLightTheme) Color.Black else Color.White,
-                modifier = Modifier.zIndex(1f),
+                modifier = Modifier.zIndex(1f).border(1.dp, mutedTextColor.copy(alpha = 0.45f), CircleShape),
             )
             onQueueClick?.let { openQueue ->
                 Box(
@@ -1567,7 +1471,7 @@ private fun FrostSoulRecommendationsPage(
                 .toMap()
         }
     }
-    // This page renders directly over FrostSoulDynamicBackground's ambient blurred artwork,
+    // This page renders directly over FrostSoulDynamicBackground's low-contrast artwork.
     // which stays dark in both app themes — so text/chip colors stay white-based regardless of
     // the app's light/dark theme setting (fixes FS-BUG-LIGHTMODE: text was flipping to
     // near-black here and disappearing against the still-dark backdrop in light theme).
@@ -2268,7 +2172,7 @@ private val GlowTwoPi = (2.0 * Math.PI).toFloat()
 private const val AmbientArtworkSampleSize = 192
 
 /**
- * Background styles that paint a palette-tinted gradient over the blurred artwork.
+ * Background styles that paint a palette-tinted gradient over the artwork.
  * Hoisted to file scope so the set is allocated once rather than on every recomposition.
  */
 private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
@@ -2276,42 +2180,49 @@ private val GradientBackgroundStyles: Set<PlayerBackgroundStyle> =
         PlayerBackgroundStyle.GRADIENT,
         PlayerBackgroundStyle.COLORING,
         PlayerBackgroundStyle.BLUR_GRADIENT,
-        PlayerBackgroundStyle.GLOW,
     )
+
+private const val GlowBandFraction = 0.38f
+private const val GlowTransitionDurationMs = 1_200
 
 /**
- * Single consolidated scrim for the glow styles.
+ * Minimum saturation/value forced onto palette colors before they are painted.
  *
- * This one brush replaces what used to be three stacked full-screen layers (a radial vignette, a
- * neutral ambient tone and a final readability scrim).
+ * Album palettes are frequently near-black (the default secondary is `#30262B`, value ~0.16).
+ * Painting those directly over black and then scaling by alpha collapses the wash to a dim
+ * grey smear, which is exactly the "barely visible, colorless" failure mode. Lifting the tone
+ * into a bright, saturated band keeps the artwork's hue while guaranteeing it reads on screen.
  *
- * It is intentionally *heavy*. Sampling the reference shows its backdrop is a near-flat
- * `#1C1C1C` (lum≈28) everywhere the glow is not — the blurred artwork is only a faint tint.
- * That dark canvas is what gives the glow a +63 luminance lift to work with. The old scrim
- * (0.62 → 0.30) left the artwork at lum≈80 and the bottom stop at 0.46 darkened the exact area
- * the glow was supposed to light up, so the wash was painted onto an already brighter image and
- * vanished. The bottom stop is now the *lightest* so the scrim never fights the wash.
+ * The saturation ceiling prevents already-vivid artwork from turning neon.
  */
-private val GlowModeScrim =
-    Brush.verticalGradient(
-        colors = listOf(
-            Color.Black.copy(alpha = 0.80f),
-            Color.Black.copy(alpha = 0.80f),
-            Color.Black.copy(alpha = 0.78f),
-            Color.Black.copy(alpha = 0.76f),
-            Color.Black.copy(alpha = 0.74f),
-        ),
-    )
+private const val GlowMinSaturation = 0.34f
+private const val GlowMaxSaturation = 0.82f
+private const val GlowMinValue = 0.70f
 
-/** Equivalent consolidated scrim for the non-glow styles. */
-private val PlainModeScrim =
-    Brush.verticalGradient(
-        colors = listOf(
-            Color.Black.copy(alpha = 0.34f),
-            Color.Black.copy(alpha = 0.16f),
-            Color.Black.copy(alpha = 0.44f),
-        ),
-    )
+/**
+ * Saturation below which a palette color is treated as intentionally achromatic.
+ *
+ * Applying a saturation floor to a truly grey color would invent a hue out of nothing (grey has
+ * hue 0, so it would turn red). Below this threshold the color is only brightened, never tinted.
+ */
+private const val GlowAchromaticThreshold = 0.10f
+
+/**
+ * Lifts [color] into a vibrant tone suitable for an additive glow while preserving its hue.
+ *
+ * Hue is never modified, so the wash still reads as "this album's color". Only saturation and
+ * value are adjusted: this rescues dark or muddy palettes without over-saturating vivid ones,
+ * and leaves genuinely monochrome artwork looking monochrome.
+ */
+private fun glowTone(color: Color): Color {
+    val hsv = FloatArray(3)
+    android.graphics.Color.colorToHSV(color.toArgb(), hsv)
+    if (hsv[1] > GlowAchromaticThreshold) {
+        hsv[1] = hsv[1].coerceIn(GlowMinSaturation, GlowMaxSaturation)
+    }
+    hsv[2] = hsv[2].coerceAtLeast(GlowMinValue)
+    return Color(android.graphics.Color.HSVToColor(hsv))
+}
 
 @Composable
 private fun FrostSoulDynamicBackground(
@@ -2325,43 +2236,14 @@ private fun FrostSoulDynamicBackground(
     val isVinyl = playerDesignStyle == PlayerDesignStyle.FROSTSOUL
     val isAnimatedGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW_ANIMATED
     val isStaticGlow = isVinyl && playerBackgroundStyle == PlayerBackgroundStyle.GLOW
-    val isGlowMode = isAnimatedGlow || isStaticGlow
-    // Keep the selected artwork present behind every player mode. Vinyl's Gradient/Glow
-    // variants tint this same blurred image instead of replacing it with a flat color.
-    val shouldBlurArtwork = !artworkUrl.isNullOrBlank()
-    val shouldUseGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
-
-    // The breathing phase is kept as a State and only read inside graphicsLayer, i.e. during the
-    // draw phase. Previously `.value` was read straight into composition, so the infinite glow
-    // animation recomposed this whole background — including the full-screen blurred AsyncImage —
-    // on every single frame. That recomposition storm was the main source of the stutter.
-    //
-    // The value is a plain 0→1 *linear* phase that Restarts, not Reverses: sin()/cos() are read
-    // from it in the draw pass, so the motion is already a smooth closed loop. A Reverse spec
-    // would additionally bounce it and make the drift visibly change direction mid-sweep, which
-    // is not what the reference does — its hue field glides continuously.
-    val glowBreath: State<Float>? =
-        if (isAnimatedGlow) {
-            rememberInfiniteTransition(label = "vinyl-glow-transition").animateFloat(
-                initialValue = 0f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    tween(GlowConstraints.CycleDurationMs, easing = LinearEasing),
-                    RepeatMode.Restart,
-                ),
-                label = "vinyl-glow-phase",
-            )
-        } else {
-            null
-        }
-
-    // Because the ambient artwork is decoded small and scaled up, it is already very soft — so a
-    // far smaller blur radius reproduces the old look. Blur cost scales with radius, and the old
-    // 36..120dp range over a full-screen layer was extremely expensive on mid-range GPUs.
-    val ambientBlurRadius = (blurRadius * 0.34f).coerceIn(10f, 26f)
-
+    val isGlow = isAnimatedGlow || isStaticGlow
+    val isBlur = isVinyl && (
+        playerBackgroundStyle == PlayerBackgroundStyle.BLUR ||
+            playerBackgroundStyle == PlayerBackgroundStyle.BLUR_GRADIENT
+    )
+    val isGradient = isVinyl && playerBackgroundStyle in GradientBackgroundStyles
     val context = LocalContext.current
-    val ambientArtworkRequest = remember(artworkUrl, context) {
+    val artworkRequest = remember(artworkUrl, context) {
         artworkUrl?.takeIf { it.isNotBlank() }?.let { url ->
             ImageRequest.Builder(context)
                 .data(url)
@@ -2370,143 +2252,129 @@ private fun FrostSoulDynamicBackground(
         }
     }
 
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-    ) {
-        if (shouldBlurArtwork && ambientArtworkRequest != null) {
-            // The previous implementation also applied ColorFilter.colorMatrix with
-            // setToSaturation(1.0f) — an identity matrix. It changed nothing visually while
-            // forcing an extra full-screen color-filter pass every frame, so it is gone.
+    // Palette colors interpolate only when artwork changes. The glow remains still between
+    // transitions, so the vinyl can rotate independently without a perpetual background sweep.
+    val primaryTarget = remember(palette) { glowTone(palette.artworkPrimary) }
+    val secondaryTarget = remember(palette) { glowTone(palette.artworkSecondary) }
+    val primary by animateColorAsState(
+        targetValue = primaryTarget,
+        animationSpec = tween(GlowTransitionDurationMs),
+        label = "vinyl-glow-primary",
+    )
+    val secondary by animateColorAsState(
+        targetValue = secondaryTarget,
+        animationSpec = tween(GlowTransitionDurationMs),
+        label = "vinyl-glow-secondary",
+    )
+
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        if (isBlur && artworkRequest != null) {
             AsyncImage(
-                model = ambientArtworkRequest,
+                model = artworkRequest,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer { scaleX = 1.12f; scaleY = 1.12f }
+                    .graphicsLayer { scaleX = 1.08f; scaleY = 1.08f }
                     .blur(
-                        ambientBlurRadius.dp,
+                        radius = blurRadius.coerceIn(0f, 64f).dp,
                         edgeTreatment = BlurredEdgeTreatment.Unbounded,
-                    ),
+                    )
+                    .alpha(0.72f),
             )
+            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.38f)))
         }
 
-        if (shouldUseGradient) {
-            // Brush depends only on the palette, so it is cached instead of being rebuilt (with
-            // its Color list) on every frame.
-            val gradientBrush = remember(palette) {
+        if (isGradient) {
+            val gradient = remember(palette) {
                 Brush.verticalGradient(
                     colors = listOf(
-                        palette.artworkPrimary.copy(alpha = 0.42f),
-                        palette.artworkSecondary.copy(alpha = 0.26f),
                         Color.Black.copy(alpha = 0.92f),
+                        palette.artworkPrimary.copy(alpha = 0.34f),
+                        palette.artworkSecondary.copy(alpha = 0.24f),
+                        Color.Black.copy(alpha = 0.84f),
                     ),
                 )
             }
-            Box(modifier = Modifier.fillMaxSize().background(gradientBrush))
+            Box(modifier = Modifier.fillMaxSize().background(gradient))
         }
 
-        // One consolidated scrim instead of the old three stacked full-screen layers. This is
-        // what keeps the turntable area above the glow "halka dark" like the reference player.
-        Box(modifier = Modifier.fillMaxSize().background(if (isGlowMode) GlowModeScrim else PlainModeScrim))
-
-        if (isGlowMode) {
-            // ── Geometry-free bottom wash ────────────────────────────────────────────────────
-            // The reference glow is not a blob: sampling its bottom rows shows one continuous
-            // two-hue field spanning the full width, so it is painted here as a single
-            // horizontal ramp masked by an eased vertical ramp. Nothing circular is drawn, which
-            // is why no arc, rim or ellipse edge can appear at any drift phase.
-            //
-            // The horizontal ramp is drawn wider than the band (BleedFraction > DriftFraction) and
-            // then translated by the animation, so the hue field slides *through* the fixed band
-            // like light moving behind frosted glass while the band itself never moves or resizes.
-            val bandHeight =
-                (LocalConfiguration.current.screenHeightDp * GlowConstraints.BandHeightFraction).dp
-                    .coerceIn(GlowConstraints.BandMinHeight, GlowConstraints.BandMaxHeight)
-
-            // Normalised once per palette, not per frame: HSL round-trips are cheap but there is
-            // no reason to redo them inside the draw cache.
-            val glowPrimary = remember(palette.artworkPrimary) { palette.artworkPrimary.toGlowHue() }
-            val glowSecondary = remember(palette.artworkSecondary) { palette.artworkSecondary.toGlowHue() }
-
+        if (isGlow) {
+            val bandHeight = (LocalConfiguration.current.screenHeightDp * GlowBandFraction)
+                .dp.coerceIn(260.dp, 420.dp)
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    // No bottom padding: the measured wash runs into the bottom screen edge. A gap
-                    // there is what previously made the effect read as a detached band.
                     .fillMaxWidth()
                     .height(bandHeight)
-                    // The offscreen layer exists for the DstIn mask below: it gives the mask a
-                    // bounded buffer to erase, so the falloff cannot punch a hole through the
-                    // blurred artwork and scrim behind this band.
-                    .graphicsLayer {
-                        compositingStrategy = CompositingStrategy.Offscreen
-                        alpha = GlowConstraints.PeakAlpha
-                    }
+                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
                     .drawWithCache {
-                        val bandWidth = size.width
-                        val bleed = bandWidth * GlowConstraints.BleedFraction
-                        val fieldWidth = bandWidth + bleed * 2f
-
-                        // Primary → secondary ramp across the whole field. Both palette hues live
-                        // in one brush, so they cross over smoothly instead of meeting as two
-                        // objects. Each hue is first lifted into the glow lightness window — see
-                        // Color.toGlowHue() — otherwise a dark swatch paints a shadow, not a glow.
-                        val hueStops = Array(GlowHueStopPositions.size) { index ->
-                            val position = GlowHueStopPositions[index]
-                            val hue = lerp(glowPrimary, glowSecondary, position)
-                            position to hue.copy(alpha = GlowHueStopAlphas[index])
-                        }
-                        val hueField = Brush.horizontalGradient(
-                            colorStops = hueStops,
-                            startX = -bleed,
-                            endX = bandWidth + bleed,
+                        // Four oversized, pre-softened fields overlap in the lower band. Their
+                        // large radial falloffs provide a blur-like ambient pool without running
+                        // Modifier.blur over the whole player or allocating a canvas per frame.
+                        val mixed = lerp(primary, secondary, 0.5f)
+                        val leftField = Brush.radialGradient(
+                            colors = listOf(
+                                primary.copy(alpha = 0.48f),
+                                primary.copy(alpha = 0.22f),
+                                primary.copy(alpha = 0.06f),
+                                Color.Transparent,
+                            ),
+                            center = Offset(size.width * 0.08f, size.height * 1.04f),
+                            radius = size.width * 0.78f,
                         )
-
-                        // Eased upward falloff, applied as a destination-in mask so the wash has
-                        // no hard top edge at all.
-                        val maskStops = Array(GlowVerticalRamp.size) { index ->
-                            val (position, coverage) = GlowVerticalRamp[index]
-                            position to Color.White.copy(alpha = coverage)
-                        }
-                        val verticalMask = Brush.verticalGradient(colorStops = maskStops)
-
+                        val rightField = Brush.radialGradient(
+                            colors = listOf(
+                                secondary.copy(alpha = 0.44f),
+                                secondary.copy(alpha = 0.20f),
+                                secondary.copy(alpha = 0.05f),
+                                Color.Transparent,
+                            ),
+                            center = Offset(size.width * 0.94f, size.height * 0.92f),
+                            radius = size.width * 0.72f,
+                        )
+                        val centerField = Brush.radialGradient(
+                            colors = listOf(
+                                mixed.copy(alpha = 0.30f),
+                                mixed.copy(alpha = 0.14f),
+                                mixed.copy(alpha = 0.03f),
+                                Color.Transparent,
+                            ),
+                            center = Offset(size.width * 0.54f, size.height * 1.14f),
+                            radius = size.width * 1.04f,
+                        )
+                        val upperField = Brush.radialGradient(
+                            colors = listOf(
+                                secondary.copy(alpha = 0.18f),
+                                primary.copy(alpha = 0.08f),
+                                Color.Transparent,
+                            ),
+                            center = Offset(size.width * 0.38f, size.height * 0.46f),
+                            radius = size.width * 0.74f,
+                        )
+                        val falloff = Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.22f to Color.White.copy(alpha = 0.06f),
+                            0.52f to Color.White.copy(alpha = 0.34f),
+                            0.80f to Color.White.copy(alpha = 0.78f),
+                            1f to Color.White,
+                        )
+                        val upperVeil = Brush.verticalGradient(
+                            0f to Color.Black.copy(alpha = 0.64f),
+                            0.50f to Color.Black.copy(alpha = 0.42f),
+                            0.78f to Color.Black.copy(alpha = 0.12f),
+                            1f to Color.Transparent,
+                        )
                         onDrawBehind {
-                            // One phase drives both axes. sin() moves the hue field horizontally;
-                            // cos() breathes its brightness — a 90° lead that reproduces the
-                            // measured offset between the reference's drift and luminance peaks.
-                            // Static glow leaves the phase at 0, i.e. no drift and full breath.
-                            val phase = (glowBreath?.value ?: 0f) * GlowTwoPi
-                            val drift = sin(phase) * bandWidth * GlowConstraints.DriftFraction
-                            // Kept strictly <= 1 so the bright half of the cycle is never clipped:
-                            // the swing is applied *below* full strength instead of above it.
-                            val breath =
-                                1f - GlowConstraints.BreathFraction +
-                                    cos(phase) * GlowConstraints.BreathFraction
-
-                            // Default SrcOver, deliberately: this draw lands in the offscreen
-                            // buffer above, where every additive/lightening blend mode would have
-                            // nothing but transparent black to lighten against — i.e. a no-op that
-                            // silently looks like flat blur. The wash is instead composited once,
-                            // as a whole, by the layer itself. The measured reference pixels match
-                            // this SrcOver result at the alphas encoded in GlowHueStopAlphas.
-                            translate(left = drift) {
-                                drawRect(
-                                    brush = hueField,
-                                    topLeft = Offset(-bleed, 0f),
-                                    // Built from the draw size rather than importing
-                                    // geometry.Size, which would clash with coil3.size.Size
-                                    // already imported in this file.
-                                    size = size.copy(width = fieldWidth),
-                                    alpha = breath.coerceIn(0f, 1f),
-                                )
-                            }
-                            // Applied last, so it carves the eased falloff out of whatever the
-                            // wash just painted. The parent's offscreen layer bounds this erase.
-                            drawRect(brush = verticalMask, blendMode = BlendMode.DstIn)
+                            // Static geometry keeps the wash stable while vinyl artwork rotates.
+                            // Palette colors crossfade through animateColorAsState when artwork
+                            // changes, avoiding an abrupt color swap.
+                            drawRect(brush = leftField, alpha = 0.92f, blendMode = BlendMode.Plus)
+                            drawRect(brush = rightField, alpha = 0.86f, blendMode = BlendMode.Plus)
+                            drawRect(brush = centerField, alpha = 0.82f, blendMode = BlendMode.Plus)
+                            drawRect(brush = upperField, alpha = 0.62f, blendMode = BlendMode.Plus)
+                            drawRect(brush = falloff, blendMode = BlendMode.DstIn)
+                            drawRect(brush = upperVeil)
                         }
                     },
             )
