@@ -472,7 +472,7 @@ internal fun FSMiniPlayer(
                 }
                 .clip(shape)
                 .background(backgroundColor.copy(alpha = 0.94f))
-                .border(1.dp, palette.accent.copy(alpha = if (isPlaying) 0.48f else 0.20f), shape)
+                .border(1.dp, Color(0xFFB09A78).copy(alpha = if (isPlaying) 0.60f else 0.30f), shape)
                 .combinedClickable(
                     interactionSource = interactionSource,
                     indication = null,
@@ -480,89 +480,15 @@ internal fun FSMiniPlayer(
                     onLongClick = onLongPress,
                 ),
     ) {
+        Box(Modifier.align(Alignment.TopStart).fillMaxWidth(progress).height(1.dp).background(Color(0xFFF7DEAF)))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 6.dp),
         ) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(artworkSize + 10.dp),
+                modifier = Modifier.size(artworkSize),
             ) {
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    val strokeWidth = 2.5.dp.toPx()
-                    val inset = strokeWidth / 2f
-                    val left = inset
-                    val top = inset
-                    val right = size.width - inset
-                    val bottom = size.height - inset
-                    val cornerRadius = 10.dp.toPx().coerceAtMost((minOf(size.width, size.height) / 2f) - inset)
-                    val topMidX = (left + right) / 2f
-                    val timelineColor = if (isLightTheme) Color.Black else Color.White
-                    // Built by hand (instead of Path.addRoundRect, whose start point sits near a
-                    // corner and which Compose defaults to counter-clockwise) so distance=0 on
-                    // this path is exactly the middle of the top edge and the path winds
-                    // clockwise from there — matching the requested start point/direction for
-                    // the progress sweep below.
-                    val perimeterPath = Path().apply {
-                        moveTo(topMidX, top)
-                        lineTo(right - cornerRadius, top)
-                        arcTo(
-                            rect = androidx.compose.ui.geometry.Rect(right - 2 * cornerRadius, top, right, top + 2 * cornerRadius),
-                            startAngleDegrees = -90f,
-                            sweepAngleDegrees = 90f,
-                            forceMoveTo = false,
-                        )
-                        lineTo(right, bottom - cornerRadius)
-                        arcTo(
-                            rect = androidx.compose.ui.geometry.Rect(right - 2 * cornerRadius, bottom - 2 * cornerRadius, right, bottom),
-                            startAngleDegrees = 0f,
-                            sweepAngleDegrees = 90f,
-                            forceMoveTo = false,
-                        )
-                        lineTo(left + cornerRadius, bottom)
-                        arcTo(
-                            rect = androidx.compose.ui.geometry.Rect(left, bottom - 2 * cornerRadius, left + 2 * cornerRadius, bottom),
-                            startAngleDegrees = 90f,
-                            sweepAngleDegrees = 90f,
-                            forceMoveTo = false,
-                        )
-                        lineTo(left, top + cornerRadius)
-                        arcTo(
-                            rect = androidx.compose.ui.geometry.Rect(left, top, left + 2 * cornerRadius, top + 2 * cornerRadius),
-                            startAngleDegrees = 180f,
-                            sweepAngleDegrees = 90f,
-                            forceMoveTo = false,
-                        )
-                        lineTo(topMidX, top)
-                        close()
-                    }
-                    val perimeterMeasure = PathMeasure()
-                    perimeterMeasure.setPath(perimeterPath, forceClosed = true)
-                    val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
-                        width = strokeWidth,
-                        cap = StrokeCap.Round,
-                        join = androidx.compose.ui.graphics.StrokeJoin.Round,
-                    )
-                    drawPath(
-                        path = perimeterPath,
-                        color = timelineColor.copy(alpha = 0.22f),
-                        style = stroke,
-                    )
-                    if (progress > 0f) {
-                        val progressPath = Path()
-                        perimeterMeasure.getSegment(
-                            startDistance = 0f,
-                            stopDistance = perimeterMeasure.length * progress,
-                            destination = progressPath,
-                            startWithMoveTo = true,
-                        )
-                        drawPath(
-                            path = progressPath,
-                            color = timelineColor,
-                            style = stroke,
-                        )
-                    }
-                }
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.size(artworkSize).clip(RoundedCornerShape(8.dp)).background(FrostSoulSurface),
@@ -583,34 +509,13 @@ internal fun FSMiniPlayer(
                     }
                 }
             }
-            Spacer(Modifier.width(12.dp))
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(
-                        SpanStyle(
-                            color = primaryTextColor,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        ),
-                    ) {
-                        append(track.title)
-                    }
-                    if (track.artist.isNotBlank()) {
-                        withStyle(
-                            SpanStyle(
-                                color = mutedTextColor,
-                                fontSize = 13.sp,
-                            ),
-                        ) {
-                            append("  -  ${track.artist}")
-                        }
-                    }
-                },
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Clip,
-                modifier = Modifier.weight(1f).basicMarquee(iterations = Int.MAX_VALUE),
-            )
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(track.title, color = primaryTextColor, fontSize = 12.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
+                Text(track.artist, color = mutedTextColor, fontSize = 10.sp, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
+            }
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(42.dp).zIndex(1f).clickable(onClick = onToggleLike),
@@ -632,7 +537,7 @@ internal fun FSMiniPlayer(
                 showContainer = false,
                 dimBackdrop = false,
                 tintOverride = if (isLightTheme) Color.Black else Color.White,
-                modifier = Modifier.zIndex(1f),
+                modifier = Modifier.zIndex(1f).border(1.dp, mutedTextColor.copy(alpha = 0.45f), CircleShape),
             )
             onQueueClick?.let { openQueue ->
                 Box(

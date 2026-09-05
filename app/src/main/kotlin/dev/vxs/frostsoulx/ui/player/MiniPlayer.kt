@@ -69,9 +69,9 @@ internal enum class MiniPlayerPeekState {
     Peeked,
 }
 
-private const val MiniPlayerCollapsedHeight = 72
+private const val MiniPlayerCollapsedHeight = 56
 private const val MiniPlayerPeekHeight = 110
-private const val MiniPlayerCollapsedArtwork = 48
+private const val MiniPlayerCollapsedArtwork = 36
 private const val MiniPlayerPeekArtwork = 64
 
 @Composable
@@ -114,12 +114,7 @@ fun MiniPlayer(
         animationSpec = spring(dampingRatio = 0.82f, stiffness = 520f),
         label = "frostsoul-mini-player-swipe-offset",
     )
-    val shape =
-        if (isPairedWithNavigation) {
-            RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)
-        } else {
-            RoundedCornerShape(16.dp)
-        }
+    val shape = RoundedCornerShape(14.dp)
 
     Box(
         modifier =
