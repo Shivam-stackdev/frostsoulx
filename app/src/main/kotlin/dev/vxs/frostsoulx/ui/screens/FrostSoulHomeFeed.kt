@@ -177,26 +177,6 @@ internal fun FrostSoulHomeFeed(
             }
         }
 
-        if (uiState.quickPicks.isNotEmpty()) {
-            item(key = "frostsoul_home_banner_carousel") {
-                FrostSoulBannerCarousel(
-                    songs = uiState.quickPicks.take(5),
-                    mediaMetadata = mediaMetadata,
-                    playerConnection = playerConnection,
-                )
-            }
-            item(key = "frostsoul_everyone_listening") {
-                FrostSoulEveryoneListening(
-                    songs = uiState.quickPicks.take(3),
-                    mediaMetadata = mediaMetadata,
-                    playerConnection = playerConnection,
-                )
-            }
-            item(key = "frostsoul_preference_prompt") {
-                FrostSoulPreferencePrompt(onClick = { navController.navigate("settings/content") })
-            }
-        }
-
         item(key = "frostsoul_home_hero") {
             FrostSoulHomeHero(
                 track = mediaMetadata,
@@ -227,15 +207,22 @@ internal fun FrostSoulHomeFeed(
         }
 
         if (uiState.quickPicks.isNotEmpty()) {
-            item(key = "frostsoul_for_this_moment_header") {
-                FSSectionHeader(title = "For This Moment", actionLabel = "See All", onAction = { openSearchPortal() })
+            item(key = "frostsoul_home_banner_carousel") {
+                FrostSoulBannerCarousel(
+                    songs = uiState.quickPicks.take(5),
+                    mediaMetadata = mediaMetadata,
+                    playerConnection = playerConnection,
+                )
             }
-            item(key = "frostsoul_for_this_moment") {
+            item(key = "frostsoul_made_for_you_header") {
+                FSSectionHeader(title = "Made for you", actionLabel = "See All", onAction = { openSearchPortal() })
+            }
+            item(key = "frostsoul_made_for_you") {
                 FrostSoulSongShelf(
                     songs = uiState.quickPicks,
                     mediaMetadata = mediaMetadata,
                     playerConnection = playerConnection,
-                    badge = "PLAY",
+                    badge = null,
                     spotlight = false,
                 )
             }
@@ -481,8 +468,8 @@ private fun FrostSoulBannerCarousel(
     playerConnection: PlayerConnection,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-        val cardWidth = (maxWidth * 0.78f).coerceIn(280.dp, 520.dp)
-        val cardHeight = cardWidth * 1.12f
+        val cardWidth = (maxWidth - 48.dp).coerceAtLeast(280.dp)
+        val cardHeight = 190.dp
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FSSectionHeader(title = "Featured for you")
             LazyRow(
@@ -505,7 +492,7 @@ private fun FrostSoulBannerCarousel(
                                 model = song.song.thumbnailUrl,
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier.fillMaxSize().blur(18.dp).alpha(0.72f),
                             )
                             Box(
                                 modifier = Modifier.fillMaxSize().background(
@@ -516,14 +503,26 @@ private fun FrostSoulBannerCarousel(
                                     ),
                                 ),
                             )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        Brush.linearGradient(
+                                            colors = listOf(
+                                                Color.Transparent,
+                                                FrostSoulTheme.colors.background.copy(alpha = 0.78f),
+                                            ),
+                                        ),
+                                    ),
+                            )
                             Column(
                                 verticalArrangement = Arrangement.Bottom,
-                                modifier = Modifier.fillMaxSize().padding(20.dp),
+                                modifier = Modifier.fillMaxSize().padding(18.dp),
                             ) {
                                 Text(
                                     text = song.title,
                                     color = Color.White,
-                                    fontSize = 22.sp,
+                                    fontSize = 24.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     maxLines = 2,
                                     overflow = TextOverflow.Ellipsis,

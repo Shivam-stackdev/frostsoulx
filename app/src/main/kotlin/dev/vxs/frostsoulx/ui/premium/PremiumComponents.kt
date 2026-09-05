@@ -287,9 +287,36 @@ fun PremiumHeroBanner(
                     ),
                 ),
             )
+            // Static reflection pass: cheap compositing layer, no per-frame canvas work.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.08f),
+                                Color.Transparent,
+                                FrostSoulTheme.colors.accent.copy(alpha = 0.06f),
+                            ),
+                        ),
+                    ),
+            )
+            artworkUrl?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(14.dp)
+                        .size(142.dp)
+                        .clip(FrostSoulTheme.shapes.large)
+                        .border(1.dp, Color.White.copy(alpha = 0.28f), FrostSoulTheme.shapes.large),
+                )
+            }
             Column(
                 verticalArrangement = Arrangement.Bottom,
-                modifier = Modifier.fillMaxSize().padding(20.dp),
+                modifier = Modifier.fillMaxWidth(0.68f).fillMaxHeight().padding(20.dp),
             ) {
                 Text(
                     text = "NOW PLAYING",
