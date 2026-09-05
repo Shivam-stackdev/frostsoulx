@@ -401,7 +401,7 @@ fun AodPlayerScreen(
     val nextLyricLine = lyricsEntries.getOrNull(currentLyricIndex + 1)?.text?.takeIf { it.isNotBlank() }
 
     val targetAccentColor =
-        Color(0xFF23F0B1)
+        Color(0xFF52BF92)
 
     val accentColor by animateColorAsState(
         targetValue = targetAccentColor,
@@ -504,16 +504,17 @@ fun AodPlayerScreen(
                 model = mediaMetadata.thumbnailUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().blur(24.dp).alpha(0.90f),
+                modifier = Modifier.fillMaxSize().blur(13.dp).alpha(0.92f),
+
             )
         }
         Box(
             modifier = Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
-                    0f to Color.Black.copy(alpha = 0.10f),
-                    0.48f to Color.Black.copy(alpha = 0.06f),
-                    0.80f to Color.Black.copy(alpha = 0.12f),
-                    1f to Color.Black.copy(alpha = 0.20f),
+                    0f to Color.Black.copy(alpha = 0.42f),
+                    0.48f to Color.Black.copy(alpha = 0.50f),
+                    0.80f to Color.Black.copy(alpha = 0.54f),
+                    1f to Color.Black.copy(alpha = 0.58f),
                 ),
             ),
         )
@@ -542,16 +543,16 @@ fun AodPlayerScreen(
                     Text(
                         text = clockText,
                         color = Color.White,
-                        fontSize = 68.sp,
+                        fontSize = 40.sp,
                         fontWeight = FontWeight.Light,
-                        lineHeight = 70.sp,
+                        lineHeight = 42.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Clip,
                     )
                     Text(
                         text = dateText,
                         color = White65,
-                        fontSize = 22.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
                         modifier = Modifier.padding(bottom = 6.dp),
                         maxLines = 1,
@@ -561,7 +562,7 @@ fun AodPlayerScreen(
                 Text(
                     text = mediaMetadata.title,
                     color = White65,
-                    fontSize = 23.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Clip,
@@ -572,7 +573,7 @@ fun AodPlayerScreen(
                 Text(
                     text = artistText,
                     color = White65,
-                    fontSize = 21.sp,
+                    fontSize = 18.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth(),
@@ -711,53 +712,78 @@ private fun AodReferenceControls(
     onToggleRepeat: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
+    BoxWithConstraints(
+        modifier = modifier.fillMaxWidth().height(100.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        IconButton(onClick = onToggleRepeat, modifier = Modifier.size(44.dp)) {
-            Icon(
-                painterResource(if (repeatMode == 1) R.drawable.repeat_one_on else R.drawable.repeat),
-                contentDescription = when (repeatMode) {
-                    1 -> "Repeat one; change repeat mode"
-                    2 -> "Repeat all; change repeat mode"
-                    else -> "Repeat off; change repeat mode"
-                },
-                tint = if (repeatMode == 0) White70 else accentColor,
-                modifier = Modifier.size(22.dp),
-            )
-        }
-        AodOutlinedIconButton(R.drawable.skip_previous, "Previous track", accentColor, onSkipPrevious, canSkipPrevious)
-        AodOutlinedIconButton(if (isPlaying) R.drawable.pause else R.drawable.play, if (isPlaying) "Pause" else "Play", accentColor, onPlayPause, isMain = true)
-        AodOutlinedIconButton(R.drawable.skip_next, "Next track", accentColor, onSkipNext, canSkipNext)
-        IconButton(onClick = onToggleLike, modifier = Modifier.size(44.dp)) {
-            Icon(
-                painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                contentDescription = if (isLiked) "Remove from favorites" else "Add to favorites",
-                tint = if (isLiked) accentColor else Color.White,
-                modifier = Modifier.size(25.dp),
-            )
+        val scale = (maxWidth / 450.dp).coerceIn(0.65f, 1f)
+        val canvasWidth = 450.dp * scale
+        val circle = 49.dp * scale
+        val sideTouch = 44.dp * scale
+        val stroke = 1.8.dp * scale
+
+        Box(modifier = Modifier.width(canvasWidth).height(100.dp * scale)) {
+            Row(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalArrangement = Arrangement.spacedBy(29.dp * scale),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AodSpecCircleButton(R.drawable.skip_previous, "Previous track", accentColor, onSkipPrevious, canSkipPrevious, circle, stroke, 22.dp * scale)
+                AodSpecCircleButton(if (isPlaying) R.drawable.pause else R.drawable.play, if (isPlaying) "Pause" else "Play", accentColor, onPlayPause, true, circle, stroke, 24.dp * scale)
+                AodSpecCircleButton(R.drawable.skip_next, "Next track", accentColor, onSkipNext, canSkipNext, circle, stroke, 22.dp * scale)
+            }
+            Box(
+                modifier = Modifier
+                    .size(sideTouch)
+                    .align(Alignment.CenterStart)
+                    .offset(x = (67.5.dp * scale) - sideTouch / 2f)
+                    .clickable(onClick = onToggleRepeat),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painterResource(if (repeatMode == 1) R.drawable.repeat_one_on else R.drawable.repeat),
+                    contentDescription = "Repeat mode",
+                    tint = if (repeatMode == 0) White70 else accentColor,
+                    modifier = Modifier.size(21.dp * scale),
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(sideTouch)
+                    .align(Alignment.CenterStart)
+                    .offset(x = (380.5.dp * scale) - sideTouch / 2f)
+                    .clickable(onClick = onToggleLike),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
+                    contentDescription = if (isLiked) "Remove from favorites" else "Add to favorites",
+                    tint = if (isLiked) accentColor else Color.White,
+                    modifier = Modifier.size(23.dp * scale),
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun AodOutlinedIconButton(
+private fun AodSpecCircleButton(
     icon: Int,
     description: String,
     tint: Color,
     onClick: () -> Unit,
-    enabled: Boolean = true,
-    isMain: Boolean = false,
+    enabled: Boolean,
+    diameter: androidx.compose.ui.unit.Dp,
+    stroke: androidx.compose.ui.unit.Dp,
+    iconSize: androidx.compose.ui.unit.Dp,
 ) {
     val color = tint.copy(alpha = if (enabled) 1f else 0.3f)
-    val buttonSize = if (isMain) 64.dp else 58.dp
-    val iconSize = if (isMain) 28.dp else 26.dp
-    IconButton(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = Modifier.size(buttonSize).border(1.5.dp, color, CircleShape),
+    Box(
+        modifier = Modifier
+            .size(diameter)
+            .border(stroke, color, CircleShape)
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         Icon(painterResource(icon), description, tint = color, modifier = Modifier.size(iconSize))
     }
