@@ -30,6 +30,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -397,7 +401,7 @@ fun AodPlayerScreen(
     val nextLyricLine = lyricsEntries.getOrNull(currentLyricIndex + 1)?.text?.takeIf { it.isNotBlank() }
 
     val targetAccentColor =
-        if (accentStyle == AodAccentStyle.THEME) dominantArtworkColor else Color.White
+        Color(0xFF39D9A5)
 
     val accentColor by animateColorAsState(
         targetValue = targetAccentColor,
@@ -447,7 +451,7 @@ fun AodPlayerScreen(
         }
     }
     val clockText = remember(clockState.value) {
-        clockState.value.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"))
+        clockState.value.format(java.time.format.DateTimeFormatter.ofPattern(if (android.text.format.DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm"))
     }
     val dateText = remember(clockState.value) {
         clockState.value.format(java.time.format.DateTimeFormatter.ofPattern("dd MMM EEE"))
@@ -500,32 +504,34 @@ fun AodPlayerScreen(
                 model = mediaMetadata.thumbnailUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().blur(48.dp).alpha(0.42f),
+                modifier = Modifier.fillMaxSize().blur(48.dp).alpha(0.82f),
             )
         }
         Box(
             modifier = Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
-                    0f to Color.Black.copy(alpha = 0.62f),
-                    0.48f to Color.Black.copy(alpha = 0.40f),
-                    0.80f to Color.Black.copy(alpha = 0.24f),
-                    1f to Color.Black.copy(alpha = 0.52f),
+                    0f to Color.Black.copy(alpha = 0.25f),
+                    0.48f to Color.Black.copy(alpha = 0.18f),
+                    0.80f to Color.Black.copy(alpha = 0.30f),
+                    1f to Color.Black.copy(alpha = 0.45f),
                 ),
             ),
         )
 
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .offset { pixelShiftOffset }
                 .alpha(contentAlpha)
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 28.dp, vertical = 18.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
+            // Size against both axes: square on phones, never clipped on short displays.
+            val landscape = maxWidth > maxHeight
+            val referenceArtworkSize = minOf(maxWidth, maxHeight * if (landscape) 0.52f else 0.46f)
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(if (landscape) 0.48f else 1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Row(
@@ -542,16 +548,16 @@ fun AodPlayerScreen(
                     Text(
                         text = dateText,
                         color = White65,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
                         modifier = Modifier.padding(bottom = 8.dp),
                     )
                 }
                 Text(
                     text = mediaMetadata.title,
-                    color = Color.White,
-                    fontSize = 25.sp,
-                    fontWeight = FontWeight.Medium,
+                    color = White65,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Clip,
                     modifier = Modifier
@@ -570,14 +576,14 @@ fun AodPlayerScreen(
             if (showThumbnail && showFullContent) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .size(thumbnailSize.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .clip(RoundedCornerShape(2.dp)),
+                        .align(if (landscape) Alignment.TopEnd else Alignment.TopCenter)
+                        .offset(y = if (landscape) 8.dp else (maxHeight * 0.53f - referenceArtworkSize / 2))
+                        .size(referenceArtworkSize)
+                        .clip(RoundedCornerShape(1.dp)),
                 ) {
                     AsyncImage(
-                        model = imageRequest,
-                        contentDescription = null,
+                        model = mediaMetadata.thumbnailUrl,
+                        contentDescription = "Artwork for ${mediaMetadata.title}",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize(),
                     )
@@ -615,8 +621,8 @@ fun AodPlayerScreen(
                                 Text(
                                     text = currentLyric,
                                     color = accentColor,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Normal,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     textAlign = TextAlign.Center,
@@ -651,14 +657,28 @@ fun AodPlayerScreen(
                 onToggleLike = { resetInteraction(); onToggleLike() },
                 onToggleShuffle = { resetInteraction(); onToggleShuffle() },
                 onToggleRepeat = { resetInteraction(); onToggleRepeat() },
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 56.dp),
             )
 
             if (showExitButton && !isAmbient) {
-                AodSlideToExitButton(
-                    accentColor = accentColor,
-                    onExit = { resetInteraction(); onExit() },
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                )
+                // Keep the reference's unobtrusive chevrons, with both swipe and accessible tap.
+                val exitThreshold = with(density) { 64.dp.toPx() }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.align(Alignment.BottomCenter).width(120.dp).height(48.dp)
+                        .clickable(onClickLabel = "Exit always-on display", onClick = onExit)
+                        .pointerInput(onExit, exitThreshold) {
+                            var distance = 0f
+                            detectHorizontalDragGestures(
+                                onDragStart = { distance = 0f },
+                                onHorizontalDrag = { change, amount -> change.consume(); distance += amount },
+                                onDragEnd = { if (distance >= exitThreshold) onExit(); distance = 0f },
+                                onDragCancel = { distance = 0f },
+                            )
+                        },
+                ) {
+                    Text("›››", color = White65, fontSize = 32.sp, fontWeight = FontWeight.Light)
+                }
             }
         }
 
@@ -683,65 +703,34 @@ private fun AodReferenceControls(
     onToggleLike: () -> Unit,
     onToggleShuffle: () -> Unit,
     onToggleRepeat: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val outline = Color.White.copy(alpha = 0.78f)
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            AodOutlinedIconButton(
-                icon = R.drawable.skip_previous,
-                tint = if (canSkipPrevious) Color.White else White35,
-                onClick = onSkipPrevious,
-                enabled = canSkipPrevious,
-            )
-            AodOutlinedIconButton(
-                icon = if (isPlaying) R.drawable.pause else R.drawable.play,
-                tint = Color.White,
-                onClick = onPlayPause,
-                emphasized = true,
-            )
-            AodOutlinedIconButton(
-                icon = R.drawable.skip_next,
-                tint = if (canSkipNext) Color.White else White35,
-                onClick = onSkipNext,
-                enabled = canSkipNext,
-            )
-            IconButton(
-                onClick = onToggleLike,
-                modifier = Modifier.size(48.dp),
-            ) {
-                Icon(
-                    painter = painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
-                    contentDescription = null,
-                    tint = if (isLiked) Color(0xFFFF7180) else outline,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            AodUtilityIconButton(
-                icon = if (shuffleEnabled) R.drawable.shuffle_on else R.drawable.shuffle,
-                tint = if (shuffleEnabled) accentColor else outline,
-                onClick = onToggleShuffle,
-            )
-            AodUtilityIconButton(
-                icon = when (repeatMode) {
-                    1 -> R.drawable.repeat_one_on
-                    2 -> R.drawable.repeat_on
-                    else -> R.drawable.repeat
+        IconButton(onClick = onToggleRepeat, modifier = Modifier.size(48.dp)) {
+            Icon(
+                painterResource(if (repeatMode == 1) R.drawable.repeat_one_on else R.drawable.repeat),
+                contentDescription = when (repeatMode) {
+                    1 -> "Repeat one; change repeat mode"
+                    2 -> "Repeat all; change repeat mode"
+                    else -> "Repeat off; change repeat mode"
                 },
-                tint = if (repeatMode == 0) outline.copy(alpha = 0.60f) else accentColor,
-                onClick = onToggleRepeat,
+                tint = if (repeatMode == 0) White70 else accentColor,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+        AodOutlinedIconButton(R.drawable.skip_previous, "Previous track", accentColor, onSkipPrevious, canSkipPrevious)
+        AodOutlinedIconButton(if (isPlaying) R.drawable.pause else R.drawable.play, if (isPlaying) "Pause" else "Play", accentColor, onPlayPause)
+        AodOutlinedIconButton(R.drawable.skip_next, "Next track", accentColor, onSkipNext, canSkipNext)
+        IconButton(onClick = onToggleLike, modifier = Modifier.size(48.dp)) {
+            Icon(
+                painterResource(if (isLiked) R.drawable.favorite else R.drawable.favorite_border),
+                contentDescription = if (isLiked) "Remove from favorites" else "Add to favorites",
+                tint = if (isLiked) accentColor else Color.White,
+                modifier = Modifier.size(28.dp),
             )
         }
     }
@@ -750,40 +739,18 @@ private fun AodReferenceControls(
 @Composable
 private fun AodOutlinedIconButton(
     icon: Int,
+    description: String,
     tint: Color,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    emphasized: Boolean = false,
 ) {
+    val color = tint.copy(alpha = if (enabled) 1f else 0.3f)
     IconButton(
         onClick = onClick,
         enabled = enabled,
-        modifier = Modifier
-            .size(if (emphasized) 57.dp else 46.dp)
-            .border(1.5.dp, tint.copy(alpha = if (enabled) 0.9f else 0.35f), CircleShape),
+        modifier = Modifier.size(48.dp).border(1.5.dp, color, CircleShape),
     ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint = tint,
-            modifier = Modifier.size(if (emphasized) 24.dp else 21.dp),
-        )
-    }
-}
-
-@Composable
-private fun AodUtilityIconButton(
-    icon: Int,
-    tint: Color,
-    onClick: () -> Unit,
-) {
-    IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint = tint,
-            modifier = Modifier.size(24.dp),
-        )
+        Icon(painterResource(icon), description, tint = color, modifier = Modifier.size(23.dp))
     }
 }
 
