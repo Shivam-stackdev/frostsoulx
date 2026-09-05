@@ -55,11 +55,12 @@ fun HomeScreen(
     DisposableEffect(localView) {
         val window = (localView.context as? Activity)?.window
         val controller = window?.let { WindowCompat.getInsetsController(it, it.decorView) }
-        val previousLightIcons = controller?.isAppearanceLightStatusBars
-        controller?.show(WindowInsetsCompat.Type.statusBars())
-        controller?.isAppearanceLightStatusBars = false
+        controller?.let {
+            it.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+            it.hide(WindowInsetsCompat.Type.statusBars())
+        }
         onDispose {
-            previousLightIcons?.let { controller?.isAppearanceLightStatusBars = it }
+            controller?.show(WindowInsetsCompat.Type.statusBars())
         }
     }
     val menuState = LocalMenuState.current

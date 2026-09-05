@@ -17,13 +17,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -266,111 +259,93 @@ fun PremiumHeroBanner(
     positionLabel: String? = null,
     durationLabel: String? = null,
     onPlayPause: (() -> Unit)? = null,
-    isLiked: Boolean = false,
-    shuffleEnabled: Boolean = false,
-    canSkipPrevious: Boolean = false,
-    canSkipNext: Boolean = false,
-    onPrevious: () -> Unit = {},
-    onNext: () -> Unit = {},
-    onShuffle: () -> Unit = {},
-    onLike: () -> Unit = {},
-    onLyrics: (() -> Unit)? = null,
-    onMore: (() -> Unit)? = null,
 ) {
-    val shape = RoundedCornerShape(16.dp)
-    BoxWithConstraints(
-        modifier = modifier.fillMaxWidth().clip(shape)
-            .background(Color(0xFF17191F))
-            .border(1.dp, Brush.linearGradient(listOf(Color(0xFF9B8060), Color(0xFF353743))), shape),
+    PremiumCard(
+        modifier = modifier,
+        shape = FrostSoulTheme.shapes.large,
+        contentPadding = PaddingValues(0.dp),
     ) {
-        val artworkSize = (maxWidth * 0.27f).coerceIn(72.dp, 120.dp)
-        AsyncImage(
-            model = artworkUrl, contentDescription = null, contentScale = ContentScale.Crop,
-            modifier = Modifier.matchParentSize().blur(28.dp).alpha(0.70f),
-        )
-        Box(Modifier.matchParentSize().background(Brush.horizontalGradient(
-            listOf(Color(0xFF694A2C).copy(alpha = 0.50f), Color(0xFF101522).copy(alpha = 0.84f)),
-        )))
-        Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 10.dp, top = 4.dp, bottom = 12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("NOW PLAYING", color = Color.White.copy(alpha = 0.8f), fontSize = 8.sp,
-                    letterSpacing = 1.sp, modifier = Modifier.weight(1f))
-                onLyrics?.let { action ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.heightIn(min = 48.dp).clickable(onClick = action).padding(horizontal = 6.dp),
-                    ) {
-                        Icon(androidx.compose.ui.res.painterResource(R.drawable.music_note), null,
-                            tint = Color.White, modifier = Modifier.size(13.dp))
-                        Text("Lyrics", color = Color.White, fontSize = 10.sp)
+        Box(modifier = Modifier.fillMaxWidth().height(220.dp)) {
+            artworkUrl?.let {
+                AsyncImage(
+                    model = it,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .blur(FrostSoulTheme.effects.backdropBlurRadius)
+                        .alpha(0.36f),
+                )
+            }
+            Box(
+                modifier = Modifier.fillMaxSize().background(
+                    Brush.verticalGradient(
+                        listOf(
+                            FrostSoulTheme.colors.background.copy(alpha = 0.10f),
+                            FrostSoulTheme.colors.background.copy(alpha = 0.90f),
+                        ),
+                    ),
+                ),
+            )
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier.fillMaxSize().padding(20.dp),
+            ) {
+                Text(
+                    text = "NOW PLAYING",
+                    style = FrostSoulTheme.typography.overline,
+                    color = FrostSoulTheme.colors.accentBright,
+                )
+                Spacer(modifier = Modifier.height(FrostSoulTheme.spacing.small))
+                Text(
+                    text = title,
+                    style = FrostSoulTheme.typography.display.copy(fontSize = 23.sp, lineHeight = 28.sp),
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = subtitle,
+                    style = FrostSoulTheme.typography.body,
+                    color = Color.White.copy(alpha = 0.76f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (positionLabel != null && durationLabel != null) {
+                    Spacer(modifier = Modifier.height(FrostSoulTheme.spacing.medium))
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(3.dp)
+                                .clip(FrostSoulTheme.shapes.pill)
+                                .background(Color.White.copy(alpha = 0.28f)),
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(progress.coerceIn(0f, 1f))
+                                    .height(3.dp)
+                                    .background(Color.White, FrostSoulTheme.shapes.pill),
+                            )
+                        }
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(positionLabel, style = FrostSoulTheme.typography.label, color = Color.White.copy(alpha = 0.68f))
+                            Text(durationLabel, style = FrostSoulTheme.typography.label, color = Color.White.copy(alpha = 0.68f))
+                        }
                     }
                 }
-                onMore?.let { action ->
-                    IconButton(onClick = action) {
-                        Icon(androidx.compose.ui.res.painterResource(R.drawable.more_vert), "Song options",
-                            tint = Color.White, modifier = Modifier.size(20.dp))
-                    }
+                onPlayPause?.let { onClick ->
+                    Spacer(modifier = Modifier.height(FrostSoulTheme.spacing.medium))
+                    PremiumIconAvatar(
+                        painter = androidx.compose.ui.res.painterResource(if (isPlaying) R.drawable.pause else R.drawable.play),
+                        contentDescription = if (isPlaying) "Pause" else "Play",
+                        size = 44.dp,
+                        tint = FrostSoulTheme.colors.onSurface,
+                        containerColor = FrostSoulTheme.colors.accentBright,
+                        modifier = Modifier.clickable(onClick = onClick),
+                    )
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(title, style = FrostSoulTheme.typography.display.copy(fontFamily = FontFamily.Serif),
-                        color = Color.White, fontSize = 23.sp, lineHeight = 27.sp,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(subtitle, color = Color.White.copy(alpha = 0.68f), fontSize = 12.sp,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Spacer(Modifier.height(12.dp))
-                    Box(Modifier.fillMaxWidth().height(2.dp).background(Color.White.copy(alpha = 0.30f))) {
-                        Box(Modifier.fillMaxWidth(progress.coerceIn(0f, 1f)).height(2.dp).background(Color(0xFFF7DEAF)))
-                    }
-                    Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(positionLabel.orEmpty(), color = Color.White.copy(alpha = 0.65f), fontSize = 10.sp)
-                        Text(durationLabel.orEmpty(), color = Color.White.copy(alpha = 0.65f), fontSize = 10.sp)
-                    }
-                    Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically) {
-                        // Equal flexible slots keep five accessible actions within narrow cards.
-                        HeroTransport(R.drawable.shuffle, "Toggle shuffle", onShuffle, Modifier.weight(1f),
-                            tint = if (shuffleEnabled) Color(0xFFF7DEAF) else Color.White)
-                        HeroTransport(R.drawable.skip_previous, "Previous track", onPrevious, Modifier.weight(1f), enabled = canSkipPrevious)
-                        HeroTransport(if (isPlaying) R.drawable.pause else R.drawable.play,
-                            if (isPlaying) "Pause" else "Play", { onPlayPause?.invoke() }, Modifier.weight(1f),
-                            enabled = onPlayPause != null, outlined = true)
-                        HeroTransport(R.drawable.skip_next, "Next track", onNext, Modifier.weight(1f), enabled = canSkipNext)
-                        HeroTransport(if (isLiked) R.drawable.favorite else R.drawable.favorite_border,
-                            if (isLiked) "Remove from favorites" else "Add to favorites", onLike, Modifier.weight(1f),
-                            tint = if (isLiked) Color(0xFFFF747C) else Color.White)
-                    }
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(artworkSize)) {
-                    FSAlbumArt(artworkUrl = artworkUrl, contentDescription = "Artwork for $title",
-                        modifier = Modifier.size(artworkSize), shape = RoundedCornerShape(10.dp))
-                    Text("Some songs stay forever.", fontSize = 9.sp, color = Color.White.copy(alpha = 0.5f),
-                        style = FrostSoulTheme.typography.body.copy(fontFamily = FontFamily.Serif),
-                        modifier = Modifier.padding(top = 7.dp))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun HeroTransport(
-    icon: Int,
-    description: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    outlined: Boolean = false,
-    tint: Color = Color.White,
-) {
-    IconButton(onClick = onClick, enabled = enabled, modifier = modifier.height(48.dp)) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.size(36.dp).then(
-            if (outlined) Modifier.background(Color.White.copy(alpha = 0.10f), CircleShape)
-                .border(1.dp, Color.White.copy(alpha = 0.65f), CircleShape) else Modifier,
-        )) {
-            Icon(androidx.compose.ui.res.painterResource(icon), description,
-                tint = tint.copy(alpha = if (enabled) 1f else 0.3f), modifier = Modifier.size(18.dp))
         }
     }
 }
